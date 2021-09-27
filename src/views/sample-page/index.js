@@ -15,13 +15,8 @@ function MCodeView() {
         const row = {};
 
         row.id = dataObject.id;
-        row.date_of_birth = dataObject.subject.date_of_birth;
-        row.date_of_death = dataObject.date_of_death;
         row.sex = dataObject.subject.sex;
-        row.race = dataObject.subject.race;
         row.ethnicity = dataObject.subject.ethnicity;
-        row.administrative_gender = dataObject.subject.administrative_gender;
-        row.communication_language = dataObject.subject.extra_properties.communication_language;
 
         return row;
     }
