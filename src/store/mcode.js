@@ -65,18 +65,46 @@ export const subjectColumns = [
         width: 150
     },
     {
+        field: 'race',
+        headerName: 'Race',
+        width: 150
+    },
+    {
         field: 'sex',
         headerName: 'Sex',
         width: 150
     },
     {
-        field: 'Administrative Gender',
-        headerName: 'administrative_gender',
+        field: 'Language',
+        headerName: 'communication_language',
+        width: 150
+    }
+];
+
+export const cancerConditionsColumns = [
+    {
+        field: 'id',
+        headerName: 'id',
         width: 150
     },
     {
-        field: 'Language',
-        headerName: 'communication_language',
+        field: 'condition_type',
+        headerName: 'Condition Type',
+        width: 150
+    },
+    {
+        field: 'code_id',
+        headerName: 'Code ID',
+        width: 150
+    },
+    {
+        field: 'code_label',
+        headerName: 'Code Label',
+        width: 150
+    },
+    {
+        field: 'date_of_diagnosis',
+        headerName: 'Date of Diagnosis',
         width: 150
     }
 ];
