@@ -98,6 +98,11 @@ export const cancerConditionsColumns = [
         width: 150
     },
     {
+        field: 'code_label',
+        headerName: 'Code Label',
+        width: 150
+    },
+    {
         field: 'date_of_diagnosis',
         headerName: 'Date of Diagnosis',
         width: 150
