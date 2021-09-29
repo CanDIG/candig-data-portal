@@ -90,7 +90,7 @@ export const cancerConditionsColumns = [
     {
         field: 'condition_type',
         headerName: 'Condition Type',
-        width: 150
+        width: 180
     },
     {
         field: 'code_id',
@@ -100,12 +100,12 @@ export const cancerConditionsColumns = [
     {
         field: 'code_label',
         headerName: 'Code Label',
-        width: 150
+        width: 180
     },
     {
         field: 'date_of_diagnosis',
         headerName: 'Date of Diagnosis',
-        width: 150
+        width: 200
     }
 ];
 
@@ -113,12 +113,12 @@ export const cancerRelatedProceduresColumns = [
     {
         field: 'id',
         headerName: 'id',
-        width: 150
+        width: 100
     },
     {
         field: 'procedure_type',
         headerName: 'Procedure Type',
-        width: 150
+        width: 190
     },
     {
         field: 'procedure_code_id',
@@ -128,17 +128,17 @@ export const cancerRelatedProceduresColumns = [
     {
         field: 'procedure_code_label',
         headerName: 'Code Label',
-        width: 150
+        width: 160
     },
     {
         field: 'body_site_id',
         headerName: 'Body Site ID',
-        width: 150
+        width: 160
     },
     {
         field: 'body_site_label',
         headerName: 'Body Site Label',
-        width: 150
+        width: 200
     }
 ];
 
@@ -151,12 +151,12 @@ export const medicationStatementColumns = [
     {
         field: 'medication_code_id',
         headerName: 'Medication Code ID',
-        width: 150
+        width: 250
     },
     {
         field: 'medication_code_label',
         headerName: 'Medication Code Label',
-        width: 150
+        width: 250
     }
 ];
 
