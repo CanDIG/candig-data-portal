@@ -75,8 +75,8 @@ export const subjectColumns = [
         width: 150
     },
     {
-        field: 'Language',
-        headerName: 'communication_language',
+        field: 'communication_language',
+        headerName: 'Language',
         width: 150
     }
 ];
@@ -159,3 +159,104 @@ export const medicationStatementColumns = [
         width: 150
     }
 ];
+
+/**
+ * @param {*} dataObject
+ * @returns an object representing one row for the main table.
+ */
+export const processMCodeMainData = (dataObject) => {
+    const row = {};
+
+    row.id = dataObject.id;
+    row.sex = dataObject.subject.sex;
+    row.ethnicity = dataObject.subject.ethnicity;
+
+    return row;
+};
+
+/**
+ * Process data for the subject subtable.
+ * @param {*} dataObject
+ * @returns a list of one row, valid datagrid row definitions.
+ */
+export const processSubjectData = (dataObject) => {
+    const row = {};
+
+    row.id = dataObject.id;
+    row.sex = dataObject.subject.sex;
+    row.date_of_birth = dataObject.subject.date_of_birth;
+    row.date_of_death = dataObject.date_of_death;
+    row.ethnicity = dataObject.subject.ethnicity;
+    row.race = dataObject.subject.race;
+    row.communication_language = dataObject.subject.extra_properties.communication_language;
+
+    return [row];
+};
+
+/**
+ * Process data for cancer conditions subtable.
+ * @param {*} dataObject
+ * @returns a list of multiple rows, valid datagrid row definitions.
+ */
+export const processConditionsData = (dataObject) => {
+    const rows = [];
+
+    // eslint-disable-next-line camelcase
+    dataObject.cancer_condition.forEach((cancer_condition) => {
+        const row = {};
+        row.id = cancer_condition.id;
+        row.condition_type = cancer_condition.condition_type;
+        row.code_id = cancer_condition.code.id;
+        row.code_label = cancer_condition.code.label;
+        row.date_of_diagnosis = cancer_condition.date_of_diagnosis;
+
+        rows.push(row);
+    });
+
+    return rows;
+};
+
+/**
+ * Process data for cancer related procedures subtable.
+ * @param {*} dataObject
+ * @returns a list of multiple rows, valid datagrid row definitions.
+ */
+export const processProceduresData = (dataObject) => {
+    const rows = [];
+
+    // eslint-disable-next-line camelcase
+    dataObject.cancer_related_procedures.forEach((cancer_related_procedure) => {
+        const row = {};
+        row.id = cancer_related_procedure.id;
+        row.procedure_type = cancer_related_procedure.procedure_type;
+        row.procedure_code_id = cancer_related_procedure.code.id;
+        row.procedure_code_label = cancer_related_procedure.code.label;
+        row.body_site_id = cancer_related_procedure.body_site.id;
+        row.body_site_label = cancer_related_procedure.body_site.label;
+
+        rows.push(row);
+    });
+
+    return rows;
+};
+
+/**
+ * Process data for medication statements subtable.
+ * @param {*} dataObject
+ * @returns a list of multiple rows, valid datagrid row definitions.
+ */
+export const processMedicationStatementData = (dataObject) => {
+    const rows = [];
+
+    // eslint-disable-next-line camelcase
+    dataObject.medication_statement.forEach((medication_statement) => {
+        const row = {};
+        row.id = medication_statement.id;
+        row.medication_code_id = medication_statement.medication_code.id;
+        row.medication_code_label = medication_statement.medication_code.label;
+
+        rows.push(row);
+    });
+
+    return rows;
+};
