@@ -33,7 +33,6 @@ function MCodeView() {
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        console.log(mcodeData);
     };
 
     const handleRowClick = (row) => {
