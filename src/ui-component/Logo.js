@@ -1,7 +1,7 @@
 import React from 'react';
 
 // material-ui
-import logo from '../assets/images/logo-2.png';
+import logo from '../assets/images/logo.svg';
 
 /**
  * if you want to use image instead of <svg> uncomment following.
