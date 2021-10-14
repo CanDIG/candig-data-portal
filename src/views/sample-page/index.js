@@ -110,7 +110,6 @@ function MCodeView() {
     }, [desktopResolution, setdesktopResolution]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
-    console.log(activeTab);
 
     return (
         <MainCard title="mCode Data">
