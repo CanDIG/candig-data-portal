@@ -37,7 +37,6 @@ const useStyles = makeStyles({
         fontWeight: 'bold',
         fontSize: '0.85em',
         color: 'grey',
-
         borderBottom: '3px solid white',
         '&:hover': {
             borderBottom: '3px solid #2196f3',
