@@ -14,8 +14,8 @@ const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
 
-// sample page routing
-const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+// Clinical
+const McodePage = Loadable(lazy(() => import('views/mcode')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 
@@ -25,7 +25,7 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            element: <DashboardDefault />
+            element: <McodePage />
         },
         {
             path: '/dashboard/default',
@@ -53,8 +53,8 @@ const MainRoutes = {
         },
 
         {
-            path: '/sample-page',
-            element: <SamplePage />
+            path: '/mcode',
+            element: <McodePage />
         }
     ]
 };
