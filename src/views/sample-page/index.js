@@ -58,9 +58,9 @@ function MCodeView() {
     const classes = useStyles();
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
-    const [selectedPatient, setSelectedPatient] = React.useState([]);
-    const [selectedPatientEthnicity, setSelectedPatientEthnicity] = React.useState([]);
-    const [selectedPatientSex, setSelectedPatientSex] = React.useState([]);
+    const [selectedPatient, setSelectedPatient] = React.useState('');
+    const [selectedPatientEthnicity, setSelectedPatientEthnicity] = React.useState('');
+    const [selectedPatientSex, setSelectedPatientSex] = React.useState('');
     const [cancerConditions, setCancerConditions] = React.useState([]);
     const [procedures, setProcedures] = React.useState([]);
     const [medicationStatement, setMedicationStatement] = React.useState([]);
