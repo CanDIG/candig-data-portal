@@ -47,17 +47,17 @@ export const subjectColumns = [
     {
         field: 'id',
         headerName: 'ID',
-        width: 150
+        width: 100
     },
     {
-        field: 'date_of_birth',
-        headerName: 'Date of Birth',
-        width: 150
-    },
-    {
-        field: 'date_of_death',
-        headerName: 'Date of Death',
-        width: 150
+        field: 'more_info',
+        headerName: 'Info',
+        width: 100,
+        sortable: false,
+        headerAlign: 'center',
+        align: 'center',
+        renderCell: moreInfoButton,
+        disableClickEventBubbling: true
     },
     {
         field: 'ethnicity',
@@ -67,17 +67,30 @@ export const subjectColumns = [
     {
         field: 'race',
         headerName: 'Race',
-        width: 150
+        width: 130
     },
     {
         field: 'sex',
         headerName: 'Sex',
-        width: 150
+        width: 130
+    },
+    {
+        field: 'date_of_birth',
+        headerName: 'Date of Birth',
+        width: 170,
+        hide: true
+    },
+    {
+        field: 'date_of_death',
+        headerName: 'Date of Death',
+        width: 170,
+        hide: true
     },
     {
         field: 'communication_language',
         headerName: 'Language',
-        width: 150
+        width: 150,
+        hide: true
     }
 ];
 
@@ -170,6 +183,11 @@ export const processMCodeMainData = (dataObject) => {
     row.id = dataObject.id;
     row.sex = dataObject.subject.sex;
     row.ethnicity = dataObject.subject.ethnicity;
+    row.date_of_birth = dataObject.subject.date_of_birth;
+    row.date_of_death = dataObject.date_of_death;
+    row.ethnicity = dataObject.subject.ethnicity;
+    row.race = dataObject.subject.race;
+    row.communication_language = dataObject.subject.extra_properties.communication_language;
 
     return row;
 };
@@ -181,7 +199,6 @@ export const processMCodeMainData = (dataObject) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-
     row.id = dataObject.id;
     row.sex = dataObject.subject.sex;
     row.date_of_birth = dataObject.subject.date_of_birth;
