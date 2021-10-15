@@ -4,6 +4,10 @@ import * as React from 'react';
 import { useTheme, makeStyles } from '@material-ui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Grid, Box } from '@material-ui/core';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -11,7 +15,7 @@ import { katsu } from 'store/api';
 import {
     cancerConditionsColumns,
     cancerRelatedProceduresColumns,
-    mainColumns,
+    subjectColumns,
     medicationStatementColumns,
     processConditionsData,
     processMedicationStatementData,
@@ -50,6 +54,23 @@ const useStyles = makeStyles({
         border: 'none',
         borderBottom: '3px solid #2196f3',
         color: '#2196f3'
+    },
+    mobileRow: {
+        width: '700px'
+    },
+    scrollbar: {
+        scrollbarWidth: 'thin',
+        '&::-webkit-scrollbar': {
+            height: '0.4em',
+            width: '0.4em'
+        },
+        '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.1)'
+        }
     }
 });
 
@@ -61,6 +82,9 @@ function MCodeView() {
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientEthnicity, setSelectedPatientEthnicity] = React.useState('');
     const [selectedPatientSex, setSelectedPatientSex] = React.useState('');
+    const [selectedPatientBirthDate, setSelectedPatientBirthDate] = React.useState('');
+    const [selectedPatientDeathDate, setSelectedPatientDeathDate] = React.useState('');
+    const [selectedPatientLanguage, setSelectedPatientLanguage] = React.useState('');
     const [cancerConditions, setCancerConditions] = React.useState([]);
     const [procedures, setProcedures] = React.useState([]);
     const [medicationStatement, setMedicationStatement] = React.useState([]);
@@ -70,9 +94,13 @@ function MCodeView() {
 
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
+        console.log(mcodeData.results[index]);
         setSelectedPatient(mcodeData.results[index].id);
         setSelectedPatientEthnicity(mcodeData.results[index].subject.ethnicity);
         setSelectedPatientSex(mcodeData.results[index].subject.sex);
+        setSelectedPatientLanguage(mcodeData.results[index].subject.extra_properties.communication_language);
+        setSelectedPatientBirthDate(mcodeData.results[index].subject.date_of_birth);
+        setSelectedPatientDeathDate(mcodeData.results[index].date_of_death);
         setCancerConditions(processConditionsData(mcodeData.results[index]));
         setProcedures(processProceduresData(mcodeData.results[index]));
         setMedicationStatement(processMedicationStatementData(mcodeData.results[index]));
@@ -92,14 +120,18 @@ function MCodeView() {
             .then((response) => response.json())
             .then((data) => {
                 setMcodeData(data);
-                setSelectedPatient(data.results[0].id);
-                setSelectedPatientEthnicity(data.results[0].subject.ethnicity);
-                setSelectedPatientSex(data.results[0].subject.sex);
+
                 const tempRows = [];
                 for (let i = 0; i < data.results.length; i += 1) {
                     tempRows.push(processMCodeMainData(data.results[i]));
                 }
                 setRows(tempRows);
+                setSelectedPatient(tempRows[0].id);
+                setSelectedPatientEthnicity(tempRows[0].ethnicity);
+                setSelectedPatientSex(tempRows[0].sex);
+                setSelectedPatientBirthDate(tempRows[0].date_of_birth);
+                setSelectedPatientDeathDate(tempRows[0].date_of_death);
+                setSelectedPatientLanguage(tempRows[0].communication_language);
                 setCancerConditions(processConditionsData(data.results[0]));
                 setProcedures(processProceduresData(data.results[0]));
                 setMedicationStatement(processMedicationStatementData(data.results[0]));
@@ -109,7 +141,9 @@ function MCodeView() {
     }, [desktopResolution, setdesktopResolution]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
-
+    console.log(selectedPatientBirthDate);
+    console.log(selectedPatientDeathDate);
+    console.log(selectedPatientLanguage);
     return (
         <MainCard title="mCode Data">
             <Grid container direction="row">
@@ -122,74 +156,104 @@ function MCodeView() {
                         <span>{selectedPatient}</span>
                     </Box>
                 )}
-                <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-                    {!desktopResolution && (
-                        <Grid container direction="row">
-                            <Grid>
-                                <Box
-                                    mr={1}
-                                    p={1}
-                                    sx={{ border: 1, borderRadius: 2 }}
-                                    onClick={() => setListOpen(!isListOpen)}
-                                    type="button"
-                                >
-                                    <span style={{ color: theme.palette.primary.main }}>
-                                        <b>Patient Id</b>
-                                    </span>
-                                    <br />
-                                    <span>
-                                        {selectedPatient}
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="icon icon-tabler icon-tabler-chevron-down"
-                                            width="15"
-                                            height="15"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="3"
-                                            stroke="#597e8d"
-                                            fill="none"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
+                {!desktopResolution && (
+                    <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
+                        <Table>
+                            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
+                                <Grid sx={{ width: '110px' }}>
+                                    <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Patient Id</b>
+                                        </span>
+                                        <br />
+                                        <span>
+                                            {selectedPatient}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="icon icon-tabler icon-tabler-chevron-down"
+                                                width="15"
+                                                height="15"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="3"
+                                                stroke="#597e8d"
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <polyline points="6 9 12 15 18 9" />
+                                            </svg>
+                                        </span>
+                                    </Box>
+                                    {isListOpen && (
+                                        <Grid
+                                            container
+                                            direction="column"
+                                            className="dropdown-menu"
+                                            aria-labelledby="actions"
+                                            sx={{
+                                                position: 'absolute',
+                                                zIndex: 1,
+                                                border: '1px grey solid',
+                                                borderRadius: 2,
+                                                width: 'max-content'
+                                            }}
                                         >
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <polyline points="6 9 12 15 18 9" />
-                                        </svg>
-                                    </span>
-                                </Box>
-                                {isListOpen && (
-                                    <Grid
-                                        container
-                                        direction="column"
-                                        className="dropdown-menu"
-                                        aria-labelledby="actions"
-                                        sx={{
-                                            position: 'absolute',
-                                            zIndex: 1,
-                                            border: '1px grey solid',
-                                            borderRadius: 2,
-                                            width: 'max-content'
-                                        }}
-                                    >
-                                        {returnIds(rows)}
-                                    </Grid>
+                                            {returnIds(rows)}
+                                        </Grid>
+                                    )}
+                                </Grid>
+                                {selectedPatientEthnicity && (
+                                    <Box mr={1} p={1} sx={{ width: '70px' }}>
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Ethnicity</b>
+                                        </span>
+                                        <br />
+                                        <span>{selectedPatientEthnicity}</span>
+                                    </Box>
                                 )}
-                            </Grid>
-                            <Box mr={1} p={1} sx={{ border: 1, borderRadius: 2 }}>
-                                <span style={{ color: theme.palette.primary.main }}>
-                                    <b>Ethnicity</b>
-                                </span>
-                                <br />
-                                <span>{selectedPatientEthnicity}</span>
-                            </Box>
-                            <Box mr={1} p={1} sx={{ border: 1, borderRadius: 2 }}>
-                                <span style={{ color: theme.palette.primary.main }}>
-                                    <b>Sex</b>
-                                </span>
-                                <br />
-                                <span>{selectedPatientSex}</span>
-                            </Box>
-                        </Grid>
-                    )}
+                                {selectedPatientSex && (
+                                    <Box mr={1} p={1} sx={{ width: '70px' }}>
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Sex</b>
+                                        </span>
+                                        <br />
+                                        <span>{selectedPatientSex}</span>
+                                    </Box>
+                                )}
+                                {selectedPatientBirthDate && (
+                                    <Box mr={1} p={1} sx={{ width: '100px' }}>
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Date of Birth</b>
+                                        </span>
+                                        <br />
+                                        <span>{selectedPatientBirthDate}</span>
+                                    </Box>
+                                )}
+                                {selectedPatientDeathDate && (
+                                    <Box mr={1} p={1} sx={{ width: '105px' }}>
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Date of Death</b>
+                                        </span>
+                                        <br />
+                                        <span>{selectedPatientDeathDate}</span>
+                                    </Box>
+                                )}
+                                {selectedPatientLanguage && (
+                                    <Box mr={1} p={1} sx={{ width: '100px' }}>
+                                        <span style={{ color: theme.palette.primary.main }}>
+                                            <b>Language</b>
+                                        </span>
+                                        <br />
+                                        <span>{selectedPatientLanguage}</span>
+                                    </Box>
+                                )}
+                            </Stack>
+                        </Table>
+                    </TableContainer>
+                )}
+
+                <Grid container direction="row" justifyContent="flex-end" alignItems="center">
                     <Box mb={3}>
                         <Grid container direction="row">
                             <Box
@@ -233,11 +297,12 @@ function MCodeView() {
                         <Grid item mr={2} sx={{ height: 600, width: '40%' }}>
                             <DataGrid
                                 rows={rows}
-                                columns={mainColumns}
+                                columns={subjectColumns}
                                 pageSize={8}
                                 rowsPerPageOptions={[8]}
                                 components={{ Toolbar: GridToolbar }}
                                 onRowClick={(rowData) => handleRowClick(rowData.row)}
+                                className={classes.scrollbar}
                             />
                         </Grid>
                     )}
@@ -251,6 +316,7 @@ function MCodeView() {
                                     rowsPerPageOptions={[8]}
                                     components={{ Toolbar: GridToolbar }}
                                     disableSelectionOnClick
+                                    className={classes.scrollbar}
                                 />
                             </Grid>
                         )}
@@ -263,6 +329,7 @@ function MCodeView() {
                                     rowsPerPageOptions={[8]}
                                     components={{ Toolbar: GridToolbar }}
                                     disableSelectionOnClick
+                                    className={classes.scrollbar}
                                 />
                             </Grid>
                         )}
@@ -275,6 +342,7 @@ function MCodeView() {
                                     rowsPerPageOptions={[8]}
                                     components={{ Toolbar: GridToolbar }}
                                     disableSelectionOnClick
+                                    className={classes.scrollbar}
                                 />
                             </Grid>
                         )}
