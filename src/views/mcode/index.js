@@ -94,7 +94,6 @@ function MCodeView() {
 
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
-        console.log(mcodeData.results[index]);
         setSelectedPatient(mcodeData.results[index].id);
         setSelectedPatientEthnicity(mcodeData.results[index].subject.ethnicity);
         setSelectedPatientSex(mcodeData.results[index].subject.sex);
@@ -141,9 +140,7 @@ function MCodeView() {
     }, [desktopResolution, setdesktopResolution]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
-    console.log(selectedPatientBirthDate);
-    console.log(selectedPatientDeathDate);
-    console.log(selectedPatientLanguage);
+
     return (
         <MainCard title="mCode Data">
             <Grid container direction="row">
