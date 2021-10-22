@@ -16,43 +16,6 @@ const useStyles = makeStyles({
             background: '#2196f3',
             color: 'white'
         }
-    },
-    tabs: {
-        background: 'white',
-        border: 'none',
-        fontWeight: 'bold',
-        fontSize: '0.85em',
-        color: 'grey',
-        borderBottom: '3px solid white',
-        '&:hover': {
-            borderBottom: '3px solid #2196f3',
-            color: '#2196f3'
-        }
-    },
-    active: {
-        background: 'white',
-        fontWeight: 'bold',
-        fontSize: '0.85em',
-        border: 'none',
-        borderBottom: '3px solid #2196f3',
-        color: '#2196f3'
-    },
-    mobileRow: {
-        width: '700px'
-    },
-    scrollbar: {
-        scrollbarWidth: 'thin',
-        '&::-webkit-scrollbar': {
-            height: '0.4em',
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)'
-        }
     }
 });
 
