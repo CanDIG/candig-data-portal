@@ -4,10 +4,6 @@ import * as React from 'react';
 import { useTheme, makeStyles } from '@material-ui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Grid, Box } from '@material-ui/core';
-import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -22,39 +18,10 @@ import {
     processProceduresData,
     processMCodeMainData
 } from 'store/mcode';
+import SingleRowTable from 'ui-component/SingleRowTable';
+import Tabs from 'ui-component/Tabs';
 
 const useStyles = makeStyles({
-    dropdownItem: {
-        background: 'white',
-        paddingRight: '1.25em',
-        paddingLeft: '1.25em',
-        border: 'none',
-        width: 'fit-content(5em)',
-        '&:hover': {
-            background: '#2196f3',
-            color: 'white'
-        }
-    },
-    tabs: {
-        background: 'white',
-        border: 'none',
-        fontWeight: 'bold',
-        fontSize: '0.85em',
-        color: 'grey',
-        borderBottom: '3px solid white',
-        '&:hover': {
-            borderBottom: '3px solid #2196f3',
-            color: '#2196f3'
-        }
-    },
-    active: {
-        background: 'white',
-        fontWeight: 'bold',
-        fontSize: '0.85em',
-        border: 'none',
-        borderBottom: '3px solid #2196f3',
-        color: '#2196f3'
-    },
     mobileRow: {
         width: '700px'
     },
@@ -77,6 +44,7 @@ const useStyles = makeStyles({
 function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
+
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
     const [selectedPatient, setSelectedPatient] = React.useState('');
@@ -90,7 +58,7 @@ function MCodeView() {
     const [medicationStatement, setMedicationStatement] = React.useState([]);
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const [isListOpen, setListOpen] = React.useState(false);
-    const [activeTab, setActiveTab] = React.useState('0');
+    const [activeTab, setActiveTab] = React.useState('CONDITIONS');
 
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
@@ -105,14 +73,6 @@ function MCodeView() {
         setMedicationStatement(processMedicationStatementData(mcodeData.results[index]));
         setListOpen(false);
     };
-
-    function returnIds(rows) {
-        return rows.map((row) => (
-            <button className={classes.dropdownItem} type="button" onClick={() => handleRowClick(row)} key={row.id}>
-                {row.id}
-            </button>
-        ));
-    }
 
     React.useEffect(() => {
         fetch(`${katsu}/api/mcodepackets`)
@@ -140,6 +100,14 @@ function MCodeView() {
     }, [desktopResolution, setdesktopResolution]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
+    const headerLabels = ['Ethnicity', 'Sex', 'Date of Birth', 'Date of Death', 'Language'];
+    const stackCells = [
+        selectedPatientEthnicity,
+        selectedPatientSex,
+        selectedPatientBirthDate,
+        selectedPatientDeathDate,
+        selectedPatientLanguage
+    ];
 
     return (
         <MainCard title="mCode Data">
@@ -154,140 +122,20 @@ function MCodeView() {
                     </Box>
                 )}
                 {!desktopResolution && (
-                    <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
-                        <Table>
-                            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
-                                <Grid sx={{ width: '110px' }}>
-                                    <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Patient Id</b>
-                                        </span>
-                                        <br />
-                                        <span>
-                                            {selectedPatient}
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="icon icon-tabler icon-tabler-chevron-down"
-                                                width="15"
-                                                height="15"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth="3"
-                                                stroke="#597e8d"
-                                                fill="none"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            >
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <polyline points="6 9 12 15 18 9" />
-                                            </svg>
-                                        </span>
-                                    </Box>
-                                    {isListOpen && (
-                                        <Grid
-                                            container
-                                            direction="column"
-                                            className="dropdown-menu"
-                                            aria-labelledby="actions"
-                                            sx={{
-                                                position: 'absolute',
-                                                zIndex: 1,
-                                                border: '1px grey solid',
-                                                borderRadius: 2,
-                                                width: 'max-content'
-                                            }}
-                                        >
-                                            {returnIds(rows)}
-                                        </Grid>
-                                    )}
-                                </Grid>
-                                {selectedPatientEthnicity && (
-                                    <Box mr={1} p={1} sx={{ width: '70px' }}>
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Ethnicity</b>
-                                        </span>
-                                        <br />
-                                        <span>{selectedPatientEthnicity}</span>
-                                    </Box>
-                                )}
-                                {selectedPatientSex && (
-                                    <Box mr={1} p={1} sx={{ width: '70px' }}>
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Sex</b>
-                                        </span>
-                                        <br />
-                                        <span>{selectedPatientSex}</span>
-                                    </Box>
-                                )}
-                                {selectedPatientBirthDate && (
-                                    <Box mr={1} p={1} sx={{ width: '100px' }}>
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Date of Birth</b>
-                                        </span>
-                                        <br />
-                                        <span>{selectedPatientBirthDate}</span>
-                                    </Box>
-                                )}
-                                {selectedPatientDeathDate && (
-                                    <Box mr={1} p={1} sx={{ width: '105px' }}>
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Date of Death</b>
-                                        </span>
-                                        <br />
-                                        <span>{selectedPatientDeathDate}</span>
-                                    </Box>
-                                )}
-                                {selectedPatientLanguage && (
-                                    <Box mr={1} p={1} sx={{ width: '100px' }}>
-                                        <span style={{ color: theme.palette.primary.main }}>
-                                            <b>Language</b>
-                                        </span>
-                                        <br />
-                                        <span>{selectedPatientLanguage}</span>
-                                    </Box>
-                                )}
-                            </Stack>
-                        </Table>
-                    </TableContainer>
+                    <SingleRowTable
+                        dropDownLabel="Patient Id"
+                        dropDownSelection={selectedPatient}
+                        headerLabels={headerLabels}
+                        stackCells={stackCells}
+                        handleRowClick={handleRowClick}
+                        isListOpen={isListOpen}
+                        setListOpen={setListOpen}
+                        rows={rows}
+                    />
                 )}
 
                 <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-                    <Box mb={3}>
-                        <Grid container direction="row">
-                            <Box
-                                component="button"
-                                pl={1}
-                                pr={1}
-                                pt={2}
-                                pb={2}
-                                className={activeTab === '0' ? classes.active : classes.tabs}
-                                onClick={() => setActiveTab('0')}
-                            >
-                                CONDITIONS
-                            </Box>
-                            <Box
-                                component="button"
-                                pl={1}
-                                pr={1}
-                                pt={2}
-                                pb={2}
-                                className={activeTab === '1' ? classes.active : classes.tabs}
-                                onClick={() => setActiveTab('1')}
-                            >
-                                PROCEDURES
-                            </Box>
-                            <Box
-                                component="button"
-                                pl={1}
-                                pr={1}
-                                pt={2}
-                                pb={2}
-                                className={activeTab === '2' ? classes.active : classes.tabs}
-                                onClick={() => setActiveTab('2')}
-                            >
-                                MEDICATIONS
-                            </Box>
-                        </Grid>
-                    </Box>
+                    <Tabs tabHeaders={['CONDITIONS', 'PROCEDURES', 'MEDICATIONS']} setActiveTab={setActiveTab} activeTab={activeTab} />
                 </Grid>
                 <Grid container justifyContent="center" alignItems="center">
                     {desktopResolution && (
@@ -304,7 +152,7 @@ function MCodeView() {
                         </Grid>
                     )}
                     <Grid item sx={{ width: screenWidth }}>
-                        {activeTab === '0' && (
+                        {activeTab === 'CONDITIONS' && (
                             <Grid item sx={{ height: 600, width: '100%' }}>
                                 <DataGrid
                                     rows={cancerConditions}
@@ -317,7 +165,7 @@ function MCodeView() {
                                 />
                             </Grid>
                         )}
-                        {activeTab === '1' && (
+                        {activeTab === 'PROCEDURES' && (
                             <Grid item sx={{ height: 600, width: '100%' }}>
                                 <DataGrid
                                     rows={procedures}
@@ -330,7 +178,7 @@ function MCodeView() {
                                 />
                             </Grid>
                         )}
-                        {activeTab === '2' && (
+                        {activeTab === 'MEDICATIONS' && (
                             <Grid item sx={{ height: 600, width: '100%' }}>
                                 <DataGrid
                                     rows={medicationStatement}
