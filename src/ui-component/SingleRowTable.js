@@ -60,9 +60,9 @@ function SingleRowTable({ dropDownLabel, dropDownSelection, headerLabels, stackC
                         selectOption={handleRowClick}
                     />
                     {headerLabels.map((header, index) => (
-                        <Box>
+                        <Box key={header}>
                             {stackCells[index] && (
-                                <Box mr={1} p={1}>
+                                <Box mr={1} p={1} sx={{ minWidth: '105px' }}>
                                     <span style={{ color: theme.palette.primary.main }}>
                                         <b>{header}</b>
                                     </span>
