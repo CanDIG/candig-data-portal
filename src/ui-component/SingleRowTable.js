@@ -43,7 +43,17 @@ const useStyles = makeStyles({
     }
 });
 
-function SingleRowTable({ dropDownLabel, dropDownSelection, headerLabels, stackCells, handleRowClick, setListOpen, isListOpen, rows }) {
+function SingleRowTable({
+    dropDownLabel,
+    dropDownSelection,
+    headerLabels,
+    headerWidths,
+    stackCells,
+    handleRowClick,
+    setListOpen,
+    isListOpen,
+    rows
+}) {
     const theme = useTheme();
     const classes = useStyles();
 
@@ -62,7 +72,7 @@ function SingleRowTable({ dropDownLabel, dropDownSelection, headerLabels, stackC
                     {headerLabels.map((header, index) => (
                         <Box key={header}>
                             {stackCells[index] && (
-                                <Box mr={1} p={1} sx={{ minWidth: '105px' }}>
+                                <Box mr={1} p={1} sx={{ width: headerWidths[index] }}>
                                     <span style={{ color: theme.palette.primary.main }}>
                                         <b>{header}</b>
                                     </span>
@@ -82,6 +92,7 @@ SingleRowTable.propTypes = {
     dropDownLabel: PropTypes.string,
     dropDownSelection: PropTypes.string,
     headerLabels: PropTypes.array,
+    headerWidths: PropTypes.array,
     stackCells: PropTypes.array,
     handleRowClick: PropTypes.func,
     setListOpen: PropTypes.func,

@@ -20,6 +20,14 @@ const clinical = {
             url: '/mcode',
             icon: icons.IconReportMedical,
             breadcrumbs: false
+        },
+        {
+            id: 'phenopackets',
+            title: 'phenopackets',
+            type: 'item',
+            url: '/phenopackets',
+            icon: icons.IconReportMedical,
+            breadcrumbs: false
         }
     ]
 };
