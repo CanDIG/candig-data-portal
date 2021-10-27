@@ -15,7 +15,8 @@ const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialI
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
 
 // Clinical
-const McodePage = Loadable(lazy(() => import('views/mcode')));
+const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
+const PhenopacketsPage = Loadable(lazy(() => import('views/clinical/phenopackets')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 
@@ -51,10 +52,13 @@ const MainRoutes = {
             path: '/icons/material-icons',
             element: <UtilsMaterialIcons />
         },
-
         {
             path: '/mcode',
             element: <McodePage />
+        },
+        {
+            path: '/phenopackets',
+            element: <PhenopacketsPage />
         }
     ]
 };

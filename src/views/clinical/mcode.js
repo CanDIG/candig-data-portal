@@ -101,6 +101,7 @@ function MCodeView() {
 
     const screenWidth = desktopResolution ? '58%' : '100%';
     const headerLabels = ['Ethnicity', 'Sex', 'Date of Birth', 'Date of Death', 'Language'];
+    const headerWidths = ['85px', '85px', '100px', '110px', '110px'];
     const stackCells = [
         selectedPatientEthnicity,
         selectedPatientSex,
@@ -126,6 +127,7 @@ function MCodeView() {
                         dropDownLabel="Patient Id"
                         dropDownSelection={selectedPatient}
                         headerLabels={headerLabels}
+                        headerWidths={headerWidths}
                         stackCells={stackCells}
                         handleRowClick={handleRowClick}
                         isListOpen={isListOpen}

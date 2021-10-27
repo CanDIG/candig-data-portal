@@ -32,7 +32,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
     }
 
     return (
-        <Grid sx={{ width: '110px' }}>
+        <Grid sx={{ width: '120px' }}>
             <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
                 <span style={{ color: theme.palette.primary.main }}>
                     <b>{dropDownLabel}</b>
