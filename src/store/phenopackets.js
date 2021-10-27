@@ -171,7 +171,7 @@ export const diseasesColumns = [
     {
         field: 'id',
         headerName: 'id',
-        width: 85
+        width: 100
     },
     {
         field: 'label',
