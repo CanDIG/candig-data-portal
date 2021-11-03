@@ -237,6 +237,7 @@ function Phenopackets() {
                                 components={{ Toolbar: GridToolbar }}
                                 onRowClick={(rowData) => handleRowClick(rowData.row)}
                                 className={classes.scrollbar}
+                                disableSelectionOnClick
                             />
                         </Grid>
                     )}
