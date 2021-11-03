@@ -1,14 +1,10 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 
-function moreInfoButton(params) {
+function MoreInfoButton() {
     return (
         <strong>
-            <Button
-                onClick={() => {
-                    console.log(params.row.id);
-                }}
-            >
+            <Button className="moreInfoButton" variant="text">
                 More Info
             </Button>
         </strong>
@@ -38,7 +34,7 @@ export const mainColumns = [
         sortable: false,
         headerAlign: 'center',
         align: 'center',
-        renderCell: moreInfoButton,
+        renderCell: MoreInfoButton,
         disableClickEventBubbling: true
     }
 ];
@@ -56,7 +52,7 @@ export const subjectColumns = [
         sortable: false,
         headerAlign: 'center',
         align: 'center',
-        renderCell: moreInfoButton,
+        renderCell: MoreInfoButton,
         disableClickEventBubbling: true
     },
     {
