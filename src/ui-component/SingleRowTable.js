@@ -69,15 +69,15 @@ function SingleRowTable({
                         rows={rows}
                         selectOption={handleRowClick}
                     />
-                    {headerLabels.map((header, index) => (
-                        <Box key={header}>
-                            {stackCells[index] && (
-                                <Box mr={1} p={1} sx={{ width: headerWidths[index] }}>
+                    {Object.entries(stackCells).map(([key, value]) => (
+                        <Box key={key}>
+                            {value && (
+                                <Box mr={1} p={1} sx={{ width: headerWidths[key] }}>
                                     <span style={{ color: theme.palette.primary.main }}>
-                                        <b>{header}</b>
+                                        <b>{headerLabels[key]}</b>
                                     </span>
                                     <br />
-                                    <span>{stackCells[index]}</span>
+                                    <span>{value}</span>
                                 </Box>
                             )}
                         </Box>
@@ -91,9 +91,9 @@ function SingleRowTable({
 SingleRowTable.propTypes = {
     dropDownLabel: PropTypes.string,
     dropDownSelection: PropTypes.string,
-    headerLabels: PropTypes.array,
-    headerWidths: PropTypes.array,
-    stackCells: PropTypes.array,
+    headerLabels: PropTypes.object,
+    headerWidths: PropTypes.object,
+    stackCells: PropTypes.object,
     handleRowClick: PropTypes.func,
     setListOpen: PropTypes.func,
     isListOpen: PropTypes.bool,

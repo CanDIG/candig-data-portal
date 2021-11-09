@@ -7,7 +7,7 @@ import { Grid, Box } from '@material-ui/core';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { katsu } from 'store/api';
+import { fetchKatsu } from 'store/api';
 import {
     cancerConditionsColumns,
     cancerRelatedProceduresColumns,
@@ -20,6 +20,7 @@ import {
 } from 'store/mcode';
 import SingleRowTable from 'ui-component/SingleRowTable';
 import Tabs from 'ui-component/Tabs';
+import { trackPromise } from 'react-promise-tracker';
 
 const useStyles = makeStyles({
     mobileRow: {
@@ -48,11 +49,8 @@ function MCodeView() {
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
     const [selectedPatient, setSelectedPatient] = React.useState('');
-    const [selectedPatientEthnicity, setSelectedPatientEthnicity] = React.useState('');
-    const [selectedPatientSex, setSelectedPatientSex] = React.useState('');
-    const [selectedPatientBirthDate, setSelectedPatientBirthDate] = React.useState('');
-    const [selectedPatientDeathDate, setSelectedPatientDeathDate] = React.useState('');
-    const [selectedPatientLanguage, setSelectedPatientLanguage] = React.useState('');
+    const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
+
     const [cancerConditions, setCancerConditions] = React.useState([]);
     const [procedures, setProcedures] = React.useState([]);
     const [medicationStatement, setMedicationStatement] = React.useState([]);
@@ -63,11 +61,14 @@ function MCodeView() {
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
         setSelectedPatient(mcodeData.results[index].id);
-        setSelectedPatientEthnicity(mcodeData.results[index].subject.ethnicity);
-        setSelectedPatientSex(mcodeData.results[index].subject.sex);
-        setSelectedPatientLanguage(mcodeData.results[index].subject.extra_properties.communication_language);
-        setSelectedPatientBirthDate(mcodeData.results[index].subject.date_of_birth);
-        setSelectedPatientDeathDate(mcodeData.results[index].date_of_death);
+        setSelectedPatientMobileInfo({
+            Ethnicity: mcodeData.results[index].subject.ethnicity,
+            Sex: mcodeData.results[index].subject.sex,
+            Birthday: mcodeData.results[index].subject.date_of_birth,
+            DeathDate: mcodeData.results[index].date_of_death,
+            Language: mcodeData.results[index].subject.extra_properties.communication_language
+        });
+
         setCancerConditions(processConditionsData(mcodeData.results[index]));
         setProcedures(processProceduresData(mcodeData.results[index]));
         setMedicationStatement(processMedicationStatementData(mcodeData.results[index]));
@@ -75,9 +76,8 @@ function MCodeView() {
     };
 
     React.useEffect(() => {
-        fetch(`${katsu}/api/mcodepackets`)
-            .then((response) => response.json())
-            .then((data) => {
+        trackPromise(
+            fetchKatsu('/api/mcodepackets').then((data) => {
                 setMcodeData(data);
 
                 const tempRows = [];
@@ -86,29 +86,38 @@ function MCodeView() {
                 }
                 setRows(tempRows);
                 setSelectedPatient(tempRows[0].id);
-                setSelectedPatientEthnicity(tempRows[0].ethnicity);
-                setSelectedPatientSex(tempRows[0].sex);
-                setSelectedPatientBirthDate(tempRows[0].date_of_birth);
-                setSelectedPatientDeathDate(tempRows[0].date_of_death);
-                setSelectedPatientLanguage(tempRows[0].communication_language);
+                setSelectedPatientMobileInfo({
+                    Ethnicity: tempRows[0].ethnicity,
+                    Sex: tempRows[0].sex,
+                    Birthday: tempRows[0].date_of_birth,
+                    DeathDate: tempRows[0].date_of_death,
+                    Language: tempRows[0].communication_language
+                });
+
                 setCancerConditions(processConditionsData(data.results[0]));
                 setProcedures(processProceduresData(data.results[0]));
                 setMedicationStatement(processMedicationStatementData(data.results[0]));
-            });
+            })
+        );
 
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
     }, [desktopResolution, setdesktopResolution]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
-    const headerLabels = ['Ethnicity', 'Sex', 'Date of Birth', 'Date of Death', 'Language'];
-    const headerWidths = ['85px', '85px', '100px', '110px', '110px'];
-    const stackCells = [
-        selectedPatientEthnicity,
-        selectedPatientSex,
-        selectedPatientBirthDate,
-        selectedPatientDeathDate,
-        selectedPatientLanguage
-    ];
+    const headerLabels = {
+        Ethnicity: 'Ethnicity',
+        Sex: 'Sex',
+        Birthday: 'Date of Birth',
+        DeathDate: 'Date of Death',
+        Language: 'Language'
+    };
+    const headerWidths = {
+        Ethnicity: '85px',
+        Sex: '85px',
+        Birthday: '100px',
+        DeathDate: '110px',
+        Language: '110px'
+    };
 
     return (
         <MainCard title="mCode Data">
@@ -128,7 +137,7 @@ function MCodeView() {
                         dropDownSelection={selectedPatient}
                         headerLabels={headerLabels}
                         headerWidths={headerWidths}
-                        stackCells={stackCells}
+                        stackCells={selectedPatientMobileInfo}
                         handleRowClick={handleRowClick}
                         isListOpen={isListOpen}
                         setListOpen={setListOpen}
