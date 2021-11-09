@@ -19,7 +19,6 @@ const other = {
             id: 'Dashboard',
             title: 'Dashboard',
             type: 'item',
-            url: '/dashboard/default',
             icon: icons.IconDashboard,
             target: true
         },
