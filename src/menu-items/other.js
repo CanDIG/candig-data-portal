@@ -1,11 +1,12 @@
 // assets
-import { IconBrandChrome, IconHelp, IconSitemap } from '@tabler/icons';
+import { IconBrandChrome, IconHelp, IconSitemap, IconDashboard } from '@tabler/icons';
 
 // constant
 const icons = {
     IconBrandChrome,
     IconHelp,
-    IconSitemap
+    IconSitemap,
+    IconDashboard
 };
 
 // ===========================|| SAMPLE PAGE & DOCUMENTATION MENU ITEMS ||=========================== //
@@ -15,12 +16,11 @@ const other = {
     type: 'group',
     children: [
         {
-            id: 'sample-page',
-            title: 'Sample Page',
+            id: 'Dashboard',
+            title: 'Dashboard',
             type: 'item',
-            url: '/sample-page',
-            icon: icons.IconBrandChrome,
-            breadcrumbs: false
+            icon: icons.IconDashboard,
+            target: true
         },
         {
             id: 'documentation',
