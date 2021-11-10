@@ -1,7 +1,6 @@
 // API Server constant
-export const katsu = '';
-
-export const federation = '';
+export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
+export const federation = process.env.REACT_APP_FEDERATION_API_SERVER;
 
 // API Calls
 export function fetchKatsu(URL) {
