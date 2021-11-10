@@ -1,6 +1,6 @@
 {
     "name": "candig-data-portal",
-    "version": "v0.1",
+    "version": "0.1.0",
     "private": true,
     "dependencies": {
         "@emotion/cache": "^11.4.0",
