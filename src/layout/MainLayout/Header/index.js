@@ -64,7 +64,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             <div className={classes.grow} />
 
             {/* notification & profile */}
-            <NotificationSection />
+            {/* <NotificationSection /> */}
             <ProfileSection />
         </>
     );

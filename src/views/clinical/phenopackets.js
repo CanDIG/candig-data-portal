@@ -91,8 +91,6 @@ function Phenopackets() {
         setResources(processResourcesData(phenopacketsData.results[index]));
 
         setListOpen(false);
-
-        console.log(phenopacketsData.results[index]);
     };
 
     React.useEffect(() => {
