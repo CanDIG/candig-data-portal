@@ -16,13 +16,33 @@ import {
     processConditionsData,
     processMedicationStatementData,
     processProceduresData,
-    processMCodeMainData
+    processMCodeMainData,
+    processMedicationListData,
+    processCondtionsListData,
+    processProceduresListData
 } from 'store/mcode';
 import SingleRowTable from 'ui-component/SingleRowTable';
 import Tabs from 'ui-component/Tabs';
 import { trackPromise } from 'react-promise-tracker';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import DropDown from '../../ui-component/DropDown';
 
+// Styles
 const useStyles = makeStyles({
+    dropdownItem: {
+        background: 'white',
+        paddingRight: '1.25em',
+        paddingLeft: '1.25em',
+        border: 'none',
+        width: 'fit-content(5em)',
+        '&:hover': {
+            background: '#2196f3',
+            color: 'white'
+        }
+    },
     mobileRow: {
         width: '700px'
     },
@@ -51,13 +71,32 @@ function MCodeView() {
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
 
+    // Sub tables
     const [cancerConditions, setCancerConditions] = React.useState([]);
     const [procedures, setProcedures] = React.useState([]);
     const [medicationStatement, setMedicationStatement] = React.useState([]);
+
+    // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const [isListOpen, setListOpen] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState('CONDITIONS');
 
+    // Dropdown patient table open/closed
+    const [isListOpenMedications, setListOpenMedications] = React.useState(false);
+    const [isListOpenConditions, setListOpenConditions] = React.useState(false);
+    const [isListOpenProcedures, setListOpenProcedures] = React.useState(false);
+
+    // Dropdown patient table filtering current selection in dropdown
+    const [selectedMedications, setSelectedMedications] = React.useState('All');
+    const [selectedConditions, setSelectedConditions] = React.useState('All');
+    const [selectedProcedures, setSelectedProcedures] = React.useState('All');
+
+    // Dropdown patient table list for filtering
+    const [medicationList, setMedicationList] = React.useState([]);
+    const [conditionList, setConditionList] = React.useState([]);
+    const [procedureList, setProcedureList] = React.useState([]);
+
+    // Subtable selection of patient
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
         setSelectedPatient(mcodeData.results[index].id);
@@ -69,10 +108,24 @@ function MCodeView() {
             Language: mcodeData.results[index].subject.extra_properties.communication_language
         });
 
+        // Subtables
         setCancerConditions(processConditionsData(mcodeData.results[index]));
         setProcedures(processProceduresData(mcodeData.results[index]));
         setMedicationStatement(processMedicationStatementData(mcodeData.results[index]));
         setListOpen(false);
+    };
+
+    const dropDownSelection = (dropDownGroup, selected) => {
+        if (dropDownGroup === 'CONDITIONS') {
+            setSelectedConditions(selected);
+            setListOpenConditions(false);
+        } else if (dropDownGroup === 'PROCEDURES') {
+            setSelectedProcedures(selected);
+            setListOpenProcedures(false);
+        } else if (dropDownGroup === 'MEDICATIONS') {
+            setSelectedMedications(selected);
+            setListOpenMedications(false);
+        }
     };
 
     React.useEffect(() => {
@@ -82,7 +135,41 @@ function MCodeView() {
 
                 const tempRows = [];
                 for (let i = 0; i < data.results.length; i += 1) {
-                    tempRows.push(processMCodeMainData(data.results[i]));
+                    // Patient table filtering
+                    if (selectedConditions === 'All' && selectedProcedures === 'All' && selectedMedications === 'All') {
+                        // All patients
+                        tempRows.push(processMCodeMainData(data.results[i]));
+                    } else {
+                        // Filtered patients
+                        let patientCondition = false;
+                        data.results[i].cancer_condition.every((condition) => {
+                            if (selectedConditions === 'All' || selectedConditions === condition.code.label) {
+                                patientCondition = true;
+                                return false;
+                            }
+                            return true;
+                        });
+                        let patientProcedure = false;
+                        data.results[i].cancer_related_procedures.every((procedure) => {
+                            if (selectedProcedures === 'All' || selectedProcedures === procedure.procedure_type) {
+                                patientProcedure = true;
+                                return false;
+                            }
+                            return true;
+                        });
+                        let patientMedication = false;
+                        data.results[i].medication_statement.every((medication) => {
+                            if (selectedMedications === 'All' || selectedMedications === medication.medication_code.label) {
+                                patientMedication = true;
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        if (patientCondition && patientProcedure && patientMedication) {
+                            tempRows.push(processMCodeMainData(data.results[i]));
+                        }
+                    }
                 }
                 setRows(tempRows);
                 setSelectedPatient(tempRows[0].id);
@@ -94,14 +181,21 @@ function MCodeView() {
                     Language: tempRows[0].communication_language
                 });
 
-                setCancerConditions(processConditionsData(data.results[0]));
-                setProcedures(processProceduresData(data.results[0]));
-                setMedicationStatement(processMedicationStatementData(data.results[0]));
+                // Subtables
+                const index = data.results.findIndex((item) => item.id === tempRows[0].id);
+                setCancerConditions(processConditionsData(data.results[index]));
+                setProcedures(processProceduresData(data.results[index]));
+                setMedicationStatement(processMedicationStatementData(data.results[index]));
+
+                // Dropdown patient table list for filtering
+                setMedicationList(processMedicationListData(data.results));
+                setConditionList(processCondtionsListData(data.results));
+                setProcedureList(processProceduresListData(data.results));
             })
         );
 
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
-    }, [desktopResolution, setdesktopResolution]);
+    }, [desktopResolution, setdesktopResolution, selectedConditions, selectedProcedures, selectedMedications]);
 
     const screenWidth = desktopResolution ? '58%' : '100%';
     const headerLabels = {
@@ -123,13 +217,46 @@ function MCodeView() {
         <MainCard title="mCode Data">
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
-                    <Box mr={2} ml={1} p={1} pr={10} sx={{ position: 'absolute', border: 1, borderRadius: 2 }}>
-                        <span style={{ color: theme.palette.primary.main }}>
-                            <b>Patient Id</b>
-                        </span>
-                        <br />
-                        <span>{selectedPatient}</span>
-                    </Box>
+                    <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
+                        <Table>
+                            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
+                                <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>
+                                    <span style={{ color: theme.palette.primary.main }}>
+                                        <b>Patient Id</b>
+                                    </span>
+                                    <br />
+                                    <span>{selectedPatient}</span>
+                                </Box>
+                                <DropDown
+                                    setListOpen={setListOpenMedications}
+                                    isListOpen={isListOpenMedications}
+                                    dropDownLabel="Medications"
+                                    currentSelection={selectedMedications}
+                                    rows={medicationList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="MEDICATIONS"
+                                />
+                                <DropDown
+                                    setListOpen={setListOpenConditions}
+                                    isListOpen={isListOpenConditions}
+                                    dropDownLabel="Conditions"
+                                    currentSelection={selectedConditions}
+                                    rows={conditionList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="CONDITIONS"
+                                />
+                                <DropDown
+                                    setListOpen={setListOpenProcedures}
+                                    isListOpen={isListOpenProcedures}
+                                    dropDownLabel="Procedures"
+                                    currentSelection={selectedProcedures}
+                                    rows={procedureList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="PROCEDURES"
+                                />
+                            </Stack>
+                        </Table>
+                    </TableContainer>
                 )}
                 {!desktopResolution && (
                     <SingleRowTable

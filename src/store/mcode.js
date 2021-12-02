@@ -273,3 +273,60 @@ export const processMedicationStatementData = (dataObject) => {
 
     return rows;
 };
+
+/**
+ * Process data for medication list
+ * @param {*} dataObject
+ * @returns a list of medications valid for dropdown
+ */
+export const processMedicationListData = (dataObject) => {
+    const list = {};
+    dataObject.forEach((patient) => {
+        patient.medication_statement.forEach((medication) => {
+            const key = medication.medication_code.id;
+            if (!(key in list)) {
+                list[key] = medication.medication_code.label;
+            }
+        });
+    });
+    list.ALL = 'All';
+    return list;
+};
+
+/**
+ * Process data for condition list
+ * @param {*} dataObject
+ * @returns a list of conditions valid for dropdown
+ */
+export const processCondtionsListData = (dataObject) => {
+    const list = {};
+    dataObject.forEach((patient) => {
+        patient.cancer_condition.forEach((condition) => {
+            const key = condition.code.id;
+            if (!(key in list)) {
+                list[key] = condition.code.label;
+            }
+        });
+    });
+    list.ALL = 'All';
+    return list;
+};
+
+/**
+ * Process data for Procedures list
+ * @param {*} dataObject
+ * @returns a list of Procedures valid for dropdown
+ */
+export const processProceduresListData = (dataObject) => {
+    const list = {};
+    dataObject.forEach((patient) => {
+        patient.cancer_related_procedures.forEach((procedure) => {
+            const key = procedure.code.id;
+            if (!(key in list)) {
+                list[key] = procedure.procedure_type;
+            }
+        });
+    });
+    list.ALL = 'All';
+    return list;
+};

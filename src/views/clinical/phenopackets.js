@@ -183,7 +183,7 @@ function Phenopackets() {
         <MainCard title="Phenopackets Data">
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
-                    <Box mr={2} ml={1} p={1} pr={10} sx={{ position: 'absolute', border: 1, borderRadius: 2 }}>
+                    <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>
                         <span style={{ color: theme.palette.primary.main }}>
                             <b>Patient Id</b>
                         </span>

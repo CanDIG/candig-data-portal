@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     }
 });
 
-function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, rows }) {
+function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, rows, dropDownGroup }) {
     const theme = useTheme();
     const classes = useStyles();
 
@@ -31,8 +31,20 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
         ));
     }
 
+    function returnListItem(rows) {
+        const content = [];
+        Object.entries(rows).forEach(([key, value]) => {
+            content.push(
+                <button className={classes.dropdownItem} type="button" onClick={() => selectOption(dropDownGroup, rows[key])} key={key}>
+                    {value}
+                </button>
+            );
+        });
+        return content;
+    }
+
     return (
-        <Grid sx={{ width: '120px' }}>
+        <Grid sx={{ width: '125px' }}>
             <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
                 <span style={{ color: theme.palette.primary.main }}>
                     <b>{dropDownLabel}</b>
@@ -71,7 +83,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
                         width: 'max-content'
                     }}
                 >
-                    {returnIds(rows)}
+                    {typeof rows === 'object' ? returnListItem(rows) : returnIds(rows)}
                 </Grid>
             )}
         </Grid>
@@ -84,7 +96,8 @@ DropDown.propTypes = {
     rows: PropTypes.array,
     dropDownLabel: PropTypes.string,
     currentSelection: PropTypes.string,
-    selectOption: PropTypes.func
+    selectOption: PropTypes.func,
+    dropDownGroup: PropTypes.string
 };
 
 export default DropDown;
