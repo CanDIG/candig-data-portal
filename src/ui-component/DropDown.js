@@ -93,7 +93,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
 DropDown.propTypes = {
     setListOpen: PropTypes.func,
     isListOpen: PropTypes.bool,
-    rows: PropTypes.array,
+    rows: PropTypes.any,
     dropDownLabel: PropTypes.string,
     currentSelection: PropTypes.string,
     selectOption: PropTypes.func,
