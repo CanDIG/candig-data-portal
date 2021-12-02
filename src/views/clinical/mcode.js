@@ -228,15 +228,6 @@ function MCodeView() {
                                     <span>{selectedPatient}</span>
                                 </Box>
                                 <DropDown
-                                    setListOpen={setListOpenMedications}
-                                    isListOpen={isListOpenMedications}
-                                    dropDownLabel="Medications"
-                                    currentSelection={selectedMedications}
-                                    rows={medicationList}
-                                    selectOption={dropDownSelection}
-                                    dropDownGroup="MEDICATIONS"
-                                />
-                                <DropDown
                                     setListOpen={setListOpenConditions}
                                     isListOpen={isListOpenConditions}
                                     dropDownLabel="Conditions"
@@ -253,6 +244,15 @@ function MCodeView() {
                                     rows={procedureList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="PROCEDURES"
+                                />
+                                <DropDown
+                                    setListOpen={setListOpenMedications}
+                                    isListOpen={isListOpenMedications}
+                                    dropDownLabel="Medications"
+                                    currentSelection={selectedMedications}
+                                    rows={medicationList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="MEDICATIONS"
                                 />
                             </Stack>
                         </Table>
