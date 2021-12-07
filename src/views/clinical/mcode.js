@@ -269,6 +269,7 @@ function MCodeView() {
                         isListOpen={isListOpen}
                         setListOpen={setListOpen}
                         rows={rows}
+                        dropDownGroup="PATIENT"
                     />
                 )}
 

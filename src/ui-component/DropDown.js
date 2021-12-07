@@ -22,6 +22,19 @@ const useStyles = makeStyles({
 function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, rows, dropDownGroup }) {
     const theme = useTheme();
     const classes = useStyles();
+    const ref = React.useRef(null);
+
+    React.useEffect(() => {
+        const closeDropDowns = (e) => {
+            if (isListOpen && !ref.current.contains(e.target) && ref.current) {
+                setListOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', closeDropDowns);
+        return () => {
+            document.removeEventListener('mousedown', closeDropDowns);
+        };
+    }, [isListOpen, setListOpen]);
 
     function returnIds(rows) {
         return rows.map((row) => (
@@ -44,7 +57,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
     }
 
     return (
-        <Grid sx={{ width: '125px' }}>
+        <Grid sx={{ width: '125px' }} ref={ref}>
             <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
                 <span style={{ color: theme.palette.primary.main }}>
                     <b>{dropDownLabel}</b>
@@ -83,7 +96,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
                         width: 'max-content'
                     }}
                 >
-                    {typeof rows === 'object' ? returnListItem(rows) : returnIds(rows)}
+                    {dropDownGroup === 'PATIENT' ? returnIds(rows) : returnListItem(rows)}
                 </Grid>
             )}
         </Grid>
@@ -93,7 +106,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
 DropDown.propTypes = {
     setListOpen: PropTypes.func,
     isListOpen: PropTypes.bool,
-    rows: PropTypes.any,
+    rows: PropTypes.object,
     dropDownLabel: PropTypes.string,
     currentSelection: PropTypes.string,
     selectOption: PropTypes.func,
