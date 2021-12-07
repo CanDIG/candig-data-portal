@@ -8,8 +8,6 @@ COPY . /app/candig-data-portal
 
 WORKDIR /app/candig-data-portal
 
-# Export REACT_APP_KATSU_API_SERVER as Katsu API
-
-RUN npm install && npm run build
+RUN npm install
 
 ENTRYPOINT ["npm", "start"]
