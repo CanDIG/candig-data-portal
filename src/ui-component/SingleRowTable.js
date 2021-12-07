@@ -67,7 +67,7 @@ function SingleRowTable({
                         isListOpen={isListOpen}
                         dropDownLabel={dropDownLabel}
                         currentSelection={dropDownSelection}
-                        rows={rows}
+                        dropDownItems={rows}
                         selectOption={handleRowClick}
                         dropDownGroup={dropDownGroup}
                     />

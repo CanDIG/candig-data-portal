@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     }
 });
 
-function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, rows, dropDownGroup }) {
+function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, dropDownItems, dropDownGroup }) {
     const theme = useTheme();
     const classes = useStyles();
     const ref = React.useRef(null);
@@ -44,11 +44,16 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
         ));
     }
 
-    function returnListItem(rows) {
+    function returnListItem(dropDownItems) {
         const content = [];
-        Object.entries(rows).forEach(([key, value]) => {
+        Object.entries(dropDownItems).forEach(([key, value]) => {
             content.push(
-                <button className={classes.dropdownItem} type="button" onClick={() => selectOption(dropDownGroup, rows[key])} key={key}>
+                <button
+                    className={classes.dropdownItem}
+                    type="button"
+                    onClick={() => selectOption(dropDownGroup, dropDownItems[key])}
+                    key={key}
+                >
                     {value}
                 </button>
             );
@@ -96,7 +101,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
                         width: 'max-content'
                     }}
                 >
-                    {dropDownGroup === 'PATIENT' ? returnIds(rows) : returnListItem(rows)}
+                    {dropDownGroup === 'PATIENT' ? returnIds(dropDownItems) : returnListItem(dropDownItems)}
                 </Grid>
             )}
         </Grid>
@@ -106,7 +111,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
 DropDown.propTypes = {
     setListOpen: PropTypes.func,
     isListOpen: PropTypes.bool,
-    rows: PropTypes.object,
+    dropDownItems: PropTypes.any,
     dropDownLabel: PropTypes.string,
     currentSelection: PropTypes.string,
     selectOption: PropTypes.func,

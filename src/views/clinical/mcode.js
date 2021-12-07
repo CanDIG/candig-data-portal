@@ -232,7 +232,7 @@ function MCodeView() {
                                     isListOpen={isListOpenConditions}
                                     dropDownLabel="Conditions"
                                     currentSelection={selectedConditions}
-                                    rows={conditionList}
+                                    dropDownItems={conditionList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="CONDITIONS"
                                 />
@@ -241,7 +241,7 @@ function MCodeView() {
                                     isListOpen={isListOpenProcedures}
                                     dropDownLabel="Procedures"
                                     currentSelection={selectedProcedures}
-                                    rows={procedureList}
+                                    dropDownItems={procedureList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="PROCEDURES"
                                 />
@@ -250,7 +250,7 @@ function MCodeView() {
                                     isListOpen={isListOpenMedications}
                                     dropDownLabel="Medications"
                                     currentSelection={selectedMedications}
-                                    rows={medicationList}
+                                    dropDownItems={medicationList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="MEDICATIONS"
                                 />
