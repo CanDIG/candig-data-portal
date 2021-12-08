@@ -52,7 +52,8 @@ function SingleRowTable({
     handleRowClick,
     setListOpen,
     isListOpen,
-    rows
+    rows,
+    dropDownGroup
 }) {
     const theme = useTheme();
     const classes = useStyles();
@@ -66,8 +67,9 @@ function SingleRowTable({
                         isListOpen={isListOpen}
                         dropDownLabel={dropDownLabel}
                         currentSelection={dropDownSelection}
-                        rows={rows}
+                        dropDownItems={rows}
                         selectOption={handleRowClick}
+                        dropDownGroup={dropDownGroup}
                     />
                     {Object.entries(stackCells).map(([key, value]) => (
                         <Box key={key}>
@@ -97,7 +99,8 @@ SingleRowTable.propTypes = {
     handleRowClick: PropTypes.func,
     setListOpen: PropTypes.func,
     isListOpen: PropTypes.bool,
-    rows: PropTypes.any
+    rows: PropTypes.any,
+    dropDownGroup: PropTypes.string
 };
 
 export default SingleRowTable;
