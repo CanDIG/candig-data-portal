@@ -23,6 +23,8 @@
         "clsx": "^1.1.1",
         "formik": "^2.2.6",
         "framer-motion": "^4.1.13",
+        "highcharts": "^10.0.0",
+        "highcharts-react-official": "^3.1.0",
         "history": "^5.0.0",
         "material-ui-popup-state": "^1.8.0",
         "prop-types": "^15.7.2",

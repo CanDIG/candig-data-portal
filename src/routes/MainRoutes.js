@@ -14,6 +14,9 @@ import Loadable from 'ui-component/Loadable';
 // const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 // const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
 
+// Overview routing
+const IndividualsOverview = Loadable(lazy(() => import('views/overview/individuals')));
+
 // Clinical
 const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
 const PhenopacketsPage = Loadable(lazy(() => import('views/clinical/phenopackets')));
@@ -27,6 +30,10 @@ const MainRoutes = {
         {
             path: '/',
             element: <McodePage />
+        },
+        {
+            path: '/individuals-overview',
+            element: <IndividualsOverview />
         },
         // {
         //     path: '/dashboard/default',

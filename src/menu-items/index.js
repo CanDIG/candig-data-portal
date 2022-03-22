@@ -1,4 +1,5 @@
 import clinical from './clinical';
+import overview from './overview';
 // import pages from './pages';
 // import utilities from './utilities';
 // import other from './other';
@@ -6,7 +7,7 @@ import clinical from './clinical';
 // ===========================|| MENU ITEMS ||=========================== //
 
 const menuItems = {
-    items: [clinical /* pages, utilities, other */]
+    items: [overview, clinical /* pages, utilities, other */]
 };
 
 export default menuItems;
