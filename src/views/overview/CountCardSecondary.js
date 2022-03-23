@@ -192,7 +192,9 @@ const CountCardSecondary = ({ isLoading, title, count }) => {
 };
 
 CountCardSecondary.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    title: PropTypes.string,
+    count: PropTypes.number
 };
 
 export default CountCardSecondary;

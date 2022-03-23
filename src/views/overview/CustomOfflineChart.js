@@ -29,7 +29,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
             enabled: false
         },
         colors: ['#2196f3', '#90caf9', '#37ca50', '#aaffb8', '#ffc107'],
-        chart: { type: chartType, height },
+        chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
         title: {
             text: `Distribution of ${splitString(barTitle)}`
         },

@@ -106,7 +106,9 @@ const SmallCountCardDark = ({ isLoading, title, count }) => {
 };
 
 SmallCountCardDark.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    title: PropTypes.string,
+    count: PropTypes.number
 };
 
 export default SmallCountCardDark;

@@ -97,7 +97,9 @@ const SmallCountLightDark = ({ isLoading, title, count }) => {
 };
 
 SmallCountLightDark.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    title: PropTypes.string,
+    count: PropTypes.number
 };
 
 export default SmallCountLightDark;
