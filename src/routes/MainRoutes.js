@@ -17,6 +17,7 @@ import Loadable from 'ui-component/Loadable';
 // Clinical
 const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
 const PhenopacketsPage = Loadable(lazy(() => import('views/clinical/phenopackets')));
+const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/variantsSearch')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 
@@ -59,7 +60,23 @@ const MainRoutes = {
         {
             path: '/phenopackets',
             element: <PhenopacketsPage />
+        },
+        {
+            path: '/variantssearch',
+            element: <VariantsSearchPage />
         }
+        // {
+        //     path: '/dashboard',
+        //     element: <DashboardDefault />
+        // },
+        // {
+        //     path: '/MaterialIcons',
+        //     element: <UtilsMaterialIcons />
+        // },
+        // {
+        //     path: '/TablerIcons',
+        //     element: <UtilsTablerIcons />
+        // }
     ]
 };
 
