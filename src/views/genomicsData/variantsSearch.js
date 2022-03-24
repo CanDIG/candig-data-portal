@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Button, FormControl, InputLabel, Input } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, Input } from '@mui/material';
 import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
@@ -177,14 +177,19 @@ function VariantsSearch() {
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="baseline" spacing={2} p={2}>
                             <Grid item>
-                                {true && (
+                                {options.length > 0 && (
                                     <FormControl>
-                                        <MultiSelect // Width set in CSS
-                                            options={options}
-                                            value={selected}
-                                            onChange={setSelected}
-                                            labelledBy="Variant Set"
-                                        />
+                                        <Grid container direction="row">
+                                            <Box mr={2}>
+                                                <p>Variant Set</p>
+                                            </Box>
+                                            <MultiSelect // Width set in CSS
+                                                options={options}
+                                                value={selected}
+                                                onChange={setSelected}
+                                                labelledBy="Variant Set"
+                                            />
+                                        </Grid>
                                     </FormControl>
                                 )}
                             </Grid>
