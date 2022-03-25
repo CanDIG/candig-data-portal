@@ -1,9 +1,11 @@
 // assets
-import { IconFileSearch } from '@tabler/icons';
+import { IconFileSearch, IconBrowser, IconFolder } from '@tabler/icons';
 
 // constant
 const icons = {
-    IconFileSearch
+    IconFileSearch,
+    IconBrowser,
+    IconFolder
 };
 
 // ===========================|| Genomics Data MENU ITEMS ||=========================== //
@@ -18,7 +20,7 @@ const genomicsData = {
             title: 'file directory',
             type: 'item',
             url: '/file-directory',
-            icon: icons.IconFileSearch,
+            icon: icons.IconFolder,
             breadcrumbs: false
         },
         {
@@ -30,6 +32,14 @@ const genomicsData = {
             breadcrumbs: false
         },
         {
+            id: 'vcf browser',
+            title: 'vcf browser',
+            type: 'item',
+            url: '/vcf-browser',
+            icon: icons.IconBrowser,
+            breadcrumbs: false
+        },
+        {
             id: 'reads search',
             title: 'reads search',
             type: 'item',
@@ -38,19 +48,11 @@ const genomicsData = {
             breadcrumbs: false
         },
         {
-            id: 'vcf browser',
-            title: 'vcf browser',
-            type: 'item',
-            url: '/vcf-browser',
-            icon: icons.IconFileSearch,
-            breadcrumbs: false
-        },
-        {
             id: 'bam browser',
             title: 'bam browser',
             type: 'item',
             url: '/bam-browser',
-            icon: icons.IconFileSearch,
+            icon: icons.IconBrowser,
             breadcrumbs: false
         }
     ]
