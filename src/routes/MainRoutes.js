@@ -24,7 +24,11 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            element: <McodePage />
+            element: <IndividualsOverview />
+        },
+        {
+            path: '/individuals-overview',
+            element: <IndividualsOverview />
         },
         {
             path: '/mcode',
