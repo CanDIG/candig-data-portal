@@ -142,7 +142,7 @@ function FileDirectory() {
 
     return (
         <>
-            <MainCard title="Variants Search" sx={{ minHeight: 830, position: 'relative' }}>
+            <MainCard title="File Directory" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
                 <Grid container direction="column" className="content">
                     {/* <NotificationAlert ref={notifyEl} /> */}
