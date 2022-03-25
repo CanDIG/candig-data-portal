@@ -17,55 +17,6 @@ import { trackPromise } from 'react-promise-tracker';
 import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
-// Styles
-// const useStyles = makeStyles({
-//     dropdownItem: {
-//         background: 'white',
-//         paddingRight: '1.25em',
-//         paddingLeft: '1.25em',
-//         border: 'none',
-//         width: 'fit-content(5em)',
-//         '&:hover': {
-//             background: '#2196f3',
-//             color: 'white'
-//         }
-//     },
-//     mobileRow: {
-//         width: '700px'
-//     },
-//     scrollbar: {
-//         scrollbarWidth: 'thin',
-//         '&::-webkit-scrollbar': {
-//             height: '0.4em',
-//             width: '0.4em'
-//         },
-//         '&::-webkit-scrollbar-track': {
-//             boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-//             webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-//         },
-//         '&::-webkit-scrollbar-thumb': {
-//             backgroundColor: 'rgba(0,0,0,.1)'
-//         }
-//     }
-// });
-
-/*
- * Return a specific extra property grouped by gender
- * @param {data}... Object
- * @param {property}... Property to be grouped by
- */
-// function groupExtraPropertieByGender(data, property) {
-//     const extraPropertieList = {};
-//     for (let i = 0; i < data.length; i += 1) {
-//         const key = data[i].sex.charAt(0).toUpperCase() + data[i].sex.slice(1).toLowerCase().replace('_', ' ');
-//         if (!extraPropertieList[key]) {
-//             extraPropertieList[key] = [];
-//         }
-//         extraPropertieList[key].push(parseFloat(schemaFxn(() => data[i].extra_properties[property])));
-//     }
-//     return extraPropertieList;
-// }
-
 /*
  * Return the aggregation of diseases
  * @param {data}... Object
@@ -101,24 +52,6 @@ function countPhenotypeDatatype(data, type) {
     }
     return count;
 }
-
-/*
- * Return the aggregation of a especific property under extra_property
- * @param {data}... Object
- * @param {property}... Property to be grouped by
- */
-// function getCounterUnderExtraProperties(data, property) {
-//     const education = {};
-//     for (let i = 0; i < data.length; i += 1) {
-//         const key = schemaFxn(() => data[i].extra_properties[property]);
-//         if (!education[key]) {
-//             education[key] = 0;
-//         }
-//         education[key] += 1;
-//     }
-
-//     return education;
-// }
 
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
