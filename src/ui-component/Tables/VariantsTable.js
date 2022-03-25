@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AgGridReact } from 'ag-grid-react';
-import { BASE_URL } from '../../store/constant';
+import { BASE_URL } from 'store/constant';
 // import { notify, NotificationAlert } from '../../../utils/alert.js';
 import VariantsTableButton from './VariantsTableButton';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import '../../assets/css/VariantsSearch.css';
+import 'assets/css/VariantsSearch.css';
 
 function VariantsTable({ rowData, datasetId }) {
     // const notifyEl = useRef(null);

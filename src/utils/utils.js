@@ -25,4 +25,3 @@ export function mergeFederatedResults(data) {
     }
     return output;
 }
-
