@@ -174,7 +174,7 @@ function FileDirectory() {
                     </Grid>
 
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
-                        <Grid container direction="row" justifyContent="center" alignItems="baseline" spacing={2} p={2}>
+                        <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="fileType">File Type</InputLabel>

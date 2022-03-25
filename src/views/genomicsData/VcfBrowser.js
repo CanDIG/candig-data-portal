@@ -139,11 +139,11 @@ function VcfBrowser() {
                     </Grid>
                 </Grid>
                 <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
-                    <Grid container direction="row" justifyContent="center" alignItems="baseline" spacing={2} p={2}>
+                    <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                         <Grid item>
                             {options.length > 0 && (
                                 <FormControl>
-                                    <Grid container direction="row">
+                                    <Grid container direction="row" alignItems="center">
                                         <Box mr={2}>
                                             <p>VCF</p>
                                         </Box>

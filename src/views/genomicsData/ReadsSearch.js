@@ -174,7 +174,7 @@ function ReadsSearch() {
 
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <form inline onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
-                            <Grid container direction="row" justifyContent="center" alignItems="baseline" spacing={2} p={2}>
+                            <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                                 <Grid item sx={{ minWidth: 150 }}>
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel id="bam-label">BAM</InputLabel>
