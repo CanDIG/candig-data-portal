@@ -1,5 +1,7 @@
 import clinical from './clinical';
 import genomicsData from './genomicsData';
+import overview from './overview';
+
 // import pages from './pages';
 // import utilities from './utilities';
 // import other from './other';
@@ -7,7 +9,7 @@ import genomicsData from './genomicsData';
 // ===========================|| MENU ITEMS ||=========================== //
 
 const menuItems = {
-    items: [clinical, genomicsData /* pages, utilities, other */]
+    items: [overview, clinical, genomicsData /* pages, utilities, other */]
 };
 
 export default menuItems;
