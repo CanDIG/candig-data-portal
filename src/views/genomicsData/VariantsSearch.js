@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl, InputLabel, Input } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, Input, NativeSelect, FormHelperText } from '@mui/material';
 import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 
-import VariantsTable from './VariantsTable';
-import { searchVariant, searchVariantSets, searchVariantByVariantSetIds, getReferenceSet } from '../../store/api';
-import { ListOfReferenceNames } from '../../store/constant';
-import LightCard from '../dashboard/Default/LightCard';
-import DatasetIdSelect from '../dashboard/Default/datasetIdSelect';
+import VariantsTable from 'ui-component/Tables/VariantsTable';
+import { searchVariant, searchVariantSets, searchVariantByVariantSetIds, getReferenceSet } from 'store/api';
+import { ListOfLongReferenceNames } from 'store/constant';
+import LightCard from 'views/dashboard/Default/LightCard';
+import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 
 // import { notify, NotificationAlert } from '../../utils/alert';
-import { LoadingIndicator, usePromiseTracker, trackPromise } from '../../ui-component/LoadingIndicator/LoadingIndicator';
-import { SearchIndicator } from '../../ui-component/LoadingIndicator/SearchIndicator';
+import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import { Map, Description } from '@material-ui/icons';
-import '../../assets/css/VariantsSearch.css';
+import 'assets/css/VariantsSearch.css';
 
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
@@ -55,7 +55,7 @@ function VariantsSearch() {
     function chrSelectBuilder() {
         const refNameList = [];
 
-        ListOfReferenceNames.forEach((refName) => {
+        ListOfLongReferenceNames.forEach((refName) => {
             refNameList.push(
                 <option key={refName} value={refName}>
                     {refName}
@@ -175,11 +175,11 @@ function VariantsSearch() {
                     </Grid>
 
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
-                        <Grid container direction="row" justifyContent="center" alignItems="baseline" spacing={2} p={2}>
+                        <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
                                 {options.length > 0 && (
                                     <FormControl>
-                                        <Grid container direction="row">
+                                        <Grid container direction="row" alignItems="center">
                                             <Box mr={2}>
                                                 <p>Variant Set</p>
                                             </Box>
@@ -193,12 +193,12 @@ function VariantsSearch() {
                                     </FormControl>
                                 )}
                             </Grid>
-                            <Grid item>
-                                <FormControl>
-                                    <InputLabel for="chromosome">Chromosome</InputLabel>
-                                    <Input required type="select" id="chromosome">
+                            <Grid item sx={{ minWidth: 150 }}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="chr-label">Chromosome</InputLabel>
+                                    <NativeSelect labelId="chr-label" required id="chromosome">
                                         {chrSelectBuilder()}
-                                    </Input>
+                                    </NativeSelect>
                                 </FormControl>
                             </Grid>
                             <Grid item>
@@ -214,9 +214,11 @@ function VariantsSearch() {
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <Button type="submit" variant="contained">
-                                    Search
-                                </Button>
+                                <FormControl>
+                                    <Button type="submit" variant="contained">
+                                        Search
+                                    </Button>
+                                </FormControl>
                             </Grid>
                         </Grid>
                     </form>

@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@candig/igv": "^2.10.5-c.1",
         "@emotion/cache": "^11.4.0",
         "@emotion/react": "^11.4.1",
         "@emotion/styled": "^11.3.0",
@@ -25,6 +26,8 @@
         "clsx": "^1.1.1",
         "formik": "^2.2.6",
         "framer-motion": "^4.1.13",
+        "highcharts": "^10.0.0",
+        "highcharts-react-official": "^3.1.0",
         "history": "^5.0.0",
         "material-ui-popup-state": "^1.8.0",
         "prop-types": "^15.7.2",
