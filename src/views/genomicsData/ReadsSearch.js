@@ -179,6 +179,9 @@ function ReadsSearch() {
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel id="bam-label">BAM</InputLabel>
                                         <NativeSelect labelId="bam-label" required id="bam">
+                                            <option selected disabled hidden>
+                                                Choose one
+                                            </option>
                                             {bamOptionList}
                                         </NativeSelect>
                                     </FormControl>
@@ -204,9 +207,11 @@ function ReadsSearch() {
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <Button type="submit" variant="contained">
-                                        Search
-                                    </Button>
+                                    <FormControl>
+                                        <Button type="submit" variant="contained">
+                                            Search
+                                        </Button>
+                                    </FormControl>
                                 </Grid>
                             </Grid>
                         </form>

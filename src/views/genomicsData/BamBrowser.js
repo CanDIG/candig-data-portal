@@ -208,9 +208,11 @@ function BamBrowser() {
                             </Grid>
 
                             <Grid item>
-                                <Button type="submit" variant="contained">
-                                    Open Browser
-                                </Button>
+                                <FormControl>
+                                    <Button type="submit" variant="contained">
+                                        Search
+                                    </Button>
+                                </FormControl>
                             </Grid>
                         </Grid>
                     </form>

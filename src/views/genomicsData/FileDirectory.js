@@ -184,9 +184,11 @@ function FileDirectory() {
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <Button type="submit" variant="contained">
-                                    View
-                                </Button>
+                                <FormControl>
+                                    <Button type="submit" variant="contained">
+                                        Search
+                                    </Button>
+                                </FormControl>
                             </Grid>
                         </Grid>
                     </form>

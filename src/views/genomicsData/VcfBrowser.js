@@ -17,8 +17,6 @@ import { searchVariantSets, getReferenceSet } from 'store/api';
 import { notify, NotificationAlert } from 'utils/alert';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 
-import 'assets/css/VariantsSearch.css';
-
 function VcfBrowser() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
@@ -146,7 +144,7 @@ function VcfBrowser() {
                             {options.length > 0 && (
                                 <FormControl>
                                     <Grid container direction="row">
-                                        <Box mr={2} style={{ marginTop: '10px' }}>
+                                        <Box mr={2}>
                                             <p>VCF</p>
                                         </Box>
                                         <MultiSelect // Width set in CSS
@@ -162,9 +160,11 @@ function VcfBrowser() {
                         </Grid>
 
                         <Grid item>
-                            <Button type="submit" variant="contained">
-                                Open Browser
-                            </Button>
+                            <FormControl>
+                                <Button type="submit" variant="contained">
+                                    Search
+                                </Button>
+                            </FormControl>
                         </Grid>
                     </Grid>
                 </form>
