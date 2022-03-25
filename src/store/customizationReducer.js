@@ -37,8 +37,35 @@ const customizationReducer = (state = initialState, action) => {
                 ...state,
                 borderRadius: action.borderRadius
             };
+        case 'SET_SELECTED_DATASET':
+            return {
+                ...state,
+                selectedDataset: action.payload
+            };
+        case 'SET_DATASETS':
+            return {
+                ...state,
+                datasets: {
+                    ...action.payload
+                }
+            };
+        case 'SET_UPDATE_STATE':
+            return {
+                ...state,
+                update: {
+                    ...action.payload
+                }
+            };
         default:
-            return state;
+            return {
+                ...state,
+                selectedDataset: '',
+                datasets: {},
+                update: {
+                    datasetName: '',
+                    datasetId: ''
+                }
+            };
     }
 };
 

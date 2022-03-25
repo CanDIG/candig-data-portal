@@ -9,9 +9,6 @@ import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
-// assets
-import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
-
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -59,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| DASHBOARD - TOTAL INCOME LIGHT CARD ||=========================== //
 
-const TotalIncomeLightCard = ({ isLoading }) => {
+const LightCard = ({ isLoading, header, value, icon }) => {
     const classes = useStyles();
 
     return (
@@ -72,7 +69,7 @@ const TotalIncomeLightCard = ({ isLoading }) => {
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
                             <ListItemAvatar>
                                 <Avatar variant="rounded" className={classes.avatar}>
-                                    <StorefrontTwoToneIcon fontSize="inherit" />
+                                    {icon}
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText
@@ -81,10 +78,10 @@ const TotalIncomeLightCard = ({ isLoading }) => {
                                     mb: 0.45
                                 }}
                                 className={classes.padding}
-                                primary={<Typography variant="h4">$203k</Typography>}
+                                primary={<Typography variant="h4">{header}</Typography>}
                                 secondary={
                                     <Typography variant="subtitle2" className={classes.secondary}>
-                                        Total Income
+                                        {value}
                                     </Typography>
                                 }
                             />
@@ -96,8 +93,11 @@ const TotalIncomeLightCard = ({ isLoading }) => {
     );
 };
 
-TotalIncomeLightCard.propTypes = {
-    isLoading: PropTypes.bool
+LightCard.propTypes = {
+    isLoading: PropTypes.bool,
+    header: PropTypes.string,
+    value: PropTypes.any,
+    icon: PropTypes.any
 };
 
-export default TotalIncomeLightCard;
+export default LightCard;
