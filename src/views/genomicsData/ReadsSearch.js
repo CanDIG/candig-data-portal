@@ -155,6 +155,7 @@ function ReadsSearch() {
                                     header="Reference Genome"
                                     value={referenceSetName}
                                     icon={<Map fontSize="inherit" />}
+                                    color="primary"
                                 />
                             )}
                         </Grid>
@@ -167,6 +168,7 @@ function ReadsSearch() {
                                     header="ReadGroupSets/BAMs"
                                     value={readGroupSetCount}
                                     icon={<Description fontSize="inherit" />}
+                                    color="secondary"
                                 />
                             )}
                         </Grid>

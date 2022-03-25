@@ -157,6 +157,7 @@ function VariantsSearch() {
                                     header="Reference Genome"
                                     value={referenceSetName}
                                     icon={<Map fontSize="inherit" />}
+                                    color="primary"
                                 />
                             )}
                         </Grid>
@@ -169,6 +170,7 @@ function VariantsSearch() {
                                     header="VariantSets/VCFs"
                                     value={variantSet}
                                     icon={<Description fontSize="inherit" />}
+                                    color="secondary"
                                 />
                             )}
                         </Grid>
@@ -188,6 +190,7 @@ function VariantsSearch() {
                                                 value={selected}
                                                 onChange={setSelected}
                                                 labelledBy="Variant Set"
+                                                color="primary"
                                             />
                                         </Grid>
                                     </FormControl>
