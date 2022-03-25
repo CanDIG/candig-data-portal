@@ -199,11 +199,11 @@ const ProfileSection = () => {
                                             <Grid item className={classes.flex}>
                                                 <Typography variant="h4">Hello!</Typography>
                                                 <Typography component="span" variant="h4" className={classes.name}>
-                                                    {/* Username */}
+                                                    First Name Last Name
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
-                                                <Typography variant="subtitle2">{/* User Role */}</Typography>
+                                                <Typography variant="subtitle2">BC Cancer/UHN</Typography>
                                             </Grid>
                                         </Grid>
                                         <OutlinedInput
