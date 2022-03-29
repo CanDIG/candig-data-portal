@@ -1,7 +1,12 @@
 // assets
 import { IconFileSearch, IconBrowser, IconFolder } from '@tabler/icons';
 
+// import prepend route
+import config from 'config';
+
 // constant
+const { basename } = config;
+
 const icons = {
     IconFileSearch,
     IconBrowser,
@@ -19,7 +24,7 @@ const genomicsData = {
             id: 'file directory',
             title: 'file directory',
             type: 'item',
-            url: '/file-directory',
+            url: `${basename}/file-directory`,
             icon: icons.IconFolder,
             breadcrumbs: false
         },
@@ -27,7 +32,7 @@ const genomicsData = {
             id: 'variants search',
             title: 'variants search',
             type: 'item',
-            url: '/variants-search',
+            url: `${basename}/variants-search`,
             icon: icons.IconFileSearch,
             breadcrumbs: false
         },
@@ -35,7 +40,7 @@ const genomicsData = {
             id: 'vcf browser',
             title: 'vcf browser',
             type: 'item',
-            url: '/vcf-browser',
+            url: `${basename}/vcf-browser`,
             icon: icons.IconBrowser,
             breadcrumbs: false
         },
@@ -43,7 +48,7 @@ const genomicsData = {
             id: 'reads search',
             title: 'reads search',
             type: 'item',
-            url: '/reads-search',
+            url: `${basename}/reads-search`,
             icon: icons.IconFileSearch,
             breadcrumbs: false
         },
@@ -51,7 +56,7 @@ const genomicsData = {
             id: 'bam browser',
             title: 'bam browser',
             type: 'item',
-            url: '/bam-browser',
+            url: `${basename}/bam-browser`,
             icon: icons.IconBrowser,
             breadcrumbs: false
         }

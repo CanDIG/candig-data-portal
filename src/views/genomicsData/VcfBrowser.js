@@ -122,6 +122,7 @@ function VcfBrowser() {
                                 header="Reference Genome"
                                 value={referenceSetName}
                                 icon={<Map fontSize="inherit" />}
+                                color="primary"
                             />
                         )}
                     </Grid>
@@ -134,6 +135,7 @@ function VcfBrowser() {
                                 header="VariantSets/VCFs"
                                 value={variantSet}
                                 icon={<Description fontSize="inherit" />}
+                                color="secondary"
                             />
                         )}
                     </Grid>

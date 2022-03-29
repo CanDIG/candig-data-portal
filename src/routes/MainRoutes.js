@@ -4,6 +4,12 @@ import React, { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
+// import project config
+import config from 'config';
+
+// import basename
+const { basename } = config;
+
 // Overview routing
 const IndividualsOverview = Loadable(lazy(() => import('views/overview/individuals')));
 
@@ -28,39 +34,39 @@ const MainRoutes = {
     element: <MainLayout />,
     children: [
         {
-            path: '/',
+            path: `${basename}/`,
             element: <IndividualsOverview />
         },
         {
-            path: '/individuals-overview',
+            path: `${basename}/individuals-overview`,
             element: <IndividualsOverview />
         },
         {
-            path: '/mcode',
+            path: `${basename}/mcode`,
             element: <McodePage />
         },
         {
-            path: '/phenopackets',
+            path: `${basename}/phenopackets`,
             element: <PhenopacketsPage />
         },
         {
-            path: '/file-directory',
+            path: `${basename}/file-directory`,
             element: <FileDirectoryPage />
         },
         {
-            path: '/variants-search',
+            path: `${basename}/variants-search`,
             element: <VariantsSearchPage />
         },
         {
-            path: '/reads-search',
+            path: `${basename}/reads-search`,
             element: <ReadsSearchPage />
         },
         {
-            path: '/vcf-browser',
+            path: `${basename}/vcf-browser`,
             element: <VcfBrowserPage />
         },
         {
-            path: '/bam-browser',
+            path: `${basename}/bam-browser`,
             element: <BamBrowserPage />
         },
         {
