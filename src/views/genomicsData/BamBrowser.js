@@ -162,6 +162,7 @@ function BamBrowser() {
                                     header="Reference Genome"
                                     value={referenceSetName}
                                     icon={<Map fontSize="inherit" />}
+                                    color="primary"
                                 />
                             )}
                         </Grid>
@@ -174,6 +175,7 @@ function BamBrowser() {
                                     header="ReadGroupSets/BAMs"
                                     value={variantSet}
                                     icon={<Description fontSize="inherit" />}
+                                    color="secondary"
                                 />
                             )}
                         </Grid>

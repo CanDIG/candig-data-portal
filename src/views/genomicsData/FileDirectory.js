@@ -161,6 +161,7 @@ function FileDirectory() {
                                     header="Currently Displaying"
                                     value={currentTable}
                                     icon={<Map fontSize="inherit" />}
+                                    color="primary"
                                 />
                             )}
                         </Grid>
@@ -173,6 +174,7 @@ function FileDirectory() {
                                     header="Number of Records"
                                     value={numberOfRecords}
                                     icon={<Description fontSize="inherit" />}
+                                    color="secondary"
                                 />
                             )}
                         </Grid>
