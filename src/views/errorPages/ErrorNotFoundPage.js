@@ -20,9 +20,9 @@ function ErrorNotFoundPage() {
 
     return (
         <MainCard title="Error 404: Page Not Found" justifyContent="center" alignItems="center" sx={{ minHeight: 830 }}>
-            <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ minHeight: 100, padding: 8 }}>
-                <img src={errorImages[index]} alt="Error 404" width="450" />
-                <Typography variant="h4" gutterBottom component="div" m={2}>
+            <Grid container direction="column" justifyContent="center" alignItems="center">
+                <img src={errorImages[index]} alt="Error 404" width="50%" />
+                <Typography variant="h4" gutterBottom component="div" m={4}>
                     Sorry, there was a problem with your request. You can redirect to the Overview page below or choose from the sidebar on
                     the left.
                 </Typography>
