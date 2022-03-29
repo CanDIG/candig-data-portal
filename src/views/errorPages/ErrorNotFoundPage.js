@@ -19,8 +19,8 @@ function ErrorNotFoundPage() {
     const index = Math.floor(Math.random() * errorImages.length);
 
     return (
-        <MainCard title="Error 404: Page Not Found" justifyContent="center" alignItems="center" sx={{ minHeight: 830 }}>
-            <Grid container direction="column" justifyContent="center" alignItems="center">
+        <MainCard title="Error 404: Page Not Found" sx={{ minHeight: '87vh' }}>
+            <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ minHeight: '100%' }}>
                 <img src={errorImages[index]} alt="Error 404" width="50%" />
                 <Typography variant="h4" gutterBottom component="div" m={4}>
                     Sorry, there was a problem with your request. You can redirect to the Overview page below or choose from the sidebar on
