@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Alert from '@mui/material/Alert';
 import { AgGridReact } from 'ag-grid-react';
 
 import { BASE_URL } from 'store/constant';
@@ -94,7 +93,7 @@ function VariantsTable({ rowData, datasetId }) {
                 }
             })
             .catch((err) => {
-                <Alert severity="warning"> err.message,</Alert>;
+                // console.log(err);
             });
     }
 
