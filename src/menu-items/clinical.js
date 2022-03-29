@@ -1,7 +1,12 @@
 // assets
 import { IconReportMedical } from '@tabler/icons';
 
+// import project config
+import config from 'config';
+
 // constant
+const { basename } = config;
+
 const icons = {
     IconReportMedical
 };
@@ -17,7 +22,7 @@ const clinical = {
             id: 'mcode',
             title: 'mcode',
             type: 'item',
-            url: '/mcode',
+            url: `${basename}/mcode`,
             icon: icons.IconReportMedical,
             breadcrumbs: false
         },
@@ -25,7 +30,7 @@ const clinical = {
             id: 'phenopackets',
             title: 'phenopackets',
             type: 'item',
-            url: '/phenopackets',
+            url: `${basename}/phenopackets`,
             icon: icons.IconReportMedical,
             breadcrumbs: false
         }
