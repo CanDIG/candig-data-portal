@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect, FormHelperText } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, Input, NativeSelect, Alert } from '@mui/material';
 import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
@@ -12,11 +12,11 @@ import { searchVariant, searchVariantSets, searchVariantByVariantSetIds, getRefe
 import { ListOfLongReferenceNames } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
-
-// import { notify, NotificationAlert } from '../../utils/alert';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import { Map, Description } from '@material-ui/icons';
+import AlertComponent from 'ui-component/AlertComponent';
+
 import 'assets/css/VariantsSearch.css';
 
 function VariantsSearch() {
@@ -25,13 +25,14 @@ function VariantsSearch() {
     let { datasetId } = events.customization.update.datasetId;
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
-    const notifyEl = useRef(null);
     const [variantSet, setVariantSets] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
     const [options, setOptions] = useState([]);
     const [selected, setSelected] = useState([]);
     const [variantSetIds, setVariantSetIds] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [alertText, setAlertText] = useState('');
 
     /*
   Fetches reference set Name and sets referenceSetName
@@ -88,11 +89,7 @@ function VariantsSearch() {
                     .catch(() => {
                         setVariantSets('Not Available');
                         setReferenceSetName('Not Available');
-                        // notify(
-                        //   notifyEl,
-                        //   'No variants or reference set names were found.',
-                        //   'warning',
-                        // );
+                        setAlertText('No variants or reference set names were found');
                     })
             );
         }
@@ -115,11 +112,8 @@ function VariantsSearch() {
                     .catch(() => {
                         setRowData([]);
                         setDisplayVariantsTable(false);
-                        //           notify(
-                        //             notifyEl,
-                        //             'No variants were found.',
-                        //             'warning',
-                        //           );
+                        setOpen(true);
+                        setAlertText('No variants were found');
                     }),
                 'table'
             );
@@ -132,11 +126,8 @@ function VariantsSearch() {
                 })
                 .catch(() => {
                     setDisplayVariantsTable(false);
-                    // notify(
-                    //   notifyEl,
-                    //   'No variants were found.',
-                    //   'warning',
-                    // );
+                    setOpen(true);
+                    setAlertText('No variants were found');
                 });
         }
     };
@@ -145,8 +136,8 @@ function VariantsSearch() {
         <>
             <MainCard title="Variants Search" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
+                <AlertComponent open={open} setOpen={setOpen} text={alertText} severity="warning" variant="filled" />
                 <Grid container direction="column" className="content">
-                    {/* <NotificationAlert ref={notifyEl} /> */}
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>
                             {promiseInProgress === true ? (

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Alert from '@mui/material/Alert';
 import { AgGridReact } from 'ag-grid-react';
+
 import { BASE_URL } from 'store/constant';
-// import { notify, NotificationAlert } from '../../../utils/alert.js';
 import VariantsTableButton from './VariantsTableButton';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -10,8 +11,6 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'assets/css/VariantsSearch.css';
 
 function VariantsTable({ rowData, datasetId }) {
-    // const notifyEl = useRef(null);
-
     let gridOptions = {};
 
     function getColumnDefs() {
@@ -95,7 +94,7 @@ function VariantsTable({ rowData, datasetId }) {
                 }
             })
             .catch((err) => {
-                // notify(notifyEl, err.message, 'warning');
+                <Alert severity="warning"> err.message,</Alert>;
             });
     }
 
@@ -125,7 +124,6 @@ function VariantsTable({ rowData, datasetId }) {
 
     return (
         <>
-            {/* <NotificationAlert ref={notifyEl} /> */}
             <div className="ag-theme-alpine">
                 <AgGridReact columnDefs={getColumnDefs()} rowData={rowData} gridOptions={gridOptions} context={{ datasetId }} />
             </div>

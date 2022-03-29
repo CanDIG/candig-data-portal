@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect, FormHelperText } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -9,11 +9,11 @@ import { BASE_URL, ListOfLongReferenceNames, referenceToIgvTrack } from 'store/c
 import LightCard from 'views/dashboard/Default/LightCard';
 import { Map, Description } from '@material-ui/icons';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
+import AlertComponent from 'ui-component/AlertComponent';
 
 import BamInstance from 'ui-component/IGV/BamInstance';
 import { searchReadGroupSets, getReferenceSet } from 'store/api';
 
-import { notify, NotificationAlert } from 'utils/alert';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 
 import 'assets/css/VariantsSearch.css';
@@ -22,7 +22,6 @@ function BamBrowser() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
     let { datasetId } = events.customization.update.datasetId;
-    const notifyEl = useRef(null);
     const [variantSet, setVariantSets] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
@@ -32,6 +31,7 @@ function BamBrowser() {
     const [apiResponse, setApiResponse] = useState({});
     const [igvTrackRefGenome, setIgvTrackRefGenome] = useState('');
     const [selectedChr, setSelectedChr] = useState('');
+    const [open, setOpen] = useState(false);
 
     /*
   Fetches reference set Name and sets referenceSetName
@@ -92,7 +92,7 @@ function BamBrowser() {
 
                     // Do not show error message when datasetId is empty
                     if (datasetId !== '') {
-                        notify(notifyEl, 'No ReadGroupSets are available.', 'warning');
+                        setOpen(true);
                     }
                 })
         );
@@ -150,8 +150,8 @@ function BamBrowser() {
         <>
             <MainCard title="Bam Browser" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
+                <AlertComponent open={open} setOpen={setOpen} text="No ReadGroupSets are available." severity="warning" variant="filled" />
                 <Grid container direction="column" className="content">
-                    {/* <NotificationAlert ref={notifyEl} /> */}
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>
                             {promiseInProgress === true ? (
