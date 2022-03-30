@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 
@@ -11,9 +11,9 @@ import { searchGenomicSets } from 'store/api';
 import { Map, Description } from '@material-ui/icons';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
-import { notify, NotificationAlert } from 'utils/alert';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import AlertComponent from 'ui-component/AlertComponent';
 
 import 'assets/css/VariantsSearch.css';
 
@@ -28,7 +28,7 @@ function FileDirectory() {
     const [displayFilesTable, setDisplayFilesTable] = useState(false);
     const [currentTable, setCurrentTable] = useState(genomicsFileTypes[0]);
     const [numberOfRecords, setNumberOfRecords] = useState(0);
-    const notifyEl = useRef(null);
+    const [open, setOpen] = useState(false);
 
     /** *
      * Build the column definition dynamically.
@@ -108,7 +108,7 @@ function FileDirectory() {
                     setDisplayFilesTable(false);
 
                     if (datasetId !== '') {
-                        notify(notifyEl, 'Sorry, no data was found for your request.', 'warning');
+                        setOpen(true);
                     }
                 }),
             'table'
@@ -134,7 +134,6 @@ function FileDirectory() {
                 .catch(() => {
                     setRowData([]);
                     setDisplayFilesTable(false);
-                    notify(notifyEl, 'Sorry, but no files of this type were found.', 'warning');
                 }),
             'table'
         );
@@ -144,8 +143,14 @@ function FileDirectory() {
         <>
             <MainCard title="File Directory" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
+                <AlertComponent
+                    open={open}
+                    setOpen={setOpen}
+                    text="Sorry, no data was found for your request."
+                    severity="warning"
+                    variant="filled"
+                />
                 <Grid container direction="column" className="content">
-                    {/* <NotificationAlert ref={notifyEl} /> */}
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>
                             {promiseInProgress === true ? (

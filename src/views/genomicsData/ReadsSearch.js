@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
+import { Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
@@ -14,8 +14,8 @@ import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
-import { notify, NotificationAlert } from 'utils/alert';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
+import AlertComponent from 'ui-component/AlertComponent';
 
 import 'assets/css/ReadsSearch.css';
 
@@ -25,12 +25,12 @@ function ReadsSearch() {
     let { datasetId } = events.customization.update.datasetId;
     const [rowData, setRowData] = useState([]);
     const [displayReadsTable, setDisplayReadsTable] = useState(false);
-    const notifyEl = useRef(null);
     const { promiseInProgress } = usePromiseTracker();
     const [readGroupSetCount, setReadGroupSetCount] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const [apiResponse, setApiResponse] = useState({});
     const [bamOptionList, setBamOptionList] = useState([]);
+    const [open, setOpen] = useState(false);
     /*
   Fetches reference set Name and sets referenceSetName
   * @param {string}... referenceSetId
@@ -129,11 +129,12 @@ function ReadsSearch() {
                 .then((data) => {
                     setDisplayReadsTable(true);
                     setRowData(data.results.alignments);
+                    setOpen(false);
                 })
                 .catch(() => {
                     setRowData([]);
                     setDisplayReadsTable(false);
-                    notify(notifyEl, 'Sorry, but no reads were found in your search range.', 'warning');
+                    setOpen(true);
                 }),
             'table'
         );
@@ -143,8 +144,14 @@ function ReadsSearch() {
         <>
             <MainCard title="Reads Search" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
+                <AlertComponent
+                    open={open}
+                    setOpen={setOpen}
+                    text="Sorry, but no reads were found in your search range."
+                    severity="warning"
+                    variant="filled"
+                />
                 <Grid container direction="column" className="content">
-                    {/* <NotificationAlert ref={notifyEl} /> */}
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>
                             {promiseInProgress === true ? (
@@ -173,7 +180,6 @@ function ReadsSearch() {
                             )}
                         </Grid>
                     </Grid>
-
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <form inline onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
                             <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
 import { Box, Button, FormControl } from '@mui/material';
@@ -10,18 +10,15 @@ import { BASE_URL, referenceToIgvTrack } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
 import { Map, Description } from '@material-ui/icons';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
-
 import VcfInstance from 'ui-component/IGV/VcfInstance';
 import { searchVariantSets, getReferenceSet } from 'store/api';
-
-import { notify, NotificationAlert } from 'utils/alert';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import AlertComponent from 'ui-component/AlertComponent';
 
 function VcfBrowser() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
     let { datasetId } = events.customization.update.datasetId;
-    const notifyEl = useRef(null);
     const [variantSet, setVariantSets] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
@@ -29,6 +26,7 @@ function VcfBrowser() {
     const [selected, setSelected] = useState([]);
     const [variantsTracks, setVariantsTracks] = useState([]);
     const [igvTrackRefGenome, setIgvTrackRefGenome] = useState('');
+    const [open, setOpen] = useState(false);
 
     /*
   Fetches reference set Name and sets referenceSetName
@@ -70,7 +68,7 @@ function VcfBrowser() {
 
                     // Do not show error message when datasetId is empty
                     if (datasetId !== '') {
-                        notify(notifyEl, 'No VariantSets are available.', 'warning');
+                        setOpen(true);
                     }
                 })
         );
@@ -111,7 +109,7 @@ function VcfBrowser() {
         <>
             <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
-                {/* <NotificationAlert ref={notifyEl} /> */}
+                <AlertComponent open={open} setOpen={setOpen} text="No VariantSets are available." severity="warning" variant="filled" />
                 <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                     <Grid item sm={12} xs={12} md={4} lg={4}>
                         {promiseInProgress === true ? (
