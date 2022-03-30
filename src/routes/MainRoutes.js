@@ -34,6 +34,10 @@ const MainRoutes = {
     element: <MainLayout />,
     children: [
         {
+            path: `/`,
+            element: <IndividualsOverview />
+        },
+        {
             path: `${basename}/`,
             element: <IndividualsOverview />
         },
