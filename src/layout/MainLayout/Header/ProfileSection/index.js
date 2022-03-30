@@ -127,6 +127,7 @@ const ProfileSection = () => {
     const [selectedIndex] = React.useState(1);
 
     const [open, setOpen] = React.useState(false);
+
     const anchorRef = React.useRef(null);
     const handleLogout = async () => {
         console.error('Logout');
@@ -151,6 +152,18 @@ const ProfileSection = () => {
 
         prevOpen.current = open;
     }, [open]);
+
+    const setRoles = () => {
+        switch (ROLE) {
+            case 'BCGSC':
+                return BCGSC;
+            case 'UHN':
+                return UHN;
+            default:
+                return User1;
+        }
+    };
+
     return (
         <>
             <Chip
@@ -158,7 +171,7 @@ const ProfileSection = () => {
                 className={classes.profileChip}
                 icon={
                     <Avatar
-                        src={ROLE === 'BCGSC' ? BCGSC : UHN}
+                        src={setRoles()}
                         className={classes.headerAvatar}
                         ref={anchorRef}
                         aria-controls={open ? 'menu-list-grow' : undefined}
@@ -206,7 +219,7 @@ const ProfileSection = () => {
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
-                                                <Typography variant="subtitle2">{ROLE === 'BCGSC' ? 'BC Cancer' : 'UHN'}</Typography>
+                                                <Typography variant="subtitle2">{ROLE}</Typography>
                                             </Grid>
                                         </Grid>
                                         <OutlinedInput
