@@ -16,11 +16,16 @@ const IndividualsOverview = Loadable(lazy(() => import('views/overview/individua
 // Clinical
 const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
 const PhenopacketsPage = Loadable(lazy(() => import('views/clinical/phenopackets')));
+
+// Genomic
 const FileDirectoryPage = Loadable(lazy(() => import('views/genomicsData/FileDirectory')));
 const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/VariantsSearch')));
 const ReadsSearchPage = Loadable(lazy(() => import('views/genomicsData/ReadsSearch')));
 const VcfBrowserPage = Loadable(lazy(() => import('views/genomicsData/VcfBrowser')));
 const BamBrowserPage = Loadable(lazy(() => import('views/genomicsData/BamBrowser')));
+
+// Error Pages
+const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 
@@ -63,6 +68,10 @@ const MainRoutes = {
         {
             path: `${basename}/bam-browser`,
             element: <BamBrowserPage />
+        },
+        {
+            path: '*',
+            element: <ErrorNotFoundPage />
         }
     ]
 };
