@@ -1,6 +1,6 @@
 # CanDIG Data Portal
 
-A data analytics and visualization portal for CanDIG Services. Is built off the Berry Material-UI React Template and that documentation can be found [here](https://codedthemes.gitbook.io/berry/)
+A data analytics and visualization portal for CanDIG Services. Is built off the Berry Material-UI React Template and that documentation can be found [here](https://codedthemes.gitbook.io/berry/).
 
 ## Setup Development Server
 
@@ -45,13 +45,13 @@ Note that the development build is not optimized.
 To create a production build, use yarn build.
 ```
 
-### Deployment
+## Deployment
 
 You would need to specify the variables required in `.env.production`, see the section above on what values are required for which variables.
 
 One thing worth noting is that the `REACT_APP_BASE_NAME` variable only affects the routes of the app. The static assets are still served from root.
 
-As an example, if you would like the both the app's static assets to be served at `/v2/data-portal`, you would need to specify this line at `package.json`.
+As an example, if you would like the app's static assets to be served at `/v2/data-portal`, you would need to specify this line at `package.json`.
 
 ```
     "homepage": "https://example.ca/v2/data-portal",
