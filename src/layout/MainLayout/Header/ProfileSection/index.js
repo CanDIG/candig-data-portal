@@ -29,10 +29,13 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
+import { SITE } from 'store/constant';
 
 // assets
 import { IconLogout, IconSearch, IconSettings } from '@tabler/icons';
 import User1 from 'assets/images/users/user-round.svg';
+import BCGSC from 'assets/images/users/bcgsc.svg';
+import UHN from 'assets/images/users/UHN.svg';
 
 // style const
 const useStyles = makeStyles((theme) => ({
@@ -124,6 +127,7 @@ const ProfileSection = () => {
     const [selectedIndex] = React.useState(1);
 
     const [open, setOpen] = React.useState(false);
+
     const anchorRef = React.useRef(null);
     const handleLogout = async () => {
         console.error('Logout');
@@ -148,6 +152,18 @@ const ProfileSection = () => {
 
         prevOpen.current = open;
     }, [open]);
+
+    const setSite = () => {
+        switch (SITE) {
+            case 'BCGSC':
+                return BCGSC;
+            case 'UHN':
+                return UHN;
+            default:
+                return User1;
+        }
+    };
+
     return (
         <>
             <Chip
@@ -155,7 +171,7 @@ const ProfileSection = () => {
                 className={classes.profileChip}
                 icon={
                     <Avatar
-                        src={User1}
+                        src={setSite()}
                         className={classes.headerAvatar}
                         ref={anchorRef}
                         aria-controls={open ? 'menu-list-grow' : undefined}
@@ -203,7 +219,7 @@ const ProfileSection = () => {
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
-                                                <Typography variant="subtitle2">BC Cancer/UHN</Typography>
+                                                <Typography variant="subtitle2">{SITE}</Typography>
                                             </Grid>
                                         </Grid>
                                         <OutlinedInput

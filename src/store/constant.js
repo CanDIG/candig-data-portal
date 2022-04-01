@@ -2,6 +2,9 @@
  * All the constants should go on this file
  */
 
+// Roles
+export const SITE = process.env.REACT_APP_SITE_LOCATION;
+
 // API URL where the Dashboard get all the data
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 
