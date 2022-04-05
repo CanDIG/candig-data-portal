@@ -29,6 +29,8 @@ function FileDirectory() {
     const [currentTable, setCurrentTable] = useState(genomicsFileTypes[0]);
     const [numberOfRecords, setNumberOfRecords] = useState(0);
     const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     /** *
      * Build the column definition dynamically.
@@ -109,6 +111,8 @@ function FileDirectory() {
 
                     if (datasetId !== '') {
                         setOpen(true);
+                        setAlertMessage('Sorry, no data was found for your request.');
+                        setAlertSeverity('warning');
                     }
                 }),
             'table'
@@ -146,9 +150,10 @@ function FileDirectory() {
                 <AlertComponent
                     open={open}
                     setOpen={setOpen}
-                    text="Sorry, no data was found for your request."
-                    severity="warning"
+                    text={alertMessage}
+                    severity={alertSeverity}
                     variant="filled"
+                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
                 />
                 <Grid container direction="column" className="content">
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
