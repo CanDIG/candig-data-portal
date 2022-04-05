@@ -105,13 +105,6 @@ function ReadsSearch() {
                     .catch(() => {
                         setReadGroupSetCount('Not Available');
                         setReferenceSetName('Not Available');
-                        if (!datasetId) {
-                            setOpen(true);
-                            setAlertMessage(
-                                'No datasets are currently available. If this issue persists, contact your sysadmin for assistance'
-                            );
-                            setAlertSeverity('error');
-                        }
                     }),
                 'tile'
             );
@@ -148,12 +141,6 @@ function ReadsSearch() {
                         setOpen(true);
                         setAlertMessage('Sorry, but no reads were found in your search range.');
                         setAlertSeverity('warning');
-                    } else {
-                        setOpen(true);
-                        setAlertMessage(
-                            'No datasets are currently available. If this issue persists, contact your sysadmin for assistance'
-                        );
-                        setAlertSeverity('error');
                     }
                 }),
             'table'
