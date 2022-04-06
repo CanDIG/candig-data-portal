@@ -31,6 +31,8 @@ function ReadsSearch() {
     const [apiResponse, setApiResponse] = useState({});
     const [bamOptionList, setBamOptionList] = useState([]);
     const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
     /*
   Fetches reference set Name and sets referenceSetName
   * @param {string}... referenceSetId
@@ -134,7 +136,12 @@ function ReadsSearch() {
                 .catch(() => {
                     setRowData([]);
                     setDisplayReadsTable(false);
-                    setOpen(true);
+
+                    if (datasetId !== '') {
+                        setOpen(true);
+                        setAlertMessage('Sorry, but no reads were found in your search range.');
+                        setAlertSeverity('warning');
+                    }
                 }),
             'table'
         );
@@ -147,9 +154,10 @@ function ReadsSearch() {
                 <AlertComponent
                     open={open}
                     setOpen={setOpen}
-                    text="Sorry, but no reads were found in your search range."
-                    severity="warning"
+                    text={alertMessage}
+                    severity={alertSeverity}
                     variant="filled"
+                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
                 />
                 <Grid container direction="column" className="content">
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>

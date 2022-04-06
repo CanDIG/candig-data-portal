@@ -32,7 +32,8 @@ function VariantsSearch() {
     const [selected, setSelected] = useState([]);
     const [variantSetIds, setVariantSetIds] = useState([]);
     const [open, setOpen] = useState(false);
-    const [alertText, setAlertText] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('warning');
 
     /*
   Fetches reference set Name and sets referenceSetName
@@ -89,7 +90,12 @@ function VariantsSearch() {
                     .catch(() => {
                         setVariantSets('Not Available');
                         setReferenceSetName('Not Available');
-                        setAlertText('No variants or reference set names were found');
+
+                        if (datasetId !== '') {
+                            setOpen(true);
+                            setAlertMessage('No variants or reference set names were found');
+                            setAlertSeverity('warning');
+                        }
                     })
             );
         }
@@ -113,7 +119,12 @@ function VariantsSearch() {
                         setRowData([]);
                         setDisplayVariantsTable(false);
                         setOpen(true);
-                        setAlertText('No variants were found');
+
+                        if (datasetId !== '') {
+                            setOpen(true);
+                            setAlertMessage('No variants were found');
+                            setAlertSeverity('warning');
+                        }
                     }),
                 'table'
             );
@@ -127,7 +138,12 @@ function VariantsSearch() {
                 .catch(() => {
                     setDisplayVariantsTable(false);
                     setOpen(true);
-                    setAlertText('No variants were found');
+
+                    if (datasetId !== '') {
+                        setOpen(true);
+                        setAlertMessage('No variants were found');
+                        setAlertSeverity('warning');
+                    }
                 });
         }
     };
@@ -136,7 +152,14 @@ function VariantsSearch() {
         <>
             <MainCard title="Variants Search" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
-                <AlertComponent open={open} setOpen={setOpen} text={alertText} severity="warning" variant="filled" />
+                <AlertComponent
+                    open={open}
+                    setOpen={setOpen}
+                    text={alertMessage}
+                    severity={alertSeverity}
+                    variant="filled"
+                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+                />
                 <Grid container direction="column" className="content">
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>

@@ -32,7 +32,8 @@ function BamBrowser() {
     const [igvTrackRefGenome, setIgvTrackRefGenome] = useState('');
     const [selectedChr, setSelectedChr] = useState('');
     const [open, setOpen] = useState(false);
-
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
     /*
   Fetches reference set Name and sets referenceSetName
   * @param {string}... referenceSetId
@@ -93,6 +94,8 @@ function BamBrowser() {
                     // Do not show error message when datasetId is empty
                     if (datasetId !== '') {
                         setOpen(true);
+                        setAlertMessage('No ReadGroupSets are available.');
+                        setAlertSeverity('warning');
                     }
                 })
         );
@@ -150,7 +153,14 @@ function BamBrowser() {
         <>
             <MainCard title="Bam Browser" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
-                <AlertComponent open={open} setOpen={setOpen} text="No ReadGroupSets are available." severity="warning" variant="filled" />
+                <AlertComponent
+                    open={open}
+                    setOpen={setOpen}
+                    text={alertMessage}
+                    severity={alertSeverity}
+                    variant="filled"
+                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+                />
                 <Grid container direction="column" className="content">
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                         <Grid item sm={12} xs={12} md={4} lg={4}>

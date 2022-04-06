@@ -27,6 +27,8 @@ function VcfBrowser() {
     const [variantsTracks, setVariantsTracks] = useState([]);
     const [igvTrackRefGenome, setIgvTrackRefGenome] = useState('');
     const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     /*
   Fetches reference set Name and sets referenceSetName
@@ -66,9 +68,10 @@ function VcfBrowser() {
                     setVariantSets('Not Available');
                     setReferenceSetName('Not Available');
 
-                    // Do not show error message when datasetId is empty
                     if (datasetId !== '') {
                         setOpen(true);
+                        setAlertMessage('No VariantSets are available.');
+                        setAlertSeverity('warning');
                     }
                 })
         );
@@ -109,7 +112,14 @@ function VcfBrowser() {
         <>
             <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative' }}>
                 <DatasetIdSelect />
-                <AlertComponent open={open} setOpen={setOpen} text="No VariantSets are available." severity="warning" variant="filled" />
+                <AlertComponent
+                    open={open}
+                    setOpen={setOpen}
+                    text={alertMessage}
+                    severity={alertSeverity}
+                    variant="filled"
+                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+                />
                 <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
                     <Grid item sm={12} xs={12} md={4} lg={4}>
                         {promiseInProgress === true ? (

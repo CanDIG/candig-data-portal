@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { fetchDatasets } from '../../../store/api';
+import AlertComponent from 'ui-component/AlertComponent';
 
 // REDUX
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,6 +17,9 @@ export default function DatasetIdSelect() {
     // STATES
     const [selectedDataset, setSelectedDataset] = useState(events.customization.selectedDataset);
     const [datasets, setDatasets] = useState(events.customization.datasets);
+    const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     function updateParentState(datasetName, datasetId) {
         dispatch({ type: 'SET_UPDATE_STATE', payload: { datasetName, datasetId } });
@@ -38,12 +42,20 @@ export default function DatasetIdSelect() {
 
     useEffect(() => {
         if (!selectedDataset) {
-            fetchDatasets().then((data) => {
-                const datasetsList = processDatasetJson(data.results.datasets);
-                setDatasets(datasetsList);
-                setFirstDataset(datasetsList);
-                dispatch({ type: 'SET_DATASETS', payload: datasetsList });
-            });
+            fetchDatasets()
+                .then((data) => {
+                    if (data.results) {
+                        const datasetsList = processDatasetJson(data.results.datasets);
+                        setDatasets(datasetsList);
+                        setFirstDataset(datasetsList);
+                        dispatch({ type: 'SET_DATASETS', payload: datasetsList });
+                    }
+                })
+                .catch(() => {
+                    setOpen(true);
+                    setAlertMessage('No datasets are currently available. If this issue persists, contact your sysadmin for assistance');
+                    setAlertSeverity('error');
+                });
         }
     });
 
@@ -60,22 +72,32 @@ export default function DatasetIdSelect() {
     ));
 
     return (
-        <Box sx={{ position: 'absolute', top: 12, right: 10 }}>
-            {selectedDataset && (
-                <FormControl sx={{ minWidth: 150 }}>
-                    <InputLabel id="demo-simple-select-label">Dataset ID</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={selectedDataset}
-                        label="Dataset ID"
-                        name="POG"
-                        sx={{ fontsize: '0.25rem', height: '1.75rem' }}
-                    >
-                        {datasetList}
-                    </Select>
-                </FormControl>
-            )}
+        <Box>
+            <Box sx={{ position: 'absolute', top: 12, right: 10 }}>
+                {selectedDataset && (
+                    <FormControl sx={{ minWidth: 150 }}>
+                        <InputLabel id="demo-simple-select-label">Dataset ID</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={selectedDataset}
+                            label="Dataset ID"
+                            name="POG"
+                            sx={{ fontsize: '0.25rem', height: '1.75rem' }}
+                        >
+                            {datasetList}
+                        </Select>
+                    </FormControl>
+                )}
+            </Box>
+            <AlertComponent
+                open={open}
+                setOpen={setOpen}
+                text={alertMessage}
+                severity={alertSeverity}
+                variant="filled"
+                fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+            />
         </Box>
     );
 }
