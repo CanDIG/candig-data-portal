@@ -5,7 +5,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
-import { BASE_URL, ListOfLongReferenceNames, referenceToIgvTrack } from 'store/constant';
+import { BASE_URL, ListOfReferenceNames, referenceToIgvTrack } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
 import { Map, Description } from '@material-ui/icons';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
@@ -56,7 +56,7 @@ function BamBrowser() {
     function chrSelectBuilder() {
         const refNameList = [];
 
-        ListOfLongReferenceNames.forEach((refName) => {
+        ListOfReferenceNames.forEach((refName) => {
             refNameList.push(
                 <option key={refName} value={refName}>
                     {refName}

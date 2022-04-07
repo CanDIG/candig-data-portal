@@ -9,7 +9,7 @@ import { MultiSelect } from 'react-multi-select-component';
 
 import VariantsTable from 'ui-component/Tables/VariantsTable';
 import { searchVariant, searchVariantSets, searchVariantByVariantSetIds, getReferenceSet } from 'store/api';
-import { ListOfLongReferenceNames } from 'store/constant';
+import { ListOfReferenceNames } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
@@ -57,7 +57,7 @@ function VariantsSearch() {
     function chrSelectBuilder() {
         const refNameList = [];
 
-        ListOfLongReferenceNames.forEach((refName) => {
+        ListOfReferenceNames.forEach((refName) => {
             refNameList.push(
                 <option key={refName} value={refName}>
                     {refName}

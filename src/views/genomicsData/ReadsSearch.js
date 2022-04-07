@@ -6,7 +6,7 @@ import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
 
-import { ListOfLongReferenceNames } from 'store/constant';
+import { ListOfReferenceNames } from 'store/constant';
 import ReadsTable from 'ui-component/Tables/ReadsTable';
 import { searchReadGroupSets, searchReads, getReferenceSet } from 'store/api';
 import { Map, Description } from '@material-ui/icons';
@@ -74,7 +74,7 @@ function ReadsSearch() {
     function chrSelectBuilder() {
         const refNameList = [];
 
-        ListOfLongReferenceNames.forEach((refName) => {
+        ListOfReferenceNames.forEach((refName) => {
             refNameList.push(
                 <option key={refName} value={refName}>
                     {refName}
