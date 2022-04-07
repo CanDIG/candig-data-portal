@@ -23,35 +23,38 @@ function VariantsTable({ rowData, datasetId }) {
 
         if (rowData[0] !== undefined) {
             // First population is empty
-            const { attr } = rowData[0].attributes;
-            Object.keys(attr).forEach((key) => {
-                columnDefs.push({
-                    headerName: key,
-                    valueFormatter: (params) => {
-                        try {
-                            let attributeValue;
+            // Check if the first element contains attributes
+            if (Object.prototype.hasOwnProperty.call(rowData[0], 'attributes')) {
+                const { attr } = rowData[0].attributes;
+                Object.keys(attr).forEach((key) => {
+                    columnDefs.push({
+                        headerName: key,
+                        valueFormatter: (params) => {
+                            try {
+                                let attributeValue;
 
-                            if (params.value.values[0].stringValue !== undefined) {
-                                attributeValue = params.value.values[0].stringValue;
-                            } else if (params.value.values[0].doubleValue !== undefined) {
-                                attributeValue = params.value.values[0].doubleValue;
-                            } else if (params.value.values[0].int32Value !== undefined) {
-                                attributeValue = params.value.values[0].int32Value;
+                                if (params.value.values[0].stringValue !== undefined) {
+                                    attributeValue = params.value.values[0].stringValue;
+                                } else if (params.value.values[0].doubleValue !== undefined) {
+                                    attributeValue = params.value.values[0].doubleValue;
+                                } else if (params.value.values[0].int32Value !== undefined) {
+                                    attributeValue = params.value.values[0].int32Value;
+                                }
+
+                                return attributeValue;
+                            } catch (error) {
+                                // console.log(error);
+                                /*
+                                 * This is to handle the case where the attribute value is not available in the select row
+                                 */
+                                return 'N/A';
                             }
-
-                            return attributeValue;
-                        } catch (error) {
-                            // console.log(error);
-                            /*
-                             * This is to handle the case where the attribute value is not available in the select row
-                             */
-                            return 'N/A';
-                        }
-                    },
-                    field: `attributes.attr.${key}`, // Allows us to work with key without it retroactively changing to the last key
-                    editable: true
+                        },
+                        field: `attributes.attr.${key}`, // Allows us to work with key without it retroactively changing to the last key
+                        editable: true
+                    });
                 });
-            });
+            }
         }
 
         return columnDefs;
