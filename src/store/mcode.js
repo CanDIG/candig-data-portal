@@ -14,17 +14,15 @@ function MoreInfoButton() {
 function getStrAttrSafe(obj, attr) {
     if (Object.prototype.hasOwnProperty.call(obj, attr)) {
         return obj[attr];
-    }
-    else {
-        return "";
+    } else {
+        return '';
     }
 }
 
 function getObjAttrSafe(obj, attr) {
     if (Object.prototype.hasOwnProperty.call(obj, attr)) {
         return obj[attr];
-    }
-    else {
+    } else {
         return {};
     }
 }
@@ -199,7 +197,7 @@ export const processMCodeMainData = (dataObject) => {
     row.ethnicity = getStrAttrSafe(dataObject.subject, 'ethnicity');
     row.date_of_birth = getStrAttrSafe(dataObject.subject, 'date_of_birth');
     row.date_of_death = getStrAttrSafe(dataObject, 'date_of_death');
-    row.ethnicity = getStrAttrSafe(dataObject.subject,'ethnicity');
+    row.ethnicity = getStrAttrSafe(dataObject.subject, 'ethnicity');
     row.race = getStrAttrSafe(dataObject.subject, 'race');
     row.communication_language = getStrAttrSafe(dataObject.subject.extra_properties, 'communication_language');
 
