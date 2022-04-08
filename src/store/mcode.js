@@ -11,6 +11,24 @@ function MoreInfoButton() {
     );
 }
 
+function getStrAttrSafe(obj, attr) {
+    if (Object.prototype.hasOwnProperty.call(obj, attr)) {
+        return obj[attr];
+    }
+    else {
+        return "";
+    }
+}
+
+function getObjAttrSafe(obj, attr) {
+    if (Object.prototype.hasOwnProperty.call(obj, attr)) {
+        return obj[attr];
+    }
+    else {
+        return {};
+    }
+}
+
 export const mainColumns = [
     {
         field: 'id',
@@ -176,14 +194,14 @@ export const medicationStatementColumns = [
 export const processMCodeMainData = (dataObject) => {
     const row = {};
 
-    row.id = dataObject.id;
-    row.sex = dataObject.subject.sex;
-    row.ethnicity = dataObject.subject.ethnicity;
-    row.date_of_birth = dataObject.subject.date_of_birth;
-    row.date_of_death = dataObject.date_of_death;
-    row.ethnicity = dataObject.subject.ethnicity;
-    row.race = dataObject.subject.race;
-    row.communication_language = dataObject.subject.extra_properties.communication_language;
+    row.id = getStrAttrSafe(dataObject, 'id');
+    row.sex = getStrAttrSafe(dataObject, 'sex');
+    row.ethnicity = getStrAttrSafe(dataObject.subject, 'ethnicity');
+    row.date_of_birth = getStrAttrSafe(dataObject.subject, 'date_of_birth');
+    row.date_of_death = getStrAttrSafe(dataObject, 'date_of_death');
+    row.ethnicity = getStrAttrSafe(dataObject.subject,'ethnicity');
+    row.race = getStrAttrSafe(dataObject.subject, 'race');
+    row.communication_language = getStrAttrSafe(dataObject.subject.extra_properties, 'communication_language');
 
     return row;
 };
@@ -195,13 +213,13 @@ export const processMCodeMainData = (dataObject) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-    row.id = dataObject.id;
-    row.sex = dataObject.subject.sex;
-    row.date_of_birth = dataObject.subject.date_of_birth;
-    row.date_of_death = dataObject.date_of_death;
-    row.ethnicity = dataObject.subject.ethnicity;
-    row.race = dataObject.subject.race;
-    row.communication_language = dataObject.subject.extra_properties.communication_language;
+    row.id = getStrAttrSafe(dataObject, 'id');
+    row.sex = getStrAttrSafe(dataObject, 'sex');
+    row.date_of_birth = getStrAttrSafe(dataObject.subject, 'date_of_birth');
+    row.date_of_death = getStrAttrSafe(dataObject, 'date_of_death');
+    row.ethnicity = getStrAttrSafe(dataObject.subject, 'ethnicity');
+    row.race = getStrAttrSafe(dataObject.subject, 'race');
+    row.communication_language = getStrAttrSafe(dataObject.subject.extra_properties, 'communication_language');
 
     return [row];
 };
@@ -217,12 +235,6 @@ export const processConditionsData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.cancer_condition.forEach((cancer_condition) => {
         const row = {};
-        row.id = cancer_condition.id;
-        row.condition_type = cancer_condition.condition_type;
-        row.code_id = cancer_condition.code.id;
-        row.code_label = cancer_condition.code.label;
-        row.date_of_diagnosis = cancer_condition.date_of_diagnosis;
-
         rows.push(row);
     });
 
@@ -240,13 +252,6 @@ export const processProceduresData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.cancer_related_procedures.forEach((cancer_related_procedure) => {
         const row = {};
-        row.id = cancer_related_procedure.id;
-        row.procedure_type = cancer_related_procedure.procedure_type;
-        row.procedure_code_id = cancer_related_procedure.code.id;
-        row.procedure_code_label = cancer_related_procedure.code.label;
-        row.body_site_id = cancer_related_procedure.body_site.id;
-        row.body_site_label = cancer_related_procedure.body_site.label;
-
         rows.push(row);
     });
 
@@ -264,10 +269,6 @@ export const processMedicationStatementData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.medication_statement.forEach((medication_statement) => {
         const row = {};
-        row.id = medication_statement.id;
-        row.medication_code_id = medication_statement.medication_code.id;
-        row.medication_code_label = medication_statement.medication_code.label;
-
         rows.push(row);
     });
 
