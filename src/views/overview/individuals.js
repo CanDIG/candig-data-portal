@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
-import CountCardPrimary from './CountCardPrimary';
-import CountCardSecondary from './CountCardSecondary';
+import CountCard from './CountCard';
 import SmallCountCardDark from './SmallCountCardDark';
 import SmallCountCardLight from './SmallCountCardLight';
 import CustomOfflineChart from './CustomOfflineChart';
@@ -110,10 +109,10 @@ function IndividualsOverview() {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCardPrimary isLoading={isLoading} title="Number of Individuals" count={individualCounter} />
+                        <CountCard isLoading={isLoading} title="Number of Individuals" count={individualCounter} primary />
                     </Grid>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCardSecondary isLoading={isLoading} title="Phenotypic Features in Database" count={featureCount} />
+                        <CountCard isLoading={isLoading} title="Phenotypic Features in Database" count={featureCount} primary={false} />
                     </Grid>
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>

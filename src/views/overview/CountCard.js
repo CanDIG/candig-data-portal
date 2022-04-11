@@ -21,8 +21,9 @@ import ArchiveTwoToneIcon from '@material-ui/icons/ArchiveOutlined';
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
-        backgroundColor: theme.palette.primary.dark,
-        color: '#fff',
+        backgroundColor: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark),
+        // backgroundColor: theme.palette.primary.dark,
+        color: '#fff    ',
         overflow: 'hidden',
         position: 'relative',
         '&:after': {
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: theme.palette.primary[800],
+            background: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
             borderRadius: '50%',
             top: '-85px',
             right: '-95px',
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: theme.palette.primary[800],
+            background: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
             borderRadius: '50%',
             top: '-125px',
             right: '-15px',
@@ -61,14 +62,14 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
-        backgroundColor: theme.palette.primary[800],
+        backgroundColor: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
         marginTop: '8px'
     },
     avatarRight: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
-        backgroundColor: theme.palette.primary.dark,
-        color: theme.palette.primary[200],
+        backgroundColor: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark),
+        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
         zIndex: 1
     },
     cardHeading: {
@@ -81,13 +82,13 @@ const useStyles = makeStyles((theme) => ({
     subHeading: {
         fontSize: '1rem',
         fontWeight: 500,
-        color: theme.palette.primary[200]
+        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200])
     },
     avatarCircle: {
         cursor: 'pointer',
         ...theme.typography.smallAvatar,
-        backgroundColor: theme.palette.primary[200],
-        color: theme.palette.primary.dark
+        backgroundColor: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
+        color: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark)
     },
     circleIcon: {
         transform: 'rotate3d(1, 1, 1, 45deg)'
@@ -100,8 +101,8 @@ const useStyles = makeStyles((theme) => ({
 
 //= ==========================|| INDIVIDUAL OVERVIEW - COUNT CARD ||===========================//
 
-const CountCardPrimary = ({ isLoading, title, count }) => {
-    const classes = useStyles();
+const CountCard = ({ isLoading, title, count, primary }) => {
+    const classes = useStyles({ primary });
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -191,10 +192,10 @@ const CountCardPrimary = ({ isLoading, title, count }) => {
     );
 };
 
-CountCardPrimary.propTypes = {
+CountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
     count: PropTypes.number
 };
 
-export default CountCardPrimary;
+export default CountCard;
