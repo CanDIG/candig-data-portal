@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 // import { useTheme, makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
 import CountCard from './CountCard';
-import SmallCountCardDark from './SmallCountCardDark';
-import SmallCountCardLight from './SmallCountCardLight';
+import SmallCountCard from './SmallCountCard';
 import CustomOfflineChart from './CustomOfflineChart';
 
 import { groupBy } from '../../utils/utils';
@@ -117,10 +116,10 @@ function IndividualsOverview() {
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCardDark isLoading={isLoading} title="Number of Diseases" count={diseasesSum} />
+                                <SmallCountCard isLoading={isLoading} title="Number of Diseases" count={diseasesSum} dark />
                             </Grid>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCardLight isLoading={isLoading} title="Number of Biosamples" count={biosampleCount} />
+                                <SmallCountCard isLoading={isLoading} title="Number of Biosamples" count={biosampleCount} dark={false} />
                             </Grid>
                         </Grid>
                     </Grid>

@@ -22,7 +22,6 @@ import ArchiveTwoToneIcon from '@material-ui/icons/ArchiveOutlined';
 const useStyles = makeStyles((theme) => ({
     card: {
         backgroundColor: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark),
-        // backgroundColor: theme.palette.primary.dark,
         color: '#fff    ',
         overflow: 'hidden',
         position: 'relative',
@@ -195,7 +194,8 @@ const CountCard = ({ isLoading, title, count, primary }) => {
 CountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
-    count: PropTypes.number
+    count: PropTypes.number,
+    primary: PropTypes.bool
 };
 
 export default CountCard;
