@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
-import CountCard from './CountCard';
-import SmallCountCard from './SmallCountCard';
+import CountCard from '../../ui-component/cards/CountCard';
+import SmallCountCard from '../../ui-component/cards/SmallCountCard';
 import CustomOfflineChart from './CustomOfflineChart';
 
 import { groupBy } from '../../utils/utils';
