@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
 import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
-import CustomOfflineChart from './CustomOfflineChart';
+import CustomOfflineChart from 'views/overview/CustomOfflineChart';
 
 import { groupBy } from 'utils/utils';
 // import { schemaFxn } from 'utils/ChordSchemas';
