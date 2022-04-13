@@ -16,8 +16,6 @@ import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
-        // backgroundColor: theme.palette.primary.dark,
-        // color: theme.palette.primary.light,
         backgroundColor: ({ dark }) => (dark ? theme.palette.primary.dark : null),
         color: ({ dark }) => (dark ? theme.palette.primary.light : null),
         overflow: 'hidden',

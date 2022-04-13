@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
-import CountCard from '../../ui-component/cards/CountCard';
-import SmallCountCard from '../../ui-component/cards/SmallCountCard';
+import CountCard from 'ui-component/cards/CountCard';
+import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from './CustomOfflineChart';
 
-import { groupBy } from '../../utils/utils';
-// import { schemaFxn } from '../../utils/ChordSchemas';
+import { groupBy } from 'utils/utils';
+// import { schemaFxn } from 'utils/ChordSchemas';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
