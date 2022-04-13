@@ -27,9 +27,10 @@ const useStyles = makeStyles((theme) => ({
             height: '210px',
             background: ({ dark }) =>
                 dark
-                    ? `linear-gradient(210.04deg), ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`
+                    ? `linear-gradient(210.04deg, ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`
                     : `linear-gradient(210.04deg, ${theme.palette.grey[700]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
             borderRadius: '50%',
+            // top: '160px',
             top: '-30px',
             right: '-180px'
         },
@@ -40,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
             height: '210px',
             background: ({ dark }) =>
                 dark
-                    ? `linear-gradient(140.9deg), ${theme.palette.primary[200]} -14.02.94%, rgba(144, 202, 249, 0) 77.58%)`
-                    : `linear-gradient(140.9.04deg, ${theme.palette.grey[700]} -14.02%, rgba(144, 202, 249, 0) 70.50%)`,
+                    ? `linear-gradient(140.9deg, ${theme.palette.primary[200]} -14.02%, rgba(144, 202, 249, 0) 77.58%)`
+                    : `linear-gradient(140.9deg, ${theme.palette.grey[700]} -14.02%, rgba(144, 202, 249, 0) 70.50%)`,
             borderRadius: '50%',
             top: '-160px',
             right: '-130px'
@@ -71,9 +72,9 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| INDIVIDUALS - SMALL COUNT CARD ||=========================== //
 
-const SmallCountCard = ({ isLoading, title, count, dark }) => {
+const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
     const classes = useStyles({ dark });
-    const icon = dark ? <TableChartOutlinedIcon fontSize="inherit" /> : <StorefrontTwoToneIcon fontSize="inherit" />;
+    // const icon = dark ? <TableChartOutlinedIcon fontSize="inherit" /> : <StorefrontTwoToneIcon fontSize="inherit" />;
 
     return (
         <>
@@ -117,7 +118,8 @@ SmallCountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
     count: PropTypes.number,
-    dark: PropTypes.bool
+    dark: PropTypes.bool,
+    icon: PropTypes.any
 };
 
 export default SmallCountCard;
