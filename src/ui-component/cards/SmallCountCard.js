@@ -9,10 +9,6 @@ import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
-// assets
-import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
-import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
-
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -74,7 +70,6 @@ const useStyles = makeStyles((theme) => ({
 
 const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
     const classes = useStyles({ dark });
-    // const icon = dark ? <TableChartOutlinedIcon fontSize="inherit" /> : <StorefrontTwoToneIcon fontSize="inherit" />;
 
     return (
         <>

@@ -15,6 +15,10 @@ import { trackPromise } from 'react-promise-tracker';
 import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
+// assets
+import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
+import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
+
 /*
  * Return the aggregation of diseases
  * @param {data}... Object
@@ -116,10 +120,21 @@ function IndividualsOverview() {
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCard isLoading={isLoading} title="Number of Diseases" count={diseasesSum} dark />
+                                <SmallCountCard
+                                    isLoading={isLoading}
+                                    title="Number of Diseases"
+                                    count={diseasesSum}
+                                    dark
+                                    icon={<TableChartOutlinedIcon fontSize="inherit" />}
+                                />
                             </Grid>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCard isLoading={isLoading} title="Number of Biosamples" count={biosampleCount} dark={false} />
+                                <SmallCountCard
+                                    title="Number of Biosamples"
+                                    count={biosampleCount}
+                                    dark={false}
+                                    icon={<StorefrontTwoToneIcon fontSize="inherit" />}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>
