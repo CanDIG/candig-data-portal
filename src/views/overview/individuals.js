@@ -3,19 +3,21 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
-import CountCardPrimary from './CountCardPrimary';
-import CountCardSecondary from './CountCardSecondary';
-import SmallCountCardDark from './SmallCountCardDark';
-import SmallCountCardLight from './SmallCountCardLight';
-import CustomOfflineChart from './CustomOfflineChart';
+import CountCard from 'ui-component/cards/CountCard';
+import SmallCountCard from 'ui-component/cards/SmallCountCard';
+import CustomOfflineChart from 'views/overview/CustomOfflineChart';
 
-import { groupBy } from '../../utils/utils';
-// import { schemaFxn } from '../../utils/ChordSchemas';
+import { groupBy } from 'utils/utils';
+// import { schemaFxn } from 'utils/ChordSchemas';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
 import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
+
+// assets
+import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
+import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
 
 /*
  * Return the aggregation of diseases
@@ -110,18 +112,29 @@ function IndividualsOverview() {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCardPrimary isLoading={isLoading} title="Number of Individuals" count={individualCounter} />
+                        <CountCard isLoading={isLoading} title="Number of Individuals" count={individualCounter} primary />
                     </Grid>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCardSecondary isLoading={isLoading} title="Phenotypic Features in Database" count={featureCount} />
+                        <CountCard isLoading={isLoading} title="Phenotypic Features in Database" count={featureCount} primary={false} />
                     </Grid>
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCardDark isLoading={isLoading} title="Number of Diseases" count={diseasesSum} />
+                                <SmallCountCard
+                                    isLoading={isLoading}
+                                    title="Number of Diseases"
+                                    count={diseasesSum}
+                                    dark
+                                    icon={<TableChartOutlinedIcon fontSize="inherit" />}
+                                />
                             </Grid>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCardLight isLoading={isLoading} title="Number of Biosamples" count={biosampleCount} />
+                                <SmallCountCard
+                                    title="Number of Biosamples"
+                                    count={biosampleCount}
+                                    dark={false}
+                                    icon={<StorefrontTwoToneIcon fontSize="inherit" />}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>

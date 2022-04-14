@@ -9,14 +9,11 @@ import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
-// assets
-import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
-
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
-        backgroundColor: theme.palette.primary.dark,
-        color: theme.palette.primary.light,
+        backgroundColor: ({ dark }) => (dark ? theme.palette.primary.dark : null),
+        color: ({ dark }) => (dark ? theme.palette.primary.light : null),
         overflow: 'hidden',
         position: 'relative',
         '&:after': {
@@ -24,8 +21,12 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: `linear-gradient(210.04deg, ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
+            background: ({ dark }) =>
+                dark
+                    ? `linear-gradient(210.04deg, ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`
+                    : `linear-gradient(210.04deg, ${theme.palette.grey[700]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
             borderRadius: '50%',
+            // top: '160px',
             top: '-30px',
             right: '-180px'
         },
@@ -34,7 +35,10 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: `linear-gradient(140.9deg, ${theme.palette.primary[200]} -14.02%, rgba(144, 202, 249, 0) 77.58%)`,
+            background: ({ dark }) =>
+                dark
+                    ? `linear-gradient(140.9deg, ${theme.palette.primary[200]} -14.02%, rgba(144, 202, 249, 0) 77.58%)`
+                    : `linear-gradient(140.9deg, ${theme.palette.grey[700]} -14.02%, rgba(144, 202, 249, 0) 70.50%)`,
             borderRadius: '50%',
             top: '-160px',
             right: '-130px'
@@ -46,14 +50,14 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
-        backgroundColor: theme.palette.primary[800],
-        color: '#fff'
+        backgroundColor: ({ dark }) => (dark ? theme.palette.primary[800] : theme.palette.grey[300]),
+        color: ({ dark }) => (dark ? '#fff' : theme.palette.grey[700])
     },
     primary: {
-        color: '#fff'
+        color: ({ dark }) => (dark ? '#fff' : null)
     },
     secondary: {
-        color: theme.palette.primary.light,
+        color: ({ dark }) => (dark ? theme.palette.primary.light : theme.palette.grey[500]),
         marginTop: '5px'
     },
     padding: {
@@ -64,8 +68,8 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| INDIVIDUALS - SMALL COUNT CARD ||=========================== //
 
-const SmallCountCardDark = ({ isLoading, title, count }) => {
-    const classes = useStyles();
+const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
+    const classes = useStyles({ dark });
 
     return (
         <>
@@ -77,7 +81,7 @@ const SmallCountCardDark = ({ isLoading, title, count }) => {
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
                             <ListItemAvatar>
                                 <Avatar variant="rounded" className={classes.avatar}>
-                                    <TableChartOutlinedIcon fontSize="inherit" />
+                                    {icon}
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText
@@ -105,10 +109,12 @@ const SmallCountCardDark = ({ isLoading, title, count }) => {
     );
 };
 
-SmallCountCardDark.propTypes = {
+SmallCountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
-    count: PropTypes.number
+    count: PropTypes.number,
+    dark: PropTypes.bool,
+    icon: PropTypes.any
 };
 
-export default SmallCountCardDark;
+export default SmallCountCard;
