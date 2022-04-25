@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 // material-ui
-import { useTheme } from '@material-ui/styles';
 import { Grid, Button } from '@material-ui/core';
 import Typography from '@mui/material/Typography';
 
@@ -13,8 +12,6 @@ import Error4042 from 'assets/images/ErrorPages/Error404-2.svg';
 import Error4043 from 'assets/images/ErrorPages/Error404-3.svg';
 
 function ErrorNotFoundPage() {
-    const theme = useTheme();
-
     const errorImages = [Error4040, Error4041, Error4042, Error4043];
     const index = Math.floor(Math.random() * errorImages.length);
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
+import { Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 
@@ -20,7 +20,7 @@ import 'assets/css/VariantsSearch.css';
 function FileDirectory() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    let { datasetId } = events.customization.update.datasetId;
+    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const { promiseInProgress } = usePromiseTracker();
 
     const [rowData, setRowData] = useState([]);
@@ -94,7 +94,7 @@ function FileDirectory() {
         const reqType = currentTable;
         const reqPath = currentTable.toLowerCase();
         setDisplayFilesTable(false);
-        datasetId = events.customization.update.datasetId;
+        setDatasetId(events.customization.update.datasetId);
 
         trackPromise(
             searchGenomicSets(datasetId, reqPath)
@@ -117,7 +117,7 @@ function FileDirectory() {
                 }),
             'table'
         );
-    }, [datasetId, currentTable, events.customization.update.datasetId]);
+    }, [datasetId, currentTable, events.customization.update.datasetId, setDatasetId]);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission

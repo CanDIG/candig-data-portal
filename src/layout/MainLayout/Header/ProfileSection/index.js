@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import {
     Avatar,
-    Card,
     CardContent,
     Chip,
     ClickAwayListener,
@@ -19,7 +18,6 @@ import {
     OutlinedInput,
     Paper,
     Popper,
-    Switch,
     Typography
 } from '@material-ui/core';
 import ListItemButton from '@material-ui/core/ListItemButton';
@@ -122,17 +120,12 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [sdm, setSdm] = React.useState(true);
     const [value, setValue] = React.useState('');
-    const [notification, setNotification] = React.useState(false);
     const [selectedIndex] = React.useState(1);
 
     const [open, setOpen] = React.useState(false);
 
     const anchorRef = React.useRef(null);
-    const handleLogout = async () => {
-        console.error('Logout');
-    };
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
