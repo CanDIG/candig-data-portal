@@ -329,7 +329,7 @@ export const processProceduresListData = (dataObject) => {
         patient.cancer_related_procedures.forEach((procedure) => {
             const key = procedure.code.id;
             if (!(key in list)) {
-                list[key] = procedure.procedure_typeo;
+                list[key] = procedure.procedure_type;
             }
         });
     });
