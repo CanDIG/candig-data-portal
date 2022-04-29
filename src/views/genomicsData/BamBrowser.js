@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 import MainCard from 'ui-component/cards/MainCard';
@@ -21,7 +21,7 @@ import 'assets/css/VariantsSearch.css';
 function BamBrowser() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    let { datasetId } = events.customization.update.datasetId;
+    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const [variantSet, setVariantSets] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
@@ -71,7 +71,7 @@ function BamBrowser() {
         options.length = 0;
         setReadsTracks([]);
         setLoading(false);
-        datasetId = events.customization.update.datasetId;
+        setDatasetId(events.customization.update.datasetId);
 
         // Check for variant and reference name set on datasetId changes
         trackPromise(
@@ -99,7 +99,7 @@ function BamBrowser() {
                     }
                 })
         );
-    }, [datasetId, options, events.customization.update.datasetId]);
+    }, [datasetId, options, events.customization.update.datasetId, setDatasetId]);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission

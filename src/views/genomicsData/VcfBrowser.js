@@ -18,7 +18,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 function VcfBrowser() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    let { datasetId } = events.customization.update.datasetId;
+    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const [variantSet, setVariantSets] = useState('');
     const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
@@ -49,7 +49,7 @@ function VcfBrowser() {
         setSelected([]);
         setVariantsTracks([]);
         options.length = 0;
-        datasetId = events.customization.update.datasetId;
+        setDatasetId(events.customization.update.datasetId);
 
         // Check for variant and reference name set on datasetId changes
         trackPromise(
@@ -75,7 +75,7 @@ function VcfBrowser() {
                     }
                 })
         );
-    }, [datasetId, options, events.customization.update.datasetId]);
+    }, [datasetId, options, events.customization.update.datasetId, setDatasetId]);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission
