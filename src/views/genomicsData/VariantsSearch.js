@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect, Alert } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 import { Grid } from '@material-ui/core';
 
 import { useSelector } from 'react-redux';
@@ -22,7 +22,7 @@ import 'assets/css/VariantsSearch.css';
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    let { datasetId } = events.customization.update.datasetId;
+    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
     const [variantSet, setVariantSets] = useState('');
@@ -71,7 +71,8 @@ function VariantsSearch() {
         setLoading(false);
         setDisplayVariantsTable(false);
         // Check for variant and reference name set on datasetId changes
-        datasetId = events.customization.update.datasetId;
+        setDatasetId(events.customization.update.datasetId);
+
         if (events.customization.update.datasetId) {
             trackPromise(
                 searchVariantSets(datasetId)
@@ -99,7 +100,7 @@ function VariantsSearch() {
                     })
             );
         }
-    }, [datasetId, events.customization.update.datasetId]);
+    }, [datasetId, events.customization.update.datasetId, setDatasetId]);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission

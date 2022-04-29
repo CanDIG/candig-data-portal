@@ -22,7 +22,7 @@ import 'assets/css/ReadsSearch.css';
 function ReadsSearch() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    let { datasetId } = events.customization.update.datasetId;
+    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const [rowData, setRowData] = useState([]);
     const [displayReadsTable, setDisplayReadsTable] = useState(false);
     const { promiseInProgress } = usePromiseTracker();
@@ -90,7 +90,7 @@ function ReadsSearch() {
         setDisplayReadsTable(false);
 
         // Check for variant and reference name set on datasetId changes
-        datasetId = events.customization.update.datasetId;
+        setDatasetId(events.customization.update.datasetId);
 
         if (events.customization.update.datasetId) {
             trackPromise(
@@ -109,7 +109,7 @@ function ReadsSearch() {
                 'tile'
             );
         }
-    }, [datasetId, events.customization.update.datasetId]);
+    }, [datasetId, events.customization.update.datasetId, setDatasetId]);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission

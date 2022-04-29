@@ -101,7 +101,8 @@ LightCard.propTypes = {
     isLoading: PropTypes.bool,
     header: PropTypes.string,
     value: PropTypes.any,
-    icon: PropTypes.any
+    icon: PropTypes.any,
+    color: PropTypes.string
 };
 
 export default LightCard;

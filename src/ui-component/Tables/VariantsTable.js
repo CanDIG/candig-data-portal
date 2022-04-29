@@ -96,7 +96,7 @@ function VariantsTable({ rowData, datasetId }) {
                 }
             })
             .catch((err) => {
-                // console.log(err);
+                console.log(err);
             });
     }
 
