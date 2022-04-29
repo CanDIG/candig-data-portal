@@ -181,7 +181,6 @@ export const processMCodeMainData = (dataObject) => {
     row.ethnicity = dataObject.subject.ethnicity || 'NA';
     row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
     row.date_of_death = dataObject.date_of_death || 'NA';
-    row.ethnicity = dataObject.subject.ethnicity || 'NA';
     row.race = dataObject.subject.race || 'NA';
     row.communication_language = dataObject.subject.extra_properties.communication_language || 'NA';
 
