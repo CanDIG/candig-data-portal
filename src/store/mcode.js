@@ -176,7 +176,7 @@ export const medicationStatementColumns = [
 export const processMCodeMainData = (dataObject) => {
     const row = {};
 
-    row.id = dataObject.id;
+    row.id = dataObject.id || null;
     row.sex = dataObject.subject.sex || 'NA';
     row.ethnicity = dataObject.subject.ethnicity || 'NA';
     row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
@@ -195,7 +195,7 @@ export const processMCodeMainData = (dataObject) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-    row.id = dataObject.id;
+    row.id = dataObject.id || null;
     row.sex = dataObject.subject.sex || 'NA';
     row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
     row.date_of_death = dataObject.date_of_death || 'NA';
@@ -217,13 +217,15 @@ export const processConditionsData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.cancer_condition.forEach((cancer_condition) => {
         const row = {};
-        row.id = cancer_condition.id;
-        row.condition_type = cancer_condition.condition_type || 'NA';
-        row.code_id = cancer_condition.code.id || 'NA';
-        row.code_label = cancer_condition.code.label || 'NA';
-        row.date_of_diagnosis = cancer_condition.date_of_diagnosis || 'NA';
+        row.id = cancer_condition.id || null;
+        if (row.id !== null) {
+            row.condition_type = cancer_condition.condition_type || 'NA';
+            row.code_id = cancer_condition.code.id || 'NA';
+            row.code_label = cancer_condition.code.label || 'NA';
+            row.date_of_diagnosis = cancer_condition.date_of_diagnosis || 'NA';
 
-        rows.push(row);
+            rows.push(row);
+        }
     });
 
     return rows;
@@ -240,14 +242,16 @@ export const processProceduresData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.cancer_related_procedures.forEach((cancer_related_procedure) => {
         const row = {};
-        row.id = cancer_related_procedure.id;
-        row.procedure_type = cancer_related_procedure.procedure_type || 'NA';
-        row.procedure_code_id = cancer_related_procedure.code.id || 'NA';
-        row.procedure_code_label = cancer_related_procedure.code.label || 'NA';
-        row.body_site_id = cancer_related_procedure.body_site.id || 'NA';
-        row.body_site_label = cancer_related_procedure.body_site.label || 'NA';
+        row.id = cancer_related_procedure.id || null;
+        if (row.id !== null) {
+            row.procedure_type = cancer_related_procedure.procedure_type || 'NA';
+            row.procedure_code_id = cancer_related_procedure.code.id || 'NA';
+            row.procedure_code_label = cancer_related_procedure.code.label || 'NA';
+            row.body_site_id = cancer_related_procedure.body_site.id || 'NA';
+            row.body_site_label = cancer_related_procedure.body_site.label || 'NA';
 
-        rows.push(row);
+            rows.push(row);
+        }
     });
 
     return rows;
@@ -264,11 +268,13 @@ export const processMedicationStatementData = (dataObject) => {
     // eslint-disable-next-line camelcase
     dataObject.medication_statement.forEach((medication_statement) => {
         const row = {};
-        row.id = medication_statement.id;
-        row.medication_code_id = medication_statement.medication_code.id || 'NA';
-        row.medication_code_label = medication_statement.medication_code.label || 'NA';
+        row.id = medication_statement.id || null;
+        if (row.id !== null) {
+            row.medication_code_id = medication_statement.medication_code.id || 'NA';
+            row.medication_code_label = medication_statement.medication_code.label || 'NA';
 
-        rows.push(row);
+            rows.push(row);
+        }
     });
 
     return rows;

@@ -255,7 +255,7 @@ export const resourcesColumns = [
  */
 export const processPhenopacketMainData = (dataObject) => {
     const row = {};
-    row.id = dataObject.id;
+    row.id = dataObject.id || null;
     row.ethnicity = dataObject.subject.ethnicity || 'NA';
     row.sex = dataObject.subject.sex || 'NA';
     row.height = dataObject.subject.extra_properties.height || 'NA';
@@ -290,13 +290,15 @@ export const processPhenotypicFeaturesData = (dataObject) => {
     dataObject.phenotypic_features.forEach((phenotypic_features) => {
         const row = {};
 
-        row.id = phenotypic_features.type.id;
-        row.label = phenotypic_features.type.label || 'NA';
-        row.description = phenotypic_features.description || 'NA';
-        row.negated = phenotypic_features.negated || 'NA';
-        row.datatype = phenotypic_features.extra_properties.datatype || 'NA';
+        row.id = phenotypic_features.type.id || null;
+        if (row.id !== null) {
+            row.label = phenotypic_features.type.label || 'NA';
+            row.description = phenotypic_features.description || 'NA';
+            row.negated = phenotypic_features.negated || 'NA';
+            row.datatype = phenotypic_features.extra_properties.datatype || 'NA';
 
-        rows.push(row);
+            rows.push(row);
+        }
     });
 
     return rows;
@@ -313,12 +315,14 @@ export const processDiseaseData = (dataObject) => {
     dataObject.diseases.forEach((diseases) => {
         const row = {};
 
-        row.id = diseases.id;
-        row.label = diseases.term.label || 'NA';
-        row.datatype = diseases.extra_properties.datatype || 'NA';
-        row.comorbidities_group = diseases.extra_properties.comorbidities_group || 'NA';
-        row.created = diseases.created || 'NA';
-        row.updated = diseases.updated || 'NA';
+        row.id = diseases.id || null;
+        if (row.id !== null) {
+            row.label = diseases.term.label || 'NA';
+            row.datatype = diseases.extra_properties.datatype || 'NA';
+            row.comorbidities_group = diseases.extra_properties.comorbidities_group || 'NA';
+            row.created = diseases.created || 'NA';
+            row.updated = diseases.updated || 'NA';
+        }
 
         rows.push(row);
     });
@@ -337,14 +341,16 @@ export const processResourcesData = (dataObject) => {
     dataObject.meta_data.resources.forEach((resources) => {
         const row = {};
 
-        row.id = resources.id;
-        row.name = resources.name || 'NA';
-        row.namespace_prefix = resources.namespace_prefix || 'NA';
-        row.url = resources.url || 'NA';
-        row.version = resources.version || 'NA';
-        row.iri_prefix = resources.iri_prefix || 'NA';
-        row.created = resources.created || 'NA';
-        row.updated = resources.updated || 'NA';
+        row.id = resources.id || null;
+        if (row.id !== null) {
+            row.name = resources.name || 'NA';
+            row.namespace_prefix = resources.namespace_prefix || 'NA';
+            row.url = resources.url || 'NA';
+            row.version = resources.version || 'NA';
+            row.iri_prefix = resources.iri_prefix || 'NA';
+            row.created = resources.created || 'NA';
+            row.updated = resources.updated || 'NA';
+        }
 
         rows.push(row);
     });
