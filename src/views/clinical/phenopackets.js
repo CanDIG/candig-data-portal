@@ -99,36 +99,40 @@ function Phenopackets() {
                 setPhenopacketsData(data);
                 const tempRows = [];
                 for (let i = 0; i < data.results.length; i += 1) {
-                    tempRows.push(processPhenopacketMainData(data.results[i]));
+                    if (processPhenopacketMainData(data.results[i]).id !== null) {
+                        tempRows.push(processPhenopacketMainData(data.results[i]));
+                    }
                 }
                 setRows(tempRows);
-                setSelectedPatient(tempRows[0].id);
-                setSelectedPatientMobileInfo({
-                    Ethnicity: tempRows[0].ethnicity,
-                    Sex: tempRows[0].sex,
-                    Birthday: tempRows[0].date_of_birth,
-                    Height: tempRows[0].height,
-                    Weight: tempRows[0].weight,
-                    BloodType: tempRows[0].abo_type,
-                    Education: tempRows[0].education,
-                    Household: tempRows[0].household,
-                    Pregnancy: tempRows[0].pregnancy,
-                    Employment: tempRows[0].employment,
-                    Asymptomatic: tempRows[0].asymptomatic,
-                    Covid19_test: tempRows[0].covid19_test,
-                    Hospitalized: tempRows[0].hospitalized,
-                    Birth_country: tempRows[0].birth_country,
-                    Host_hospital: tempRows[0].host_hospital,
-                    Residence_type: tempRows[0].residence_type,
-                    Enrollment_date: tempRows[0].enrollment_date,
-                    Covid19_test_date: tempRows[0].Covid19_test_date,
-                    Covid19_diagnosis_date: tempRows[0].covid19_diagnosis_date
-                });
+                if (tempRows[0].id !== null) {
+                    setSelectedPatient(tempRows[0].id);
+                    setSelectedPatientMobileInfo({
+                        Ethnicity: tempRows[0].ethnicity,
+                        Sex: tempRows[0].sex,
+                        Birthday: tempRows[0].date_of_birth,
+                        Height: tempRows[0].height,
+                        Weight: tempRows[0].weight,
+                        BloodType: tempRows[0].abo_type,
+                        Education: tempRows[0].education,
+                        Household: tempRows[0].household,
+                        Pregnancy: tempRows[0].pregnancy,
+                        Employment: tempRows[0].employment,
+                        Asymptomatic: tempRows[0].asymptomatic,
+                        Covid19_test: tempRows[0].covid19_test,
+                        Hospitalized: tempRows[0].hospitalized,
+                        Birth_country: tempRows[0].birth_country,
+                        Host_hospital: tempRows[0].host_hospital,
+                        Residence_type: tempRows[0].residence_type,
+                        Enrollment_date: tempRows[0].enrollment_date,
+                        Covid19_test_date: tempRows[0].Covid19_test_date,
+                        Covid19_diagnosis_date: tempRows[0].covid19_diagnosis_date
+                    });
 
-                // Subtables
-                setPhenotypicFeatures(processPhenotypicFeaturesData(data.results[0]));
-                setDiseases(processDiseaseData(data.results[0]));
-                setResources(processResourcesData(data.results[0]));
+                    // Subtables
+                    setPhenotypicFeatures(processPhenotypicFeaturesData(data.results[0]));
+                    setDiseases(processDiseaseData(data.results[0]));
+                    setResources(processResourcesData(data.results[0]));
+                }
             })
         );
 
@@ -191,7 +195,7 @@ function Phenopackets() {
                         <span>{selectedPatient}</span>
                     </Box>
                 )}
-                {!desktopResolution && (
+                {!desktopResolution && selectedPatient && (
                     <SingleRowTable
                         dropDownLabel="Patient Id"
                         dropDownSelection={selectedPatient}

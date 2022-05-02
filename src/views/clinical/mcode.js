@@ -99,6 +99,7 @@ function MCodeView() {
     // Subtable selection of patient
     const handleRowClick = (row) => {
         const index = mcodeData.results.findIndex((item) => item.id === row.id);
+
         setSelectedPatient(mcodeData.results[index].id);
         setSelectedPatientMobileInfo({
             Ethnicity: mcodeData.results[index].subject.ethnicity,
@@ -138,7 +139,9 @@ function MCodeView() {
                     // Patient table filtering
                     if (selectedConditions === 'All' && selectedProcedures === 'All' && selectedMedications === 'All') {
                         // All patients
-                        tempRows.push(processMCodeMainData(data.results[i]));
+                        if (processMCodeMainData(data.results[i]).id !== null) {
+                            tempRows.push(processMCodeMainData(data.results[i]));
+                        }
                     } else {
                         // Filtered patients
                         let patientCondition = false;
@@ -166,20 +169,27 @@ function MCodeView() {
                             return true;
                         });
 
-                        if (patientCondition && patientProcedure && patientMedication) {
+                        if (
+                            patientCondition &&
+                            patientProcedure &&
+                            patientMedication &&
+                            processMCodeMainData(data.results[i]).id !== null
+                        ) {
                             tempRows.push(processMCodeMainData(data.results[i]));
                         }
                     }
                 }
                 setRows(tempRows);
-                setSelectedPatient(tempRows[0].id);
-                setSelectedPatientMobileInfo({
-                    Ethnicity: tempRows[0].ethnicity,
-                    Sex: tempRows[0].sex,
-                    Birthday: tempRows[0].date_of_birth,
-                    DeathDate: tempRows[0].date_of_death,
-                    Language: tempRows[0].communication_language
-                });
+                if (tempRows[0].id !== null) {
+                    setSelectedPatient(tempRows[0].id);
+                    setSelectedPatientMobileInfo({
+                        Ethnicity: tempRows[0].ethnicity,
+                        Sex: tempRows[0].sex,
+                        Birthday: tempRows[0].date_of_birth,
+                        DeathDate: tempRows[0].date_of_death,
+                        Language: tempRows[0].communication_language
+                    });
+                }
 
                 // Subtables
                 const index = data.results.findIndex((item) => item.id === tempRows[0].id);
@@ -258,7 +268,7 @@ function MCodeView() {
                         </Table>
                     </TableContainer>
                 )}
-                {!desktopResolution && (
+                {!desktopResolution && selectedPatient && (
                     <SingleRowTable
                         dropDownLabel="Patient Id"
                         dropDownSelection={selectedPatient}

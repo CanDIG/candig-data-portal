@@ -255,26 +255,26 @@ export const resourcesColumns = [
  */
 export const processPhenopacketMainData = (dataObject) => {
     const row = {};
-    row.id = dataObject.id;
-    row.ethnicity = dataObject.subject.ethnicity;
-    row.sex = dataObject.subject.sex;
-    row.height = dataObject.subject.extra_properties.height;
-    row.weight = dataObject.subject.extra_properties.weight;
-    row.abo_type = dataObject.subject.extra_properties.abo_type;
-    row.education = dataObject.subject.extra_properties.education;
-    row.household = dataObject.subject.extra_properties.household;
-    row.pregnancy = dataObject.subject.extra_properties.pregnancy;
-    row.employment = dataObject.subject.extra_properties.employment;
-    row.asymptomatic = dataObject.subject.extra_properties.asymptomatic;
-    row.covid19_test = dataObject.subject.extra_properties.covid19_test;
-    row.hospitalized = dataObject.subject.extra_properties.hospitalized;
-    row.birth_country = dataObject.subject.extra_properties.birth_country;
-    row.host_hospital = dataObject.subject.extra_properties.host_hospital;
-    row.residence_type = dataObject.subject.extra_properties.residence_type;
-    row.enrollment_date = dataObject.subject.extra_properties.enrollment_date;
-    row.covid19_test_date = dataObject.subject.extra_properties.covid19_test_date;
-    row.covid19_diagnosis_date = dataObject.subject.extra_properties.covid19_diagnosis_date;
-    row.date_of_birth = dataObject.subject.date_of_birth;
+    row.id = dataObject.id || null;
+    row.ethnicity = dataObject.subject.ethnicity || 'NA';
+    row.sex = dataObject.subject.sex || 'NA';
+    row.height = dataObject.subject.extra_properties.height || 'NA';
+    row.weight = dataObject.subject.extra_properties.weight || 'NA';
+    row.abo_type = dataObject.subject.extra_properties.abo_type || 'NA';
+    row.education = dataObject.subject.extra_properties.education || 'NA';
+    row.household = dataObject.subject.extra_properties.household || 'NA';
+    row.pregnancy = dataObject.subject.extra_properties.pregnancy || 'NA';
+    row.employment = dataObject.subject.extra_properties.employment || 'NA';
+    row.asymptomatic = dataObject.subject.extra_properties.asymptomatic || 'NA';
+    row.covid19_test = dataObject.subject.extra_properties.covid19_test || 'NA';
+    row.hospitalized = dataObject.subject.extra_properties.hospitalized || 'NA';
+    row.birth_country = dataObject.subject.extra_properties.birth_country || 'NA';
+    row.host_hospital = dataObject.subject.extra_properties.host_hospital || 'NA';
+    row.residence_type = dataObject.subject.extra_properties.residence_type || 'NA';
+    row.enrollment_date = dataObject.subject.extra_properties.enrollment_date || 'NA';
+    row.covid19_test_date = dataObject.subject.extra_properties.covid19_test_date || 'NA';
+    row.covid19_diagnosis_date = dataObject.subject.extra_properties.covid19_diagnosis_date || 'NA';
+    row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
 
     return row;
 };
@@ -290,13 +290,15 @@ export const processPhenotypicFeaturesData = (dataObject) => {
     dataObject.phenotypic_features.forEach((phenotypic_features) => {
         const row = {};
 
-        row.id = phenotypic_features.type.id;
-        row.label = phenotypic_features.type.label;
-        row.description = phenotypic_features.description;
-        row.negated = phenotypic_features.negated;
-        row.datatype = phenotypic_features.extra_properties.datatype;
+        row.id = phenotypic_features.type.id || null;
+        if (row.id !== null) {
+            row.label = phenotypic_features.type.label || 'NA';
+            row.description = phenotypic_features.description || 'NA';
+            row.negated = phenotypic_features.negated || 'NA';
+            row.datatype = phenotypic_features.extra_properties.datatype || 'NA';
 
-        rows.push(row);
+            rows.push(row);
+        }
     });
 
     return rows;
@@ -313,12 +315,14 @@ export const processDiseaseData = (dataObject) => {
     dataObject.diseases.forEach((diseases) => {
         const row = {};
 
-        row.id = diseases.id;
-        row.label = diseases.term.label;
-        row.datatype = diseases.extra_properties.datatype;
-        row.comorbidities_group = diseases.extra_properties.comorbidities_group;
-        row.created = diseases.created;
-        row.updated = diseases.updated;
+        row.id = diseases.id || null;
+        if (row.id !== null) {
+            row.label = diseases.term.label || 'NA';
+            row.datatype = diseases.extra_properties.datatype || 'NA';
+            row.comorbidities_group = diseases.extra_properties.comorbidities_group || 'NA';
+            row.created = diseases.created || 'NA';
+            row.updated = diseases.updated || 'NA';
+        }
 
         rows.push(row);
     });
@@ -337,14 +341,16 @@ export const processResourcesData = (dataObject) => {
     dataObject.meta_data.resources.forEach((resources) => {
         const row = {};
 
-        row.id = resources.id;
-        row.name = resources.name;
-        row.namespace_prefix = resources.namespace_prefix;
-        row.url = resources.url;
-        row.version = resources.version;
-        row.iri_prefix = resources.iri_prefix;
-        row.created = resources.created;
-        row.updated = resources.updated;
+        row.id = resources.id || null;
+        if (row.id !== null) {
+            row.name = resources.name || 'NA';
+            row.namespace_prefix = resources.namespace_prefix || 'NA';
+            row.url = resources.url || 'NA';
+            row.version = resources.version || 'NA';
+            row.iri_prefix = resources.iri_prefix || 'NA';
+            row.created = resources.created || 'NA';
+            row.updated = resources.updated || 'NA';
+        }
 
         rows.push(row);
     });
