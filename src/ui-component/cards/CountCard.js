@@ -10,8 +10,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 
 // assets
-import EarningIcon from 'assets/images/icons/earning.svg';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import GetAppTwoToneIcon from '@material-ui/icons/GetAppOutlined';
 import FileCopyTwoToneIcon from '@material-ui/icons/FileCopyOutlined';
@@ -62,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
+        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
         marginTop: '8px'
     },
     avatarRight: {
@@ -100,14 +99,14 @@ const useStyles = makeStyles((theme) => ({
 
 //= ==========================|| INDIVIDUAL OVERVIEW - COUNT CARD ||===========================//
 
-const CountCard = ({ isLoading, title, count, primary }) => {
+const CountCard = ({ isLoading, title, count, primary, icon }) => {
     const classes = useStyles({ primary });
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const handleClick = (event) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -124,19 +123,10 @@ const CountCard = ({ isLoading, title, count, primary }) => {
                             <Grid container justifyContent="space-between">
                                 <Grid item>
                                     <Avatar variant="rounded" className={classes.avatar}>
-                                        <img src={EarningIcon} alt="Notification" />
+                                        {icon}
                                     </Avatar>
                                 </Grid>
                                 <Grid item>
-                                    <Avatar
-                                        variant="rounded"
-                                        className={classes.avatarRight}
-                                        aria-controls="menu-earning-card"
-                                        aria-haspopup="true"
-                                        onClick={handleClick}
-                                    >
-                                        <MoreHorizIcon fontSize="inherit" />
-                                    </Avatar>
                                     <Menu
                                         id="menu-earning-card"
                                         anchorEl={anchorEl}
@@ -195,7 +185,8 @@ CountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
     count: PropTypes.number,
-    primary: PropTypes.bool
+    primary: PropTypes.bool,
+    icon: PropTypes.any
 };
 
 export default CountCard;

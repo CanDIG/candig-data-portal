@@ -175,15 +175,6 @@ const SearchSection = () => {
                             <IconSearch stroke={1.5} size="1rem" className={classes.startAdornment} />
                         </InputAdornment>
                     }
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <ButtonBase sx={{ borderRadius: '12px' }}>
-                                <Avatar variant="rounded" className={classes.headerAvatar}>
-                                    <IconAdjustmentsHorizontal stroke={1.5} size="1.3rem" />
-                                </Avatar>
-                            </ButtonBase>
-                        </InputAdornment>
-                    }
                     aria-describedby="search-helper-text"
                     inputProps={{
                         'aria-label': 'weight'
