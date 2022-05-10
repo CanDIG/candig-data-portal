@@ -16,8 +16,9 @@ import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
-import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
-import StorefrontTwoToneIcon from '@material-ui/icons/StorefrontTwoTone';
+import BiotechIcon from '@material-ui/icons/Biotech';
+import QueryStatsIcon from '@material-ui/icons/QueryStats';
+import PersonIcon from '@material-ui/icons/Person';
 
 /*
  * Return the aggregation of diseases
@@ -112,10 +113,22 @@ function IndividualsOverview() {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCard isLoading={isLoading} title="Number of Individuals" count={individualCounter} primary />
+                        <CountCard
+                            isLoading={isLoading}
+                            title="Number of Individuals"
+                            count={individualCounter}
+                            primary
+                            icon={<PersonIcon fontSize="inherit" />}
+                        />
                     </Grid>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCard isLoading={isLoading} title="Phenotypic Features in Database" count={featureCount} primary={false} />
+                        <CountCard
+                            isLoading={isLoading}
+                            title="Phenotypic Features in Database"
+                            count={featureCount}
+                            primary={false}
+                            icon={<PersonIcon fontSize="inherit" />}
+                        />
                     </Grid>
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
@@ -125,7 +138,7 @@ function IndividualsOverview() {
                                     title="Number of Diseases"
                                     count={diseasesSum}
                                     dark
-                                    icon={<TableChartOutlinedIcon fontSize="inherit" />}
+                                    icon={<QueryStatsIcon fontSize="inherit" />}
                                 />
                             </Grid>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
@@ -133,7 +146,7 @@ function IndividualsOverview() {
                                     title="Number of Biosamples"
                                     count={biosampleCount}
                                     dark={false}
-                                    icon={<StorefrontTwoToneIcon fontSize="inherit" />}
+                                    icon={<BiotechIcon fontSize="inherit" />}
                                 />
                             </Grid>
                         </Grid>
