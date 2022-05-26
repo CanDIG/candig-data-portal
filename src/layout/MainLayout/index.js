@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 // material-ui
-import { makeStyles, useTheme } from '@material-ui/styles';
-import { AppBar, CssBaseline, Toolbar, useMediaQuery } from '@material-ui/core';
+import { makeStyles, useTheme } from '@mui/styles';
+import { AppBar, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
 
 // third-party
 import clsx from 'clsx';
@@ -45,12 +45,12 @@ const useStyles = makeStyles((theme) => ({
             marginLeft: -(drawerWidth - 20),
             width: `calc(100% - ${drawerWidth}px)`
         },
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             marginLeft: '20px',
             width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px'
         },
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             marginLeft: '10px',
             width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px',
@@ -65,10 +65,10 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 0,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             marginLeft: '20px'
         },
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             marginLeft: '10px'
         }
     }
@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
 const MainLayout = () => {
     const classes = useStyles();
     const theme = useTheme();
-    const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
+    const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 
     // Handle left drawer
     const leftDrawerOpened = useSelector((state) => state.customization.opened);

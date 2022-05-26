@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // material-ui
-import { Grid, Button } from '@material-ui/core';
+import { Grid, Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
 // project imports

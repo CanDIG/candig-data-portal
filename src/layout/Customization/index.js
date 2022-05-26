@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
-import { useTheme } from '@material-ui/styles';
+import { useTheme } from '@mui/styles';
 import {
     Drawer,
     Fab,
@@ -15,7 +15,7 @@ import {
     Slider,
     Tooltip,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';

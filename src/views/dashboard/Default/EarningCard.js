@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Grid, Menu, MenuItem, Typography } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -11,12 +11,12 @@ import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 
 // assets
 import EarningIcon from 'assets/images/icons/earning.svg';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import GetAppTwoToneIcon from '@material-ui/icons/GetAppOutlined';
-import FileCopyTwoToneIcon from '@material-ui/icons/FileCopyOutlined';
-import PictureAsPdfTwoToneIcon from '@material-ui/icons/PictureAsPdfOutlined';
-import ArchiveTwoToneIcon from '@material-ui/icons/ArchiveOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
+import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
             borderRadius: '50%',
             top: '-85px',
             right: '-95px',
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-105px',
                 right: '-140px'
             }
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
             top: '-125px',
             right: '-15px',
             opacity: 0.5,
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-155px',
                 right: '-70px'
             }

@@ -1,7 +1,7 @@
 import React from 'react';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
     Avatar,
     Button,
@@ -17,7 +17,7 @@ import {
     ListItemText,
     Stack,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 // assets
 import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@tabler/icons';
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         paddingTop: 0,
         paddingBottom: 0,
         borderRadius: '10px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             maxWidth: '300px'
         }
     },

@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // material-ui
-import { useTheme } from '@material-ui/styles';
-import { Box, Card, Grid } from '@material-ui/core';
+import { useTheme } from '@mui/styles';
+import { Box, Card, Grid } from '@mui/material';
 
 // project imports
 import SubCard from 'ui-component/cards/SubCard';

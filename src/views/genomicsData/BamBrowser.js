@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 import { BASE_URL, ListOfReferenceNames, referenceToIgvTrack } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import AlertComponent from 'ui-component/AlertComponent';
 

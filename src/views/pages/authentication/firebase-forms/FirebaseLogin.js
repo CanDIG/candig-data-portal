@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
     Box,
     Button,
@@ -19,7 +19,7 @@ import {
     OutlinedInput,
     Stack,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 // third party
 import * as Yup from 'yup';
@@ -30,8 +30,8 @@ import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
 // assets
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import Google from 'assets/images/icons/social-google.svg';
 
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             backgroundColor: theme.palette.primary.light
         },
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             fontSize: '0.875rem'
         }
     },
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     },
     loginIcon: {
         marginRight: '16px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             marginRight: '8px'
         }
     },
@@ -214,6 +214,7 @@ const FirebaseLogin = (props, { ...others }) => {
                                             onClick={handleClickShowPassword}
                                             onMouseDown={handleMouseDownPassword}
                                             edge="end"
+                                            size="large"
                                         >
                                             {showPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>

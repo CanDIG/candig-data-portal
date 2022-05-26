@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Divider, List, Typography } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Divider, List, Typography } from '@mui/material';
 
 // project imports
 import NavItem from '../NavItem';

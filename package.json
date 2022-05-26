@@ -5,8 +5,8 @@
     "dependencies": {
         "@candig/igv": "^2.10.5-c.1",
         "@emotion/cache": "^11.4.0",
-        "@emotion/react": "^11.4.1",
-        "@emotion/styled": "^11.3.0",
+        "@emotion/react": "^11.9.0",
+        "@emotion/styled": "^11.8.1",
         "@material-ui/core": "^5.0.0-beta.0",
         "@material-ui/data-grid": "^4.0.0-alpha.33",
         "@material-ui/icons": "^5.0.0-beta.0",

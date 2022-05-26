@@ -2,8 +2,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 // material-ui
-import { useTheme, makeStyles } from '@material-ui/styles';
-import { Box } from '@material-ui/core';
+import { useTheme, makeStyles } from '@mui/styles';
+import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import TableContainer from '@mui/material/TableContainer';

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 
 import { ListOfReferenceNames } from 'store/constant';
 import ReadsTable from 'ui-component/Tables/ReadsTable';
 import { searchReadGroupSets, searchReads, getReferenceSet } from 'store/api';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 

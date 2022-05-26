@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Box, ButtonBase, Card, CardContent, Grid, InputAdornment, OutlinedInput, Popper } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Box, ButtonBase, Card, CardContent, Grid, InputAdornment, OutlinedInput, Popper } from '@mui/material';
 
 // third-party
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
@@ -24,10 +24,10 @@ const useStyles = makeStyles((theme) => ({
             background: 'transparent !important',
             paddingLeft: '5px !important'
         },
-        [theme.breakpoints.down('lg')]: {
+        [theme.breakpoints.down('xl')]: {
             width: '250px'
         },
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             width: '100%',
             marginLeft: '4px',
             background: '#fff'
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
         width: '99%',
         top: '-55px !important',
         padding: '0 12px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             padding: '0 10px'
         }
     },
@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     },
     card: {
         background: '#fff',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             border: 0,
             boxShadow: 'none'
         }

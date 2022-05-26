@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 // material-ui
-// import { useTheme, makeStyles } from '@material-ui/styles';
-import { Grid } from '@material-ui/core';
+// import { useTheme, makeStyles } from '@mui/styles';
+import { Grid } from '@mui/material';
 import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
@@ -16,9 +16,9 @@ import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
-import BiotechIcon from '@material-ui/icons/Biotech';
-import QueryStatsIcon from '@material-ui/icons/QueryStats';
-import PersonIcon from '@material-ui/icons/Person';
+import BiotechIcon from '@mui/icons-material/Biotech';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import PersonIcon from '@mui/icons-material/Person';
 
 /*
  * Return the aggregation of diseases

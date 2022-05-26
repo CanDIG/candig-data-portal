@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
@@ -14,7 +13,7 @@ import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import AlertComponent from 'ui-component/AlertComponent';
 
 import 'assets/css/VariantsSearch.css';

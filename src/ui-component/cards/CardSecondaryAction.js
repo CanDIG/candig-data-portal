@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // material-ui
-import { useTheme } from '@material-ui/styles';
-import { ButtonBase, Link, Tooltip } from '@material-ui/core';
+import { useTheme } from '@mui/styles';
+import { ButtonBase, Link, Tooltip } from '@mui/material';
 
 // project imports
 import Avatar from '../extended/Avatar';

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Box, Button, FormControl } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 import { BASE_URL, referenceToIgvTrack } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import VcfInstance from 'ui-component/IGV/VcfInstance';
 import { searchVariantSets, getReferenceSet } from 'store/api';

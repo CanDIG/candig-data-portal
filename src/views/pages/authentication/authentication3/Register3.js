@@ -2,8 +2,8 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 // material-ui
-import { useTheme } from '@material-ui/core/styles';
-import { Divider, Grid, Stack, Typography, useMediaQuery } from '@material-ui/core';
+import { useTheme } from '@mui/material/styles';
+import { Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 
 // project imports
 import AuthWrapper1 from '../AuthWrapper1';
@@ -18,7 +18,7 @@ import AuthFooter from 'ui-component/cards/AuthFooter';
 
 const Register = () => {
     const theme = useTheme();
-    const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+    const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
     return (
         <AuthWrapper1>

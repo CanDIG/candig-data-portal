@@ -4,15 +4,15 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Chip, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@material-ui/core';
-import ListItemButton from '@material-ui/core/ListItemButton';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Chip, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
+import ListItemButton from '@mui/material/ListItemButton';
 
 // project imports
 import { MENU_OPEN, SET_MENU } from 'store/actions';
 
 // assets
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +51,7 @@ const NavItem = ({ item, level }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
-    const matchesSM = useMediaQuery((theme) => theme.breakpoints.down('md'));
+    const matchesSM = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
     const Icon = item.icon;
     const itemIcon = item.icon ? (

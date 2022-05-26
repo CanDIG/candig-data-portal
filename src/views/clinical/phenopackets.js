@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 // material-ui
-import { useTheme, makeStyles } from '@material-ui/styles';
+import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box } from '@material-ui/core';
+import { Grid, Box } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';

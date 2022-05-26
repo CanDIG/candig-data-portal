@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // material-ui
-import { makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import {
     Avatar,
     CardContent,
@@ -19,8 +19,8 @@ import {
     Paper,
     Popper,
     Typography
-} from '@material-ui/core';
-import ListItemButton from '@material-ui/core/ListItemButton';
+} from '@mui/material';
+import ListItemButton from '@mui/material/ListItemButton';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
         minWidth: '300px',
         backgroundColor: theme.palette.background.paper,
         borderRadius: '10px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             minWidth: '100%'
         }
     },

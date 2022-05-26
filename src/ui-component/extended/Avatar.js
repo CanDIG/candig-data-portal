@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // material-ui
-import { makeStyles } from '@material-ui/styles';
-import MuiAvatar from '@material-ui/core/Avatar';
+import { makeStyles } from '@mui/styles';
+import MuiAvatar from '@mui/material/Avatar';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
