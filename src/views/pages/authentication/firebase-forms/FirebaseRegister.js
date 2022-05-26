@@ -199,6 +199,7 @@ const FirebaseRegister = ({ ...others }) => {
                                     type="text"
                                     defaultValue="Joseph"
                                     className={classes.loginInput}
+                                    variant="standard"
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -210,6 +211,7 @@ const FirebaseRegister = ({ ...others }) => {
                                     type="text"
                                     defaultValue="Doe"
                                     className={classes.loginInput}
+                                    variant="standard"
                                 />
                             </Grid>
                         </Grid>

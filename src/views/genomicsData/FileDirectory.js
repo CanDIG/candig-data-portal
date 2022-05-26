@@ -195,7 +195,7 @@ function FileDirectory() {
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <Button type="submit" variant="contained">
                                         Search
                                     </Button>

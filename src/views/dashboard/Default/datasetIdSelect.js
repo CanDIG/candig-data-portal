@@ -83,6 +83,7 @@ export default function DatasetIdSelect() {
                             value={selectedDataset}
                             label="Dataset ID"
                             name="POG"
+                            variant="standard"
                             sx={{ fontsize: '0.25rem', height: '1.75rem' }}
                         >
                             {datasetList}

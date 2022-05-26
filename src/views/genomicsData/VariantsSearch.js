@@ -194,7 +194,7 @@ function VariantsSearch() {
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
                                 {options.length > 0 && (
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <Grid container direction="row" alignItems="center">
                                             <Box mr={2}>
                                                 <p>Variant Set</p>
@@ -219,19 +219,19 @@ function VariantsSearch() {
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <InputLabel for="start">Start</InputLabel>
                                     <Input required type="number" id="start" />
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <InputLabel for="end">End</InputLabel>
                                     <Input required type="number" id="end" />
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <Button type="submit" variant="contained">
                                         Search
                                     </Button>

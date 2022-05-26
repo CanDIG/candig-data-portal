@@ -106,6 +106,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                                     <TextField
                                         id="standard-select-currency"
                                         select
+                                        variant="standard"
                                         value={value}
                                         onChange={(e) => setValue(e.target.value)}
                                     >

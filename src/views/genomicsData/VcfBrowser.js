@@ -151,7 +151,7 @@ function VcfBrowser() {
                     <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                         <Grid item>
                             {options.length > 0 && (
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <Grid container direction="row" alignItems="center">
                                         <Box mr={2}>
                                             <p>VCF</p>
@@ -169,7 +169,7 @@ function VcfBrowser() {
                         </Grid>
 
                         <Grid item>
-                            <FormControl>
+                            <FormControl variant="standard">
                                 <Button type="submit" variant="contained">
                                     Search
                                 </Button>

@@ -206,6 +206,7 @@ const NotificationSection = () => {
                                                                     id="outlined-select-currency-native"
                                                                     select
                                                                     fullWidth
+                                                                    variant="standard"
                                                                     value={value}
                                                                     onChange={handleChange}
                                                                     SelectProps={{

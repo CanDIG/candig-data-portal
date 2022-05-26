@@ -133,7 +133,7 @@ const Customization = () => {
                         <Grid item xs={12}>
                             {/* font family */}
                             <SubCard title="Font Family">
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <RadioGroup
                                         aria-label="font-family"
                                         value={fontFamily}

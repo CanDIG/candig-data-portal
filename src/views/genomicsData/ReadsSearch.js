@@ -210,19 +210,19 @@ function ReadsSearch() {
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <InputLabel for="start">Start</InputLabel>
                                         <Input required type="number" id="start" />
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <InputLabel for="end">End</InputLabel>
                                         <Input required type="number" id="end" />
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <Button type="submit" variant="contained">
                                             Search
                                         </Button>
