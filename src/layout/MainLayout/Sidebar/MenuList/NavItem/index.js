@@ -73,7 +73,7 @@ const NavItem = ({ item, level }) => {
         itemTarget = '_blank';
     }
 
-    let listItemProps = { component: React.forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} />) };
+    let listItemProps = { component: React.forwardRef((props, ref) => <Link underline="hover" ref={ref} {...props} to={item.url} />) };
     if (item.external) {
         listItemProps = { component: 'a', href: item.url };
     }
