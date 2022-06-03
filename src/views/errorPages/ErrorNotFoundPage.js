@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-// material-ui
+// mui
 import { Grid, Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
 

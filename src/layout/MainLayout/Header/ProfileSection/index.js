@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// material-ui
 import { makeStyles, useTheme } from '@mui/styles';
 import {
     Avatar,

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-// material-ui
+// mui
 import { makeStyles } from '@mui/styles';
 import { Collapse, List, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';

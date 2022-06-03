@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-// material-ui
+// mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Grid, Box } from '@mui/material';

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
+// mui
 import { useTheme } from '@mui/styles';
 import { Box, Card, Grid, Typography } from '@mui/material';
 

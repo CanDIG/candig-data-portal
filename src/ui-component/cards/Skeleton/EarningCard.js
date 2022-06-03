@@ -1,6 +1,6 @@
 import React from 'react';
 
-// material-ui
+// mui
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Grid, Skeleton } from '@mui/material';
 

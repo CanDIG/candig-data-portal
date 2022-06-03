@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// material-ui
+// mui
 import { ButtonBase } from '@mui/material';
 
 // project imports

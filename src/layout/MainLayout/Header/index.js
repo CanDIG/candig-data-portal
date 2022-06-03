@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
 import { makeStyles } from '@mui/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 

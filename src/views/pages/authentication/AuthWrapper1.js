@@ -1,4 +1,4 @@
-// material-ui
+// mui
 import { styled } from '@mui/styles';
 
 // ===========================|| AUTHENTICATION 1 WRAPPER ||=========================== //

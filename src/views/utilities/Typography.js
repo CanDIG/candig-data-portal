@@ -1,5 +1,5 @@
 import React from 'react';
-// material-ui
+// mui
 import { Grid, Link } from '@mui/material';
 import MuiTypography from '@mui/material/Typography';
 

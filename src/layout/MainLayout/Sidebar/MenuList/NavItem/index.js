@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-// material-ui
+// mui
 import { makeStyles } from '@mui/styles';
 import { Avatar, Chip, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';

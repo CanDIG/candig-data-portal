@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// material-ui
 import { makeStyles, useTheme } from '@mui/styles';
 import {
     Avatar,

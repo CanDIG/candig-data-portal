@@ -1,6 +1,5 @@
 import React from 'react';
 
-// material-ui
 import { makeStyles } from '@mui/styles';
 import {
     Avatar,

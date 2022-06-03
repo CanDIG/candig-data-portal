@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
+// mui
 import { makeStyles, useTheme } from '@mui/styles';
 import { Box, Drawer, useMediaQuery } from '@mui/material';
 

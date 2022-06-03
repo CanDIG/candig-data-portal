@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// material-ui
+// mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';

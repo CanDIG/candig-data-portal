@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-// material-ui
+// mui
 import { Grid } from '@mui/material';
 
 // project imports

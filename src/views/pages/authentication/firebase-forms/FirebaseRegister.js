@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// material-ui
+// mui
 import { makeStyles } from '@mui/styles';
 import {
     Box,
