@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 // mui
 import { makeStyles } from '@mui/styles';
 import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
+
+// REDUX
+import { useSelector, useDispatch } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -101,7 +104,9 @@ const useStyles = makeStyles((theme) => ({
 
 const CountCard = ({ isLoading, title, count, primary, icon }) => {
     const classes = useStyles({ primary });
+    const events = useSelector((state) => state);
 
+    // STATES
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     // const handleClick = (event) => {
@@ -117,7 +122,7 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
-                <MainCard border={false} className={classes.card} contentClass={classes.content}>
+                <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }} border={false} className={classes.card} contentClass={classes.content}>
                     <Grid container direction="column">
                         <Grid item>
                             <Grid container justifyContent="space-between">

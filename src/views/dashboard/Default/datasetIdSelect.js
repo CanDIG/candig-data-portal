@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -73,7 +72,7 @@ export default function DatasetIdSelect() {
 
     return (
         <Box>
-            <Box sx={{ border: 1, borderRadius: 16, position: 'absolute', top: 12, right: 10, pr: 1, pl: 1 }}>
+            <Box sx={{ border: 1, borderRadius: events.customization.borderRadius * 0.25, position: 'absolute', top: 12, right: 10, pr: 1, pl: 1 }}>
                 {selectedDataset && (
                     <FormControl sx={{ minWidth: 125 }} >
                         {/* <InputLabel id="demo-simple-select-label">Dataset ID</InputLabel> */}

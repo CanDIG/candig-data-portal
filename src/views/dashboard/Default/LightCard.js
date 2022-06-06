@@ -5,6 +5,9 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
+// REDUX
+import { useSelector } from 'react-redux';
+
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
@@ -12,6 +15,7 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 // ===========================|| DASHBOARD - TOTAL INCOME LIGHT CARD ||=========================== //
 
 const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
+    const events = useSelector((state) => state);
     const useStyles = makeStyles((theme) => ({
         card: {
             backgroundColor: '#fff',
@@ -68,7 +72,7 @@ const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
-                <MainCard className={classes.card} contentClass={classes.content}>
+                <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }} className={classes.card} contentClass={classes.content}>
                     <List className={classes.padding}>
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
                             <ListItemAvatar>

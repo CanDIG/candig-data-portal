@@ -109,7 +109,7 @@ function VcfBrowser() {
 
     return (
         <>
-            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative' }}>
+            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -170,7 +170,7 @@ function VcfBrowser() {
 
                         <Grid item>
                             <FormControl variant="standard">
-                                <Button type="submit" variant="contained">
+                                <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
                                     Search
                                 </Button>
                             </FormControl>

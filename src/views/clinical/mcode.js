@@ -5,6 +5,9 @@ import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Grid, Box } from '@mui/material';
 
+// REDUX
+import { useSelector } from 'react-redux';
+
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { fetchKatsu } from 'store/api';
@@ -65,6 +68,7 @@ const useStyles = makeStyles({
 function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
+    const events = useSelector((state) => state);
 
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
@@ -224,7 +228,7 @@ function MCodeView() {
     };
 
     return (
-        <MainCard title="mCode Data">
+        <MainCard title="mCode Data" sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
                     <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
