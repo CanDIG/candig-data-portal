@@ -73,15 +73,14 @@ export default function DatasetIdSelect() {
 
     return (
         <Box>
-            <Box sx={{ position: 'absolute', top: 12, right: 10 }}>
+            <Box sx={{ border: 1, borderRadius: 16, position: 'absolute', top: 12, right: 10, pr: 1, pl: 1 }}>
                 {selectedDataset && (
-                    <FormControl sx={{ minWidth: 150 }}>
-                        <InputLabel id="demo-simple-select-label">Dataset ID</InputLabel>
+                    <FormControl sx={{ minWidth: 125 }} >
+                        {/* <InputLabel id="demo-simple-select-label">Dataset ID</InputLabel> */}
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={selectedDataset}
-                            label="Dataset ID"
                             name="POG"
                             variant="standard"
                             sx={{ fontsize: '0.25rem', height: '1.75rem' }}

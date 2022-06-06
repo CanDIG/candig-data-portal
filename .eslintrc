@@ -47,7 +47,8 @@
                 "singleQuote": true,
                 "trailingComma": "none",
                 "tabWidth": 4,
-                "useTabs": false
+                "useTabs": false,
+                "endOfLine": "auto"
             }
         ]
     }
