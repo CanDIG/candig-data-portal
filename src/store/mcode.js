@@ -176,13 +176,15 @@ export const medicationStatementColumns = [
 export const processMCodeMainData = (dataObject) => {
     const row = {};
 
-    row.id = dataObject.id || null;
-    row.sex = dataObject.subject.sex || 'NA';
-    row.ethnicity = dataObject.subject.ethnicity || 'NA';
-    row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
-    row.date_of_death = dataObject.date_of_death || 'NA';
-    row.race = dataObject.subject.race || 'NA';
-    row.communication_language = dataObject.subject.extra_properties.communication_language || 'NA';
+    row.id = dataObject?.id ? dataObject?.id : null;
+    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
+    row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
+    row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
+    row.race = dataObject?.subject?.race ? dataObject?.subject?.race : 'NA';
+    row.communication_language = dataObject?.subject?.extra_properties?.communication_language
+        ? dataObject?.subject?.extra_properties?.communication_language
+        : 'NA';
 
     return row;
 };
@@ -194,13 +196,15 @@ export const processMCodeMainData = (dataObject) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-    row.id = dataObject.id || null;
-    row.sex = dataObject.subject.sex || 'NA';
-    row.date_of_birth = dataObject.subject.date_of_birth || 'NA';
-    row.date_of_death = dataObject.date_of_death || 'NA';
-    row.ethnicity = dataObject.subject.ethnicity || 'NA';
-    row.race = dataObject.subject.race || 'NA';
-    row.communication_language = dataObject.subject.extra_properties.communication_language || 'NA';
+    row.id = dataObject?.id ? dataObject?.id : null;
+    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
+    row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
+    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
+    row.race = dataObject?.subject?.race ? dataObject?.subject?.race : 'NA';
+    row.communication_language = dataObject?.subject?.extra_properties?.communication_language
+        ? dataObject?.subject?.extra_properties?.communication_language
+        : 'NA';
 
     return [row];
 };
@@ -214,14 +218,14 @@ export const processConditionsData = (dataObject) => {
     const rows = [];
 
     // eslint-disable-next-line camelcase
-    dataObject.cancer_condition.forEach((cancer_condition) => {
+    dataObject?.cancer_condition.forEach((cancer_condition) => {
         const row = {};
-        row.id = cancer_condition.id || null;
+        row.id = cancer_condition?.id || null;
         if (row.id !== null) {
-            row.condition_type = cancer_condition.condition_type || 'NA';
-            row.code_id = cancer_condition.code.id || 'NA';
-            row.code_label = cancer_condition.code.label || 'NA';
-            row.date_of_diagnosis = cancer_condition.date_of_diagnosis || 'NA';
+            row.condition_type = cancer_condition?.condition_type ? cancer_condition?.condition_type : 'NA';
+            row.code_id = cancer_condition?.code?.id ? cancer_condition?.code?.id : 'NA';
+            row.code_label = cancer_condition?.code?.label ? cancer_condition?.code?.label : 'NA';
+            row.date_of_diagnosis = cancer_condition?.date_of_diagnosis ? cancer_condition?.date_of_diagnosis : 'NA';
 
             rows.push(row);
         }
@@ -243,11 +247,11 @@ export const processProceduresData = (dataObject) => {
         const row = {};
         row.id = cancer_related_procedure.id || null;
         if (row.id !== null) {
-            row.procedure_type = cancer_related_procedure.procedure_type || 'NA';
-            row.procedure_code_id = cancer_related_procedure.code.id || 'NA';
-            row.procedure_code_label = cancer_related_procedure.code.label || 'NA';
-            row.body_site_id = cancer_related_procedure.body_site.id || 'NA';
-            row.body_site_label = cancer_related_procedure.body_site.label || 'NA';
+            row.procedure_type = cancer_related_procedure?.procedure_type ? cancer_related_procedure?.procedure_type : 'NA';
+            row.procedure_code_id = cancer_related_procedure?.code?.id ? cancer_related_procedure?.code?.id : 'NA';
+            row.procedure_code_label = cancer_related_procedure?.code?.label ? cancer_related_procedure?.code?.label : 'NA';
+            row.body_site_id = cancer_related_procedure?.body_site?.id ? cancer_related_procedure?.body_site?.id : 'NA';
+            row.body_site_label = cancer_related_procedure?.body_site?.label ? cancer_related_procedure?.body_site?.label : 'NA';
 
             rows.push(row);
         }
@@ -269,8 +273,8 @@ export const processMedicationStatementData = (dataObject) => {
         const row = {};
         row.id = medication_statement.id || null;
         if (row.id !== null) {
-            row.medication_code_id = medication_statement.medication_code.id || 'NA';
-            row.medication_code_label = medication_statement.medication_code.label || 'NA';
+            row.medication_code_id = medication_statement?.medication_code?.id ? medication_statement?.medication_code?.id : 'NA';
+            row.medication_code_label = medication_statement?.medication_code?.label ? medication_statement?.medication_code?.label : 'NA';
 
             rows.push(row);
         }
@@ -287,10 +291,10 @@ export const processMedicationStatementData = (dataObject) => {
 export const processMedicationListData = (dataObject) => {
     const list = {};
     dataObject.forEach((patient) => {
-        patient.medication_statement.forEach((medication) => {
-            const key = medication.medication_code.id;
+        patient?.medication_statement.forEach((medication) => {
+            const key = medication?.medication_code?.id;
             if (!(key in list)) {
-                list[key] = medication.medication_code.label;
+                list[key] = medication?.medication_code?.label;
             }
         });
     });
@@ -306,10 +310,10 @@ export const processMedicationListData = (dataObject) => {
 export const processCondtionsListData = (dataObject) => {
     const list = {};
     dataObject.forEach((patient) => {
-        patient.cancer_condition.forEach((condition) => {
-            const key = condition.code.id;
+        patient?.cancer_condition.forEach((condition) => {
+            const key = condition?.code?.id;
             if (!(key in list)) {
-                list[key] = condition.code.label;
+                list[key] = condition?.code?.label;
             }
         });
     });
@@ -325,10 +329,10 @@ export const processCondtionsListData = (dataObject) => {
 export const processProceduresListData = (dataObject) => {
     const list = {};
     dataObject.forEach((patient) => {
-        patient.cancer_related_procedures.forEach((procedure) => {
-            const key = procedure.code.id;
+        patient?.cancer_related_procedures.forEach((procedure) => {
+            const key = procedure?.code?.id;
             if (!(key in list)) {
-                list[key] = procedure.procedure_type;
+                list[key] = procedure?.procedure_type;
             }
         });
     });
