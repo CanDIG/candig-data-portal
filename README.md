@@ -4,6 +4,12 @@ A data analytics and visualization portal for CanDIG Services. Is built off the 
 
 ## Setup Development Server
 
+-   Node:v17.7.1
+-   npm: 8.5.2
+-   MUI: V5
+
+There was a migration from V4 - V5 of MUI following https://mui.com/material-ui/guides/migration-v4/
+
 ### Installation
 
 Navigate to route folder of the project and do an npm install
@@ -16,18 +22,18 @@ cd candig-data-portal
 npm install
 ```
 
-
 The file `.env.development` is where you specify API Servers and site-specific variables.
 
-- `REACT_APP_KATSU_API_SERVER`: Path to the Katsu API.
-- `REACT_APP_CANDIG_SERVER`: Path to the candig-server API.
-- `REACT_APP_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
-- `REACT_APP_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
+-   `REACT_APP_KATSU_API_SERVER`: Path to the Katsu API.
+-   `REACT_APP_CANDIG_SERVER`: Path to the candig-server API.
+-   `REACT_APP_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
+-   `REACT_APP_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
+-   `GENERATE_SOURCEMAP`: Removes map fodlers from build when set to false
 
 After this you can start the application by running **npm start**
 
 Note that if you change any of the variables above, you need to restart your server for them to be in effect.
-    
+
 ```
 npm start
 ```
@@ -39,7 +45,7 @@ Compiled successfully!
 
 You can now view candig-data-portal in the browser.
 
-Local:            http://localhost:3000    
+Local:            http://localhost:3000
 On Your Network:  http://192.168.29.77:3000
 
 Note that the development build is not optimized.
@@ -65,4 +71,3 @@ npm run build
 ```
 
 This will produce a static folder `/build` to be served with any static file server.
-

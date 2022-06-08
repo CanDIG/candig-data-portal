@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
+// mui
+import { makeStyles } from '@mui/styles';
 
 // project import
 import MainCard from 'ui-component/cards/MainCard';
@@ -15,16 +15,16 @@ const useStyles = makeStyles((theme) => ({
             flexGrow: 1,
             flexBasis: '50%'
         },
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             margin: '20px'
         },
-        [theme.breakpoints.down('lg')]: {
+        [theme.breakpoints.down('xl')]: {
             maxWidth: '400px'
         }
     },
     content: {
         padding: `${theme.spacing(5)} !important`,
-        [theme.breakpoints.down('lg')]: {
+        [theme.breakpoints.down('xl')]: {
             padding: `${theme.spacing(3)} !important`
         }
     }

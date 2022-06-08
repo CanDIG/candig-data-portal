@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// material-ui
-import { makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import {
     Avatar,
     Box,
@@ -20,7 +19,7 @@ import {
     TextField,
     Typography,
     useMediaQuery
-} from '@material-ui/core';
+} from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -72,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     box: {
         marginLeft: '16px',
         marginRight: '24px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             marginRight: '16px'
         }
     },
@@ -109,7 +108,7 @@ const status = [
 const NotificationSection = () => {
     const classes = useStyles();
     const theme = useTheme();
-    const matchesXs = useMediaQuery(theme.breakpoints.down('sm'));
+    const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState('');
@@ -206,6 +205,7 @@ const NotificationSection = () => {
                                                                     id="outlined-select-currency-native"
                                                                     select
                                                                     fullWidth
+                                                                    variant="standard"
                                                                     value={value}
                                                                     onChange={handleChange}
                                                                     SelectProps={{

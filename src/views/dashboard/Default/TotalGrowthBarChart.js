@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { Grid, MenuItem, TextField, Typography, useTheme } from '@material-ui/core';
+// mui
+import { Grid, MenuItem, TextField, Typography, useTheme } from '@mui/material';
 
 // third-party
 import ApexCharts from 'apexcharts';
@@ -106,6 +106,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                                     <TextField
                                         id="standard-select-currency"
                                         select
+                                        variant="standard"
                                         value={value}
                                         onChange={(e) => setValue(e.target.value)}
                                     >

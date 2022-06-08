@@ -2,19 +2,19 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Divider, Grid, Typography } from '@material-ui/core';
-import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Card, CardContent, Divider, Grid, Typography } from '@mui/material';
+import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
 // project imports
 import config from 'config';
 import { gridSpacing } from 'store/constant';
 
 // assets
-import AccountTreeTwoToneIcon from '@material-ui/icons/AccountTreeTwoTone';
-import HomeIcon from '@material-ui/icons/Home';
-import HomeTwoToneIcon from '@material-ui/icons/HomeTwoTone';
+import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
+import HomeIcon from '@mui/icons-material/Home';
+import HomeTwoToneIcon from '@mui/icons-material/HomeTwoTone';
 
 // style constant
 const useStyles = makeStyles((theme) => ({

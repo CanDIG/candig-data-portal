@@ -1,9 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// material-ui
-import { useTheme, makeStyles } from '@material-ui/styles';
-import { Grid, Box } from '@material-ui/core';
+// mui
+import { useTheme, makeStyles } from '@mui/styles';
+import { Grid, Box } from '@mui/material';
 
 const useStyles = makeStyles({
     dropdownItem: {

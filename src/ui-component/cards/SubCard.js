@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { useTheme } from '@material-ui/styles';
-import { Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
+// mui
+import { useTheme } from '@mui/styles';
+import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
 
 // ===========================|| CUSTOM SUB CARD ||=========================== //
 

@@ -1,20 +1,23 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Grid, Menu, MenuItem, Typography } from '@material-ui/core';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
+
+// REDUX
+import { useSelector, useDispatch } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 
 // assets
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import GetAppTwoToneIcon from '@material-ui/icons/GetAppOutlined';
-import FileCopyTwoToneIcon from '@material-ui/icons/FileCopyOutlined';
-import PictureAsPdfTwoToneIcon from '@material-ui/icons/PictureAsPdfOutlined';
-import ArchiveTwoToneIcon from '@material-ui/icons/ArchiveOutlined';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
+import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -32,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
             borderRadius: '50%',
             top: '-85px',
             right: '-95px',
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-105px',
                 right: '-140px'
             }
@@ -47,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
             top: '-125px',
             right: '-15px',
             opacity: 0.5,
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-155px',
                 right: '-70px'
             }
@@ -101,7 +104,9 @@ const useStyles = makeStyles((theme) => ({
 
 const CountCard = ({ isLoading, title, count, primary, icon }) => {
     const classes = useStyles({ primary });
+    const events = useSelector((state) => state);
 
+    // STATES
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     // const handleClick = (event) => {
@@ -117,7 +122,7 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
-                <MainCard border={false} className={classes.card} contentClass={classes.content}>
+                <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }} border={false} className={classes.card} contentClass={classes.content}>
                     <Grid container direction="column">
                         <Grid item>
                             <Grid container justifyContent="space-between">

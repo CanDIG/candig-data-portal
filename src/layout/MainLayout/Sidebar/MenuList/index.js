@@ -1,7 +1,7 @@
 import React from 'react';
 
-// material-ui
-import { Typography } from '@material-ui/core';
+// mui
+import { Typography } from '@mui/material';
 
 // project imports
 import NavGroup from './NavGroup';
