@@ -3,8 +3,10 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMap from 'highcharts/modules/map';
 import mapDataCanada from '@highcharts/map-collection/countries/ca/ca-all.geo.json';
-import { trackPromise, usePromiseTracker } from 'react-promise-tracker';
 import PropTypes from 'prop-types';
+
+import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import MainCard from 'ui-component/cards/MainCard';
 
 // Initialize HighchartsMap
 HighchartsMap(Highcharts);
@@ -65,8 +67,6 @@ const provFullNames = [
 ];
 
 function reducer(state, action) {
-    console.log('in reducer', action);
-
     switch (action.type) {
         case 'addSeries':
             return {
@@ -168,27 +168,14 @@ function TreatingCentreMap({ datasetName }) {
     //     console.log(err);
     // }
     // }, [datasetName]);
-
-    console.log({ Highcharts, chartOptions, promiseInProgress });
-
-    const options = {
-        series: [
-            {
-                type: 'map',
-                mapData: mapDataCanada,
-                data: [['ca-bc', 100]]
-            }
-        ]
-    };
-
     return (
-        <>
+        <MainCard>
             {promiseInProgress ? (
-                <div>Loading...</div>
+                <LoadingIndicator />
             ) : (
-                <HighchartsReact contructorType="mapChart" highcharts={Highcharts} options={options} />
+                <HighchartsReact options={chartOptions} highcharts={Highcharts} constructorType="mapChart" />
             )}
-        </>
+        </MainCard>
     );
 }
 
