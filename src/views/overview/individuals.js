@@ -121,35 +121,34 @@ function IndividualsOverview() {
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                    <Grid item lg={6} md={6} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
-                            <Grid item sm={6} xs={12} md={6} lg={6}>
+                            <Grid item xs={12} sm={6} md={12}>
                                 <SmallCountCard
                                     isLoading={isLoading}
                                     title="Provinces"
-                                    count={diseasesSum}
+                                    count="1"
                                     dark={false}
                                     icon={<PublicIcon fontSize="inherit" />}
                                 />
                             </Grid>
-                            <Grid item sm={6} xs={12} md={6} lg={6}>
-                                <SmallCountCard
-                                    title="Hospitals"
-                                    count={biosampleCount}
-                                    dark={false}
-                                    icon={<AccountBalanceIcon fontSize="inherit" />}
-                                />
+                            <Grid item xs={12} sm={6} md={12}>
+                                <SmallCountCard title="Hospitals" count="1" dark={false} icon={<AccountBalanceIcon fontSize="inherit" />} />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12}>
                                 <CustomOfflineChart
                                     datasetName=""
                                     dataObject={SERVER_DATA}
                                     chartType="bar"
                                     barTitle="Server Status"
-                                    height="200px; auto"
+                                    height="186px; auto"
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12}>
                                 <TreatingCentreMap datasetName="" />
                             </Grid>
                         </Grid>
@@ -206,7 +205,7 @@ function IndividualsOverview() {
                             datasetName=""
                             dataObject={ethnicityObject}
                             chartType="bar"
-                            barTitle="Ethnicity"
+                            barTitle="Distribution of Ethnicity"
                             height="500px; auto"
                         />
                     </Grid>
@@ -215,7 +214,7 @@ function IndividualsOverview() {
                             datasetName=""
                             dataObject={genderObject}
                             chartType="pie"
-                            barTitle="Gender"
+                            barTitle="Distribution of Gender"
                             height="500px; auto"
                         />
                     </Grid>
