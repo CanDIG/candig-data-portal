@@ -6,6 +6,7 @@ import { Grid } from '@material-ui/core';
 import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
+import TreatingCentreMap from 'views/overview/TreatingCentreMap';
 
 import { groupBy } from 'utils/utils';
 // import { schemaFxn } from 'utils/ChordSchemas';
@@ -16,6 +17,8 @@ import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import PublicIcon from '@material-ui/icons/Public';
 import BiotechIcon from '@material-ui/icons/Biotech';
 import QueryStatsIcon from '@material-ui/icons/QueryStats';
 import PersonIcon from '@material-ui/icons/Person';
@@ -108,8 +111,51 @@ function IndividualsOverview() {
         };
     }, [didFetch]);
 
+    const SERVER_DATA = {
+        'Known Peers': 3,
+        'Queried Peers': 3,
+        'Successful Communications': 1
+    };
+
     return (
         <Grid container spacing={gridSpacing}>
+            <Grid item xs={12}>
+                <Grid container spacing={gridSpacing}>
+                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item sm={6} xs={12} md={6} lg={6}>
+                                <SmallCountCard
+                                    isLoading={isLoading}
+                                    title="Provinces"
+                                    count={diseasesSum}
+                                    dark={false}
+                                    icon={<PublicIcon fontSize="inherit" />}
+                                />
+                            </Grid>
+                            <Grid item sm={6} xs={12} md={6} lg={6}>
+                                <SmallCountCard
+                                    title="Hospitals"
+                                    count={biosampleCount}
+                                    dark={false}
+                                    icon={<AccountBalanceIcon fontSize="inherit" />}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <CustomOfflineChart
+                                    datasetName=""
+                                    dataObject={SERVER_DATA}
+                                    chartType="bar"
+                                    barTitle="Server Status"
+                                    height="200px; auto"
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TreatingCentreMap datasetName="" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
