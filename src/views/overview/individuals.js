@@ -62,6 +62,9 @@ function countPhenotypeDatatype(data, type) {
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
+    const [provinceCounter, setProvinceCount] = useState(0);
+    const [hospitalCounter, setHospitalCount] = useState(0);
+    const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
     const [featureCount, setFeatureCount] = useState(0);
@@ -87,11 +90,21 @@ function IndividualsOverview() {
             fetchKatsu('/api/individuals?page_size=1000')
                 .then((data) => {
                     if (isMounted) {
+                        setProvinceCount('1');
+                        setHospitalCount('1');
                         countIndividuals(data);
                         countEthnicity(data);
                         countGender(data);
                         const diseases = countDiseases(data);
                         setDiseasesSum(Object.keys(diseases).length);
+
+                        const SERVER_DATA = {
+                            'Known Peers': 3,
+                            'Queried Peers': 3,
+                            'Successful Communications': 1
+                        };
+
+                        setServerObject(SERVER_DATA);
 
                         setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
                         setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
@@ -111,12 +124,6 @@ function IndividualsOverview() {
         };
     }, [didFetch]);
 
-    const SERVER_DATA = {
-        'Known Peers': 3,
-        'Queried Peers': 3,
-        'Successful Communications': 1
-    };
-
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
@@ -127,18 +134,23 @@ function IndividualsOverview() {
                                 <SmallCountCard
                                     isLoading={isLoading}
                                     title="Provinces"
-                                    count="1"
+                                    count={provinceCounter}
                                     dark={false}
                                     icon={<PublicIcon fontSize="inherit" />}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={12}>
-                                <SmallCountCard title="Hospitals" count="1" dark={false} icon={<AccountBalanceIcon fontSize="inherit" />} />
+                                <SmallCountCard
+                                    title="Hospitals"
+                                    count={hospitalCounter}
+                                    dark={false}
+                                    icon={<AccountBalanceIcon fontSize="inherit" />}
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <CustomOfflineChart
                                     datasetName=""
-                                    dataObject={SERVER_DATA}
+                                    dataObject={serverObject}
                                     chartType="bar"
                                     barTitle="Server Status"
                                     height="186px; auto"

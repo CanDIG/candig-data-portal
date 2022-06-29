@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useRef } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMap from 'highcharts/modules/map';
@@ -99,7 +99,6 @@ function reducer(state, action) {
 function TreatingCentreMap({ datasetName }) {
     const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
-    const notifyEl = useRef(null);
 
     function processJson(data) {
         const dataCount = [];

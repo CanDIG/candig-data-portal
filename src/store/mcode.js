@@ -56,9 +56,15 @@ export const subjectColumns = [
         disableClickEventBubbling: true
     },
     {
+        field: 'site',
+        headerName: 'Site',
+        width: 150
+    },
+    {
         field: 'ethnicity',
         headerName: 'Ethnicity',
-        width: 150
+        width: 150,
+        hide: true
     },
     {
         field: 'race',
