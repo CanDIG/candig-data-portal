@@ -11,6 +11,10 @@ function MoreInfoButton() {
     );
 }
 
+function getSite() {
+    return <strong>UHN</strong>;
+}
+
 export const mainColumns = [
     {
         field: 'id',
@@ -56,9 +60,16 @@ export const subjectColumns = [
         disableClickEventBubbling: true
     },
     {
+        field: 'site',
+        headerName: 'Site',
+        renderCell: getSite,
+        width: 120
+    },
+    {
         field: 'ethnicity',
         headerName: 'Ethnicity',
-        width: 150
+        width: 150,
+        hide: true
     },
     {
         field: 'race',

@@ -6,6 +6,7 @@ import { Grid } from '@material-ui/core';
 import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
+import TreatingCentreMap from 'views/overview/TreatingCentreMap';
 
 import { groupBy } from 'utils/utils';
 // import { schemaFxn } from 'utils/ChordSchemas';
@@ -16,6 +17,8 @@ import { fetchKatsu } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import PublicIcon from '@material-ui/icons/Public';
 import BiotechIcon from '@material-ui/icons/Biotech';
 import QueryStatsIcon from '@material-ui/icons/QueryStats';
 import PersonIcon from '@material-ui/icons/Person';
@@ -59,6 +62,9 @@ function countPhenotypeDatatype(data, type) {
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
+    const [provinceCounter, setProvinceCount] = useState(0);
+    const [hospitalCounter, setHospitalCount] = useState(0);
+    const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
     const [featureCount, setFeatureCount] = useState(0);
@@ -84,11 +90,21 @@ function IndividualsOverview() {
             fetchKatsu('/api/individuals?page_size=1000')
                 .then((data) => {
                     if (isMounted) {
+                        setProvinceCount('1');
+                        setHospitalCount('1');
                         countIndividuals(data);
                         countEthnicity(data);
                         countGender(data);
                         const diseases = countDiseases(data);
                         setDiseasesSum(Object.keys(diseases).length);
+
+                        const SERVER_DATA = {
+                            'Known Peers': 3,
+                            'Queried Peers': 3,
+                            'Successful Communications': 1
+                        };
+
+                        setServerObject(SERVER_DATA);
 
                         setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
                         setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
@@ -110,6 +126,47 @@ function IndividualsOverview() {
 
     return (
         <Grid container spacing={gridSpacing}>
+            <Grid item xs={12}>
+                <Grid container spacing={gridSpacing}>
+                    <Grid item lg={6} md={6} sm={12} xs={12}>
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} sm={6} md={12}>
+                                <SmallCountCard
+                                    isLoading={isLoading}
+                                    title="Provinces"
+                                    count={provinceCounter}
+                                    dark={false}
+                                    icon={<PublicIcon fontSize="inherit" />}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={12}>
+                                <SmallCountCard
+                                    title="Hospitals"
+                                    count={hospitalCounter}
+                                    dark={false}
+                                    icon={<AccountBalanceIcon fontSize="inherit" />}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <CustomOfflineChart
+                                    datasetName=""
+                                    dataObject={serverObject}
+                                    chartType="bar"
+                                    barTitle="Server Status"
+                                    height="186px; auto"
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12}>
+                                <TreatingCentreMap datasetName="" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item lg={4} md={6} sm={6} xs={12}>
@@ -160,7 +217,7 @@ function IndividualsOverview() {
                             datasetName=""
                             dataObject={ethnicityObject}
                             chartType="bar"
-                            barTitle="Ethnicity"
+                            barTitle="Distribution of Ethnicity"
                             height="500px; auto"
                         />
                     </Grid>
@@ -169,7 +226,7 @@ function IndividualsOverview() {
                             datasetName=""
                             dataObject={genderObject}
                             chartType="pie"
-                            barTitle="Gender"
+                            barTitle="Distribution of Gender"
                             height="500px; auto"
                         />
                     </Grid>
