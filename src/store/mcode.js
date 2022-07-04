@@ -11,6 +11,10 @@ function MoreInfoButton() {
     );
 }
 
+function getSite() {
+    return <strong>UHN</strong>;
+}
+
 export const mainColumns = [
     {
         field: 'id',
@@ -58,7 +62,8 @@ export const subjectColumns = [
     {
         field: 'site',
         headerName: 'Site',
-        width: 150
+        renderCell: getSite,
+        width: 120
     },
     {
         field: 'ethnicity',
