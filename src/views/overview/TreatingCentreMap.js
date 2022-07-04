@@ -124,8 +124,8 @@ function TreatingCentreMap({ datasetName }) {
             dispatchChartOptions({
                 type: 'addSeries',
                 payload: [
-                    ['ca-bc', 100],
-                    ['ca-on', 5]
+                    ['ca-bc', 5],
+                    ['ca-on', 146]
                 ]
             });
             resolve();
