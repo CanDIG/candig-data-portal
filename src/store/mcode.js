@@ -113,14 +113,19 @@ export const cancerConditionsColumns = [
         width: 180
     },
     {
-        field: 'code_id',
-        headerName: 'Code ID',
+        field: 'body_site',
+        headerName: 'Body Site',
+        width: 180
+    },
+    {
+        field: 'code',
+        headerName: 'Code',
         width: 150
     },
     {
-        field: 'code_label',
-        headerName: 'Code Label',
-        width: 180
+        field: 'histology_morphology_behavior',
+        headerName: 'Histology morphology behavior',
+        width: 300
     },
     {
         field: 'date_of_diagnosis',
@@ -227,6 +232,7 @@ export const processSubjectData = (dataObject) => {
  */
 export const processConditionsData = (dataObject) => {
     const rows = [];
+    console.log(dataObject);
 
     // eslint-disable-next-line camelcase
     dataObject?.cancer_condition.forEach((cancer_condition) => {
@@ -234,8 +240,11 @@ export const processConditionsData = (dataObject) => {
         row.id = cancer_condition?.id || null;
         if (row.id !== null) {
             row.condition_type = cancer_condition?.condition_type ? cancer_condition?.condition_type : 'NA';
-            row.code_id = cancer_condition?.code?.id ? cancer_condition?.code?.id : 'NA';
-            row.code_label = cancer_condition?.code?.label ? cancer_condition?.code?.label : 'NA';
+            row.body_site = cancer_condition?.body_site ? cancer_condition?.body_site : 'NA';
+            row.code = cancer_condition?.code ? cancer_condition?.code : 'NA';
+            row.histology_morphology_behavior = cancer_condition?.histology_morphology_behavior
+                ? cancer_condition?.histology_morphology_behavior
+                : 'NA';
             row.date_of_diagnosis = cancer_condition?.date_of_diagnosis ? cancer_condition?.date_of_diagnosis : 'NA';
 
             rows.push(row);
