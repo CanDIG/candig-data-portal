@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
-import { Grid } from '@material-ui/core';
+import { Grid, Stack } from '@material-ui/core';
 import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
@@ -125,52 +125,42 @@ function IndividualsOverview() {
     }, [didFetch]);
 
     return (
-        <Grid container spacing={gridSpacing}>
-            <Grid item xs={12}>
-                <Grid container spacing={gridSpacing}>
-                    <Grid item lg={6} md={6} sm={12} xs={12}>
-                        <Grid container spacing={gridSpacing}>
-                            <Grid item xs={12} sm={6} md={12}>
-                                <SmallCountCard
-                                    isLoading={isLoading}
-                                    title="Provinces"
-                                    count={provinceCounter}
-                                    dark={false}
-                                    icon={<PublicIcon fontSize="inherit" />}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={12}>
-                                <SmallCountCard
-                                    title="Hospitals"
-                                    count={hospitalCounter}
-                                    dark={false}
-                                    icon={<AccountBalanceIcon fontSize="inherit" />}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <CustomOfflineChart
-                                    datasetName=""
-                                    dataObject={serverObject}
-                                    chartType="bar"
-                                    barTitle="Server Status"
-                                    height="186px; auto"
-                                />
-                            </Grid>
-                        </Grid>
+        <Grid container>
+            <Grid container xs={12} pb={2.5}>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
+                    <Grid item xs={12} pb={3} pr={2}>
+                        <SmallCountCard
+                            isLoading={isLoading}
+                            title="Provinces"
+                            count={provinceCounter}
+                            dark={false}
+                            icon={<PublicIcon fontSize="inherit" />}
+                        />
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Grid container spacing={gridSpacing}>
-                            <Grid item xs={12}>
-                                <TreatingCentreMap datasetName="" />
-                            </Grid>
-                        </Grid>
+                    <Grid item xs={12} pb={2} pr={2}>
+                        <TreatingCentreMap datasetName="" />
                     </Grid>
                 </Grid>
-            </Grid>
-            <Grid item xs={12}>
-                <Grid container spacing={gridSpacing}>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCard
+                <Grid container spacing={2} xs={12} sm={6} md={6} lg={6}>
+                    <Grid item xs={12}>
+                        <SmallCountCard
+                            title="Hospitals"
+                            count={hospitalCounter}
+                            dark={false}
+                            icon={<AccountBalanceIcon fontSize="inherit" />}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <CustomOfflineChart
+                            datasetName=""
+                            dataObject={serverObject}
+                            chartType="bar"
+                            barTitle="Server Status"
+                            height="186px; auto"
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <SmallCountCard
                             isLoading={isLoading}
                             title="Number of Individuals"
                             count={individualCounter}
@@ -178,7 +168,7 @@ function IndividualsOverview() {
                             icon={<PersonIcon fontSize="inherit" />}
                         />
                     </Grid>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
+                    {/* <Grid item lg={4} md={6} sm={6} xs={12}>
                         <CountCard
                             isLoading={isLoading}
                             title="Phenotypic Features in Database"
@@ -186,10 +176,9 @@ function IndividualsOverview() {
                             primary={false}
                             icon={<PersonIcon fontSize="inherit" />}
                         />
-                    </Grid>
-                    <Grid item lg={4} md={12} sm={12} xs={12}>
-                        <Grid container spacing={gridSpacing}>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
+                    </Grid> */}
+                    {/* <Grid container spacing={gridSpacing}> */}
+                    {/* <Grid item sm={6} xs={12} md={6} lg={12}>
                                 <SmallCountCard
                                     isLoading={isLoading}
                                     title="Number of Diseases"
@@ -197,16 +186,15 @@ function IndividualsOverview() {
                                     dark
                                     icon={<QueryStatsIcon fontSize="inherit" />}
                                 />
-                            </Grid>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCard
-                                    title="Number of Biosamples"
-                                    count={biosampleCount}
-                                    dark={false}
-                                    icon={<BiotechIcon fontSize="inherit" />}
-                                />
-                            </Grid>
-                        </Grid>
+                            </Grid> */}
+                    <Grid item xs={12}>
+                        <SmallCountCard
+                            title="Number of Biosamples"
+                            count={biosampleCount}
+                            dark={false}
+                            icon={<BiotechIcon fontSize="inherit" />}
+                        />
+                        {/* </Grid> */}
                     </Grid>
                 </Grid>
             </Grid>

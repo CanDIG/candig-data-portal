@@ -123,10 +123,7 @@ function TreatingCentreMap({ datasetName }) {
         const updateChart = new Promise((resolve) => {
             dispatchChartOptions({
                 type: 'addSeries',
-                payload: [
-                    ['ca-bc', 5],
-                    ['ca-on', 146]
-                ]
+                payload: [['ca-on', 146]]
             });
             resolve();
         });
