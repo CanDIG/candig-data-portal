@@ -23,6 +23,7 @@ const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/Varian
 const ReadsSearchPage = Loadable(lazy(() => import('views/genomicsData/ReadsSearch')));
 const VcfBrowserPage = Loadable(lazy(() => import('views/genomicsData/VcfBrowser')));
 const BamBrowserPage = Loadable(lazy(() => import('views/genomicsData/BamBrowser')));
+const HtsgetBrowserPage = Loadable(lazy(() => import('views/genomicsData/HtsgetBrowser')));
 
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
@@ -72,6 +73,10 @@ const MainRoutes = {
         {
             path: `${basename}/bam-browser`,
             element: <BamBrowserPage />
+        },
+        {
+            path: `${basename}/htsget-browser`,
+            element: <HtsgetBrowserPage />
         },
         {
             path: '*',

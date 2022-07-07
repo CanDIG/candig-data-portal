@@ -59,6 +59,14 @@ const genomicsData = {
             url: `${basename}/bam-browser`,
             icon: icons.IconBrowser,
             breadcrumbs: false
+        },
+        {
+            id: 'htsget browser',
+            title: 'htsget browser',
+            type: 'item',
+            url: `${basename}/htsget-browser`,
+            icon: icons.IconBrowser,
+            breadcrumbs: false
         }
     ]
 };
