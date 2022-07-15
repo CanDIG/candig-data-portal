@@ -71,11 +71,11 @@ export const subjectColumns = [
         width: 150,
         hide: true
     },
-    {
-        field: 'race',
-        headerName: 'Race',
-        width: 130
-    },
+    // {
+    //     field: 'race',
+    //     headerName: 'Race',
+    //     width: 130
+    // },
     {
         field: 'sex',
         headerName: 'Sex',
