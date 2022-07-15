@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 // material-ui
 // import { useTheme, makeStyles } from '@material-ui/styles';
-import { Grid, Stack } from '@material-ui/core';
-import CountCard from 'ui-component/cards/CountCard';
+import { Grid } from '@material-ui/core';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
 import TreatingCentreMap from 'views/overview/TreatingCentreMap';
@@ -19,7 +18,7 @@ import { gridSpacing } from 'store/constant';
 // assets
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import PublicIcon from '@material-ui/icons/Public';
-import BiotechIcon from '@material-ui/icons/Biotech';
+// import BiotechIcon from '@material-ui/icons/Biotech';
 import QueryStatsIcon from '@material-ui/icons/QueryStats';
 import PersonIcon from '@material-ui/icons/Person';
 
@@ -49,15 +48,15 @@ function countDiseases(data) {
  * Return the aggregation of phenotype datatypes
  * @param {data}... Object
  */
-function countPhenotypeDatatype(data, type) {
-    let count = 0;
-    for (let i = 0; i < data.results.length; i += 1) {
-        if (data.results[i].phenopackets !== undefined) {
-            count += data.results[i].phenopackets[0][type].length;
-        }
-    }
-    return count;
-}
+// function countPhenotypeDatatype(data, type) {
+//     let count = 0;
+//     for (let i = 0; i < data.results.length; i += 1) {
+//         if (data.results[i].phenopackets !== undefined) {
+//             count += data.results[i].phenopackets[0][type].length;
+//         }
+//     }
+//     return count;
+// }
 
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
@@ -67,8 +66,7 @@ function IndividualsOverview() {
     const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
-    const [featureCount, setFeatureCount] = useState(0);
-    const [biosampleCount, setBiosampleCount] = useState(0);
+    // const [biosampleCount, setBiosampleCount] = useState(0);
     const [diseasesSum, setDiseasesSum] = useState(0);
     const [didFetch, setDidFetch] = useState(false);
 
@@ -87,35 +85,28 @@ function IndividualsOverview() {
     useEffect(() => {
         let isMounted = true;
         trackPromise(
-            fetchKatsu('/api/individuals?page_size=1000')
-                .then((data) => {
-                    if (isMounted) {
-                        setProvinceCount('1');
-                        setHospitalCount('1');
-                        countIndividuals(data);
-                        countEthnicity(data);
-                        countGender(data);
-                        const diseases = countDiseases(data);
-                        setDiseasesSum(Object.keys(diseases).length);
+            fetchKatsu('/api/individuals?page_size=1000').then((data) => {
+                if (isMounted) {
+                    setProvinceCount('1');
+                    setHospitalCount('1');
+                    countIndividuals(data);
+                    countEthnicity(data);
+                    countGender(data);
+                    const diseases = countDiseases(data);
+                    setDiseasesSum(Object.keys(diseases).length);
 
-                        const SERVER_DATA = {
-                            'Known Peers': 3,
-                            'Queried Peers': 3,
-                            'Successful Communications': 1
-                        };
+                    const SERVER_DATA = {
+                        'Known Peers': 3,
+                        'Queried Peers': 3,
+                        'Successful Communications': 1
+                    };
 
-                        setServerObject(SERVER_DATA);
+                    setServerObject(SERVER_DATA);
 
-                        setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
-                        setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
-                        setDidFetch(true);
-                    }
-                })
-                .catch(() => {
-                    // pass
-                    // setIndividualCount('Not available');
-                    // setDiseasesSum('Not available');
-                })
+                    // setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
+                    setDidFetch(true);
+                }
+            })
         );
         setLoading(false);
 
@@ -126,9 +117,9 @@ function IndividualsOverview() {
 
     return (
         <Grid container>
-            <Grid container xs={12} pb={2.5}>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Grid item xs={12} pb={3} pr={2}>
+            <Grid container xs={12}>
+                <Grid item xs={12} sm={6} md={6} lg={6} pr={gridSpacing}>
+                    <Grid item xs={12} pb={3}>
                         <SmallCountCard
                             isLoading={isLoading}
                             title="Provinces"
@@ -137,11 +128,11 @@ function IndividualsOverview() {
                             icon={<PublicIcon fontSize="inherit" />}
                         />
                     </Grid>
-                    <Grid item xs={12} pb={2} pr={2}>
+                    <Grid item xs={12} pb={2}>
                         <TreatingCentreMap datasetName="" />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} xs={12} sm={6} md={6} lg={6}>
+                <Grid container xs={12} sm={6} md={6} lg={6}>
                     <Grid item xs={12}>
                         <SmallCountCard
                             title="Hospitals"
@@ -162,40 +153,28 @@ function IndividualsOverview() {
                     <Grid item xs={12}>
                         <SmallCountCard
                             isLoading={isLoading}
-                            title="Number of Individuals"
+                            title="Individuals"
                             count={individualCounter}
                             primary
                             icon={<PersonIcon fontSize="inherit" />}
                         />
                     </Grid>
-                    {/* <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCard
-                            isLoading={isLoading}
-                            title="Phenotypic Features in Database"
-                            count={featureCount}
-                            primary={false}
-                            icon={<PersonIcon fontSize="inherit" />}
-                        />
-                    </Grid> */}
-                    {/* <Grid container spacing={gridSpacing}> */}
-                    {/* <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCard
-                                    isLoading={isLoading}
-                                    title="Number of Diseases"
-                                    count={diseasesSum}
-                                    dark
-                                    icon={<QueryStatsIcon fontSize="inherit" />}
-                                />
-                            </Grid> */}
-                    <Grid item xs={12}>
+                    <Grid item sm={6} xs={12} md={6} lg={12}>
                         <SmallCountCard
-                            title="Number of Biosamples"
-                            count={biosampleCount}
+                            isLoading={isLoading}
+                            title="Diseases"
+                            count={diseasesSum}
                             dark={false}
-                            icon={<BiotechIcon fontSize="inherit" />}
+                            icon={<QueryStatsIcon fontSize="inherit" />}
                         />
-                        {/* </Grid> */}
                     </Grid>
+                    {/* <Grid item xs={12}>
+                        <SmallCountCard 
+                            title="Biosamples" 
+                            count={biosampleCount} 
+                            dark={false} 
+                            icon={<BiotechIcon fontSize="inherit" />} />
+                    </Grid> */}
                 </Grid>
             </Grid>
             <Grid item xs={12}>
