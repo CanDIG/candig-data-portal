@@ -7,7 +7,11 @@ export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export function fetchKatsu(URL) {
     return fetch(`${katsu}${URL}`)
         .then((response) => response.json())
-        .then((data) => data);
+        .then((data) =>
+            fetch(`${katsu}${URL}?page_size=${data.count}`) // Page size by default is 25 set page size to count to returns all
+                .then((response) => response.json())
+                .then((data) => data)
+        );
 }
 
 /*
