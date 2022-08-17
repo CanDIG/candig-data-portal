@@ -2,12 +2,17 @@
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
 export const federation = process.env.REACT_APP_FEDERATION_API_SERVER;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
+export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 
 // API Calls
 export function fetchKatsu(URL) {
     return fetch(`${katsu}${URL}`)
         .then((response) => response.json())
-        .then((data) => data);
+        .then((data) =>
+            fetch(`${katsu}${URL}?page_size=${data.count}`) // Page size by default is 25 set page size to count to returns all
+                .then((response) => response.json())
+                .then((data) => data)
+        );
 }
 
 /*

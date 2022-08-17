@@ -116,7 +116,7 @@ const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
 SmallCountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
-    count: PropTypes.number,
+    count: PropTypes.any,
     dark: PropTypes.bool,
     icon: PropTypes.any
 };
