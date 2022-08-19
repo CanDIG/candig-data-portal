@@ -4,7 +4,7 @@
         "browser": true,
         "es2021": true
     },
-    "extends": ["airbnb", "prettier", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended", "plugin:react/jsx-runtime"],
+    "extends": ["airbnb", "prettier", "plugin:jsx-a11y/recommended", "plugin:react-hooks/recommended", "plugin:react/recommended", "plugin:react/jsx-runtime"],
     "settings": {
         "import/resolver": {
             "node": {
