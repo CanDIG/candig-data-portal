@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, FormControl } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 import LightCard from 'views/dashboard/Default/LightCard';
-import { Map, Description } from '@material-ui/icons';
 import AlertComponent from 'ui-component/AlertComponent';
 
 import HtsgetInstance from 'ui-component/IGV/HtsgetInstance';
 import { fetchKatsu } from 'store/api';
 
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+
+// Assets
+import MapIcon from '@mui/icons-material/Map';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 import 'assets/css/VariantsSearch.css';
 
@@ -83,7 +86,7 @@ function HtsgetBrowser() {
                                     isLoading={isLoading}
                                     header="VCFs"
                                     value={VcfCount}
-                                    icon={<Map fontSize="inherit" />}
+                                    icon={<MapIcon fontSize="inherit" />}
                                     color="primary"
                                 />
                             )}
@@ -96,7 +99,7 @@ function HtsgetBrowser() {
                                     isLoading={isLoading}
                                     header="BAMs"
                                     value={BamCount}
-                                    icon={<Description fontSize="inherit" />}
+                                    icon={<DescriptionIcon fontSize="inherit" />}
                                     color="secondary"
                                 />
                             )}

@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Box, ButtonBase } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
@@ -33,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     boxContainer: {
         width: '228px',
         display: 'flex',
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             width: 'auto'
         }
     }

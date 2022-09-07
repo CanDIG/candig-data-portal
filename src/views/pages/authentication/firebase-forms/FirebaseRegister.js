@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
+// mui
+import { makeStyles } from '@mui/styles';
 import {
     Box,
     Button,
@@ -20,7 +20,7 @@ import {
     TextField,
     Typography,
     useMediaQuery
-} from '@material-ui/core';
+} from '@mui/material';
 
 // third party
 import * as Yup from 'yup';
@@ -33,8 +33,8 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
 // assets
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             backgroundColor: theme.palette.primary.light
         },
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             fontSize: '0.875rem'
         }
     },
@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     },
     loginIcon: {
         marginRight: '16px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             marginRight: '8px'
         }
     },
@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 const FirebaseRegister = ({ ...others }) => {
     const classes = useStyles();
     const scriptedRef = useScriptRef();
-    const matchDownSM = useMediaQuery((theme) => theme.breakpoints.down('sm'));
+    const matchDownSM = useMediaQuery((theme) => theme.breakpoints.down('md'));
     const customization = useSelector((state) => state.customization);
     const [showPassword, setShowPassword] = React.useState(false);
     const [checked, setChecked] = React.useState(true);
@@ -199,6 +199,7 @@ const FirebaseRegister = ({ ...others }) => {
                                     type="text"
                                     defaultValue="Joseph"
                                     className={classes.loginInput}
+                                    variant="standard"
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -210,6 +211,7 @@ const FirebaseRegister = ({ ...others }) => {
                                     type="text"
                                     defaultValue="Doe"
                                     className={classes.loginInput}
+                                    variant="standard"
                                 />
                             </Grid>
                         </Grid>
@@ -256,6 +258,7 @@ const FirebaseRegister = ({ ...others }) => {
                                             onClick={handleClickShowPassword}
                                             onMouseDown={handleMouseDownPassword}
                                             edge="end"
+                                            size="large"
                                         >
                                             {showPassword ? <Visibility /> : <VisibilityOff />}
                                         </IconButton>

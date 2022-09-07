@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-// material-ui
-import { Grid } from '@material-ui/core';
+// mui
+import { Grid } from '@mui/material';
 
 // project imports
 import EarningCard from './EarningCard';

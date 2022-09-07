@@ -4,6 +4,10 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import MainCard from 'ui-component/cards/MainCard';
 
+// REDUX
+import { useSelector } from 'react-redux';
+
+
 window.Highcharts = Highcharts;
 
 /*
@@ -24,6 +28,7 @@ function splitString(newString) {
  * @param {array} dataObject
  */
 function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject }) {
+    const events = useSelector((state) => state);
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -93,7 +98,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
     }, [datasetName, dataObject, chartType]);
 
     return (
-        <MainCard>
+        <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <HighchartsReact highcharts={Highcharts} options={chartOptions} />
         </MainCard>
     );

@@ -1,8 +1,8 @@
 import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Card } from '@material-ui/core';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Card } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';

@@ -1,8 +1,8 @@
 import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Grid, Skeleton } from '@material-ui/core';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Card, CardContent, Grid, Skeleton } from '@mui/material';
 
 // style constant
 const useStyles = makeStyles({
@@ -24,18 +24,18 @@ const EarningCard = () => {
                     <Grid item>
                         <Grid container justifyContent="space-between">
                             <Grid item>
-                                <Skeleton variant="rect" width={44} height={44} />
+                                <Skeleton variant="rectangular" width={44} height={44} />
                             </Grid>
                             <Grid item>
-                                <Skeleton variant="rect" width={34} height={34} />
+                                <Skeleton variant="rectangular" width={34} height={34} />
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid item>
-                        <Skeleton variant="rect" className={classes.cardHeading} height={40} />
+                        <Skeleton variant="rectangular" className={classes.cardHeading} height={40} />
                     </Grid>
                     <Grid item>
-                        <Skeleton variant="rect" height={30} />
+                        <Skeleton variant="rectangular" height={30} />
                     </Grid>
                 </Grid>
             </CardContent>

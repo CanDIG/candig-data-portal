@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { Box, Button, FormControl } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Box, Button, FormControl } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 import { BASE_URL, referenceToIgvTrack } from 'store/constant';
 import LightCard from 'views/dashboard/Default/LightCard';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import VcfInstance from 'ui-component/IGV/VcfInstance';
 import { searchVariantSets, getReferenceSet } from 'store/api';
@@ -110,7 +109,7 @@ function VcfBrowser() {
 
     return (
         <>
-            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative' }}>
+            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -152,7 +151,7 @@ function VcfBrowser() {
                     <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                         <Grid item>
                             {options.length > 0 && (
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <Grid container direction="row" alignItems="center">
                                         <Box mr={2}>
                                             <p>VCF</p>
@@ -170,8 +169,8 @@ function VcfBrowser() {
                         </Grid>
 
                         <Grid item>
-                            <FormControl>
-                                <Button type="submit" variant="contained">
+                            <FormControl variant="standard">
+                                <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
                                     Search
                                 </Button>
                             </FormControl>

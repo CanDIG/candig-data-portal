@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { makeStyles, useTheme } from '@material-ui/styles';
-import { Box, Drawer, useMediaQuery } from '@material-ui/core';
+// mui
+import { makeStyles, useTheme } from '@mui/styles';
+import { Box, Drawer, useMediaQuery } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
         height: 'calc(100vh - 88px)',
         paddingLeft: '16px',
         paddingRight: '16px',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             height: 'calc(100vh - 56px)'
         }
     },

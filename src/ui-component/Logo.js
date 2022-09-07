@@ -1,6 +1,6 @@
 import React from 'react';
 
-// material-ui
+// mui
 import logo from '../assets/images/logo.svg';
 
 /**
