@@ -48,10 +48,16 @@ function fetchDatasets() {
 }
 
 /*
-Fetch servers from CanDIG web api datasets endpoint and returns a promise
+Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
-    return fetchDatasets();
+    return fetch(`${federation}/federation/servers`, {
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        return {};
+    });
 }
 
 /*

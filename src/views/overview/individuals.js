@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
@@ -14,7 +13,7 @@ import { groupBy } from 'utils/utils';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
-import { fetchKatsu, getCounts, fetchDatasets } from 'store/api';
+import { fetchKatsu, fetchServers } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
@@ -23,6 +22,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PersonIcon from '@mui/icons-material/Person';
 import PublicIcon from '@mui/icons-material/Public';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import { object } from 'prop-types';
 
 /*
  * Return the aggregation of diseases
@@ -61,8 +61,6 @@ function countPhenotypeDatatype(data, type) {
 }
 
 function IndividualsOverview() {
-    // const events = useSelector((state) => state);
-    // const { datasetId } = events.setData.update;
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
     const [provinceCounter, setProvinceCount] = useState(0);
@@ -74,7 +72,6 @@ function IndividualsOverview() {
     const [biosampleCount, setBiosampleCount] = useState(0);
     const [diseasesSum, setDiseasesSum] = useState(0);
     const [didFetch, setDidFetch] = useState(false);
-    const dataset = 'WyJQT0ciXQ';
 
     const countIndividuals = (data) => {
         setIndividualCount(data.results.length);
@@ -89,126 +86,51 @@ function IndividualsOverview() {
     };
 
     useEffect(() => {
-    let isMounted = true;
-    trackPromise(
-        fetchKatsu('/api/individuals?page_size=1000')
-            .then((data) => {
-                if (isMounted) {
-                    // setProvinceCount('1');
-                    setHospitalCount('1');
-                    countIndividuals(data);
-                    countEthnicity(data);
-                    countGender(data);
-                    const diseases = countDiseases(data);
-                    setDiseasesSum(Object.keys(diseases).length);
-
+        let isMounted = true;
+        trackPromise(
+            fetchKatsu('/api/individuals?page_size=1000')
+                .then((data) => {
+                    if (isMounted) {
+                        setProvinceCount('1');
+                        setHospitalCount('1');
+                        countIndividuals(data);
+                        countEthnicity(data);
+                        countGender(data);
+                        const diseases = countDiseases(data);
+                        setDiseasesSum(Object.keys(diseases).length);
+                        setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
+                        setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
+                        setDidFetch(true);
+                    }
+                    console.log("Katsu Data")
+                    console.log(data);
+                })
+                .catch(() => {
+                    // pass
+                    // setIndividualCount('Not available');
+                    // setDiseasesSum('Not available');
+                })
+        );
+        trackPromise(
+             fetchServers()
+                .then((data) => {
+                    console.log(Object.keys(data).length);
                     const SERVER_DATA = {
-                        'Known Peers': 3,
-                        'Queried Peers': 3,
+                        'Known Peers': Object.keys(data).length,
+                        'Queried Peers': 2,
                         'Successful Communications': 1
                     };
-
                     setServerObject(SERVER_DATA);
-
-                    setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
-                    setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
-                    setDidFetch(true);
                 }
-                console.log("Katsu Data")
-                console.log(data);
-            })
-            .catch(() => {
-                // pass
-                // setIndividualCount('Not available');
-                // setDiseasesSum('Not available');
-            })
-    );
+        )
+        )
 
         setLoading(false);
+
         return () => {
             isMounted = false;
         };
     }, [didFetch]);
-
-    // console.log(fetchDatasets());
-    // getCounts(datasetId, table, fields)
-    // .then((data) => {
-    //     console.log(data)
-
-    // })
-    // .catch((err) => {
-    //     setProvinceCount('Not Available');
-    //     setHospitalCount('Not Available');
-    // })
-
-    function getEnrollmentsCounters(
-        datasetId = 'WyJtb2NrMSJd',
-        table = 'enrollments',
-        fields = ['datasetId', 'treatingCentreName', 'TreatingCentreProvince']
-    ) {
-        getCounts(datasetId, table, fields)
-            .then((data) => {
-                console.log(data);
-                const enrolObj = data.results.enrollments[0];
-                console.log(enrolObj)
-
-                if ('datasetId' in enrolObj) {
-                    setIndividualCount(enrolObj.datasetId[datasetId]);
-                } else {
-                    setIndividualCount('Not Available');
-                }
-
-                if ('treatingCentreName' in enrolObj) {
-                    setHospitalCount(Object.keys(enrolObj.treatingCentreName).length);
-                } else {
-                    setHospitalCount('Not Available');
-                }
-
-                if ('treatingCentreProvince' in enrolObj) {
-                    console.log('PROVINCE')
-                    console.log(Object.keys(enrolObj.treatingCentreProvince).length)
-                    setProvinceCount(Object.keys(enrolObj.treatingCentreProvince).length);
-                } else {
-                    setProvinceCount('Not Available');
-                }
-            })
-            .catch((err) => {
-                setProvinceCount('Not Available');
-                setHospitalCount('Not Available');
-                setIndividualCount('Not Available');
-            });
-    }
-
-    console.log(getEnrollmentsCounters());
-
-    // function fetchData(datasetId) {
-    //     if (datasetId) {
-    //         getEnrollmentsCounters(datasetId, 'enrollments', ['datasetId', 'treatingCentreName', 'treatingCentreProvince']);
-    //         getSampleCounters(datasetId, 'samples', ['datasetId']);
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (datasetId = dataset) {
-    //         fetchData(events.setData.update.datasetId);
-    //     }
-    // }, [datasetId]);/         .catch((err) => {
-    //             setBiosampleCount('Not Available');
-    //         });
-    // }
-
-    // function fetchData(datasetId) {
-    //     if (datasetId) {
-    //         getEnrollmentsCounters(datasetId, 'enrollments', ['datasetId', 'treatingCentreName', 'treatingCentreProvince']);
-    //         getSampleCounters(datasetId, 'samples', ['datasetId']);
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (datasetId = dataset) {
-    //         fetchData(events.setData.update.datasetId);
-    //     }
-    // }, [datasetId]);
 
     return (
         <Grid container>

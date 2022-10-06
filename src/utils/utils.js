@@ -17,6 +17,10 @@ export function groupBy(objectArray, property) {
     }, {});
 }
 
+/*
+ * Merge results formm federation service into one array
+ * @param data: The federated response object
+ */
 export function mergeFederatedResults(data) {
     let output = [];
     const { results } = data;
