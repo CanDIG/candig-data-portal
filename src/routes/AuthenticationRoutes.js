@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import Loadable from 'ui-component/Loadable';
 
 // project imports

@@ -123,18 +123,12 @@ const FirebaseRegister = ({ ...others }) => {
                             size="large"
                             variant="contained"
                         >
-                            <img src={Google} alt="google" width="20px" sx={{ mr: { xs: 1, sm: 2 } }} className={classes.loginIcon} /> Sign
-                            up with Google
+                            <img src={Google} alt="google" width="20px" className={classes.loginIcon} /> Sign up with Google
                         </Button>
                     </AnimateButton>
                 </Grid>
                 <Grid item xs={12}>
-                    <Box
-                        sx={{
-                            alignItems: 'center',
-                            display: 'flex'
-                        }}
-                    >
+                    <Box sx={{ alignItems: 'center', display: 'flex' }}>
                         <Divider className={classes.signDivider} orientation="horizontal" />
                         <AnimateButton>
                             <Button

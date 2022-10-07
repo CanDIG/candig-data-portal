@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable camelcase */
 import { Button } from '@mui/material';
 
 function moreInfoButton(params) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -6,7 +6,6 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
-
 
 window.Highcharts = Highcharts;
 

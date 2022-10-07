@@ -68,9 +68,9 @@ function IndividualsOverview() {
     const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
-    const [featureCount, setFeatureCount] = useState(0);
-    const [biosampleCount, setBiosampleCount] = useState(0);
-    const [diseasesSum, setDiseasesSum] = useState(0);
+    // const [featureCount, setFeatureCount] = useState(0);
+    // const [biosampleCount, setBiosampleCount] = useState(0);
+    // const [diseasesSum, setDiseasesSum] = useState(0);
     const [didFetch, setDidFetch] = useState(false);
 
     const countIndividuals = (data) => {
@@ -78,32 +78,43 @@ function IndividualsOverview() {
     };
 
     const countEthnicity = (data) => {
-        setEthnicityObject(groupBy(data.results, 'ethnicity'));
+        setEthnicityObject(groupBy(data, 'ethnicity'));
     };
 
     const countGender = (data) => {
-        setGenderObject(groupBy(data.results, 'sex'));
+        console.log('Gender', data);
+        setGenderObject(data);
     };
 
     useEffect(() => {
         let isMounted = true;
         trackPromise(
-            fetchKatsu('/api/individuals?page_size=1000')
+            fetchKatsu('/api/moh_overview')
                 .then((data) => {
+                    console.log('first', data);
+                    // { "province_count": 1, "hospital_count": 14, "center_count": 90, "individual_count": 668, "ethnicity": { "ethnicity": "Not Hispanic or Latino ", "count": "668" }, "gender": [{ "sex": "Male", "count": 365 }, { "sex": "Female", "count": 360 }] };
+                    console.log('individuals', data);
                     if (isMounted) {
-                        setProvinceCount('1');
-                        setHospitalCount('1');
-                        countIndividuals(data);
-                        countEthnicity(data);
-                        countGender(data);
-                        const diseases = countDiseases(data);
-                        setDiseasesSum(Object.keys(diseases).length);
-                        setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
-                        setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
+                        setProvinceCount(data.province_count);
+                        setHospitalCount(data.hospital_count);
+                        setIndividualCount(data.individual_count);
+                        countEthnicity(data.ethnicity);
+                        countGender(data.gender);
+                        // const diseases = countDiseases(data);
+                        // setDiseasesSum(Object.keys(diseases).length);
+
+                        const SERVER_DATA = {
+                            'Known Peers': 3,
+                            'Queried Peers': 3,
+                            'Successful Communications': 1
+                        };
+
+                        setServerObject(SERVER_DATA);
+
+                        // setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
+                        // setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
                         setDidFetch(true);
                     }
-                    console.log("Katsu Data")
-                    console.log(data);
                 })
                 .catch(() => {
                     // pass
@@ -111,19 +122,18 @@ function IndividualsOverview() {
                     // setDiseasesSum('Not available');
                 })
         );
+
         trackPromise(
-             fetchServers()
-                .then((data) => {
-                    console.log(Object.keys(data).length);
-                    const SERVER_DATA = {
-                        'Known Peers': Object.keys(data).length,
-                        'Queried Peers': 2,
-                        'Successful Communications': 1
-                    };
-                    setServerObject(SERVER_DATA);
-                }
-        )
-        )
+            fetchServers().then((data) => {
+                console.log(Object.keys(data).length);
+                const SERVER_DATA = {
+                    'Known Peers': Object.keys(data).length,
+                    'Queried Peers': 2,
+                    'Successful Communications': 1
+                };
+                setServerObject(SERVER_DATA);
+            })
+        );
 
         setLoading(false);
 
@@ -196,12 +206,7 @@ function IndividualsOverview() {
                                 />
                             </Grid> */}
                     <Grid item xs={12}>
-                        <SmallCountCard
-                            title="Number of Biosamples"
-                            count={biosampleCount}
-                            dark={false}
-                            icon={<BiotechIcon fontSize="inherit" />}
-                        />
+                        <SmallCountCard title="Number of Biosamples" count={14} dark={false} icon={<BiotechIcon fontSize="inherit" />} />
                         {/* </Grid> */}
                     </Grid>
                 </Grid>

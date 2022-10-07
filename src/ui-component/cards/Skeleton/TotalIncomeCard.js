@@ -1,5 +1,3 @@
-import React from 'react';
-
 // mui
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Skeleton } from '@mui/material';

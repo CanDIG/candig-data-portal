@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 // mui
 import { useTheme } from '@mui/styles';
@@ -80,4 +80,5 @@ MainCard.propTypes = {
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string, PropTypes.object])
 };
 
+MainCard.displayName = 'MainCard';
 export default MainCard;

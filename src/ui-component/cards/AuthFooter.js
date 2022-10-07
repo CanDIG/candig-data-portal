@@ -1,5 +1,3 @@
-import React from 'react';
-
 // mui
 import { Link, Typography, Stack } from '@mui/material';
 
