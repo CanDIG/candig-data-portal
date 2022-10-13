@@ -7,7 +7,6 @@ import MainCard from 'ui-component/cards/MainCard';
 // REDUX
 import { useSelector } from 'react-redux';
 
-
 window.Highcharts = Highcharts;
 
 /*

@@ -72,7 +72,11 @@ const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
-                <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }} className={classes.card} contentClass={classes.content}>
+                <MainCard
+                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    className={classes.card}
+                    contentClass={classes.content}
+                >
                     <List className={classes.padding}>
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
                             <ListItemAvatar>

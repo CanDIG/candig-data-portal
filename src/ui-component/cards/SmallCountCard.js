@@ -80,7 +80,12 @@ const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
-                <MainCard border={false} sx={{ borderRadius: events.customization.borderRadius * 0.25 }} className={classes.card} contentClass={classes.content}>
+                <MainCard
+                    border={false}
+                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    className={classes.card}
+                    contentClass={classes.content}
+                >
                     <List className={classes.padding}>
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
                             <ListItemAvatar>

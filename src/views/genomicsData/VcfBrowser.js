@@ -109,7 +109,10 @@ function VcfBrowser() {
 
     return (
         <>
-            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="VCF Browser"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}

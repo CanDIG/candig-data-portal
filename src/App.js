@@ -19,7 +19,6 @@ const App = () => {
     const customization = useSelector((state) => state.customization);
 
     return (
-
         <ThemeProvider theme={themes(customization)}>
             <StyledEngineProvider injectFirst>
                 <CssBaseline />
@@ -28,7 +27,6 @@ const App = () => {
                 </NavigationScroll>
             </StyledEngineProvider>
         </ThemeProvider>
-
     );
 };
 

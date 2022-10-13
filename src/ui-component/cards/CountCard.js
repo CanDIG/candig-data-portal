@@ -122,7 +122,12 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
-                <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }} border={false} className={classes.card} contentClass={classes.content}>
+                <MainCard
+                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    border={false}
+                    className={classes.card}
+                    contentClass={classes.content}
+                >
                     <Grid container direction="column">
                         <Grid item>
                             <Grid container justifyContent="space-between">

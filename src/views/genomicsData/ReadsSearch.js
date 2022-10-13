@@ -148,7 +148,10 @@ function ReadsSearch() {
 
     return (
         <>
-            <MainCard title="Reads Search" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="Reads Search"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -223,7 +226,11 @@ function ReadsSearch() {
                                 </Grid>
                                 <Grid item>
                                     <FormControl variant="standard">
-                                        <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        >
                                             Search
                                         </Button>
                                     </FormControl>
