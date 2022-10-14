@@ -69,37 +69,7 @@ function VariantsSearch() {
     useEffect(() => {
         setLoading(false);
         setDisplayVariantsTable(false);
-        // Check for variant and reference name set on datasetId changes
-        setDatasetId(events.customization.update.datasetId);
-
-        if (events.customization.update.datasetId) {
-            trackPromise(
-                searchVariantSets(datasetId)
-                    .then((data) => {
-                        setVariantSets(data.results.total);
-                        setSelected([]);
-                        const dropdownOptions = [];
-                        dropdownOptions.length = 0;
-                        data.results.variantSets.forEach((variant) => {
-                            dropdownOptions.push({ label: variant.name, value: variant.id });
-                        });
-                        setOptions(dropdownOptions);
-                        setSelected(dropdownOptions);
-                        settingReferenceSetName(data.results.variantSets[0].referenceSetId);
-                    })
-                    .catch(() => {
-                        setVariantSets('Not Available');
-                        setReferenceSetName('Not Available');
-
-                        if (datasetId !== '') {
-                            setOpen(true);
-                            setAlertMessage('No variants or reference set names were found');
-                            setAlertSeverity('warning');
-                        }
-                    })
-            );
-        }
-    }, [datasetId, events.customization.update.datasetId, setDatasetId]);
+    }, []);
 
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission
