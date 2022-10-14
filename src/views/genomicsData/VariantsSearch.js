@@ -74,6 +74,7 @@ function VariantsSearch() {
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission
         setDisplayVariantsTable(false);
+        // call api to fetch variant sets here???
     };
 
     return (
@@ -93,6 +94,15 @@ function VariantsSearch() {
                 <Grid container direction="column" className="content">
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
+                            <Grid item sx={{ minWidth: 150 }}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="ref-gene-label">Reference Genome</InputLabel>
+                                    <NativeSelect labelId="ref-gene-label" required id="ref-genome">
+                                        <option value="gh38">gh38</option>
+                                        <option value="gh37">gh37</option>
+                                    </NativeSelect>
+                                </FormControl>
+                            </Grid>
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="chr-label">Chromosome</InputLabel>
