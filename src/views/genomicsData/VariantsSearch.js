@@ -74,48 +74,6 @@ function VariantsSearch() {
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission
         setDisplayVariantsTable(false);
-        if (selected) {
-            selected.forEach((variantSetId) => {
-                variantSetIds.push(variantSetId.value);
-            });
-            // searchVariant(e.target.start.value, e.target.end.value, e.target.chromosome.value, variantSetIds) query /variants/search
-            trackPromise(
-                searchVariantByVariantSetIds(e.target.start.value, e.target.end.value, e.target.chromosome.value, variantSetIds)
-                    .then((data) => {
-                        setDisplayVariantsTable(true);
-                        setRowData(data.results.variants);
-                    })
-                    .catch(() => {
-                        setRowData([]);
-                        setDisplayVariantsTable(false);
-                        setOpen(true);
-
-                        if (datasetId !== '') {
-                            setOpen(true);
-                            setAlertMessage('No variants were found');
-                            setAlertSeverity('warning');
-                        }
-                    }),
-                'table'
-            );
-            setVariantSetIds([]);
-        } else {
-            searchVariant(datasetId, e.target.start.value, e.target.end.value, e.target.chromosome.value)
-                .then((data) => {
-                    setRowData(data.results.variants);
-                    setDisplayVariantsTable(true);
-                })
-                .catch(() => {
-                    setDisplayVariantsTable(false);
-                    setOpen(true);
-
-                    if (datasetId !== '') {
-                        setOpen(true);
-                        setAlertMessage('No variants were found');
-                        setAlertSeverity('warning');
-                    }
-                });
-        }
     };
 
     return (
@@ -135,24 +93,6 @@ function VariantsSearch() {
                 <Grid container direction="column" className="content">
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
-                            <Grid item>
-                                {options.length > 0 && (
-                                    <FormControl variant="standard">
-                                        <Grid container direction="row" alignItems="center">
-                                            <Box mr={2}>
-                                                <p>Variant Set</p>
-                                            </Box>
-                                            <MultiSelect // Width set in CSS
-                                                options={options}
-                                                value={selected}
-                                                onChange={setSelected}
-                                                labelledBy="Variant Set"
-                                                color="primary"
-                                            />
-                                        </Grid>
-                                    </FormControl>
-                                )}
-                            </Grid>
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="chr-label">Chromosome</InputLabel>
