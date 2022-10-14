@@ -163,35 +163,6 @@ function VariantsSearch() {
                     fontColor={alertSeverity === 'error' ? 'white' : 'black'}
                 />
                 <Grid container direction="column" className="content">
-                    <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
-                        <Grid item sm={12} xs={12} md={4} lg={4}>
-                            {promiseInProgress === true ? (
-                                <LoadingIndicator />
-                            ) : (
-                                <LightCard
-                                    isLoading={isLoading}
-                                    header="Reference Genome"
-                                    value={referenceSetName}
-                                    icon={<Map fontSize="inherit" />}
-                                    color="primary"
-                                />
-                            )}
-                        </Grid>
-                        <Grid item sm={12} xs={12} md={4} lg={4}>
-                            {promiseInProgress === true ? (
-                                <LoadingIndicator />
-                            ) : (
-                                <LightCard
-                                    isLoading={isLoading}
-                                    header="VariantSets/VCFs"
-                                    value={variantSet}
-                                    icon={<Description fontSize="inherit" />}
-                                    color="secondary"
-                                />
-                            )}
-                        </Grid>
-                    </Grid>
-
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
