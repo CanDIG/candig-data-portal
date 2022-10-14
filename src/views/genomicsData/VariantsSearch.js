@@ -154,7 +154,6 @@ function VariantsSearch() {
                 title="Variants Search"
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
             >
-                <DatasetIdSelect />
                 <AlertComponent
                     open={open}
                     setOpen={setOpen}
