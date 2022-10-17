@@ -79,7 +79,6 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
                 data.push(dataObject[key]);
                 return key;
             });
-
             setChartOptions({
                 credits: {
                     enabled: false

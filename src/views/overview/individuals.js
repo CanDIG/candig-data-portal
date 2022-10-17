@@ -1,145 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
 import { Grid } from '@mui/material';
-import CountCard from 'ui-component/cards/CountCard';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/overview/CustomOfflineChart';
 import TreatingCentreMap from 'views/overview/TreatingCentreMap';
-
-import { groupBy } from 'utils/utils';
-// import { schemaFxn } from 'utils/ChordSchemas';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
-import { fetchKatsu, fetchServers } from 'store/api';
+import { fetchSummaryStats, fetchServers } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
-import BiotechIcon from '@mui/icons-material/Biotech';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import HiveIcon from '@mui/icons-material/Hive';
+// import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import PersonIcon from '@mui/icons-material/Person';
 import PublicIcon from '@mui/icons-material/Public';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import { object } from 'prop-types';
-
-/*
- * Return the aggregation of diseases
- * @param {data}... Object
- */
-function countDiseases(data) {
-    const diseases = {};
-    for (let i = 0; i < data.results.length; i += 1) {
-        if (data.results[i].phenopackets !== undefined) {
-            for (let j = 0; j < data.results[i].phenopackets.length; j += 1) {
-                for (let k = 0; k < data.results[i].phenopackets[j].diseases.length; k += 1) {
-                    const key = data.results[i].phenopackets[j].diseases[k].term.label;
-                    if (!diseases[key]) {
-                        diseases[key] = 0;
-                    }
-                    diseases[key] += 1;
-                }
-            }
-        }
-    }
-    return diseases;
-}
-
-/*
- * Return the aggregation of phenotype datatypes
- * @param {data}... Object
- */
-function countPhenotypeDatatype(data, type) {
-    let count = 0;
-    for (let i = 0; i < data.results.length; i += 1) {
-        if (data.results[i].phenopackets !== undefined) {
-            count += data.results[i].phenopackets[0][type].length;
-        }
-    }
-    return count;
-}
+import { groupCount } from 'utils/utils';
 
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
     const [provinceCounter, setProvinceCount] = useState(0);
     const [hospitalCounter, setHospitalCount] = useState(0);
+    const [cohortCounter, setCohortCount] = useState(0);
     const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
-    // const [featureCount, setFeatureCount] = useState(0);
-    // const [biosampleCount, setBiosampleCount] = useState(0);
-    // const [diseasesSum, setDiseasesSum] = useState(0);
+    const [canDigDataSource, setCanDigDataSource] = useState({});
     const [didFetch, setDidFetch] = useState(false);
 
-    const countIndividuals = (data) => {
-        setIndividualCount(data.results.length);
-    };
+    /* Aggregated count of federated data */
+    function federationStatCount(data) {
+        let centerCount = 0;
+        let hospitalCount = 0;
+        let provinceCount = 0;
+        let individualCount = 0;
+        let cohortCount = 0;
+        const ethnicitiesCount = {};
+        const gendersCount = {};
+        const candigDataSouceCollection = {};
+        data.results.forEach((stat) => {
+            centerCount += stat?.center_count ? stat?.center_count : 0;
+            hospitalCount += stat?.location ? 1 : 0;
+            provinceCount += stat?.location ? 1 : 0;
+            individualCount += stat?.individual_count ? stat?.individual_count : 0;
+            cohortCount += stat?.cohort_count ? stat?.cohort_count : 0;
+            if (stat.location) {
+                candigDataSouceCollection[stat.location[2]] = stat?.individual_count ? stat?.individual_count : 0;
+            }
+            if (stat.gender) {
+                stat.gender.forEach((gender) => {
+                    if (gender.sex in gendersCount) {
+                        gendersCount[gender.sex] += gender.count;
+                    } else {
+                        gendersCount[gender.sex] = gender.count;
+                    }
+                });
+            }
+            if (stat.ethnicity) {
+                stat.ethnicity.forEach((ethnicity) => {
+                    if (ethnicity.ethnicity in ethnicitiesCount) {
+                        ethnicitiesCount[ethnicity.ethnicity] += ethnicity.count;
+                    } else {
+                        ethnicitiesCount[ethnicity.ethnicity] = ethnicity.count;
+                    }
+                });
+            }
+        });
+        setProvinceCount(provinceCount);
+        setHospitalCount(hospitalCount);
+        setIndividualCount(individualCount);
+        setCohortCount(cohortCount);
+        setEthnicityObject(ethnicitiesCount);
+        setGenderObject(gendersCount);
+        setCanDigDataSource(candigDataSouceCollection);
+    }
 
-    const countEthnicity = (data) => {
-        setEthnicityObject(groupBy(data, 'ethnicity'));
-    };
-
-    const countGender = (data) => {
-        console.log('Gender', data);
-        setGenderObject(data);
-    };
+    /* Setting summary page to local site data */
+    function summaryStats(data) {
+        setProvinceCount(data?.province_count ? data?.province_count : 0);
+        setHospitalCount(data?.hospital_count ? data?.hospital_count : 0);
+        setIndividualCount(data?.individual_count ? data?.individual_count : 0);
+        setCohortCount(data?.cohort_count ? data?.cohort_count : 0);
+        setEthnicityObject(groupCount(data.ethnicity, 'ethnicity'));
+        setGenderObject(groupCount(data.gender, 'sex'));
+    }
 
     useEffect(() => {
-        let isMounted = true;
         trackPromise(
-            fetchKatsu('/api/moh_overview')
+            /* If federated URL is set return federated call */
+            fetchSummaryStats('/api/moh_overview')
                 .then((data) => {
-                    console.log('first', data);
-                    // { "province_count": 1, "hospital_count": 14, "center_count": 90, "individual_count": 668, "ethnicity": { "ethnicity": "Not Hispanic or Latino ", "count": "668" }, "gender": [{ "sex": "Male", "count": 365 }, { "sex": "Female", "count": 360 }] };
-                    console.log('individuals', data);
-                    if (isMounted) {
-                        setProvinceCount(data.province_count);
-                        setHospitalCount(data.hospital_count);
-                        setIndividualCount(data.individual_count);
-                        countEthnicity(data.ethnicity);
-                        countGender(data.gender);
-                        // const diseases = countDiseases(data);
-                        // setDiseasesSum(Object.keys(diseases).length);
-
-                        const SERVER_DATA = {
-                            'Known Peers': 3,
-                            'Queried Peers': 3,
-                            'Successful Communications': 1
-                        };
-
-                        setServerObject(SERVER_DATA);
-
-                        // setFeatureCount(countPhenotypeDatatype(data, 'phenotypic_features'));
-                        // setBiosampleCount(countPhenotypeDatatype(data, 'biosamples'));
-                        setDidFetch(true);
+                    if (data.results) {
+                        federationStatCount(data);
+                    } else {
+                        summaryStats(data);
                     }
+                    setDidFetch(true);
                 })
                 .catch(() => {
                     // pass
-                    // setIndividualCount('Not available');
-                    // setDiseasesSum('Not available');
+                    setProvinceCount('Not Available');
+                    setHospitalCount('Not Available');
+                    setIndividualCount('Not Available');
+                    setCohortCount('Not Available');
                 })
         );
 
         trackPromise(
-            fetchServers().then((data) => {
-                console.log(Object.keys(data).length);
-                const SERVER_DATA = {
-                    'Known Peers': Object.keys(data).length,
-                    'Queried Peers': 2,
-                    'Successful Communications': 1
-                };
-                setServerObject(SERVER_DATA);
-            })
+            fetchServers()
+                .then((data) => {
+                    /* Aggregated federated server data */
+                    const SERVER_DATA = {
+                        'Known Peers': Object.keys(data).length,
+                        'Queried Peers': 2,
+                        'Successful Communications': 1
+                    };
+                    setServerObject(SERVER_DATA);
+                })
+                .catch(() => {
+                    // pass
+                    /* Local site data in the event of no federated URL */
+                    const SERVER_DATA = {
+                        'Known Peers': 1,
+                        'Queried Peers': 1,
+                        'Successful Communications': 1
+                    };
+                    setServerObject(SERVER_DATA);
+                })
         );
 
         setLoading(false);
-
-        return () => {
-            isMounted = false;
-        };
     }, [didFetch]);
 
     return (
@@ -156,7 +150,7 @@ function IndividualsOverview() {
                         />
                     </Grid>
                     <Grid item xs={12} pb={2} pr={2}>
-                        <TreatingCentreMap datasetName="" />
+                        <TreatingCentreMap datasetName="" data={canDigDataSource} />
                     </Grid>
                 </Grid>
                 <Grid container spacing={2} xs={12} sm={6} md={6} lg={6}>
@@ -178,6 +172,9 @@ function IndividualsOverview() {
                         />
                     </Grid>
                     <Grid item xs={12}>
+                        <SmallCountCard title="Cohorts" count={cohortCounter} dark={false} icon={<HiveIcon fontSize="inherit" />} />
+                    </Grid>
+                    <Grid item xs={12}>
                         <SmallCountCard
                             isLoading={isLoading}
                             title="Number of Individuals"
@@ -185,29 +182,6 @@ function IndividualsOverview() {
                             primary
                             icon={<PersonIcon fontSize="inherit" />}
                         />
-                    </Grid>
-                    {/* <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <CountCard
-                            isLoading={isLoading}
-                            title="Phenotypic Features in Database"
-                            count={featureCount}
-                            primary={false}
-                            icon={<PersonIcon fontSize="inherit" />}
-                        />
-                    </Grid> */}
-                    {/* <Grid container spacing={gridSpacing}> */}
-                    {/* <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <SmallCountCard
-                                    isLoading={isLoading}
-                                    title="Number of Diseases"
-                                    count={diseasesSum}
-                                    dark
-                                    icon={<QueryStatsIcon fontSize="inherit" />}
-                                />
-                            </Grid> */}
-                    <Grid item xs={12}>
-                        <SmallCountCard title="Number of Biosamples" count={14} dark={false} icon={<BiotechIcon fontSize="inherit" />} />
-                        {/* </Grid> */}
                     </Grid>
                 </Grid>
             </Grid>

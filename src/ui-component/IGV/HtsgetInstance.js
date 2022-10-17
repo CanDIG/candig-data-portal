@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useRef, useEffect } from 'react';
 
 import igv from '@candig/igv/dist/igv.esm';

@@ -18,6 +18,24 @@ export function groupBy(objectArray, property) {
 }
 
 /*
+ * Return aggregation value of a key anmd its count from an array of objects
+ * @param {array} objectArray: An array of objects.
+ * @param {object} property: The key to aggregate on.
+ * @return an object a collection of keys and their counts
+ */
+export function groupCount(objectArray, property) {
+    return objectArray.reduce((acc, obj) => {
+        const key = obj[property];
+        if (!acc[key]) {
+            acc[key] = 0;
+        }
+        acc[key] = obj.count;
+        delete acc.undefined;
+        return acc;
+    }, {});
+}
+
+/*
  * Merge results formm federation service into one array
  * @param data: The federated response object
  */
