@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -9,95 +9,26 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'assets/css/VariantsSearch.css';
 
-function VariantsTable({ rowData, datasetId }) {
+function VariantsTable({ rowData }) {
     let gridOptions = {};
-
-    function getColumnDefs() {
-        const columnDefs = [
-            { headerName: 'Chromosome', field: 'referenceName' },
-            { headerName: 'Start', field: 'start' },
-            { headerName: 'End', field: 'end' },
-            { headerName: 'Reference Bases', field: 'referenceBases' },
-            { headerName: 'Alternate Bases', field: 'alternateBases' }
-        ];
-
-        if (rowData[0] !== undefined) {
-            // First population is empty
-            // Check if the first element contains attributes
-            if (Object.prototype.hasOwnProperty.call(rowData[0], 'attributes')) {
-                const { attr } = rowData[0].attributes;
-                Object.keys(attr).forEach((key) => {
-                    columnDefs.push({
-                        headerName: key,
-                        valueFormatter: (params) => {
-                            try {
-                                let attributeValue;
-
-                                if (params.value.values[0].stringValue !== undefined) {
-                                    attributeValue = params.value.values[0].stringValue;
-                                } else if (params.value.values[0].doubleValue !== undefined) {
-                                    attributeValue = params.value.values[0].doubleValue;
-                                } else if (params.value.values[0].int32Value !== undefined) {
-                                    attributeValue = params.value.values[0].int32Value;
-                                }
-
-                                return attributeValue;
-                            } catch (error) {
-                                // console.log(error);
-                                /*
-                                 * This is to handle the case where the attribute value is not available in the select row
-                                 */
-                                return 'N/A';
-                            }
-                        },
-                        field: `attributes.attr.${key}`, // Allows us to work with key without it retroactively changing to the last key
-                        editable: true
-                    });
-                });
-            }
-        }
-
-        return columnDefs;
-    }
+    const [columnDefs] = useState([
+        { field: 'Patient ID' },
+        { field: 'Genomic Sample ID' },
+        { field: 'Positions' },
+        { field: 'VCF File' },
+        { field: 'IGV Link', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
+    ]);
+    // parse rowData contains id, reference_genome, htsget, samples, variantcount to fit the table
+    const displayRowData = rowData.map((row) => {
+        const { patient_id: patientID, genomic_sample_id: genomicSampleID, positions, VCF_file: VCFFile } = row;
+        return { 'Patient ID': patientID, 'Genomic Sample ID': genomicSampleID, Positions: positions, 'VCF File': VCFFile };
+    });
 
     function onSelectionChanged() {
         const selectedRows = gridOptions.api.getSelectedRows();
-
-        fetch(`${BASE_URL}/search`, {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                datasetId: gridOptions.context.datasetId,
-                logic: {
-                    id: 'A'
-                },
-                components: [
-                    {
-                        id: 'A',
-                        variants: {
-                            start: selectedRows[0].start,
-                            end: selectedRows[0].end,
-                            referenceName: selectedRows[0].referenceName
-                        }
-                    }
-                ],
-                results: [
-                    {
-                        table: 'patients',
-                        fields: ['patientId']
-                    }
-                ]
-            })
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.results.patients.length === 0) {
-                    throw new Error('The variant you selected does not have associated individuals.');
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        selectedRows.forEach(function (selectedRow, index) {
+            console.log(`selectedRow: ${selectedRow}`);
+        });
     }
 
     gridOptions = {
@@ -111,23 +42,20 @@ function VariantsTable({ rowData, datasetId }) {
             minHeight: 300
         },
         onSelectionChanged,
-        rowSelection: 'single',
+        rowSelection: 'multiple',
         rowData: null,
         rowGroupPanelShow: 'always',
         pivotPanelShow: 'always',
         enableRangeSelection: true,
         paginationAutoPageSize: true,
         pagination: true,
-        valueCache: true,
-        frameworkComponents: {
-            VariantsTableButton
-        }
+        valueCache: true
     };
 
     return (
         <>
             <div className="ag-theme-alpine">
-                <AgGridReact columnDefs={getColumnDefs()} rowData={rowData} gridOptions={gridOptions} context={{ datasetId }} />
+                <AgGridReact columnDefs={columnDefs} rowData={displayRowData} gridOptions={gridOptions} />
             </div>
 
             <br />
@@ -136,8 +64,7 @@ function VariantsTable({ rowData, datasetId }) {
 }
 
 VariantsTable.propTypes = {
-    rowData: PropTypes.arrayOf(PropTypes.object).isRequired,
-    datasetId: PropTypes.string.isRequired
+    rowData: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 export default VariantsTable;

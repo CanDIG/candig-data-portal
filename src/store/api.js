@@ -104,16 +104,29 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {number}... End
  * @param {string}... Reference name
 */
-function searchVariant(datasetId, start, end, referenceName) {
-    return fetch(`${BASE_URL}/variants/search`, {
+function searchVariant(referenceName, chromosome, start, end) {
+    // REPLACE API FROM VARIANT SEARCH
+    return fetch(`https://my.api.mockaroo.com/htsget.json?key=1414fc20&__method=POST`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            start,
-            end,
             referenceName,
-            datasetId
+            chromosome,
+            start,
+            end
         })
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        return {};
+    });
+}
+
+function getVariantSearchTable() {
+    return fetch(`https://my.api.mockaroo.com/variant_search_table.json?key=1414fc20`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' }
     }).then((response) => {
         if (response.ok) {
             return response.json();
@@ -315,5 +328,6 @@ export {
     searchReads,
     getReferenceSet,
     searchVariantByVariantSetIds,
-    searchGenomicSets
+    searchGenomicSets,
+    getVariantSearchTable
 };

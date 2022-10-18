@@ -1,52 +1,25 @@
-import React, { useState, useEffect } from 'react';
-
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, Box, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
-
+import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { MultiSelect } from 'react-multi-select-component';
-
 import VariantsTable from 'ui-component/Tables/VariantsTable';
-import { searchVariant, searchVariantSets, searchVariantByVariantSetIds, getReferenceSet } from 'store/api';
-import { ListOfReferenceNames } from 'store/constant';
-import LightCard from 'views/dashboard/Default/LightCard';
-import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
-import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
-import { Map, Description } from '@mui/icons-material';
 import AlertComponent from 'ui-component/AlertComponent';
-
+import { ListOfReferenceNames } from 'store/constant';
+import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
+import { searchVariant, getVariantSearchTable } from 'store/api';
+import HtsgetInstance from 'ui-component/IGV/HtsgetInstance';
 
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
     const events = useSelector((state) => state);
-    const [datasetId, setDatasetId] = useState(events.customization.update.datasetId);
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
-    const [variantSet, setVariantSets] = useState('');
-    const [referenceSetName, setReferenceSetName] = useState('');
     const { promiseInProgress } = usePromiseTracker();
-    const [options, setOptions] = useState([]);
-    const [selected, setSelected] = useState([]);
-    const [variantSetIds, setVariantSetIds] = useState([]);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('warning');
-
-    /*
-  Fetches reference set Name and sets referenceSetName
-  * @param {string}... referenceSetId
-  */
-    function settingReferenceSetName(referenceSetId) {
-        getReferenceSet(referenceSetId)
-            .then((data) => {
-                setReferenceSetName(data.results.name);
-            })
-            .catch(() => {
-                setReferenceSetName('Not Available');
-            });
-    }
 
     /*
   Build the dropdown for chromosome
@@ -55,7 +28,6 @@ function VariantsSearch() {
   */
     function chrSelectBuilder() {
         const refNameList = [];
-
         ListOfReferenceNames.forEach((refName) => {
             refNameList.push(
                 <option key={refName} value={refName}>
@@ -75,6 +47,44 @@ function VariantsSearch() {
         e.preventDefault(); // Prevent form submission
         setDisplayVariantsTable(false);
         // call api to fetch variant sets here???
+        // step 1: get the patient id list from redux
+        const patientIdList = events.patientIdList;
+        // step 2: fetch the variant sets from api
+        const referenceName = e.target.genome.value;
+        const chromosome = e.target.chromosome.value;
+        const start = e.target.start.value;
+        const end = e.target.end.value;
+        trackPromise(
+            searchVariant(referenceName, chromosome, start, end, patientIdList)
+                .then((response) => {
+                    if (response.length === 0) {
+                        setAlertMessage('No variants found');
+                        setAlertSeverity('warning');
+                        setOpen(true);
+                    } else {
+                        console.log(`response: ${response}`);
+                        // call katsu api to get the patient ID, genomic sample ID that
+                        // match position and vcf file
+                        getVariantSearchTable()
+                            .then((tableResponse) => {
+                                console.log(`tableResponse: ${tableResponse}`);
+                                setRowData(tableResponse);
+                                setDisplayVariantsTable(true);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                setAlertMessage('Error fetching variant search table');
+                                setAlertSeverity('error');
+                                setOpen(true);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    setAlertMessage(error.message);
+                    setAlertSeverity('error');
+                    setOpen(true);
+                })
+        );
     };
 
     return (
@@ -97,7 +107,7 @@ function VariantsSearch() {
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="ref-gene-label">Reference Genome</InputLabel>
-                                    <NativeSelect labelId="ref-gene-label" required id="ref-genome">
+                                    <NativeSelect labelId="ref-gene-label" required id="genome">
                                         <option value="gh38">gh38</option>
                                         <option value="gh37">gh37</option>
                                     </NativeSelect>
@@ -137,11 +147,7 @@ function VariantsSearch() {
                         </Grid>
                     </form>
 
-                    {displayVariantsTable ? (
-                        <VariantsTable rowData={rowData} datasetId={events.customization.update.datasetId} />
-                    ) : (
-                        <SearchIndicator area="table" />
-                    )}
+                    {displayVariantsTable ? <VariantsTable rowData={rowData} /> : <SearchIndicator area="table" />}
                 </Grid>
             </MainCard>
         </>
