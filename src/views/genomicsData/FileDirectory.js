@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
 import { Grid, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
@@ -144,7 +144,10 @@ function FileDirectory() {
 
     return (
         <>
-            <MainCard title="File Directory" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="File Directory"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -196,7 +199,11 @@ function FileDirectory() {
                             </Grid>
                             <Grid item>
                                 <FormControl variant="standard">
-                                    <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                    >
                                         Search
                                     </Button>
                                 </FormControl>

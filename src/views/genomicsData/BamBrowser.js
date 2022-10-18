@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Grid, Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -150,7 +150,10 @@ function BamBrowser() {
 
     return (
         <>
-            <MainCard title="Bam Browser" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="Bam Browser"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -190,7 +193,7 @@ function BamBrowser() {
                         </Grid>
                     </Grid>
 
-                    <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                    <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
                                 {options.length > 0 && (
@@ -220,7 +223,11 @@ function BamBrowser() {
 
                             <Grid item>
                                 <FormControl variant="standard">
-                                    <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                    >
                                         Search
                                     </Button>
                                 </FormControl>

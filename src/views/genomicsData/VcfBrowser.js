@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid, Box, Button, FormControl } from '@mui/material';
@@ -109,7 +109,10 @@ function VcfBrowser() {
 
     return (
         <>
-            <MainCard title="VCF Browser" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="VCF Browser"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -147,7 +150,7 @@ function VcfBrowser() {
                         )}
                     </Grid>
                 </Grid>
-                <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                     <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                         <Grid item>
                             {options.length > 0 && (

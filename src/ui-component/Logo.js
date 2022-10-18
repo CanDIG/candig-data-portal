@@ -1,5 +1,3 @@
-import React from 'react';
-
 // mui
 import logo from '../assets/images/logo.svg';
 

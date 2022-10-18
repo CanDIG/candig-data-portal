@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
 import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
@@ -148,7 +148,10 @@ function ReadsSearch() {
 
     return (
         <>
-            <MainCard title="Reads Search" sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard
+                title="Reads Search"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -188,7 +191,7 @@ function ReadsSearch() {
                         </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
-                        <form inline onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
+                        <form onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
                             <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                                 <Grid item sx={{ minWidth: 150 }}>
                                     <FormControl fullWidth variant="standard">
@@ -223,7 +226,11 @@ function ReadsSearch() {
                                 </Grid>
                                 <Grid item>
                                     <FormControl variant="standard">
-                                        <Button type="submit" variant="contained" sx={{ borderRadius: events.customization.borderRadius * 0.15 }}>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        >
                                             Search
                                         </Button>
                                     </FormControl>

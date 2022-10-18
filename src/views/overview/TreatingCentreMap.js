@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMap from 'highcharts/modules/map';
@@ -13,7 +13,7 @@ HighchartsMap(Highcharts);
 
 const initialState = {
     title: {
-        text: 'Treating Centre Province'
+        text: 'CanDIG Data Source'
     },
     credits: {
         enabled: false
@@ -26,7 +26,7 @@ const initialState = {
     colorAxis: {
         min: 0,
         minColor: '#E6E7E8',
-        maxColor: '#005645'
+        maxColor: '#36B84C'
     },
     series: [
         {
@@ -96,7 +96,7 @@ function reducer(state, action) {
     }
 }
 
-function TreatingCentreMap({ datasetName }) {
+function TreatingCentreMap({ datasetName, data }) {
     const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
 
@@ -120,16 +120,20 @@ function TreatingCentreMap({ datasetName }) {
     }
 
     useEffect(() => {
+        const payload = [];
+        Object.keys(data).forEach((province) => {
+            payload.push([province, data[province]]);
+        });
         const updateChart = new Promise((resolve) => {
             dispatchChartOptions({
                 type: 'addSeries',
-                payload: [['ca-on', 146]]
+                payload
             });
             resolve();
         });
 
         trackPromise(updateChart);
-    }, []);
+    }, [data]);
 
     // useEffect(() => {
     // Mimic the didUpdate function
@@ -176,7 +180,8 @@ function TreatingCentreMap({ datasetName }) {
 }
 
 TreatingCentreMap.propTypes = {
-    datasetName: PropTypes.string.isRequired
+    datasetName: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired
 };
 
 export default TreatingCentreMap;

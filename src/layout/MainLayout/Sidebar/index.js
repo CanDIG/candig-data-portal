@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 
 // mui
 import { makeStyles, useTheme } from '@mui/styles';

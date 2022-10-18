@@ -1,4 +1,3 @@
-import React from 'react';
 import { MutatingDots } from 'react-loader-spinner';
 import { trackPromise, usePromiseTracker } from 'react-promise-tracker';
 
