@@ -22,7 +22,7 @@ function VariantsSearch() {
     const [alertSeverity, setAlertSeverity] = useState('warning');
     const [isIGVWindowOpen, setIsIGVWindowOpen] = useState(false);
     const [showIGVButton, setShowIGVButton] = useState(false);
-    const [IGVData, setIGVData] = useState({});
+    const [IGVOptions, setIGVOptions] = useState({});
 
     /*
   Build the dropdown for chromosome
@@ -102,17 +102,52 @@ function VariantsSearch() {
             setShowIGVButton(true);
         }
         // TODO: replace this data with data from value
-        const data = {
-            genome: 'hg38',
-            tracks: {
-                name: 'HG00103',
-                url: 'https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram',
-                indexURL:
-                    'https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram.crai',
-                format: 'cram'
-            }
+        const options = {
+            // Example of fully specifying a reference .  We could alternatively use  "genome: 'hg19'"
+            reference: {
+                id: 'hg19',
+                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta',
+                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt'
+            },
+            locus: '8:128,750,948-128,751,025',
+            tracks: [
+                {
+                    name: 'Phase 3 WGS variants',
+                    type: 'variant',
+                    format: 'vcf',
+                    url: 'https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz',
+                    indexURL:
+                        'https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi'
+                },
+                {
+                    type: 'alignment',
+                    format: 'cram',
+                    url: 'https://s3.amazonaws.com/1000genomes/phase3/data/HG00096/exome_alignment/HG00096.mapped.ILLUMINA.bwa.GBR.exome.20120522.bam.cram',
+                    indexURL:
+                        'https://s3.amazonaws.com/1000genomes/phase3/data/HG00096/exome_alignment/HG00096.mapped.ILLUMINA.bwa.GBR.exome.20120522.bam.cram.crai',
+                    name: 'HG00096',
+                    sort: {
+                        chr: 'chr8',
+                        position: 128750986,
+                        option: 'BASE',
+                        direction: 'ASC'
+                    },
+                    height: 600
+                },
+
+                {
+                    name: 'Genes',
+                    type: 'annotation',
+                    format: 'bed',
+                    url: 'https://s3.amazonaws.com/igv.broadinstitute.org/annotations/hg19/genes/refGene.hg19.bed.gz',
+                    indexURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/annotations/hg19/genes/refGene.hg19.bed.gz.tbi',
+                    order: Number.MAX_VALUE,
+                    visibilityWindow: 300000000,
+                    displayMode: 'EXPANDED'
+                }
+            ]
         };
-        setIGVData(data);
+        setIGVOptions(options);
     };
 
     return (
@@ -219,7 +254,7 @@ function VariantsSearch() {
                         <SearchIndicator area="table" />
                     )}
 
-                    {isIGVWindowOpen && <IGViewer closeWindow={toggleIGVWindow} data={IGVData} />}
+                    {isIGVWindowOpen && <IGViewer closeWindow={toggleIGVWindow} options={IGVOptions} />}
                 </Grid>
             </MainCard>
         </>

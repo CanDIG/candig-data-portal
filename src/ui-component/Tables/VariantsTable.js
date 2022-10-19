@@ -16,7 +16,7 @@ function VariantsTable({ rowData, onChange }) {
         { field: 'Genomic Sample ID' },
         { field: 'Number of Variants' },
         { field: 'VCF File' },
-        { field: 'IGV Link', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
+        { field: 'Select file(s)', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
     ]);
     // parse rowData contains id, reference_genome, htsget, samples, variantcount to fit the table
     const displayRowData = rowData.map((row) => {

@@ -1,8 +1,8 @@
 import NewWindow from 'react-new-window';
-import VcfInstance from 'ui-component/IGV/VcfInstance';
+import CramVcfInstance from 'ui-component/IGV/CramVcfInstance';
 import PropTypes from 'prop-types';
 
-const IGViewer = ({ closeWindow, data }) => {
+const IGViewer = ({ closeWindow, options }) => {
     const onClosed = () => {
         closeWindow();
     };
@@ -17,14 +17,14 @@ const IGViewer = ({ closeWindow, data }) => {
                 outerWidth: '100%'
             }}
         >
-            <VcfInstance genome={data.genome} tracks={[data.tracks]} />
+            <CramVcfInstance options={options} />
         </NewWindow>
     );
 };
 
 IGViewer.propTypes = {
     closeWindow: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired
+    options: PropTypes.object.isRequired
 };
 
 export default IGViewer;
