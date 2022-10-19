@@ -9,7 +9,7 @@ import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
 import { searchVariant, getVariantSearchTable } from 'store/api';
-import HtsgetInstance from 'ui-component/IGV/HtsgetInstance';
+import IGViewer from './IGViewer';
 
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
@@ -20,6 +20,9 @@ function VariantsSearch() {
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('warning');
+    const [isIGVWindowOpen, setIsIGVWindowOpen] = useState(false);
+    const [showIGVButton, setShowIGVButton] = useState(false);
+    const [IGVData, setIGVData] = useState({});
 
     /*
   Build the dropdown for chromosome
@@ -87,6 +90,31 @@ function VariantsSearch() {
         );
     };
 
+    const toggleIGVWindow = () => {
+        setIsIGVWindowOpen(!isIGVWindowOpen);
+    };
+
+    const onCheckboxSelectionChanged = (value) => {
+        console.log(value);
+        if (value.length === 0) {
+            setShowIGVButton(false);
+        } else {
+            setShowIGVButton(true);
+        }
+        // TODO: replace this data with data from value
+        const data = {
+            genome: 'hg38',
+            tracks: {
+                name: 'HG00103',
+                url: 'https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram',
+                indexURL:
+                    'https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram.crai',
+                format: 'cram'
+            }
+        };
+        setIGVData(data);
+    };
+
     return (
         <>
             <MainCard
@@ -107,7 +135,7 @@ function VariantsSearch() {
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="ref-gene-label">Reference Genome</InputLabel>
-                                    <NativeSelect labelId="ref-gene-label" required id="genome">
+                                    <NativeSelect required id="genome">
                                         <option value="gh38">gh38</option>
                                         <option value="gh37">gh37</option>
                                     </NativeSelect>
@@ -116,7 +144,7 @@ function VariantsSearch() {
                             <Grid item sx={{ minWidth: 150 }}>
                                 <FormControl fullWidth variant="standard">
                                     <InputLabel id="chr-label">Chromosome</InputLabel>
-                                    <NativeSelect labelId="chr-label" required id="chromosome">
+                                    <NativeSelect required id="chromosome">
                                         {chrSelectBuilder()}
                                     </NativeSelect>
                                 </FormControl>
@@ -144,10 +172,54 @@ function VariantsSearch() {
                                     </Button>
                                 </FormControl>
                             </Grid>
+                            <Grid item>
+                                <FormControl variant="standard">
+                                    <Button
+                                        variant="contained"
+                                        disabled={!showIGVButton}
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        onClick={toggleIGVWindow}
+                                    >
+                                        View in IGV
+                                    </Button>
+                                </FormControl>
+                            </Grid>
+                            <Grid item>
+                                <FormControl variant="standard">
+                                    <Button
+                                        variant="contained"
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        onClick={() => {
+                                            alert('This feature is not available yet');
+                                        }}
+                                    >
+                                        View in cBioPortal
+                                    </Button>
+                                </FormControl>
+                            </Grid>
+                            <Grid item>
+                                <FormControl variant="standard">
+                                    <Button
+                                        variant="contained"
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        onClick={() => {
+                                            alert('This feature is not available yet');
+                                        }}
+                                    >
+                                        Data Analysis
+                                    </Button>
+                                </FormControl>
+                            </Grid>
                         </Grid>
                     </form>
 
-                    {displayVariantsTable ? <VariantsTable rowData={rowData} /> : <SearchIndicator area="table" />}
+                    {displayVariantsTable ? (
+                        <VariantsTable rowData={rowData} onChange={onCheckboxSelectionChanged} />
+                    ) : (
+                        <SearchIndicator area="table" />
+                    )}
+
+                    {isIGVWindowOpen && <IGViewer closeWindow={toggleIGVWindow} data={IGVData} />}
                 </Grid>
             </MainCard>
         </>

@@ -9,26 +9,24 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'assets/css/VariantsSearch.css';
 
-function VariantsTable({ rowData }) {
+function VariantsTable({ rowData, onChange }) {
     let gridOptions = {};
     const [columnDefs] = useState([
         { field: 'Patient ID' },
         { field: 'Genomic Sample ID' },
-        { field: 'Positions' },
+        { field: 'Number of Variants' },
         { field: 'VCF File' },
         { field: 'IGV Link', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
     ]);
     // parse rowData contains id, reference_genome, htsget, samples, variantcount to fit the table
     const displayRowData = rowData.map((row) => {
         const { patient_id: patientID, genomic_sample_id: genomicSampleID, positions, VCF_file: VCFFile } = row;
-        return { 'Patient ID': patientID, 'Genomic Sample ID': genomicSampleID, Positions: positions, 'VCF File': VCFFile };
+        return { 'Patient ID': patientID, 'Genomic Sample ID': genomicSampleID, 'Number of Variants': positions, 'VCF File': VCFFile };
     });
 
     function onSelectionChanged() {
         const selectedRows = gridOptions.api.getSelectedRows();
-        selectedRows.forEach(function (selectedRow, index) {
-            console.log(`selectedRow: ${selectedRow}`);
-        });
+        onChange(selectedRows);
     }
 
     gridOptions = {
@@ -64,7 +62,8 @@ function VariantsTable({ rowData }) {
 }
 
 VariantsTable.propTypes = {
-    rowData: PropTypes.arrayOf(PropTypes.object).isRequired
+    rowData: PropTypes.arrayOf(PropTypes.object).isRequired,
+    onChange: PropTypes.func.isRequired
 };
 
 export default VariantsTable;
