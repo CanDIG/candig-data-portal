@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@material-ui/core';
+/* eslint-disable camelcase */
+import { Button } from '@mui/material';
 
 function moreInfoButton(params) {
     return (
@@ -32,9 +32,15 @@ export const mainColumns = [
         disableClickEventBubbling: true
     },
     {
+        field: 'site',
+        headerName: 'Site',
+        width: 150
+    },
+    {
         field: 'ethnicity',
         headerName: 'Ethnicity',
-        width: 180
+        width: 180,
+        hide: true
     },
     {
         field: 'sex',

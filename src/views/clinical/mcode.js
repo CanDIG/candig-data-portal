@@ -1,9 +1,12 @@
 import * as React from 'react';
 
-// material-ui
-import { useTheme, makeStyles } from '@material-ui/styles';
+// mui
+import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box } from '@material-ui/core';
+import { Grid, Box } from '@mui/material';
+
+// REDUX
+import { useSelector } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -65,6 +68,7 @@ const useStyles = makeStyles({
 function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
+    const events = useSelector((state) => state);
 
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
@@ -102,17 +106,19 @@ function MCodeView() {
 
         setSelectedPatient(mcodeData.results[index].id);
         setSelectedPatientMobileInfo({
-            Ethnicity: mcodeData.results[index].subject.ethnicity,
-            Sex: mcodeData.results[index].subject.sex,
-            Birthday: mcodeData.results[index].subject.date_of_birth,
-            DeathDate: mcodeData.results[index].date_of_death,
-            Language: mcodeData.results[index].subject.extra_properties.communication_language
+            Ethnicity: mcodeData?.results[index]?.subject?.ethnicity ? mcodeData?.results[index]?.subject?.ethnicity : 'NA',
+            Sex: mcodeData?.results[index]?.subject?.sex ? mcodeData?.results[index]?.subject?.sex : 'NA',
+            Birthday: mcodeData?.results[index]?.subject?.date_of_birth ? mcodeData?.results[index]?.subject?.date_of_birth : 'NA',
+            DeathDate: mcodeData?.results[index]?.date_of_death ? mcodeData?.results[index]?.date_of_death : 'NA',
+            Language: mcodeData?.results[index]?.subject?.extra_properties?.communication_language
+                ? mcodeData?.results[index]?.subject?.extra_properties?.communication_language
+                : 'NA'
         });
 
         // Subtables
-        setCancerConditions(processConditionsData(mcodeData.results[index]));
-        setProcedures(processProceduresData(mcodeData.results[index]));
-        setMedicationStatement(processMedicationStatementData(mcodeData.results[index]));
+        setCancerConditions(processConditionsData(mcodeData?.results[index]));
+        setProcedures(processProceduresData(mcodeData?.results[index]));
+        setMedicationStatement(processMedicationStatementData(mcodeData?.results[index]));
         setListOpen(false);
     };
 
@@ -133,7 +139,6 @@ function MCodeView() {
         trackPromise(
             fetchKatsu('/api/mcodepackets').then((data) => {
                 setMcodeData(data);
-
                 const tempRows = [];
                 for (let i = 0; i < data.results.length; i += 1) {
                     // Patient table filtering
@@ -183,11 +188,11 @@ function MCodeView() {
                 if (tempRows[0].id !== null) {
                     setSelectedPatient(tempRows[0].id);
                     setSelectedPatientMobileInfo({
-                        Ethnicity: tempRows[0].ethnicity,
-                        Sex: tempRows[0].sex,
-                        Birthday: tempRows[0].date_of_birth,
-                        DeathDate: tempRows[0].date_of_death,
-                        Language: tempRows[0].communication_language
+                        Ethnicity: tempRows[0]?.ethnicity ? tempRows[0]?.ethnicity : 'NA',
+                        Sex: tempRows[0]?.sex ? tempRows[0]?.sex : 'NA',
+                        Birthday: tempRows[0]?.date_of_birth ? tempRows[0]?.date_of_birth : 'NA',
+                        DeathDate: tempRows[0]?.date_of_death ? tempRows[0]?.date_of_death : 'NA',
+                        Language: tempRows[0]?.communication_language ? tempRows[0]?.communication_language : 'NA'
                     });
                 }
 
@@ -224,7 +229,7 @@ function MCodeView() {
     };
 
     return (
-        <MainCard title="mCode Data">
+        <MainCard title="mCode Data" sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
                     <TableContainer className={[classes.mobileRow, classes.scrollbar]}>

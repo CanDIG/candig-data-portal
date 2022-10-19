@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import MainCard from 'ui-component/cards/MainCard';
+
+// REDUX
+import { useSelector } from 'react-redux';
 
 window.Highcharts = Highcharts;
 
@@ -24,6 +27,7 @@ function splitString(newString) {
  * @param {array} dataObject
  */
 function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject }) {
+    const events = useSelector((state) => state);
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -31,7 +35,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
         colors: ['#2196f3', '#90caf9', '#37ca50', '#aaffb8', '#ffc107'],
         chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
         title: {
-            text: `Distribution of ${splitString(barTitle)}`
+            text: splitString(barTitle)
         },
         subtitle: {
             text: datasetName
@@ -75,7 +79,6 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
                 data.push(dataObject[key]);
                 return key;
             });
-
             setChartOptions({
                 credits: {
                     enabled: false
@@ -93,7 +96,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
     }, [datasetName, dataObject, chartType]);
 
     return (
-        <MainCard>
+        <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <HighchartsReact highcharts={Highcharts} options={chartOptions} />
         </MainCard>
     );

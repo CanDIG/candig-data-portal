@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { Box, Collapse, Fade, Grow, Slide, Zoom } from '@material-ui/core';
+// mui
+import { Box, Collapse, Fade, Grow, Slide, Zoom } from '@mui/material';
 
 // ===========================|| TRANSITIONS ||=========================== //
 
@@ -104,4 +104,5 @@ Transitions.defaultProps = {
     direction: 'up'
 };
 
+Transitions.displayName = 'Transitions';
 export default Transitions;

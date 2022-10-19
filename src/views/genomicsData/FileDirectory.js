@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 import { genomicsFileTypes } from 'store/constant';
 import GenericTable from 'ui-component/Tables/GenericTable';
 import { searchGenomicSets } from 'store/api';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
@@ -145,7 +144,10 @@ function FileDirectory() {
 
     return (
         <>
-            <MainCard title="File Directory" sx={{ minHeight: 830, position: 'relative' }}>
+            <MainCard
+                title="File Directory"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -196,8 +198,12 @@ function FileDirectory() {
                                 </FormControl>
                             </Grid>
                             <Grid item>
-                                <FormControl>
-                                    <Button type="submit" variant="contained">
+                                <FormControl variant="standard">
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                    >
                                         Search
                                     </Button>
                                 </FormControl>

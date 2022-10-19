@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
-import { Grid } from '@material-ui/core';
+import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 
 import { ListOfReferenceNames } from 'store/constant';
 import ReadsTable from 'ui-component/Tables/ReadsTable';
 import { searchReadGroupSets, searchReads, getReferenceSet } from 'store/api';
-import { Map, Description } from '@material-ui/icons';
+import { Map, Description } from '@mui/icons-material';
 import LightCard from 'views/dashboard/Default/LightCard';
 import DatasetIdSelect from 'views/dashboard/Default/datasetIdSelect';
 
@@ -149,7 +148,10 @@ function ReadsSearch() {
 
     return (
         <>
-            <MainCard title="Reads Search" sx={{ minHeight: 830, position: 'relative' }}>
+            <MainCard
+                title="Reads Search"
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
+            >
                 <DatasetIdSelect />
                 <AlertComponent
                     open={open}
@@ -189,7 +191,7 @@ function ReadsSearch() {
                         </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
-                        <form inline onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
+                        <form onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
                             <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                                 <Grid item sx={{ minWidth: 150 }}>
                                     <FormControl fullWidth variant="standard">
@@ -211,20 +213,24 @@ function ReadsSearch() {
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <InputLabel for="start">Start</InputLabel>
                                         <Input required type="number" id="start" />
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
+                                    <FormControl variant="standard">
                                         <InputLabel for="end">End</InputLabel>
                                         <Input required type="number" id="end" />
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl>
-                                        <Button type="submit" variant="contained">
+                                    <FormControl variant="standard">
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        >
                                             Search
                                         </Button>
                                     </FormControl>

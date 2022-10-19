@@ -1,8 +1,6 @@
-import React from 'react';
-
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Skeleton } from '@material-ui/core';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Skeleton } from '@mui/material';
 
 // style constant
 const useStyles = makeStyles({
@@ -25,11 +23,11 @@ const TotalIncomeCard = () => {
                 <List className={classes.padding}>
                     <ListItem alignItems="center" disableGutters className={classes.padding}>
                         <ListItemAvatar>
-                            <Skeleton variant="rect" width={44} height={44} />
+                            <Skeleton variant="rectangular" width={44} height={44} />
                         </ListItemAvatar>
                         <ListItemText
                             className={classes.padding}
-                            primary={<Skeleton variant="rect" height={20} />}
+                            primary={<Skeleton variant="rectangular" height={20} />}
                             secondary={<Skeleton variant="text" />}
                         />
                     </ListItem>

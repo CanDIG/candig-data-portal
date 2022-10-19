@@ -20,8 +20,7 @@ const NavigationScroll = ({ children }) => {
 };
 
 NavigationScroll.propTypes = {
-    children: PropTypes.node,
-    location: PropTypes.object
+    children: PropTypes.node
 };
 
 export default NavigationScroll;

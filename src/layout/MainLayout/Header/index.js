@@ -1,13 +1,10 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Box, ButtonBase } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
-import SearchSection from './SearchSection';
+// import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 // import NotificationSection from './NotificationSection';
 
@@ -33,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     boxContainer: {
         width: '228px',
         display: 'flex',
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             width: 'auto'
         }
     }
@@ -59,7 +56,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             </div>
 
             {/* header search */}
-            <SearchSection theme="light" />
+            {/* <SearchSection theme="light" />  Currently not needed */}
             <div className={classes.grow} />
             <div className={classes.grow} />
 

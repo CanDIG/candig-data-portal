@@ -14,6 +14,10 @@ import { fetchKatsu } from 'store/api';
 
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 
+// Assets
+import MapIcon from '@mui/icons-material/Map';
+import DescriptionIcon from '@mui/icons-material/Description';
+
 import 'assets/css/VariantsSearch.css';
 
 function HtsgetBrowser() {
@@ -83,7 +87,7 @@ function HtsgetBrowser() {
                                     isLoading={isLoading}
                                     header="VCFs"
                                     value={VcfCount}
-                                    icon={<Map fontSize="inherit" />}
+                                    icon={<MapIcon fontSize="inherit" />}
                                     color="primary"
                                 />
                             )}
@@ -96,7 +100,7 @@ function HtsgetBrowser() {
                                     isLoading={isLoading}
                                     header="BAMs"
                                     value={BamCount}
-                                    icon={<Description fontSize="inherit" />}
+                                    icon={<DescriptionIcon fontSize="inherit" />}
                                     color="secondary"
                                 />
                             )}

@@ -1,8 +1,8 @@
 import React from 'react';
 
-// material-ui
-import { makeStyles, useTheme } from '@material-ui/styles';
-import { Card, CardContent, Grid, Typography } from '@material-ui/core';
+// mui
+import { makeStyles, useTheme } from '@mui/styles';
+import { Card, CardContent, Grid, Typography } from '@mui/material';
 
 // third-party
 import ApexCharts from 'apexcharts';

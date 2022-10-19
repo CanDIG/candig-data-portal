@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import { forwardRef } from 'react';
 
-// material-ui
-import { useTheme } from '@material-ui/styles';
-import { Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
+// mui
+import { useTheme } from '@mui/styles';
+import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
 
 // constant
 const headerSX = {
@@ -12,7 +12,7 @@ const headerSX = {
 
 // ===========================|| CUSTOM MAIN CARD ||=========================== //
 
-const MainCard = React.forwardRef(
+const MainCard = forwardRef(
     (
         {
             border = true,
@@ -80,4 +80,5 @@ MainCard.propTypes = {
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string, PropTypes.object])
 };
 
+MainCard.displayName = 'MainCard';
 export default MainCard;

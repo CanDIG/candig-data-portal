@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-// material-ui
-import { useTheme } from '@material-ui/styles';
+// material
+import { useTheme } from '@mui/styles';
 import {
     Drawer,
     Fab,
@@ -15,7 +15,7 @@ import {
     Slider,
     Tooltip,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -133,7 +133,7 @@ const Customization = () => {
                         <Grid item xs={12}>
                             {/* font family */}
                             <SubCard title="Font Family">
-                                <FormControl>
+                                <FormControl variant="standard">
                                     <RadioGroup
                                         aria-label="font-family"
                                         value={fontFamily}

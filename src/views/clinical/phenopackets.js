@@ -1,9 +1,12 @@
 import * as React from 'react';
 
-// material-ui
-import { useTheme, makeStyles } from '@material-ui/styles';
+// mui
+import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box } from '@material-ui/core';
+import { Grid, Box } from '@mui/material';
+
+// REDUX
+import { useSelector } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -45,6 +48,7 @@ const useStyles = makeStyles({
 function Phenopackets() {
     const theme = useTheme();
     const classes = useStyles();
+    const events = useSelector((state) => state);
 
     const [phenopacketsData, setPhenopacketsData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
@@ -184,7 +188,7 @@ function Phenopackets() {
     };
 
     return (
-        <MainCard title="Phenopackets Data">
+        <MainCard title="Phenopackets Data" sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
                     <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>

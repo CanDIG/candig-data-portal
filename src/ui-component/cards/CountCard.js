@@ -1,22 +1,23 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
-// material-ui
-import { makeStyles } from '@material-ui/styles';
-import { Avatar, Grid, Menu, MenuItem, Typography } from '@material-ui/core';
+// mui
+import { makeStyles } from '@mui/styles';
+import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
+
+// REDUX
+import { useSelector } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 
 // assets
-import EarningIcon from 'assets/images/icons/earning.svg';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import GetAppTwoToneIcon from '@material-ui/icons/GetAppOutlined';
-import FileCopyTwoToneIcon from '@material-ui/icons/FileCopyOutlined';
-import PictureAsPdfTwoToneIcon from '@material-ui/icons/PictureAsPdfOutlined';
-import ArchiveTwoToneIcon from '@material-ui/icons/ArchiveOutlined';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
+import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
             borderRadius: '50%',
             top: '-85px',
             right: '-95px',
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-105px',
                 right: '-140px'
             }
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
             top: '-125px',
             right: '-15px',
             opacity: 0.5,
-            [theme.breakpoints.down('xs')]: {
+            [theme.breakpoints.down('sm')]: {
                 top: '-155px',
                 right: '-70px'
             }
@@ -62,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
+        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
         marginTop: '8px'
     },
     avatarRight: {
@@ -100,14 +102,16 @@ const useStyles = makeStyles((theme) => ({
 
 //= ==========================|| INDIVIDUAL OVERVIEW - COUNT CARD ||===========================//
 
-const CountCard = ({ isLoading, title, count, primary }) => {
+const CountCard = ({ isLoading, title, count, primary, icon }) => {
     const classes = useStyles({ primary });
+    const events = useSelector((state) => state);
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    // STATES
+    const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const handleClick = (event) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -118,25 +122,21 @@ const CountCard = ({ isLoading, title, count, primary }) => {
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
-                <MainCard border={false} className={classes.card} contentClass={classes.content}>
+                <MainCard
+                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    border={false}
+                    className={classes.card}
+                    contentClass={classes.content}
+                >
                     <Grid container direction="column">
                         <Grid item>
                             <Grid container justifyContent="space-between">
                                 <Grid item>
                                     <Avatar variant="rounded" className={classes.avatar}>
-                                        <img src={EarningIcon} alt="Notification" />
+                                        {icon}
                                     </Avatar>
                                 </Grid>
                                 <Grid item>
-                                    <Avatar
-                                        variant="rounded"
-                                        className={classes.avatarRight}
-                                        aria-controls="menu-earning-card"
-                                        aria-haspopup="true"
-                                        onClick={handleClick}
-                                    >
-                                        <MoreHorizIcon fontSize="inherit" />
-                                    </Avatar>
                                     <Menu
                                         id="menu-earning-card"
                                         anchorEl={anchorEl}
@@ -195,7 +195,8 @@ CountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
     count: PropTypes.number,
-    primary: PropTypes.bool
+    primary: PropTypes.bool,
+    icon: PropTypes.any
 };
 
 export default CountCard;
