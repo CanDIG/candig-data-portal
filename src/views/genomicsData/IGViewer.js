@@ -11,6 +11,7 @@ const IGViewer = ({ closeWindow, data }) => {
         <NewWindow
             title="Integrative Genomics Viewer"
             onUnload={onClosed}
+            onBlock={() => alert('Please allow popups for this website')}
             features={{
                 outerHeight: '100%',
                 outerWidth: '100%'
