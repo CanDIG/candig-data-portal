@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, FormControl } from '@mui/material';
-import { Grid } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Button, FormControl, Grid } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
-import { useSelector } from 'react-redux';
 import { MultiSelect } from 'react-multi-select-component';
 import LightCard from 'views/dashboard/Default/LightCard';
 import AlertComponent from 'ui-component/AlertComponent';
@@ -21,11 +19,11 @@ import 'assets/css/VariantsSearch.css';
 
 function HtsgetBrowser() {
     const [isLoading, setLoading] = useState(true);
-    const events = useSelector((state) => state);
+    // const events = useSelector((state) => state);
     const [BamCount, setBamCount] = useState('');
     const [VcfCount, setVcfCount] = useState('');
     const { promiseInProgress } = usePromiseTracker();
-    const [options, setOptions] = useState([]);
+    const options = useState([]);
     const [selected, setSelected] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedBamIds, setSelectedBamIds] = useState([]);
@@ -106,7 +104,7 @@ function HtsgetBrowser() {
                         </Grid>
                     </Grid>
 
-                    <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                    <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
                                 {options.length > 0 && (

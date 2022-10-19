@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable camelcase */
 import { Button } from '@mui/material';
 
 function MoreInfoButton() {
@@ -232,7 +232,6 @@ export const processSubjectData = (dataObject) => {
  */
 export const processConditionsData = (dataObject) => {
     const rows = [];
-    console.log(dataObject);
 
     // eslint-disable-next-line camelcase
     dataObject?.cancer_condition.forEach((cancer_condition) => {

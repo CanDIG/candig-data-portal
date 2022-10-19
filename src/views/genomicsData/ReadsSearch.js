@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
 import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
@@ -191,7 +191,7 @@ function ReadsSearch() {
                         </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
-                        <form inline onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
+                        <form onSubmit={formHandler} style={{ justifyContent: 'center', marginBottom: '20px' }}>
                             <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                                 <Grid item sx={{ minWidth: 150 }}>
                                     <FormControl fullWidth variant="standard">

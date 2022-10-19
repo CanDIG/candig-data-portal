@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -79,7 +79,6 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
                 data.push(dataObject[key]);
                 return key;
             });
-
             setChartOptions({
                 credits: {
                     enabled: false

@@ -1,12 +1,12 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
 
 // mui
 import { makeStyles } from '@mui/styles';
 import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // REDUX
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -107,7 +107,7 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
     const events = useSelector((state) => state);
 
     // STATES
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     // const handleClick = (event) => {
     //     setAnchorEl(event.currentTarget);

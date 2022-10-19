@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
+/* eslint-disable */
+import { useRef, useEffect } from 'react';
 
 import igv from '@candig/igv/dist/igv.esm';
 import { htsget } from 'store/api';

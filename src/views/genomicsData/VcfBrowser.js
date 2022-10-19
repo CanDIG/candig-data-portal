@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid, Box, Button, FormControl } from '@mui/material';
@@ -150,7 +150,7 @@ function VcfBrowser() {
                         )}
                     </Grid>
                 </Grid>
-                <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                     <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                         <Grid item>
                             {options.length > 0 && (

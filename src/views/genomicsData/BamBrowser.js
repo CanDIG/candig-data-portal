@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Grid, Box, Button, FormControl, InputLabel, NativeSelect } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -193,7 +193,7 @@ function BamBrowser() {
                         </Grid>
                     </Grid>
 
-                    <form inline onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                    <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
                             <Grid item>
                                 {options.length > 0 && (
