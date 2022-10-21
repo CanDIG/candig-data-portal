@@ -13,10 +13,9 @@ export const subjectColumns = [
         width: 150
     },
     {
-        field: 'genome_id',
+        field: 'genomic_id',
         headerName: 'Genome ID',
-        width: 150,
-        hide: true
+        width: 200
     },
     {
         field: 'ethnicity',
@@ -117,7 +116,7 @@ export const processMCodeMainData = (dataObject, site) => {
     row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
-    row.genome_id = dataObject?.genomics_report?.extra_properties?.genomic_id
+    row.genomic_id = dataObject?.genomics_report?.extra_properties?.genomic_id
         ? dataObject?.genomics_report?.extra_properties?.genomic_id
         : 'NA';
     return row;
