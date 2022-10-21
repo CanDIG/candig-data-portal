@@ -8,6 +8,12 @@ export const SITE = process.env.REACT_APP_SITE_LOCATION;
 // API URL where the Dashboard get all the data
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 
+export const cancerType = {
+    'C56.9': 'Ovary',
+    'C50.9': 'Breast',
+    'C25.9': 'Pancreas'
+};
+
 export const CLIN_METADATA = [
     'patients',
     'samples',

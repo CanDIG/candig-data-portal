@@ -19,18 +19,10 @@ const clinical = {
     type: 'group',
     children: [
         {
-            id: 'mcode',
-            title: 'mcode',
+            id: 'Clinical Search',
+            title: 'Clinical Search',
             type: 'item',
             url: `${basename}/mcode`,
-            icon: icons.IconReportMedical,
-            breadcrumbs: false
-        },
-        {
-            id: 'phenopackets',
-            title: 'phenopackets',
-            type: 'item',
-            url: `${basename}/phenopackets`,
             icon: icons.IconReportMedical,
             breadcrumbs: false
         }

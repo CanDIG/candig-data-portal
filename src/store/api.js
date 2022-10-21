@@ -46,8 +46,44 @@ function fetchFederationStat() {
         });
 }
 
+/*
+Fetch the federation service for clinical search data
+*/
+export function fetchFederationClinicalData() {
+    return fetch(`${federation}/federation/search`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            request_type: 'GET',
+            endpoint_path: 'api/mcodepackets',
+            endpoint_payload: {},
+            endpoint_service: 'katsu'
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
+}
+
+/*
+Fetch peer federation stats from CanDIG federation service 
+*/
 export function fetchSummaryStats(URL) {
     return federation !== '' ? fetchFederationStat() : fetchKatsu(URL);
+}
+
+/*
+Fetch peer federation stats from CanDIG federation service 
+*/
+export function fetchClinicalData(URL) {
+    return federation !== '' ? fetchFederationClinicalData() : fetchKatsu(URL);
 }
 
 /*
