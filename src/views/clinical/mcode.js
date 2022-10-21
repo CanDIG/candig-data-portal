@@ -1,37 +1,35 @@
 import * as React from 'react';
 
+// npm installs
+import ReactJson from 'react-json-view';
+
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Grid, Box } from '@mui/material';
 
 // REDUX
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { fetchKatsu } from 'store/api';
+import { fetchFederationClinicalData } from 'store/api';
 import {
-    cancerConditionsColumns,
-    cancerRelatedProceduresColumns,
     subjectColumns,
-    medicationStatementColumns,
-    processConditionsData,
-    processMedicationStatementData,
-    processProceduresData,
     processMCodeMainData,
     processMedicationListData,
     processCondtionsListData,
-    processProceduresListData
+    processSexListData,
+    processCancerTypeListData
 } from 'store/mcode';
 import SingleRowTable from 'ui-component/SingleRowTable';
-import Tabs from 'ui-component/Tabs';
 import { trackPromise } from 'react-promise-tracker';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import DropDown from '../../ui-component/DropDown';
+import { cancerType } from '../../store/constant';
 
 // Styles
 const useStyles = makeStyles({
@@ -69,56 +67,113 @@ function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
     const events = useSelector((state) => state);
+    const dispatch = useDispatch();
 
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
+    const [clinicalSearchResults, setClinicalSearchResults] = React.useState(events.customization.selectedClinicalSearchResults);
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
-
-    // Sub tables
-    const [cancerConditions, setCancerConditions] = React.useState([]);
-    const [procedures, setProcedures] = React.useState([]);
-    const [medicationStatement, setMedicationStatement] = React.useState([]);
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const [isListOpen, setListOpen] = React.useState(false);
-    const [activeTab, setActiveTab] = React.useState('CONDITIONS');
 
     // Dropdown patient table open/closed
     const [isListOpenMedications, setListOpenMedications] = React.useState(false);
     const [isListOpenConditions, setListOpenConditions] = React.useState(false);
-    const [isListOpenProcedures, setListOpenProcedures] = React.useState(false);
+    const [isListOpenSex, setListOpenSex] = React.useState(false);
+    const [isListOpenCancerType, setListOpenCancerType] = React.useState(false);
 
     // Dropdown patient table filtering current selection in dropdown
     const [selectedMedications, setSelectedMedications] = React.useState('All');
     const [selectedConditions, setSelectedConditions] = React.useState('All');
-    const [selectedProcedures, setSelectedProcedures] = React.useState('All');
+    const [selectedSex, setSelectedSex] = React.useState('All');
+    const [selectedCancerType, setSelectedCancerType] = React.useState('All');
+    const [patientJSON, setPatientJSON] = React.useState([]);
 
     // Dropdown patient table list for filtering
     const [medicationList, setMedicationList] = React.useState([]);
     const [conditionList, setConditionList] = React.useState([]);
-    const [procedureList, setProcedureList] = React.useState([]);
+    const [sexList, setSexList] = React.useState([]);
+    const [cancerTypeList, setCancerTypeList] = React.useState([]);
 
+    const jsonTheme = {
+        base00: 'white',
+        base01: '#ddd',
+        base02: '#ddd',
+        base03: 'black',
+        base04: '#1E88E5',
+        base05: 'black',
+        base06: 'black',
+        base07: '#444',
+        base08: '#444',
+        base09: '#1565C0',
+        base0A: '#1565C0',
+        base0B: '#1565C0',
+        base0C: '#1565C0',
+        base0D: '#1565C0',
+        base0E: '#1565C0',
+        base0F: '#1565C0'
+    };
+
+    function setRedux(
+        rows,
+        medicationList,
+        conditionList,
+        sexList,
+        cancerTypeList,
+        selectedMedications,
+        selectedConditions,
+        selectedCancerType
+    ) {
+        const tempClinicalSearchResults = [];
+        rows.forEach((patient) => {
+            tempClinicalSearchResults.push({ id: patient.id, genomicId: patient.genomic_id });
+        });
+        dispatch({
+            type: 'SET_SELECTED_CLINICAL_SEARCH_RESULTS',
+            payload: {
+                selectedClinicalSearchResults: tempClinicalSearchResults,
+                clinicalSearchDropDowns: {
+                    medicationList,
+                    selectedMedications,
+                    conditionList,
+                    selectedConditions,
+                    sexList,
+                    selectedSex,
+                    cancerTypeList,
+                    selectedCancerType
+                }
+            }
+        });
+    }
     // Subtable selection of patient
     const handleRowClick = (row) => {
-        const index = mcodeData.results.findIndex((item) => item.id === row.id);
+        let index;
+        mcodeData.results.forEach((federatedResults) => {
+            index = federatedResults.results.findIndex((item) => item.id === row.id);
+            if (index !== -1) {
+                setSelectedPatient(federatedResults.results[index].id);
+                setSelectedPatientMobileInfo({
+                    Ethnicity: federatedResults?.results[index]?.subject?.ethnicity
+                        ? federatedResults?.results[index]?.subject?.ethnicity
+                        : 'NA',
+                    Sex: federatedResults?.results[index]?.subject?.sex ? federatedResults?.results[index]?.subject?.sex : 'NA',
+                    Deceased: federatedResults?.results[index]?.subject?.deceased
+                        ? federatedResults?.results[index]?.subject?.deceased
+                        : 'NA',
+                    Birthday: federatedResults?.results[index]?.subject?.date_of_birth
+                        ? federatedResults?.results[index]?.subject?.date_of_birth
+                        : 'NA',
+                    DeathDate: federatedResults?.results[index]?.date_of_death ? federatedResults?.results[index]?.date_of_death : 'NA'
+                });
 
-        setSelectedPatient(mcodeData.results[index].id);
-        setSelectedPatientMobileInfo({
-            Ethnicity: mcodeData?.results[index]?.subject?.ethnicity ? mcodeData?.results[index]?.subject?.ethnicity : 'NA',
-            Sex: mcodeData?.results[index]?.subject?.sex ? mcodeData?.results[index]?.subject?.sex : 'NA',
-            Birthday: mcodeData?.results[index]?.subject?.date_of_birth ? mcodeData?.results[index]?.subject?.date_of_birth : 'NA',
-            DeathDate: mcodeData?.results[index]?.date_of_death ? mcodeData?.results[index]?.date_of_death : 'NA',
-            Language: mcodeData?.results[index]?.subject?.extra_properties?.communication_language
-                ? mcodeData?.results[index]?.subject?.extra_properties?.communication_language
-                : 'NA'
+                // Set patient JSON
+                setPatientJSON(federatedResults?.results[index], selectedPatient);
+            }
         });
 
-        // Subtables
-        setCancerConditions(processConditionsData(mcodeData?.results[index]));
-        setProcedures(processProceduresData(mcodeData?.results[index]));
-        setMedicationStatement(processMedicationStatementData(mcodeData?.results[index]));
         setListOpen(false);
     };
 
@@ -126,106 +181,137 @@ function MCodeView() {
         if (dropDownGroup === 'CONDITIONS') {
             setSelectedConditions(selected);
             setListOpenConditions(false);
-        } else if (dropDownGroup === 'PROCEDURES') {
-            setSelectedProcedures(selected);
-            setListOpenProcedures(false);
         } else if (dropDownGroup === 'MEDICATIONS') {
             setSelectedMedications(selected);
             setListOpenMedications(false);
+        } else if (dropDownGroup === 'SEX') {
+            setSelectedSex(selected);
+            setListOpenSex(false);
+        } else if (dropDownGroup === 'CANCER TYPE') {
+            setSelectedCancerType(selected);
+            setListOpenCancerType(false);
         }
     };
 
     React.useEffect(() => {
         trackPromise(
-            fetchKatsu('/api/mcodepackets').then((data) => {
+            fetchFederationClinicalData('/api/mcodepackets').then((data) => {
                 setMcodeData(data);
                 const tempRows = [];
-                for (let i = 0; i < data.results.length; i += 1) {
-                    // Patient table filtering
-                    if (selectedConditions === 'All' && selectedProcedures === 'All' && selectedMedications === 'All') {
-                        // All patients
-                        if (processMCodeMainData(data.results[i]).id !== null) {
-                            tempRows.push(processMCodeMainData(data.results[i]));
-                        }
-                    } else {
-                        // Filtered patients
-                        let patientCondition = false;
-                        data.results[i].cancer_condition.every((condition) => {
-                            if (selectedConditions === 'All' || selectedConditions === condition.code.label) {
-                                patientCondition = true;
-                                return false;
+                for (let j = 0; j < data.results.length; j += 1) {
+                    for (let i = 0; i < data.results[j].count; i += 1) {
+                        // Patient table filtering
+                        if (selectedConditions === 'All' && selectedMedications === 'All') {
+                            // All patients
+                            if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
+                                tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
                             }
-                            return true;
-                        });
-                        let patientProcedure = false;
-                        data.results[i].cancer_related_procedures.every((procedure) => {
-                            if (selectedProcedures === 'All' || selectedProcedures === procedure.procedure_type) {
-                                patientProcedure = true;
-                                return false;
-                            }
-                            return true;
-                        });
-                        let patientMedication = false;
-                        data.results[i].medication_statement.every((medication) => {
-                            if (selectedMedications === 'All' || selectedMedications === medication.medication_code.label) {
+                        } else {
+                            // Filtered patients
+                            let patientCondition = false;
+                            data?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
+                                if (selectedConditions === 'All' || selectedConditions === bodySite.label) {
+                                    patientCondition = true;
+                                    return false;
+                                }
+                                return true;
+                            });
+                            let patientMedication = false;
+                            if (
+                                selectedMedications === 'All' ||
+                                selectedMedications === data?.results[j]?.results[i]?.medication_statement[0]?.medication_code.label
+                            ) {
                                 patientMedication = true;
-                                return false;
                             }
-                            return true;
-                        });
+                            let patientSex = false;
+                            if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
+                                patientSex = true;
+                            }
+                            let patientCancerType = false;
+                            if (
+                                selectedCancerType === 'All' ||
+                                selectedCancerType ===
+                                    (cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
+                                        ? cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
+                                        : 'NA')
+                            ) {
+                                patientCancerType = true;
+                            }
 
-                        if (
-                            patientCondition &&
-                            patientProcedure &&
-                            patientMedication &&
-                            processMCodeMainData(data.results[i]).id !== null
-                        ) {
-                            tempRows.push(processMCodeMainData(data.results[i]));
+                            if (
+                                patientCondition &&
+                                patientMedication &&
+                                patientSex &&
+                                patientCancerType &&
+                                processMCodeMainData(data.results[j].results[i]).id !== null
+                            ) {
+                                tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                            }
                         }
                     }
+                    console.log('underFiltering');
                 }
                 setRows(tempRows);
-                if (tempRows[0].id !== null) {
-                    setSelectedPatient(tempRows[0].id);
-                    setSelectedPatientMobileInfo({
-                        Ethnicity: tempRows[0]?.ethnicity ? tempRows[0]?.ethnicity : 'NA',
-                        Sex: tempRows[0]?.sex ? tempRows[0]?.sex : 'NA',
-                        Birthday: tempRows[0]?.date_of_birth ? tempRows[0]?.date_of_birth : 'NA',
-                        DeathDate: tempRows[0]?.date_of_death ? tempRows[0]?.date_of_death : 'NA',
-                        Language: tempRows[0]?.communication_language ? tempRows[0]?.communication_language : 'NA'
-                    });
-                }
-
                 // Subtables
-                const index = data.results.findIndex((item) => item.id === tempRows[0].id);
-                setCancerConditions(processConditionsData(data.results[index]));
-                setProcedures(processProceduresData(data.results[index]));
-                setMedicationStatement(processMedicationStatementData(data.results[index]));
-
+                if (tempRows.length !== 0) {
+                    let index;
+                    data.results.forEach((federatedResults) => {
+                        index = federatedResults.results.findIndex((item) => item.id === tempRows[0].id);
+                        if (index !== -1) {
+                            setSelectedPatient(federatedResults.results[index].id);
+                            setPatientJSON(federatedResults.results[index], selectedPatient);
+                            if (tempRows[0].id !== null) {
+                                setSelectedPatientMobileInfo({
+                                    Ethnicity: tempRows[0]?.ethnicity ? tempRows[0]?.ethnicity : 'NA',
+                                    Sex: tempRows[0]?.sex ? tempRows[0]?.sex : 'NA',
+                                    Deceased: tempRows[0]?.deceased ? tempRows[0]?.deceased : 'NA',
+                                    Birthday: tempRows[0]?.date_of_birth ? tempRows[0]?.date_of_birth : 'NA',
+                                    DeathDate: tempRows[0]?.date_of_death ? tempRows[0]?.date_of_death : 'NA'
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    setSelectedPatient('None');
+                    setPatientJSON({});
+                }
+                setListOpen(false);
                 // Dropdown patient table list for filtering
                 setMedicationList(processMedicationListData(data.results));
                 setConditionList(processCondtionsListData(data.results));
-                setProcedureList(processProceduresListData(data.results));
+                setSexList(processSexListData(data.results));
+                setCancerTypeList(processCancerTypeListData(data.results));
+
+                setRedux(
+                    tempRows,
+                    medicationList,
+                    conditionList,
+                    sexList,
+                    cancerTypeList,
+                    selectedMedications,
+                    selectedConditions,
+                    selectedCancerType
+                );
             })
         );
 
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
-    }, [desktopResolution, setdesktopResolution, selectedConditions, selectedProcedures, selectedMedications]);
+    }, [desktopResolution, setdesktopResolution, selectedSex, selectedConditions, selectedMedications, selectedCancerType]);
 
-    const screenWidth = desktopResolution ? '58%' : '100%';
+    const screenWidth = desktopResolution ? '48%' : '100%';
     const headerLabels = {
         Ethnicity: 'Ethnicity',
         Sex: 'Sex',
+        Deceased: 'Deceased',
         Birthday: 'Date of Birth',
-        DeathDate: 'Date of Death',
-        Language: 'Language'
+        DeathDate: 'Date of Death'
     };
     const headerWidths = {
         Ethnicity: '85px',
         Sex: '85px',
+        Deceased: '85px',
         Birthday: '100px',
-        DeathDate: '110px',
-        Language: '110px'
+        DeathDate: '110px'
     };
 
     return (
@@ -243,22 +329,31 @@ function MCodeView() {
                                     <span>{selectedPatient}</span>
                                 </Box>
                                 <DropDown
+                                    setListOpen={setListOpenSex}
+                                    isListOpen={isListOpenSex}
+                                    dropDownLabel="Sex"
+                                    currentSelection={selectedSex}
+                                    dropDownItems={sexList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="SEX"
+                                />
+                                <DropDown
+                                    setListOpen={setListOpenCancerType}
+                                    isListOpen={isListOpenCancerType}
+                                    dropDownLabel="Cancer Type"
+                                    currentSelection={selectedCancerType}
+                                    dropDownItems={cancerTypeList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="CANCER TYPE"
+                                />
+                                <DropDown
                                     setListOpen={setListOpenConditions}
                                     isListOpen={isListOpenConditions}
-                                    dropDownLabel="Conditions"
+                                    dropDownLabel="Body Site"
                                     currentSelection={selectedConditions}
                                     dropDownItems={conditionList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="CONDITIONS"
-                                />
-                                <DropDown
-                                    setListOpen={setListOpenProcedures}
-                                    isListOpen={isListOpenProcedures}
-                                    dropDownLabel="Procedures"
-                                    currentSelection={selectedProcedures}
-                                    dropDownItems={procedureList}
-                                    selectOption={dropDownSelection}
-                                    dropDownGroup="PROCEDURES"
                                 />
                                 <DropDown
                                     setListOpen={setListOpenMedications}
@@ -288,17 +383,14 @@ function MCodeView() {
                     />
                 )}
 
-                <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-                    <Tabs tabHeaders={['CONDITIONS', 'PROCEDURES', 'MEDICATIONS']} setActiveTab={setActiveTab} activeTab={activeTab} />
-                </Grid>
-                <Grid container justifyContent="center" alignItems="center">
+                <Grid container pt={6} justifyContent="center" alignItems="center">
                     {desktopResolution && (
-                        <Grid item mr={2} sx={{ height: 600, width: '40%' }}>
+                        <Grid item mr={2} sx={{ height: 600, width: '50%' }}>
                             <DataGrid
                                 rows={rows}
                                 columns={subjectColumns}
-                                pageSize={8}
-                                rowsPerPageOptions={[8]}
+                                pageSize={7}
+                                rowsPerPageOptions={[7]}
                                 components={{ Toolbar: GridToolbar }}
                                 onRowClick={(rowData) => handleRowClick(rowData.row)}
                                 className={classes.scrollbar}
@@ -307,45 +399,18 @@ function MCodeView() {
                         </Grid>
                     )}
                     <Grid item sx={{ width: screenWidth }}>
-                        {activeTab === 'CONDITIONS' && (
-                            <Grid item sx={{ height: 600, width: '100%' }}>
-                                <DataGrid
-                                    rows={cancerConditions}
-                                    columns={cancerConditionsColumns}
-                                    pageSize={8}
-                                    rowsPerPageOptions={[8]}
-                                    components={{ Toolbar: GridToolbar }}
-                                    disableSelectionOnClick
-                                    className={classes.scrollbar}
-                                />
-                            </Grid>
-                        )}
-                        {activeTab === 'PROCEDURES' && (
-                            <Grid item sx={{ height: 600, width: '100%' }}>
-                                <DataGrid
-                                    rows={procedures}
-                                    columns={cancerRelatedProceduresColumns}
-                                    pageSize={8}
-                                    rowsPerPageOptions={[8]}
-                                    components={{ Toolbar: GridToolbar }}
-                                    disableSelectionOnClick
-                                    className={classes.scrollbar}
-                                />
-                            </Grid>
-                        )}
-                        {activeTab === 'MEDICATIONS' && (
-                            <Grid item sx={{ height: 600, width: '100%' }}>
-                                <DataGrid
-                                    rows={medicationStatement}
-                                    columns={medicationStatementColumns}
-                                    pageSize={8}
-                                    rowsPerPageOptions={[8]}
-                                    components={{ Toolbar: GridToolbar }}
-                                    disableSelectionOnClick
-                                    className={classes.scrollbar}
-                                />
-                            </Grid>
-                        )}
+                        <Box
+                            sx={{
+                                border: 1,
+                                borderColor: '#D3D3D3',
+                                height: 600,
+                                width: '100% ',
+                                overflow: 'auto'
+                            }}
+                            p={2}
+                        >
+                            <ReactJson src={patientJSON} theme={jsonTheme} onDelete={false} onAdd={false} onEdit={false} />
+                        </Box>
                     </Grid>
                 </Grid>
             </Grid>

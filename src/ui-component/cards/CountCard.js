@@ -123,7 +123,9 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
                 <SkeletonEarningCard />
             ) : (
                 <MainCard
-                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    sx={{
+                        borderRadius: events.customization.borderRadius * 0.25
+                    }}
                     border={false}
                     className={classes.card}
                     contentClass={classes.content}

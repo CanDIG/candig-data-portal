@@ -37,6 +37,13 @@ const customizationReducer = (state = initialState, action) => {
                 ...state,
                 borderRadius: action.borderRadius
             };
+        case 'SET_SELECTED_CLINICAL_SEARCH_RESULTS':
+            return {
+                ...state,
+                clinicalSearch: {
+                    ...action.payload
+                }
+            };
         case 'SET_SELECTED_DATASET':
             return {
                 ...state,
@@ -59,6 +66,8 @@ const customizationReducer = (state = initialState, action) => {
         default:
             return {
                 ...state,
+                selectedClinicalSearchResults: {},
+                clinicalSearch: {},
                 selectedDataset: '',
                 datasets: {},
                 update: {

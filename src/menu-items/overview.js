@@ -19,8 +19,8 @@ const overview = {
     type: 'group',
     children: [
         {
-            id: 'individual',
-            title: 'individuals',
+            id: 'summary',
+            title: 'Summary',
             type: 'item',
             url: `${basename}/individuals-overview`,
             icon: icons.IconReportMedical,
