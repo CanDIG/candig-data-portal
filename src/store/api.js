@@ -4,6 +4,7 @@ export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
 export const federation = process.env.REACT_APP_FEDERATION_API_SERVER;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
+export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
 
 // API Calls
 /* 
@@ -143,23 +144,37 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {number}... End
  * @param {string}... Reference name
 */
-function searchVariant(referenceName, chromosome, start, end) {
-    // REPLACE API FROM VARIANT SEARCH
-    return fetch(`https://my.api.mockaroo.com/htsget.json?key=1414fc20&__method=POST`, {
+function searchVariant(chromosome, start, end) {
+    // write post to fetch(`${htsget}/genomics/htsget/v1/variants/search`
+    // if response is not ok, catch error
+    // referenceName: chromosome,
+    // start: parseInt(start, 10),
+    // end: parseInt(end, 10)
+    return fetch(`${TYK_URL}/genomics/htsget/v1/variants/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            referenceName,
-            chromosome,
-            start,
-            end
+            regions: [
+                {
+                    referenceName: 'chr21',
+                    start: parseInt('45000000', 10),
+                    end: parseInt('48120000', 10)
+                }
+            ]
         })
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        return {};
-    });
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Something went wrong');
+        })
+        .then((responseJson) => {
+            // Do something with the response
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 function getVariantSearchTable() {

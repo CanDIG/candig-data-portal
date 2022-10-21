@@ -58,7 +58,7 @@ function VariantsSearch() {
         const start = e.target.start.value;
         const end = e.target.end.value;
         trackPromise(
-            searchVariant(referenceName, chromosome, start, end, patientIdList)
+            searchVariant(chromosome, start, end)
                 .then((response) => {
                     if (response.length === 0) {
                         setAlertMessage('No variants found');
@@ -86,7 +86,8 @@ function VariantsSearch() {
                     setAlertMessage(error.message);
                     setAlertSeverity('error');
                     setOpen(true);
-                })
+                }),
+            'table'
         );
     };
 
@@ -109,7 +110,7 @@ function VariantsSearch() {
                 fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta',
                 cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt'
             },
-            locus: '8:128,750,948-128,751,025',
+            locus: '8:128,750,948-128,751,025', // chromosome:start-end
             tracks: [
                 {
                     name: 'Phase 3 WGS variants',
