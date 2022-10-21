@@ -79,6 +79,7 @@ export function fetchSummaryStats(URL) {
 }
 
 /*
+<<<<<<< HEAD
 Fetch peer federation stats from CanDIG federation service 
 */
 export function fetchClinicalData(URL) {
@@ -86,6 +87,8 @@ export function fetchClinicalData(URL) {
 }
 
 /*
+=======
+>>>>>>> ba524d2d08b683a463b096be77d7dbfff96c6a12
 Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
