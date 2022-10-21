@@ -231,9 +231,9 @@ function MCodeView() {
                             if (
                                 selectedCancerType === 'All' ||
                                 selectedCancerType ===
-                                (cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
-                                    ? cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
-                                    : 'NA')
+                                    (cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
+                                        ? cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
+                                        : 'NA')
                             ) {
                                 patientCancerType = true;
                             }
