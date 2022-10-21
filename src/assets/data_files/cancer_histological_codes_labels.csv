@@ -1,0 +1,39 @@
+Cancer type label,Cancer type code,Tumour histological type label,Tumour histological type code
+Base of tongue,C01,Pleomorphic carcinoma,80223
+"Tongue, unspecified",C02.9,Small cell carcinoma NOS,80413
+"Floor of mouth, unspecified",C04.9,Non-small cell carcinoma,80463
+"Palate, unspecified",C05.9,Adenocarcinoma,81403
+"Mouth, unspecified",C06.9,Adenocarcinoma with mixed subtypes,82553
+Parotid gland,C07,Renal cell carcinoma NOS,83123
+Tonsil,C09,High grade serous carcinoma,84613
+"Tonsil, unspecified",C09.9,Mucinous adenocarcinoma,84803
+"Oropharynx, unspecified",C10.9,Acinar cell carcinoma,85503
+"Nasopharynx, unspecified",C11.9,Adenocarcinoma with neuroendocrine differentiation,85743
+"Hypopharynx, unspecified",C13.9,Malignant melanoma NOS,87203
+Thoracic part of oesophagus,C15.1,,
+"Oesophagus, unspecified",C15.9,,
+Cardia,C16.0,,
+Colon,C18,,
+"Colon, unspecified",C18.9,,
+Anus and anal canal,C21,,
+Other and unspecified parts of biliary tract,C24,,
+Pancreas,C25.9,,
+Maxillary sinus,C31.0,,
+"Larynx, unspecified",C32.9,,
+Trachea,C33,,
+"Upper lobe, bronchus or lung",C34.1,,
+"Middle lobe, bronchus or lung",C34.2,,
+"Lower lobe, bronchus or lung",C34.3,,
+"Bronchus or lung, unspecified",C34.9,,
+"Ribs, sternum and clavicle",C41.3,,
+Skin,C43,,
+"Eyelid, including canthus",C43.1,,
+"Skin, unspecified",C43.9,,
+Retroperitoneum,C48.0,,
+Other connective and soft tissue,C49,,
+"Connective and soft tissue, unspecified",C49.9,,
+"Breast, unspecified",C50.9,,
+Vagina,C52,,
+"Cervix uteri, unspecified",C53.9,,
+"Uterus, part unspecified",C55,,
+Ovary,C56.9,,
