@@ -1,102 +1,49 @@
 /* eslint-disable camelcase */
-import { Button } from '@mui/material';
-
-function MoreInfoButton() {
-    return (
-        <strong>
-            <Button className="moreInfoButton" variant="text">
-                More Info
-            </Button>
-        </strong>
-    );
-}
-
-function getSite() {
-    return <strong>UHN</strong>;
-}
-
-export const mainColumns = [
-    {
-        field: 'id',
-        headerName: 'ID',
-        width: 150
-    },
-    {
-        field: 'ethnicity',
-        headerName: 'Ethnicity',
-        width: 150
-    },
-    {
-        field: 'sex',
-        headerName: 'Sex',
-        width: 150
-    },
-    {
-        field: 'more_info',
-        headerName: 'Info',
-        width: 100,
-        sortable: false,
-        headerAlign: 'center',
-        align: 'center',
-        renderCell: MoreInfoButton,
-        disableClickEventBubbling: true
-    }
-];
+import { cancerType } from './constant';
 
 export const subjectColumns = [
     {
         field: 'id',
         headerName: 'ID',
-        width: 100
-    },
-    {
-        field: 'more_info',
-        headerName: 'Info',
-        width: 100,
-        sortable: false,
-        headerAlign: 'center',
-        align: 'center',
-        renderCell: MoreInfoButton,
-        disableClickEventBubbling: true
+        width: 150
     },
     {
         field: 'site',
         headerName: 'Site',
-        renderCell: getSite,
-        width: 120
+        width: 150
+    },
+    {
+        field: 'genome_id',
+        headerName: 'Genome ID',
+        width: 150,
+        hide: true
     },
     {
         field: 'ethnicity',
         headerName: 'Ethnicity',
-        width: 150,
+        width: 200,
         hide: true
-    },
-    {
-        field: 'race',
-        headerName: 'Race',
-        width: 130
     },
     {
         field: 'sex',
         headerName: 'Sex',
-        width: 130
+        width: 150
+    },
+    {
+        field: 'deceased',
+        headerName: 'Deceased',
+        width: 150
     },
     {
         field: 'date_of_birth',
         headerName: 'Date of Birth',
-        width: 170,
-        hide: true
+        hide: true,
+        width: 200
     },
     {
         field: 'date_of_death',
         headerName: 'Date of Death',
-        width: 170,
-        hide: true
-    },
-    {
-        field: 'communication_language',
-        headerName: 'Language',
-        width: 150,
+        width: 200,
         hide: true
     }
 ];
@@ -115,54 +62,16 @@ export const cancerConditionsColumns = [
     {
         field: 'body_site',
         headerName: 'Body Site',
-        width: 180
+        width: 250
     },
     {
         field: 'code',
         headerName: 'Code',
-        width: 150
-    },
-    {
-        field: 'histology_morphology_behavior',
-        headerName: 'Histology morphology behavior',
-        width: 300
+        width: 350
     },
     {
         field: 'date_of_diagnosis',
         headerName: 'Date of Diagnosis',
-        width: 200
-    }
-];
-
-export const cancerRelatedProceduresColumns = [
-    {
-        field: 'id',
-        headerName: 'id',
-        width: 100
-    },
-    {
-        field: 'procedure_type',
-        headerName: 'Procedure Type',
-        width: 190
-    },
-    {
-        field: 'procedure_code_id',
-        headerName: 'Code ID',
-        width: 150
-    },
-    {
-        field: 'procedure_code_label',
-        headerName: 'Code Label',
-        width: 160
-    },
-    {
-        field: 'body_site_id',
-        headerName: 'Body Site ID',
-        width: 160
-    },
-    {
-        field: 'body_site_label',
-        headerName: 'Body Site Label',
         width: 200
     }
 ];
@@ -182,6 +91,16 @@ export const medicationStatementColumns = [
         field: 'medication_code_label',
         headerName: 'Medication Code Label',
         width: 250
+    },
+    {
+        field: 'start_date',
+        headerName: 'Medication Start Date',
+        width: 250
+    },
+    {
+        field: 'end_date',
+        headerName: 'Medication End Date',
+        width: 250
     }
 ];
 
@@ -189,19 +108,18 @@ export const medicationStatementColumns = [
  * @param {*} dataObject
  * @returns an object representing one row for the main table.
  */
-export const processMCodeMainData = (dataObject) => {
+export const processMCodeMainData = (dataObject, site) => {
     const row = {};
-
     row.id = dataObject?.id ? dataObject?.id : null;
+    row.site = site;
     row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.deceased = dataObject?.subject?.deceased ? dataObject?.subject?.deceased : 'NA';
     row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
-    row.race = dataObject?.subject?.race ? dataObject?.subject?.race : 'NA';
-    row.communication_language = dataObject?.subject?.extra_properties?.communication_language
-        ? dataObject?.subject?.extra_properties?.communication_language
+    row.genome_id = dataObject?.genomics_report?.extra_properties?.genomic_id
+        ? dataObject?.genomics_report?.extra_properties?.genomic_id
         : 'NA';
-
     return row;
 };
 
@@ -218,9 +136,6 @@ export const processSubjectData = (dataObject) => {
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
     row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
     row.race = dataObject?.subject?.race ? dataObject?.subject?.race : 'NA';
-    row.communication_language = dataObject?.subject?.extra_properties?.communication_language
-        ? dataObject?.subject?.extra_properties?.communication_language
-        : 'NA';
 
     return [row];
 };
@@ -232,23 +147,17 @@ export const processSubjectData = (dataObject) => {
  */
 export const processConditionsData = (dataObject) => {
     const rows = [];
-
     // eslint-disable-next-line camelcase
-    dataObject?.cancer_condition.forEach((cancer_condition) => {
-        const row = {};
-        row.id = cancer_condition?.id || null;
-        if (row.id !== null) {
-            row.condition_type = cancer_condition?.condition_type ? cancer_condition?.condition_type : 'NA';
-            row.body_site = cancer_condition?.body_site ? cancer_condition?.body_site : 'NA';
-            row.code = cancer_condition?.code ? cancer_condition?.code : 'NA';
-            row.histology_morphology_behavior = cancer_condition?.histology_morphology_behavior
-                ? cancer_condition?.histology_morphology_behavior
-                : 'NA';
-            row.date_of_diagnosis = cancer_condition?.date_of_diagnosis ? cancer_condition?.date_of_diagnosis : 'NA';
+    const row = {};
+    row.id = dataObject?.cancer_condition?.id || null;
+    if (row.id !== null) {
+        row.condition_type = dataObject?.cancer_condition?.condition_type ? dataObject?.cancer_condition?.condition_type : 'NA';
+        row.body_site = dataObject?.cancer_condition?.body_site ? JSON.stringify(dataObject?.cancer_condition?.body_site) : 'NA';
+        row.code = dataObject?.cancer_condition?.code ? JSON.stringify(dataObject?.cancer_condition?.code) : 'NA';
+        row.date_of_diagnosis = dataObject?.cancer_condition?.date_of_diagnosis ? dataObject?.cancer_condition?.date_of_diagnosis : 'NA';
 
-            rows.push(row);
-        }
-    });
+        rows.push(row);
+    }
 
     return rows;
 };
@@ -262,19 +171,23 @@ export const processProceduresData = (dataObject) => {
     const rows = [];
 
     // eslint-disable-next-line camelcase
-    dataObject.cancer_related_procedures.forEach((cancer_related_procedure) => {
-        const row = {};
-        row.id = cancer_related_procedure.id || null;
-        if (row.id !== null) {
-            row.procedure_type = cancer_related_procedure?.procedure_type ? cancer_related_procedure?.procedure_type : 'NA';
-            row.procedure_code_id = cancer_related_procedure?.code?.id ? cancer_related_procedure?.code?.id : 'NA';
-            row.procedure_code_label = cancer_related_procedure?.code?.label ? cancer_related_procedure?.code?.label : 'NA';
-            row.body_site_id = cancer_related_procedure?.body_site?.id ? cancer_related_procedure?.body_site?.id : 'NA';
-            row.body_site_label = cancer_related_procedure?.body_site?.label ? cancer_related_procedure?.body_site?.label : 'NA';
+    const row = {};
+    row.id = dataObject?.cancer_related_procedure?.id || null;
+    if (row.id !== null) {
+        row.procedure_type = dataObject?.cancer_related_procedure?.procedure_type
+            ? dataObject?.cancer_related_procedure?.procedure_type
+            : 'NA';
+        row.procedure_code_id = dataObject?.cancer_related_procedure?.code?.id ? dataObject?.cancer_related_procedure?.code?.id : 'NA';
+        row.procedure_code_label = dataObject?.cancer_related_procedure?.code?.label
+            ? dataObject?.cancer_related_procedure?.code?.label
+            : 'NA';
+        row.body_site_id = dataObject?.cancer_related_procedure?.body_site?.id ? dataObject?.cancer_related_procedure?.body_site?.id : 'NA';
+        row.body_site_label = dataObject?.cancer_related_procedure?.body_site?.label
+            ? dataObject?.cancer_related_procedure?.body_site?.label
+            : 'NA';
 
-            rows.push(row);
-        }
-    });
+        rows.push(row);
+    }
 
     return rows;
 };
@@ -286,18 +199,22 @@ export const processProceduresData = (dataObject) => {
  */
 export const processMedicationStatementData = (dataObject) => {
     const rows = [];
+    console.log('Process Meidcation', dataObject);
 
     // eslint-disable-next-line camelcase
-    dataObject.medication_statement.forEach((medication_statement) => {
-        const row = {};
-        row.id = medication_statement.id || null;
-        if (row.id !== null) {
-            row.medication_code_id = medication_statement?.medication_code?.id ? medication_statement?.medication_code?.id : 'NA';
-            row.medication_code_label = medication_statement?.medication_code?.label ? medication_statement?.medication_code?.label : 'NA';
-
-            rows.push(row);
-        }
-    });
+    const row = {};
+    row.id = dataObject?.medication_statement[0]?.id || null;
+    if (row.id !== null) {
+        row.medication_code_id = dataObject?.medication_statement[0]?.medication_code?.id
+            ? dataObject?.medication_statement[0]?.medication_code?.id
+            : 'NA';
+        row.medication_code_label = dataObject?.medication_statement[0]?.medication_code?.label
+            ? dataObject?.medication_statement[0]?.medication_code?.label
+            : 'NA';
+        row.start_date = dataObject?.medication_statement[0]?.start_date ? dataObject?.medication_statement[0]?.start_date : 'NA';
+        row.end_date = dataObject?.medication_statement[0]?.end_date ? dataObject?.medication_statement[0]?.end_date : 'NA';
+        rows.push(row);
+    }
 
     return rows;
 };
@@ -309,11 +226,32 @@ export const processMedicationStatementData = (dataObject) => {
  */
 export const processMedicationListData = (dataObject) => {
     const list = {};
-    dataObject.forEach((patient) => {
-        patient?.medication_statement.forEach((medication) => {
-            const key = medication?.medication_code?.id;
+    dataObject.forEach((federatedResult) => {
+        federatedResult.results.forEach((patient) => {
+            patient?.medication_statement.forEach((medication) => {
+                const key = medication?.medication_code?.id;
+                if (!(key in list)) {
+                    list[key] = medication?.medication_code?.label;
+                }
+            });
+        });
+    });
+    list.ALL = 'All';
+    return list;
+};
+
+/**
+ * Process data for condition list
+ * @param {*} dataObject
+ * @returns a list of sexs valid for dropdown
+ */
+export const processSexListData = (dataObject) => {
+    const list = {};
+    dataObject.forEach((federatedResult) => {
+        federatedResult.results.forEach((patient) => {
+            const key = patient?.subject?.sex;
             if (!(key in list)) {
-                list[key] = medication?.medication_code?.label;
+                list[key] = patient?.subject?.sex;
             }
         });
     });
@@ -328,12 +266,14 @@ export const processMedicationListData = (dataObject) => {
  */
 export const processCondtionsListData = (dataObject) => {
     const list = {};
-    dataObject.forEach((patient) => {
-        patient?.cancer_condition.forEach((condition) => {
-            const key = condition?.code?.id;
-            if (!(key in list)) {
-                list[key] = condition?.code?.label;
-            }
+    dataObject.forEach((federatedResult) => {
+        federatedResult.results.forEach((patient) => {
+            patient?.cancer_condition?.body_site?.forEach((bodySite) => {
+                const key = bodySite?.id;
+                if (!(key in list)) {
+                    list[key] = bodySite?.label;
+                }
+            });
         });
     });
     list.ALL = 'All';
@@ -341,17 +281,18 @@ export const processCondtionsListData = (dataObject) => {
 };
 
 /**
- * Process data for Procedures list
+ * Process data for condition list
  * @param {*} dataObject
- * @returns a list of Procedures valid for dropdown
+ * @returns a list of conditions valid for dropdown
  */
-export const processProceduresListData = (dataObject) => {
+export const processCancerTypeListData = (dataObject) => {
     const list = {};
-    dataObject.forEach((patient) => {
-        patient?.cancer_related_procedures.forEach((procedure) => {
-            const key = procedure?.code?.id;
+    dataObject.forEach((federatedResult) => {
+        federatedResult.results.forEach((patient) => {
+            const key = patient?.cancer_condition?.code?.id;
             if (!(key in list)) {
-                list[key] = procedure?.procedure_type;
+                list[key] = cancerType[patient?.cancer_condition?.code?.id] ? cancerType[patient?.cancer_condition?.code?.id] : 'NA';
+                // list[key] = patient?.code?.label;
             }
         });
     });
