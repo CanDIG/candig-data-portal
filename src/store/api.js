@@ -1,3 +1,5 @@
+import { sampleSearchVariantResult, sampleFederationResponse } from './constant';
+
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
@@ -50,26 +52,32 @@ function fetchFederationStat() {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/federation/search`, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            request_type: 'GET',
-            endpoint_path: 'api/mcodepackets',
-            endpoint_payload: {},
-            endpoint_service: 'katsu'
-        })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return {};
-        })
-        .catch((error) => {
-            console.log('Error:', error);
-            return 'error';
-        });
+    //     return fetch(`${federation}/federation/search`, {
+    //         method: 'post',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({
+    //             request_type: 'GET',
+    //             endpoint_path: 'api/mcodepackets',
+    //             endpoint_payload: {},
+    //             endpoint_service: 'katsu'
+    //         })
+    //     })
+    //         .then((response) => {
+    //             if (response.ok) {
+    //                 return response.json();
+    //             }
+    //             return {};
+    //         })
+    //         .catch((error) => {
+    //             console.log('Error:', error);
+    //             return 'error';
+    //         });
+    // }
+
+    // dummy response
+    return new Promise((resolve) => {
+        resolve(sampleFederationResponse);
+    });
 }
 
 /*
@@ -175,53 +183,41 @@ function getCounts(datasetId, table, field) {
 
 /*
 Fetch variant for a specific Dataset Id; start; and reference name; and returns a promise
- * @param {string}... Dataset ID
  * @param {number}... Start
  * @param {number}... End
  * @param {string}... Reference name
 */
 function searchVariant(chromosome, start, end) {
-    // write post to fetch(`${htsget}/genomics/htsget/v1/variants/search`
-    // if response is not ok, catch error
-    // referenceName: chromosome,
-    // start: parseInt(start, 10),
-    // end: parseInt(end, 10)
-    return fetch(`${TYK_URL}/genomics/htsget/v1/variants/search`, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            regions: [
-                {
-                    referenceName: 'chr21',
-                    start: parseInt('45000000', 10),
-                    end: parseInt('48120000', 10)
-                }
-            ]
-        })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('Something went wrong');
-        })
-        .then((responseJson) => {
-            // Do something with the response
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
+    //     return fetch(`${TYK_URL}/genomics/htsget/v1/variants/search`, {
+    //         method: 'post',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify({
+    //             regions: [
+    //                 {
+    //                     referenceName: chromosome,
+    //                     start: parseInt(start, 10),
+    //                     end: parseInt(end, 10)
+    //                 }
+    //             ]
+    //         })
+    //     })
+    //         .then((response) => {
+    //             if (response.ok) {
+    //                 return response.json();
+    //             }
+    //             throw new Error('Something went wrong');
+    //         })
+    //         .then((responseJson) => {
+    //             // Do something with the response
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //         });
+    // }
 
-function getVariantSearchTable() {
-    return fetch(`https://my.api.mockaroo.com/variant_search_table.json?key=1414fc20`, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' }
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        return {};
+    // Dummy data for testing
+    return new Promise((resolve) => {
+        resolve(sampleSearchVariantResult);
     });
 }
 
@@ -419,6 +415,5 @@ export {
     searchReads,
     getReferenceSet,
     searchVariantByVariantSetIds,
-    searchGenomicSets,
-    getVariantSearchTable
+    searchGenomicSets
 };

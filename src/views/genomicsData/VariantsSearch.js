@@ -8,7 +8,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant, getVariantSearchTable } from 'store/api';
+import { searchVariant } from 'store/api';
 import IGViewer from './IGViewer';
 
 function VariantsSearch() {
@@ -23,6 +23,7 @@ function VariantsSearch() {
     const [isIGVWindowOpen, setIsIGVWindowOpen] = useState(false);
     const [showIGVButton, setShowIGVButton] = useState(false);
     const [IGVOptions, setIGVOptions] = useState({});
+    const [variantSearchOptions, setVariantSearchOptions] = useState({});
 
     /*
   Build the dropdown for chromosome
@@ -46,40 +47,65 @@ function VariantsSearch() {
         setDisplayVariantsTable(false);
     }, []);
 
+    // get patient data from redux store and filter out empty the genomicId
+    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
+    let patientList = [];
+    if (Object.keys(clinicalSearch).length !== 0) {
+        patientList = clinicalSearch.selectedClinicalSearchResults.filter((patient) => patient.genomicID !== 'NA');
+    }
+
+    /**
+     * This function handles the Search button
+     * It calls the searchVariant function from api.js according to the chromosome and position
+     * then compares the result with the patientList genomicID to find the matching patient
+     */
     const formHandler = (e) => {
         e.preventDefault(); // Prevent form submission
         setDisplayVariantsTable(false);
-        // call api to fetch variant sets here???
-        // step 1: get the patient id list from redux
-        const patientIdList = events.patientIdList;
-        // step 2: fetch the variant sets from api
         const referenceName = e.target.genome.value;
         const chromosome = e.target.chromosome.value;
         const start = e.target.start.value;
         const end = e.target.end.value;
+        setVariantSearchOptions({ referenceName, chromosome, start, end });
         trackPromise(
             searchVariant(chromosome, start, end)
                 .then((response) => {
-                    if (response.length === 0) {
+                    if (Object.keys(response).length === 0) {
                         setAlertMessage('No variants found');
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
-                        console.log(`response: ${response}`);
-                        // call katsu api to get the patient ID, genomic sample ID that
-                        // match position and vcf file
-                        getVariantSearchTable()
-                            .then((tableResponse) => {
-                                console.log(`tableResponse: ${tableResponse}`);
-                                setRowData(tableResponse);
-                                setDisplayVariantsTable(true);
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                                setAlertMessage('Error fetching variant search table');
-                                setAlertSeverity('error');
-                                setOpen(true);
-                            });
+                        const variantList = response.results.map((result) => ({
+                            genomicId: result.id,
+                            referenceName: result.reference_genome,
+                            variantCount: result.variantcount,
+                            url: result.htsget.urls[0].url
+                        }));
+                        const patientVariantList = [];
+                        const displayData = [];
+                        for (let i = 0; i < variantList.length; i += 1) {
+                            for (let j = 0; j < patientList.length; j += 1) {
+                                if (variantList[i].genomicId === patientList[j].genomicId) {
+                                    patientVariantList.push({
+                                        patientId: patientList[j].id,
+                                        genomicId: variantList[i].genomicId,
+                                        referenceName: variantList[i].referenceName,
+                                        variantCount: variantList[i].variantCount,
+                                        url: variantList[i].url
+                                    });
+                                    displayData.push({
+                                        patientId: patientList[j].id,
+                                        genomicSampleId: variantList[i].genomicId,
+                                        variantCount: variantList[i].variantCount,
+                                        VCFFile: variantList[i].url
+                                    });
+
+                                    break; // should have only 1 match, so we can break here
+                                }
+                            }
+                        }
+                        setRowData(displayData);
+                        setDisplayVariantsTable(true);
                     }
                 })
                 .catch((error) => {
@@ -95,58 +121,34 @@ function VariantsSearch() {
         setIsIGVWindowOpen(!isIGVWindowOpen);
     };
 
+    /**
+     * This function keeps track of the selected row in the table
+     * then it creates the IGV options to send to the IGV window
+     */
     const onCheckboxSelectionChanged = (value) => {
-        console.log(value);
         if (value.length === 0) {
             setShowIGVButton(false);
         } else {
             setShowIGVButton(true);
         }
-        // TODO: replace this data with data from value
+        const trackList = [];
+        for (let i = 0; i < value.length; i += 1) {
+            trackList.push({
+                name: value[i]['Patient ID'],
+                type: 'variant',
+                format: 'vcf',
+                url: value[i]['VCF File']
+            });
+        }
         const options = {
-            // Example of fully specifying a reference .  We could alternatively use  "genome: 'hg19'"
+            // TODO: replace the dummy URL with the actual URL
             reference: {
-                id: 'hg19',
-                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta',
-                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt'
+                id: 'hg38',
+                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta', // dummy URL
+                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt' // dummy URL
             },
-            locus: '8:128,750,948-128,751,025', // chromosome:start-end
-            tracks: [
-                {
-                    name: 'Phase 3 WGS variants',
-                    type: 'variant',
-                    format: 'vcf',
-                    url: 'https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz',
-                    indexURL:
-                        'https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi'
-                },
-                {
-                    type: 'alignment',
-                    format: 'cram',
-                    url: 'https://s3.amazonaws.com/1000genomes/phase3/data/HG00096/exome_alignment/HG00096.mapped.ILLUMINA.bwa.GBR.exome.20120522.bam.cram',
-                    indexURL:
-                        'https://s3.amazonaws.com/1000genomes/phase3/data/HG00096/exome_alignment/HG00096.mapped.ILLUMINA.bwa.GBR.exome.20120522.bam.cram.crai',
-                    name: 'HG00096',
-                    sort: {
-                        chr: 'chr8',
-                        position: 128750986,
-                        option: 'BASE',
-                        direction: 'ASC'
-                    },
-                    height: 600
-                },
-
-                {
-                    name: 'Genes',
-                    type: 'annotation',
-                    format: 'bed',
-                    url: 'https://s3.amazonaws.com/igv.broadinstitute.org/annotations/hg19/genes/refGene.hg19.bed.gz',
-                    indexURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/annotations/hg19/genes/refGene.hg19.bed.gz.tbi',
-                    order: Number.MAX_VALUE,
-                    visibilityWindow: 300000000,
-                    displayMode: 'EXPANDED'
-                }
-            ]
+            locus: `${variantSearchOptions.chromosome}:${variantSearchOptions.start}-${variantSearchOptions.end}`,
+            tracks: trackList
         };
         setIGVOptions(options);
     };

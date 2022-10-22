@@ -20,8 +20,8 @@ function VariantsTable({ rowData, onChange }) {
     ]);
     // parse rowData contains id, reference_genome, htsget, samples, variantcount to fit the table
     const displayRowData = rowData.map((row) => {
-        const { patient_id: patientID, genomic_sample_id: genomicSampleID, positions, VCF_file: VCFFile } = row;
-        return { 'Patient ID': patientID, 'Genomic Sample ID': genomicSampleID, 'Number of Variants': positions, 'VCF File': VCFFile };
+        const { patientId, genomicSampleId, variantCount, VCFFile } = row;
+        return { 'Patient ID': patientId, 'Genomic Sample ID': genomicSampleId, 'Number of Variants': variantCount, 'VCF File': VCFFile };
     });
 
     function onSelectionChanged() {
@@ -36,7 +36,7 @@ function VariantsTable({ rowData, onChange }) {
             resizable: true,
             filter: true,
             flex: 1,
-            minWidth: 150,
+            minWidth: 100,
             minHeight: 300
         },
         onSelectionChanged,
