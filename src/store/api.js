@@ -188,36 +188,23 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {string}... Reference name
 */
 function searchVariant(chromosome, start, end) {
-    //     return fetch(`${TYK_URL}/genomics/htsget/v1/variants/search`, {
-    //         method: 'post',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //             regions: [
-    //                 {
-    //                     referenceName: chromosome,
-    //                     start: parseInt(start, 10),
-    //                     end: parseInt(end, 10)
-    //                 }
-    //             ]
-    //         })
-    //     })
-    //         .then((response) => {
-    //             if (response.ok) {
-    //                 return response.json();
-    //             }
-    //             throw new Error('Something went wrong');
-    //         })
-    //         .then((responseJson) => {
-    //             // Do something with the response
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         });
-    // }
-
-    // Dummy data for testing
-    return new Promise((resolve) => {
-        resolve(sampleSearchVariantResult);
+    return fetch(`${htsget}/htsget/v1/variants/search`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            regions: [
+                {
+                    referenceName: chromosome,
+                    start: parseInt(start, 10),
+                    end: parseInt(end, 10)
+                }
+            ]
+        })
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        return {};
     });
 }
 

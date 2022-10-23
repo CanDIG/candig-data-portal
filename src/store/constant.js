@@ -273,6 +273,7 @@ export const gridSpacing = 3;
 export const drawerWidth = 260;
 export const appDrawerWidth = 320;
 
+// dummy testing data
 export const sampleSearchVariantResult = {
     results: [
         {
@@ -346,7 +347,7 @@ export const sampleSearchVariantResult = {
         }
     ]
 };
-
+// dummy testing data
 export const sampleFederationResponse = {
     message: [],
     results: [
@@ -387,7 +388,7 @@ export const sampleFederationResponse = {
                         },
                         created: '2022-10-11T17:35:13.965810Z',
                         extra_properties: {
-                            genomic_id: 'HG00097'
+                            genomic_id: 'NA18537'
                         },
                         id: 'SET3_UBU003',
                         issued: '2022-04-05T00:00:00Z',
@@ -538,7 +539,7 @@ export const sampleFederationResponse = {
                         },
                         created: '2022-10-11T17:35:14.007362Z',
                         extra_properties: {
-                            genomic_id: 'NA21144'
+                            genomic_id: 'NA20787'
                         },
                         id: 'SET3_UBU009',
                         issued: '2022-04-05T00:00:00Z',
