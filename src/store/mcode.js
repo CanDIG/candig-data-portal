@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
-import { cancerType } from './constant';
+import cancerTypeCSV from '../assets/data_files/cancer_histological_codes_labels.csv';
+import papa from 'papaparse';
 
 export const subjectColumns = [
     {
@@ -286,15 +287,28 @@ export const processCondtionsListData = (dataObject) => {
  */
 export const processCancerTypeListData = (dataObject) => {
     const list = {};
-    dataObject.forEach((federatedResult) => {
-        federatedResult.results.forEach((patient) => {
-            const key = patient?.cancer_condition?.code?.id;
-            if (!(key in list)) {
-                list[key] = cancerType[patient?.cancer_condition?.code?.id] ? cancerType[patient?.cancer_condition?.code?.id] : 'NA';
-                // list[key] = patient?.code?.label;
-            }
-        });
+    // Parsing CancerType CSV into Dictionary
+    papa.parse(cancerTypeCSV, {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+            const cancerType = results.data;
+            dataObject.forEach((federatedResult) => {
+                federatedResult.results.forEach((patient) => {
+                    const key = patient?.cancer_condition?.code?.id;
+                    if (!(key in list)) {
+                        for (let i = 0; i < cancerType.length; i += 1) {
+                            if (key === cancerType[i]['Cancer type code']) {
+                                list[key] = `${cancerType[i]['Cancer type label']} ${cancerType[i]['Cancer type code']}`;
+                                // list[key] = patient?.code?.label;
+                            }
+                        }
+                    }
+                });
+            });
+            list.ALL = 'All';
+        }
     });
-    list.ALL = 'All';
     return list;
 };
