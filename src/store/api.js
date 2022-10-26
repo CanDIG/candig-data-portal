@@ -72,6 +72,10 @@ export function fetchFederationClinicalData() {
             console.log('Error:', error);
             return 'error';
         });
+
+    // return new Promise((resolve) => {
+    //     resolve(sampleFederationResponse);
+    // });
 }
 
 /*
