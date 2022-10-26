@@ -199,7 +199,6 @@ export const processProceduresData = (dataObject) => {
  */
 export const processMedicationStatementData = (dataObject) => {
     const rows = [];
-    console.log('Process Meidcation', dataObject);
 
     // eslint-disable-next-line camelcase
     const row = {};

@@ -233,31 +233,34 @@ function MCodeView() {
                                 return true;
                             });
                             let patientMedication = false;
-                            if (
-                                selectedMedications === 'All' ||
-                                selectedMedications === data?.results[j]?.results[i]?.medication_statement[0]?.medication_code.label
-                            ) {
-                                patientMedication = true;
-                            }
+                            data?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                                if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
+                                    patientMedication = true;
+                                    return false;
+                                }
+                                return true;
+                            });
                             let patientSex = false;
                             if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
                                 patientSex = true;
                             }
                             let patientCancerType = false;
-                            for (let k = 0; k < cancerType.length; k += 1) {
-                                if (data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']) {
-                                    if (
-                                        selectedCancerType === 'All' ||
-                                        selectedCancerType ===
-                                        (`${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
-                                            ? `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
-                                            : 'NA')
-                                    ) {
-                                        patientCancerType = true;
+                            if (selectedCancerType === 'All') {
+                                patientCancerType = true;
+                            } else {
+                                for (let k = 0; k < cancerType.length; k += 1) {
+                                    if (data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']) {
+                                        if (
+                                            selectedCancerType ===
+                                            (`${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
+                                                ? `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
+                                                : 'NA')
+                                        ) {
+                                            patientCancerType = true;
+                                        }
                                     }
                                 }
                             }
-
                             if (
                                 patientCondition &&
                                 patientMedication &&
