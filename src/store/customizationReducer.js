@@ -66,8 +66,15 @@ const customizationReducer = (state = initialState, action) => {
         default:
             return {
                 ...state,
-                selectedClinicalSearchResults: {},
-                clinicalSearch: {},
+                clinicalSearch: {
+                    clinicalSearchDropDowns: {
+                        selectedMedications: 'All',
+                        selectedConditions: 'All',
+                        selectedSex: 'All',
+                        selectedCancerType: 'All'
+                    },
+                    selectedClinicalSearchResults: {}
+                },
                 selectedDataset: '',
                 datasets: {},
                 update: {

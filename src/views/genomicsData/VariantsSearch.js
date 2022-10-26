@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
+import { Grid, Button, FormControl, InputLabel, Input, NativeSelect, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 import VariantsTable from 'ui-component/Tables/VariantsTable';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
@@ -10,9 +10,51 @@ import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/L
 import 'assets/css/VariantsSearch.css';
 import { searchVariant } from 'store/api';
 import IGViewer from './IGViewer';
+import DropDown from '../../ui-component/DropDown';
+
+// mui
+import { useTheme, makeStyles } from '@mui/styles';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+
+// Styles
+const useStyles = makeStyles({
+    dropdownItem: {
+        background: 'white',
+        paddingRight: '1.25em',
+        paddingLeft: '1.25em',
+        border: 'none',
+        width: 'fit-content(5em)',
+        '&:hover': {
+            background: '#2196f3',
+            color: 'white'
+        }
+    },
+    mobileRow: {
+        width: '700px'
+    },
+    scrollbar: {
+        scrollbarWidth: 'thin',
+        '&::-webkit-scrollbar': {
+            height: '0.4em',
+            width: '0.4em'
+        },
+        '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.1)'
+        }
+    }
+});
 
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
+    const classes = useStyles();
+    const theme = useTheme();
     const events = useSelector((state) => state);
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
@@ -24,12 +66,13 @@ function VariantsSearch() {
     const [showIGVButton, setShowIGVButton] = useState(false);
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
+    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
-  Build the dropdown for chromosome
-  * @param {None}
-  * Return a list of options with chromosome
-  */
+    Build the dropdown for chromosome
+    * @param {None}
+    * Return a list of options with chromosome
+    */
     function chrSelectBuilder() {
         const refNameList = [];
         ListOfReferenceNames.forEach((refName) => {
@@ -48,9 +91,8 @@ function VariantsSearch() {
     }, []);
 
     // get patient data from redux store and filter out empty the genomicId
-    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
     let patientList = [];
-    if (Object.keys(clinicalSearch).length !== 0) {
+    if (Object.keys(clinicalSearch.selectedClinicalSearchResults).length !== 0) {
         patientList = clinicalSearch.selectedClinicalSearchResults.filter((patient) => patient.genomicID !== 'NA');
     }
 
@@ -167,6 +209,54 @@ function VariantsSearch() {
                     variant="filled"
                     fontColor={alertSeverity === 'error' ? 'white' : 'black'}
                 />
+                <Grid container direction="row">
+                    <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+                        <Box mr={1} p={1} sx={{ width: 50 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Sex</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedSex
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedSex
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 150 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Cancer Type</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedCancerType
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedCancerType
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 125 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Body Site</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedConditions
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedConditions
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 125 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Medications</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedMedications
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedMedications
+                                    : 'All'}
+                            </span>
+                        </Box>
+                    </Stack>
+                </Grid>
                 <Grid container direction="column" className="content">
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>

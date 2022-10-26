@@ -292,6 +292,7 @@ export const processCancerTypeListData = (dataObject) => {
         header: true,
         download: true,
         skipEmptyLines: true,
+        // eslint-disable-next-line
         complete: function (results) {
             const cancerType = results.data;
             dataObject.forEach((federatedResult) => {
