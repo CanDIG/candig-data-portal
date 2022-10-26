@@ -26,7 +26,7 @@ export function fetchKatsu(URL) {
 Fetch the federation service 
 */
 function fetchFederationStat() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,7 +52,7 @@ function fetchFederationStat() {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
