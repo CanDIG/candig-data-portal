@@ -1,9 +1,12 @@
+import { sampleSearchVariantResult, sampleFederationResponse } from './constant';
+
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
 export const federation = process.env.REACT_APP_FEDERATION_API_SERVER;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
+export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
 
 // API Calls
 /* 
@@ -23,7 +26,7 @@ export function fetchKatsu(URL) {
 Fetch the federation service 
 */
 function fetchFederationStat() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,7 +52,7 @@ function fetchFederationStat() {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +92,7 @@ export function fetchClinicalData(URL) {
 Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
-    return fetch(`${federation}/federation/servers`, {}).then((response) => {
+    return fetch(`${federation}/servers`, {}).then((response) => {
         if (response.ok) {
             return response.json();
         }
@@ -174,20 +177,22 @@ function getCounts(datasetId, table, field) {
 
 /*
 Fetch variant for a specific Dataset Id; start; and reference name; and returns a promise
- * @param {string}... Dataset ID
  * @param {number}... Start
  * @param {number}... End
  * @param {string}... Reference name
 */
-function searchVariant(datasetId, start, end, referenceName) {
-    return fetch(`${BASE_URL}/variants/search`, {
+function searchVariant(chromosome, start, end) {
+    return fetch(`${htsget}/htsget/v1/variants/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            start,
-            end,
-            referenceName,
-            datasetId
+            regions: [
+                {
+                    referenceName: chromosome,
+                    start: parseInt(start, 10),
+                    end: parseInt(end, 10)
+                }
+            ]
         })
     }).then((response) => {
         if (response.ok) {
