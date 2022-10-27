@@ -117,11 +117,11 @@ function VariantsSearch() {
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
-                        const variantList = response.results.map((result) => ({
+                        const variantList = response.results[0].results.map((result) => ({
                             genomicId: result.id,
                             referenceName: result.reference_genome,
                             variantCount: result.variantcount,
-                            url: result.htsget.urls[0].url
+                            url: result.urls[0]
                         }));
                         const patientVariantList = [];
                         const displayData = [];
@@ -184,11 +184,10 @@ function VariantsSearch() {
             });
         }
         const options = {
-            // TODO: replace the dummy URL with the actual URL
             reference: {
                 id: 'hg38',
-                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta', // dummy URL
-                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt' // dummy URL
+                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta',
+                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt'
             },
             locus: `${variantSearchOptions.chromosome}:${variantSearchOptions.start}-${variantSearchOptions.end}`,
             tracks: trackList
