@@ -96,7 +96,7 @@ export function fetchClinicalData(URL) {
 Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
-    return fetch(`${federation}/federation/servers`, {}).then((response) => {
+    return fetch(`${federation}/servers`, {}).then((response) => {
         if (response.ok) {
             return response.json();
         }
