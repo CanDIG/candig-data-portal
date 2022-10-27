@@ -26,7 +26,7 @@ export function fetchKatsu(URL) {
 Fetch the federation service 
 */
 function fetchFederationStat() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,7 +52,7 @@ function fetchFederationStat() {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,7 +92,7 @@ export function fetchClinicalData(URL) {
 Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
-    return fetch(`${federation}/federation/servers`, {}).then((response) => {
+    return fetch(`${federation}/servers`, {}).then((response) => {
         if (response.ok) {
             return response.json();
         }
