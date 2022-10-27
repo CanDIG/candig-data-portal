@@ -179,6 +179,7 @@ function VariantsSearch() {
                 name: value[i]['Patient ID'],
                 type: 'variant',
                 format: 'vcf',
+                sourceType: 'htsget',
                 url: value[i]['VCF File']
             });
         }
