@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, Button, FormControl, InputLabel, Input, NativeSelect } from '@mui/material';
+import { Grid, Button, FormControl, InputLabel, Input, NativeSelect, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 import VariantsTable from 'ui-component/Tables/VariantsTable';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
@@ -8,11 +8,53 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant } from 'store/api';
+import { searchVariant, fetchFederationClinicalData } from 'store/api';
 import IGViewer from './IGViewer';
+import DropDown from '../../ui-component/DropDown';
+
+// mui
+import { useTheme, makeStyles } from '@mui/styles';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+
+// Styles
+const useStyles = makeStyles({
+    dropdownItem: {
+        background: 'white',
+        paddingRight: '1.25em',
+        paddingLeft: '1.25em',
+        border: 'none',
+        width: 'fit-content(5em)',
+        '&:hover': {
+            background: '#2196f3',
+            color: 'white'
+        }
+    },
+    mobileRow: {
+        width: '700px'
+    },
+    scrollbar: {
+        scrollbarWidth: 'thin',
+        '&::-webkit-scrollbar': {
+            height: '0.4em',
+            width: '0.4em'
+        },
+        '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.1)'
+        }
+    }
+});
 
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
+    const classes = useStyles();
+    const theme = useTheme();
     const events = useSelector((state) => state);
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
@@ -24,12 +66,14 @@ function VariantsSearch() {
     const [showIGVButton, setShowIGVButton] = useState(false);
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
+    const [patientList, setPatientList] = useState([]);
+    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
-  Build the dropdown for chromosome
-  * @param {None}
-  * Return a list of options with chromosome
-  */
+    Build the dropdown for chromosome
+    * @param {None}
+    * Return a list of options with chromosome
+    */
     function chrSelectBuilder() {
         const refNameList = [];
         ListOfReferenceNames.forEach((refName) => {
@@ -45,14 +89,24 @@ function VariantsSearch() {
     useEffect(() => {
         setLoading(false);
         setDisplayVariantsTable(false);
+        // get patient data from redux store or fetch it
+        if (Object.keys(clinicalSearch.selectedClinicalSearchResults).length !== 0) {
+            setPatientList(clinicalSearch.selectedClinicalSearchResults);
+        } else {
+            fetchFederationClinicalData('/api/mcodepackets').then((response) => {
+                const patientData = [];
+                response.results.forEach((result) => {
+                    result.results.forEach((patient) => {
+                        patientData.push({
+                            id: patient.id,
+                            genomicId: patient.genomics_report?.extra_properties?.genomic_id ?? 'NA'
+                        });
+                    });
+                });
+                setPatientList(patientData);
+            });
+        }
     }, []);
-
-    // get patient data from redux store and filter out empty the genomicId
-    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
-    let patientList = [];
-    if (Object.keys(clinicalSearch).length !== 0) {
-        patientList = clinicalSearch.selectedClinicalSearchResults.filter((patient) => patient.genomicID !== 'NA');
-    }
 
     /**
      * This function handles the Search button
@@ -70,17 +124,25 @@ function VariantsSearch() {
         trackPromise(
             searchVariant(chromosome, start, end)
                 .then((response) => {
-                    if (Object.keys(response).length === 0) {
+                    const results = response.results;
+                    if (Object.keys(results).length === 0) {
                         setAlertMessage('No variants found');
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
-                        const variantList = response.results.map((result) => ({
-                            genomicId: result.id,
-                            referenceName: result.reference_genome,
-                            variantCount: result.variantcount,
-                            url: result.htsget.urls[0].url
-                        }));
+                        const variantList = [];
+                        results.forEach((result) => {
+                            result.results.forEach((variant) =>
+                                variantList.push({
+                                    genomicId: variant.id,
+                                    location: result.location[0],
+                                    referenceName: variant.reference_genome,
+                                    variantCount: variant.variantcount,
+                                    url: variant.urls[0]
+                                })
+                            );
+                        });
+
                         const patientVariantList = [];
                         const displayData = [];
                         for (let i = 0; i < variantList.length; i += 1) {
@@ -95,6 +157,7 @@ function VariantsSearch() {
                                     });
                                     displayData.push({
                                         patientId: patientList[j].id,
+                                        location: variantList[i].location,
                                         genomicSampleId: variantList[i].genomicId,
                                         variantCount: variantList[i].variantCount,
                                         VCFFile: variantList[i].url
@@ -137,16 +200,12 @@ function VariantsSearch() {
                 name: value[i]['Patient ID'],
                 type: 'variant',
                 format: 'vcf',
+                sourceType: 'htsget',
                 url: value[i]['VCF File']
             });
         }
         const options = {
-            // TODO: replace the dummy URL with the actual URL
-            reference: {
-                id: 'hg38',
-                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta', // dummy URL
-                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt' // dummy URL
-            },
+            genome: 'hg38',
             locus: `${variantSearchOptions.chromosome}:${variantSearchOptions.start}-${variantSearchOptions.end}`,
             tracks: trackList
         };
@@ -167,6 +226,59 @@ function VariantsSearch() {
                     variant="filled"
                     fontColor={alertSeverity === 'error' ? 'white' : 'black'}
                 />
+                <Grid container direction="row">
+                    <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+                        <Box mr={1} p={1} sx={{ width: 50 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Sex</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedSex
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedSex
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 150 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Cancer Type</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedCancerType
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedCancerType
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 125 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Body Site</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedConditions
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedConditions
+                                    : 'All'}
+                            </span>
+                        </Box>
+                        <Box mr={1} p={1} sx={{ width: 125 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Medications</b>
+                            </span>
+                            <br />
+                            <span>
+                                {clinicalSearch.clinicalSearchDropDowns.selectedMedications
+                                    ? clinicalSearch.clinicalSearchDropDowns.selectedMedications
+                                    : 'All'}
+                            </span>
+                        </Box>
+                    </Stack>
+                </Grid>
+                <Grid container direction="row">
+                    <p>
+                        Patients Total: <span>{patientList.length}</span>
+                    </p>
+                </Grid>
                 <Grid container direction="column" className="content">
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
                         <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>

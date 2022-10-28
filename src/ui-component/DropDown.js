@@ -8,6 +8,7 @@ import { Grid, Box } from '@mui/material';
 const useStyles = makeStyles({
     dropdownItem: {
         background: 'white',
+        textAlign: 'left',
         paddingRight: '1.25em',
         paddingLeft: '1.25em',
         border: 'none',

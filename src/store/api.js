@@ -26,7 +26,7 @@ export function fetchKatsu(URL) {
 Fetch the federation service 
 */
 function fetchFederationStat() {
-    return fetch(`${federation}/federation/search`, {
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,32 +52,30 @@ function fetchFederationStat() {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    //     return fetch(`${federation}/federation/search`, {
-    //         method: 'post',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //             request_type: 'GET',
-    //             endpoint_path: 'api/mcodepackets',
-    //             endpoint_payload: {},
-    //             endpoint_service: 'katsu'
-    //         })
-    //     })
-    //         .then((response) => {
-    //             if (response.ok) {
-    //                 return response.json();
-    //             }
-    //             return {};
-    //         })
-    //         .catch((error) => {
-    //             console.log('Error:', error);
-    //             return 'error';
-    //         });
-    // }
+    return fetch(`${federation}/search`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            request_type: 'GET',
+            endpoint_path: 'api/mcodepackets',
+            endpoint_payload: {},
+            endpoint_service: 'katsu'
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
 
-    // dummy response
-    return new Promise((resolve) => {
-        resolve(sampleFederationResponse);
-    });
+    // return new Promise((resolve) => {
+    //     resolve(sampleFederationResponse);
+    // });
 }
 
 /*
@@ -98,7 +96,7 @@ export function fetchClinicalData(URL) {
 Fetch peer servers from CanDIG federation service 
 */
 function fetchServers() {
-    return fetch(`${federation}/federation/servers`, {}).then((response) => {
+    return fetch(`${federation}/servers`, {}).then((response) => {
         if (response.ok) {
             return response.json();
         }
@@ -188,24 +186,35 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {string}... Reference name
 */
 function searchVariant(chromosome, start, end) {
-    return fetch(`${htsget}/htsget/v1/variants/search`, {
+    const payload = {
+        regions: [
+            {
+                referenceName: chromosome,
+                start: parseInt(start, 10),
+                end: parseInt(end, 10)
+            }
+        ]
+    };
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            regions: [
-                {
-                    referenceName: chromosome,
-                    start: parseInt(start, 10),
-                    end: parseInt(end, 10)
-                }
-            ]
+            request_type: 'POST',
+            endpoint_path: 'htsget/v1/variants/search',
+            endpoint_payload: payload,
+            endpoint_service: 'htsget-app'
         })
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        return {};
-    });
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
 }
 
 /*

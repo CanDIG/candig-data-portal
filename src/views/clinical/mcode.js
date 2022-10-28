@@ -2,6 +2,8 @@ import * as React from 'react';
 
 // npm installs
 import ReactJson from 'react-json-view';
+import cancerTypeCSV from '../../assets/data_files/cancer_histological_codes_labels.csv';
+import papa from 'papaparse';
 
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
@@ -29,7 +31,6 @@ import Divider from '@mui/material/Divider';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import DropDown from '../../ui-component/DropDown';
-import { cancerType } from '../../store/constant';
 
 // Styles
 const useStyles = makeStyles({
@@ -74,7 +75,7 @@ function MCodeView() {
     const [clinicalSearchResults, setClinicalSearchResults] = React.useState(events.customization.selectedClinicalSearchResults);
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
-
+    const [cancerType, setCancerType] = React.useState([]);
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const [isListOpen, setListOpen] = React.useState(false);
@@ -148,6 +149,16 @@ function MCodeView() {
             }
         });
     }
+    // Parsing CancerType CSV into Dictionary
+    papa.parse(cancerTypeCSV, {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        // eslint-disable-next-line
+        complete: function (results) {
+            setCancerType(results.data);
+        }
+    });
     // Subtable selection of patient
     const handleRowClick = (row) => {
         let index;
@@ -201,7 +212,12 @@ function MCodeView() {
                 for (let j = 0; j < data.results.length; j += 1) {
                     for (let i = 0; i < data.results[j].count; i += 1) {
                         // Patient table filtering
-                        if (selectedConditions === 'All' && selectedMedications === 'All') {
+                        if (
+                            selectedConditions === 'All' &&
+                            selectedMedications === 'All' &&
+                            selectedSex === 'All' &&
+                            selectedCancerType === 'All'
+                        ) {
                             // All patients
                             if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
                                 tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
@@ -217,27 +233,34 @@ function MCodeView() {
                                 return true;
                             });
                             let patientMedication = false;
-                            if (
-                                selectedMedications === 'All' ||
-                                selectedMedications === data?.results[j]?.results[i]?.medication_statement[0]?.medication_code.label
-                            ) {
-                                patientMedication = true;
-                            }
+                            data?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                                if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
+                                    patientMedication = true;
+                                    return false;
+                                }
+                                return true;
+                            });
                             let patientSex = false;
                             if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
                                 patientSex = true;
                             }
                             let patientCancerType = false;
-                            if (
-                                selectedCancerType === 'All' ||
-                                selectedCancerType ===
-                                    (cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
-                                        ? cancerType[data?.results[j]?.results[i]?.cancer_condition?.code?.id]
-                                        : 'NA')
-                            ) {
+                            if (selectedCancerType === 'All') {
                                 patientCancerType = true;
+                            } else {
+                                for (let k = 0; k < cancerType.length; k += 1) {
+                                    if (data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']) {
+                                        if (
+                                            selectedCancerType ===
+                                            (`${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
+                                                ? `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
+                                                : 'NA')
+                                        ) {
+                                            patientCancerType = true;
+                                        }
+                                    }
+                                }
                             }
-
                             if (
                                 patientCondition &&
                                 patientMedication &&
@@ -249,7 +272,6 @@ function MCodeView() {
                             }
                         }
                     }
-                    console.log('underFiltering');
                 }
                 setRows(tempRows);
                 // Subtables
@@ -275,6 +297,7 @@ function MCodeView() {
                     setSelectedPatient('None');
                     setPatientJSON({});
                 }
+
                 setListOpen(false);
                 // Dropdown patient table list for filtering
                 setMedicationList(processMedicationListData(data.results));
