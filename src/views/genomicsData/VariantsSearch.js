@@ -276,7 +276,7 @@ function VariantsSearch() {
                 </Grid>
                 <Grid container direction="row">
                     <p>
-                        Patient Count: <span>{patientList.length}</span>
+                        Patients Total: <span>{patientList.length}</span>
                     </p>
                 </Grid>
                 <Grid container direction="column" className="content">
