@@ -13,15 +13,22 @@ function VariantsTable({ rowData, onChange }) {
     let gridOptions = {};
     const [columnDefs] = useState([
         { field: 'Patient ID' },
+        { field: 'Location' },
         { field: 'Genomic Sample ID' },
         { field: 'Number of Variants' },
         { field: 'VCF File' },
         { field: 'Select file(s)', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
     ]);
-    // parse rowData contains id, reference_genome, htsget, samples, variantcount to fit the table
+    // parse rowData contains id, location, reference_genome, htsget, samples, variantcount to fit the table
     const displayRowData = rowData.map((row) => {
-        const { patientId, genomicSampleId, variantCount, VCFFile } = row;
-        return { 'Patient ID': patientId, 'Genomic Sample ID': genomicSampleId, 'Number of Variants': variantCount, 'VCF File': VCFFile };
+        const { patientId, location, genomicSampleId, variantCount, VCFFile } = row;
+        return {
+            'Patient ID': patientId,
+            Location: location,
+            'Genomic Sample ID': genomicSampleId,
+            'Number of Variants': variantCount,
+            'VCF File': VCFFile
+        };
     });
 
     function onSelectionChanged() {

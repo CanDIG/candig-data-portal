@@ -117,6 +117,8 @@ function VariantsSearch() {
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
+                        // TODO: do we have more than 1 here??? need sample data to find out
+                        const location = response.results[0].location[0];
                         const variantList = response.results[0].results.map((result) => ({
                             genomicId: result.id,
                             referenceName: result.reference_genome,
@@ -137,6 +139,7 @@ function VariantsSearch() {
                                     });
                                     displayData.push({
                                         patientId: patientList[j].id,
+                                        location,
                                         genomicSampleId: variantList[i].genomicId,
                                         variantCount: variantList[i].variantCount,
                                         VCFFile: variantList[i].url
@@ -184,11 +187,7 @@ function VariantsSearch() {
             });
         }
         const options = {
-            reference: {
-                id: 'hg38',
-                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta',
-                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt'
-            },
+            genome: 'hg38',
             locus: `${variantSearchOptions.chromosome}:${variantSearchOptions.start}-${variantSearchOptions.end}`,
             tracks: trackList
         };
