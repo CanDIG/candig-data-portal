@@ -72,6 +72,10 @@ export function fetchFederationClinicalData() {
             console.log('Error:', error);
             return 'error';
         });
+
+    // return new Promise((resolve) => {
+    //     resolve(sampleFederationResponse);
+    // });
 }
 
 /*
@@ -182,24 +186,35 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {string}... Reference name
 */
 function searchVariant(chromosome, start, end) {
-    return fetch(`${htsget}/htsget/v1/variants/search`, {
+    const payload = {
+        regions: [
+            {
+                referenceName: chromosome,
+                start: parseInt(start, 10),
+                end: parseInt(end, 10)
+            }
+        ]
+    };
+    return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            regions: [
-                {
-                    referenceName: chromosome,
-                    start: parseInt(start, 10),
-                    end: parseInt(end, 10)
-                }
-            ]
+            request_type: 'POST',
+            endpoint_path: 'htsget/v1/variants/search',
+            endpoint_payload: payload,
+            endpoint_service: 'htsget-app'
         })
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        return {};
-    });
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
 }
 
 /*

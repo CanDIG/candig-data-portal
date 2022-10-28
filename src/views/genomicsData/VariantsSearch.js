@@ -8,7 +8,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant } from 'store/api';
+import { searchVariant, fetchFederationClinicalData } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
 
@@ -66,6 +66,7 @@ function VariantsSearch() {
     const [showIGVButton, setShowIGVButton] = useState(false);
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
+    const [patientList, setPatientList] = useState([]);
     const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
@@ -88,13 +89,24 @@ function VariantsSearch() {
     useEffect(() => {
         setLoading(false);
         setDisplayVariantsTable(false);
+        // get patient data from redux store or fetch it
+        if (Object.keys(clinicalSearch.selectedClinicalSearchResults).length !== 0) {
+            setPatientList(clinicalSearch.selectedClinicalSearchResults);
+        } else {
+            fetchFederationClinicalData('/api/mcodepackets').then((response) => {
+                const patientData = [];
+                response.results.forEach((result) => {
+                    result.results.forEach((patient) => {
+                        patientData.push({
+                            id: patient.id,
+                            genomicId: patient.genomics_report?.extra_properties?.genomic_id ?? 'NA'
+                        });
+                    });
+                });
+                setPatientList(patientData);
+            });
+        }
     }, []);
-
-    // get patient data from redux store and filter out empty the genomicId
-    let patientList = [];
-    if (Object.keys(clinicalSearch.selectedClinicalSearchResults).length !== 0) {
-        patientList = clinicalSearch.selectedClinicalSearchResults.filter((patient) => patient.genomicID !== 'NA');
-    }
 
     /**
      * This function handles the Search button
@@ -112,17 +124,25 @@ function VariantsSearch() {
         trackPromise(
             searchVariant(chromosome, start, end)
                 .then((response) => {
-                    if (Object.keys(response).length === 0) {
+                    const results = response.results;
+                    if (Object.keys(results).length === 0) {
                         setAlertMessage('No variants found');
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
-                        const variantList = response.results.map((result) => ({
-                            genomicId: result.id,
-                            referenceName: result.reference_genome,
-                            variantCount: result.variantcount,
-                            url: result.htsget.urls[0].url
-                        }));
+                        const variantList = [];
+                        results.forEach((result) => {
+                            result.results.forEach((variant) =>
+                                variantList.push({
+                                    genomicId: variant.id,
+                                    location: result.location[0],
+                                    referenceName: variant.reference_genome,
+                                    variantCount: variant.variantcount,
+                                    url: variant.urls[0]
+                                })
+                            );
+                        });
+
                         const patientVariantList = [];
                         const displayData = [];
                         for (let i = 0; i < variantList.length; i += 1) {
@@ -137,6 +157,7 @@ function VariantsSearch() {
                                     });
                                     displayData.push({
                                         patientId: patientList[j].id,
+                                        location: variantList[i].location,
                                         genomicSampleId: variantList[i].genomicId,
                                         variantCount: variantList[i].variantCount,
                                         VCFFile: variantList[i].url
@@ -179,16 +200,12 @@ function VariantsSearch() {
                 name: value[i]['Patient ID'],
                 type: 'variant',
                 format: 'vcf',
+                sourceType: 'htsget',
                 url: value[i]['VCF File']
             });
         }
         const options = {
-            // TODO: replace the dummy URL with the actual URL
-            reference: {
-                id: 'hg38',
-                fastaURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta', // dummy URL
-                cytobandURL: 'https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt' // dummy URL
-            },
+            genome: 'hg38',
             locus: `${variantSearchOptions.chromosome}:${variantSearchOptions.start}-${variantSearchOptions.end}`,
             tracks: trackList
         };
@@ -256,6 +273,11 @@ function VariantsSearch() {
                             </span>
                         </Box>
                     </Stack>
+                </Grid>
+                <Grid container direction="row">
+                    <p>
+                        Patients Total: <span>{patientList.length}</span>
+                    </p>
                 </Grid>
                 <Grid container direction="column" className="content">
                     <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
