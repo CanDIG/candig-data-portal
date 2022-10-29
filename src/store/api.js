@@ -1,5 +1,3 @@
-import { sampleSearchVariantResult, sampleFederationResponse } from './constant';
-
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;

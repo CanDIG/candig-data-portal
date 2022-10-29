@@ -11,6 +11,7 @@ import 'assets/css/VariantsSearch.css';
 import { searchVariant, fetchFederationClinicalData } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
+import { federation } from 'store/api';
 
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
@@ -103,6 +104,7 @@ function VariantsSearch() {
                         });
                     });
                 });
+                console.log('test');
                 setPatientList(patientData);
             });
         }
@@ -124,43 +126,46 @@ function VariantsSearch() {
         trackPromise(
             searchVariant(chromosome, start, end)
                 .then((response) => {
-                    const results = response.results;
-                    if (Object.keys(results).length === 0) {
+                    const locationObjs = response.results;
+                    if (Object.keys(locationObjs).length === 0) {
                         setAlertMessage('No variants found');
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
                         const variantList = [];
-                        results.forEach((result) => {
-                            result.results.forEach((variant) =>
+                        locationObjs.forEach((location) => {
+                            location.results.forEach((item) =>
                                 variantList.push({
-                                    genomicId: variant.id,
-                                    location: result.location[0],
-                                    referenceName: variant.reference_genome,
-                                    variantCount: variant.variantcount,
-                                    url: variant.urls[0]
+                                    id: item.id,
+                                    genomicId: item.genomic_id,
+                                    locationName: location.location[0],
+                                    referenceName: item.reference_genome,
+                                    variantCount: item.variantcount,
+                                    samples: item.samples,
+                                    url: item.urls[0] // only one url unless the requirement changes
                                 })
                             );
                         });
 
-                        const patientVariantList = [];
+                        // const patientVariantList = [];
                         const displayData = [];
                         for (let i = 0; i < variantList.length; i += 1) {
                             for (let j = 0; j < patientList.length; j += 1) {
                                 if (variantList[i].genomicId === patientList[j].genomicId) {
-                                    patientVariantList.push({
-                                        patientId: patientList[j].id,
-                                        genomicId: variantList[i].genomicId,
-                                        referenceName: variantList[i].referenceName,
-                                        variantCount: variantList[i].variantCount,
-                                        url: variantList[i].url
-                                    });
+                                    // patientVariantList.push({
+                                    //     patientId: patientList[j].id,
+                                    //     genomicId: variantList[i].genomicId,
+                                    //     referenceName: variantList[i].referenceName,
+                                    //     variantCount: variantList[i].variantCount,
+                                    //     url: variantList[i].url
+                                    // });
                                     displayData.push({
                                         patientId: patientList[j].id,
-                                        location: variantList[i].location,
+                                        locationName: variantList[i].locationName,
                                         genomicSampleId: variantList[i].genomicId,
                                         variantCount: variantList[i].variantCount,
-                                        VCFFile: variantList[i].url
+                                        samples: variantList[i].samples,
+                                        VCFFile: variantList[i].id
                                     });
 
                                     break; // should have only 1 match, so we can break here
@@ -201,7 +206,7 @@ function VariantsSearch() {
                 type: 'variant',
                 format: 'vcf',
                 sourceType: 'htsget',
-                url: value[i]['VCF File']
+                url: `${federation}/${value[i]['VCF File']}`
             });
         }
         const options = {
