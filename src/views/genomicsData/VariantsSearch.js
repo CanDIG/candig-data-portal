@@ -8,7 +8,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant, fetchFederationClinicalData, BASE_URL } from 'store/api';
+import { searchVariant, fetchFederationClinicalData } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
 
@@ -67,6 +67,7 @@ function VariantsSearch() {
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
     const [patientList, setPatientList] = useState([]);
+    const [IGVBaseUrl, setIGVBaseUrl] = useState('http://docker.localhost:5080/genomics/htsget/v1/variants/');
     const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
@@ -145,19 +146,11 @@ function VariantsSearch() {
                                 })
                             );
                         });
-
-                        // const patientVariantList = [];
+                        // Build display table
                         const displayData = [];
                         for (let i = 0; i < variantList.length; i += 1) {
                             for (let j = 0; j < patientList.length; j += 1) {
                                 if (variantList[i].genomicId === patientList[j].genomicId) {
-                                    // patientVariantList.push({
-                                    //     patientId: patientList[j].id,
-                                    //     genomicId: variantList[i].genomicId,
-                                    //     referenceName: variantList[i].referenceName,
-                                    //     variantCount: variantList[i].variantCount,
-                                    //     url: variantList[i].url
-                                    // });
                                     displayData.push({
                                         patientId: patientList[j].id,
                                         locationName: variantList[i].locationName,
@@ -166,7 +159,10 @@ function VariantsSearch() {
                                         samples: variantList[i].samples,
                                         VCFFile: variantList[i].id
                                     });
-
+                                    // get the url part before the file name for IGV
+                                    const url = variantList[i].url;
+                                    const urlParts = url.substring(0, url.lastIndexOf('/') + 1);
+                                    setIGVBaseUrl(urlParts);
                                     break; // should have only 1 match, so we can break here
                                 }
                             }
@@ -205,7 +201,7 @@ function VariantsSearch() {
                 type: 'variant',
                 format: 'vcf',
                 sourceType: 'htsget',
-                url: `${BASE_URL}/genomics/htsget/v1/variants/${value[i]['VCF File']}`
+                url: `${IGVBaseUrl}${value[i]['VCF File']}`
             });
         }
         const options = {
