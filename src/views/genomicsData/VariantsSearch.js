@@ -8,10 +8,9 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant, fetchFederationClinicalData } from 'store/api';
+import { searchVariant, fetchFederationClinicalData, BASE_URL } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
-import { federation } from 'store/api';
 
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
@@ -206,7 +205,7 @@ function VariantsSearch() {
                 type: 'variant',
                 format: 'vcf',
                 sourceType: 'htsget',
-                url: `${federation}/${value[i]['VCF File']}`
+                url: `${BASE_URL}/genomics/htsget/v1/variants/${value[i]['VCF File']}`
             });
         }
         const options = {
