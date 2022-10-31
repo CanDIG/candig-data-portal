@@ -8,7 +8,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant, fetchFederationClinicalData } from 'store/api';
+import { searchVariant, fetchFederationClinicalData, htsget } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
 
@@ -67,7 +67,7 @@ function VariantsSearch() {
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
     const [patientList, setPatientList] = useState([]);
-    const [IGVBaseUrl, setIGVBaseUrl] = useState('http://docker.localhost:5080/genomics/htsget/v1/variants/');
+    const [IGVBaseUrl, setIGVBaseUrl] = useState(`${htsget}/htsget/v1/variants/`);
     const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
@@ -104,11 +104,10 @@ function VariantsSearch() {
                         });
                     });
                 });
-                console.log('test');
                 setPatientList(patientData);
             });
         }
-    }, []);
+    }, [clinicalSearch.selectedClinicalSearchResults]);
 
     /**
      * This function handles the Search button
