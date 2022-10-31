@@ -16,17 +16,19 @@ function VariantsTable({ rowData, onChange }) {
         { field: 'Location' },
         { field: 'Genomic Sample ID' },
         { field: 'Number of Variants' },
+        { field: 'Samples' },
         { field: 'VCF File' },
         { field: 'Select file(s)', headerCheckboxSelection: true, checkboxSelection: true, showDisabledCheckboxes: true }
     ]);
     // parse rowData contains id, location, reference_genome, htsget, samples, variantcount to fit the table
     const displayRowData = rowData.map((row) => {
-        const { patientId, location, genomicSampleId, variantCount, VCFFile } = row;
+        const { patientId, locationName, genomicSampleId, variantCount, samples, VCFFile } = row;
         return {
             'Patient ID': patientId,
-            Location: location,
+            'Location': locationName,
             'Genomic Sample ID': genomicSampleId,
             'Number of Variants': variantCount,
+            'Samples': samples,
             'VCF File': VCFFile
         };
     });

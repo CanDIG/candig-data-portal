@@ -8,7 +8,7 @@ import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
 import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
-import { searchVariant, fetchFederationClinicalData } from 'store/api';
+import { searchVariant, fetchFederationClinicalData, htsget } from 'store/api';
 import IGViewer from './IGViewer';
 import DropDown from '../../ui-component/DropDown';
 
@@ -67,6 +67,7 @@ function VariantsSearch() {
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
     const [patientList, setPatientList] = useState([]);
+    const [IGVBaseUrl, setIGVBaseUrl] = useState(`${htsget}/htsget/v1/variants/`);
     const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
 
     /*
@@ -106,7 +107,7 @@ function VariantsSearch() {
                 setPatientList(patientData);
             });
         }
-    }, []);
+    }, [clinicalSearch.selectedClinicalSearchResults]);
 
     /**
      * This function handles the Search button
@@ -124,45 +125,43 @@ function VariantsSearch() {
         trackPromise(
             searchVariant(chromosome, start, end)
                 .then((response) => {
-                    const results = response.results;
-                    if (Object.keys(results).length === 0) {
+                    const locationObjs = response.results;
+                    if (Object.keys(locationObjs).length === 0) {
                         setAlertMessage('No variants found');
                         setAlertSeverity('warning');
                         setOpen(true);
                     } else {
                         const variantList = [];
-                        results.forEach((result) => {
-                            result.results.forEach((variant) =>
+                        locationObjs.forEach((location) => {
+                            location.results.forEach((item) =>
                                 variantList.push({
-                                    genomicId: variant.id,
-                                    location: result.location[0],
-                                    referenceName: variant.reference_genome,
-                                    variantCount: variant.variantcount,
-                                    url: variant.urls[0]
+                                    id: item.id,
+                                    genomicId: item.genomic_id,
+                                    locationName: location.location[0],
+                                    referenceName: item.reference_genome,
+                                    variantCount: item.variantcount,
+                                    samples: item.samples,
+                                    url: item.urls[0] // only one url unless the requirement changes
                                 })
                             );
                         });
-
-                        const patientVariantList = [];
+                        // Build display table
                         const displayData = [];
                         for (let i = 0; i < variantList.length; i += 1) {
                             for (let j = 0; j < patientList.length; j += 1) {
                                 if (variantList[i].genomicId === patientList[j].genomicId) {
-                                    patientVariantList.push({
-                                        patientId: patientList[j].id,
-                                        genomicId: variantList[i].genomicId,
-                                        referenceName: variantList[i].referenceName,
-                                        variantCount: variantList[i].variantCount,
-                                        url: variantList[i].url
-                                    });
                                     displayData.push({
                                         patientId: patientList[j].id,
-                                        location: variantList[i].location,
+                                        locationName: variantList[i].locationName,
                                         genomicSampleId: variantList[i].genomicId,
                                         variantCount: variantList[i].variantCount,
-                                        VCFFile: variantList[i].url
+                                        samples: variantList[i].samples,
+                                        VCFFile: variantList[i].id
                                     });
-
+                                    // get the url part before the file name for IGV
+                                    const url = variantList[i].url;
+                                    const urlParts = url.substring(0, url.lastIndexOf('/') + 1);
+                                    setIGVBaseUrl(urlParts);
                                     break; // should have only 1 match, so we can break here
                                 }
                             }
@@ -201,7 +200,7 @@ function VariantsSearch() {
                 type: 'variant',
                 format: 'vcf',
                 sourceType: 'htsget',
-                url: value[i]['VCF File']
+                url: `${IGVBaseUrl}${value[i]['VCF File']}`
             });
         }
         const options = {
