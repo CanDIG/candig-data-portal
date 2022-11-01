@@ -241,9 +241,8 @@ function VariantsSearch() {
                                 if (response?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']) {
                                     if (
                                         selectedCancerType ===
-                                        (`${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
-                                            ? `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}`
-                                            : 'NA')
+                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                        selectedCancerType === 'NA'
                                     ) {
                                         patientCancerType = true;
                                     }
@@ -262,9 +261,8 @@ function VariantsSearch() {
                                 ) {
                                     if (
                                         selectedHistologicalType ===
-                                        (`${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}`
-                                            ? `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}`
-                                            : 'NA')
+                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                        selectedHistologicalType === 'NA'
                                     ) {
                                         patientHistologicalType = true;
                                     }
