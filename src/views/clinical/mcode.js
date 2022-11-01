@@ -22,7 +22,8 @@ import {
     processMedicationListData,
     processCondtionsListData,
     processSexListData,
-    processCancerTypeListData
+    processCancerTypeListData,
+    processHistologicalTypeListData
 } from 'store/mcode';
 import SingleRowTable from 'ui-component/SingleRowTable';
 import { trackPromise } from 'react-promise-tracker';
@@ -46,7 +47,7 @@ const useStyles = makeStyles({
         }
     },
     mobileRow: {
-        width: '700px'
+        width: '800px'
     },
     scrollbar: {
         scrollbarWidth: 'thin',
@@ -72,7 +73,6 @@ function MCodeView() {
 
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
-    const [clinicalSearchResults, setClinicalSearchResults] = React.useState(events.customization.selectedClinicalSearchResults);
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
     const [cancerType, setCancerType] = React.useState([]);
@@ -85,12 +85,14 @@ function MCodeView() {
     const [isListOpenConditions, setListOpenConditions] = React.useState(false);
     const [isListOpenSex, setListOpenSex] = React.useState(false);
     const [isListOpenCancerType, setListOpenCancerType] = React.useState(false);
+    const [isListOpenHistological, setListOpenHistological] = React.useState(false);
 
     // Dropdown patient table filtering current selection in dropdown
     const [selectedMedications, setSelectedMedications] = React.useState('All');
     const [selectedConditions, setSelectedConditions] = React.useState('All');
     const [selectedSex, setSelectedSex] = React.useState('All');
     const [selectedCancerType, setSelectedCancerType] = React.useState('All');
+    const [selectedHistologicalType, setSelectedHistologicalType] = React.useState('All');
     const [patientJSON, setPatientJSON] = React.useState([]);
 
     // Dropdown patient table list for filtering
@@ -98,24 +100,25 @@ function MCodeView() {
     const [conditionList, setConditionList] = React.useState([]);
     const [sexList, setSexList] = React.useState([]);
     const [cancerTypeList, setCancerTypeList] = React.useState([]);
+    const [HistologicalList, setHistologicalList] = React.useState([]);
 
     const jsonTheme = {
         base00: 'white',
         base01: '#ddd',
         base02: '#ddd',
         base03: 'black',
-        base04: '#1E88E5',
+        base04: '#0E3E17',
         base05: 'black',
         base06: 'black',
-        base07: '#444',
-        base08: '#444',
-        base09: '#1565C0',
-        base0A: '#1565C0',
-        base0B: '#1565C0',
-        base0C: '#1565C0',
-        base0D: '#1565C0',
-        base0E: '#1565C0',
-        base0F: '#1565C0'
+        base07: '#252525',
+        base08: '#252525',
+        base09: '#00418A',
+        base0A: '#00418A',
+        base0B: '#00418A',
+        base0C: '#00418A',
+        base0D: '#00418A',
+        base0E: '#00418A',
+        base0F: '#00418A'
     };
 
     function setRedux(
@@ -126,7 +129,9 @@ function MCodeView() {
         cancerTypeList,
         selectedMedications,
         selectedConditions,
-        selectedCancerType
+        selectedCancerType,
+        HistologicalList,
+        selectedHistologicalType
     ) {
         const tempClinicalSearchResults = [];
         rows.forEach((patient) => {
@@ -144,7 +149,9 @@ function MCodeView() {
                     sexList,
                     selectedSex,
                     cancerTypeList,
-                    selectedCancerType
+                    selectedCancerType,
+                    HistologicalList,
+                    selectedHistologicalType
                 }
             }
         });
@@ -201,6 +208,9 @@ function MCodeView() {
         } else if (dropDownGroup === 'CANCER TYPE') {
             setSelectedCancerType(selected);
             setListOpenCancerType(false);
+        } else if (dropDownGroup === 'HISTOLOGICAL') {
+            setSelectedHistologicalType(selected);
+            setListOpenHistological(false);
         }
     };
 
@@ -216,7 +226,8 @@ function MCodeView() {
                             selectedConditions === 'All' &&
                             selectedMedications === 'All' &&
                             selectedSex === 'All' &&
-                            selectedCancerType === 'All'
+                            selectedCancerType === 'All' &&
+                            selectedHistologicalType === 'All'
                         ) {
                             // All patients
                             if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
@@ -261,11 +272,33 @@ function MCodeView() {
                                     }
                                 }
                             }
+                            let patientHistologicalType = false;
+                            if (selectedHistologicalType === 'All') {
+                                patientHistologicalType = true;
+                            } else {
+                                for (let k = 0; k < cancerType.length; k += 1) {
+                                    if (
+                                        data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
+                                        data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
+                                            cancerType[k]['Tumour histological type code']
+                                    ) {
+                                        if (
+                                            selectedHistologicalType ===
+                                            (`${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}`
+                                                ? `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}`
+                                                : 'NA')
+                                        ) {
+                                            patientHistologicalType = true;
+                                        }
+                                    }
+                                }
+                            }
                             if (
                                 patientCondition &&
                                 patientMedication &&
                                 patientSex &&
                                 patientCancerType &&
+                                patientHistologicalType &&
                                 processMCodeMainData(data.results[j].results[i]).id !== null
                             ) {
                                 tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
@@ -304,6 +337,7 @@ function MCodeView() {
                 setConditionList(processCondtionsListData(data.results));
                 setSexList(processSexListData(data.results));
                 setCancerTypeList(processCancerTypeListData(data.results));
+                setHistologicalList(processHistologicalTypeListData(data.results));
 
                 setRedux(
                     tempRows,
@@ -313,13 +347,23 @@ function MCodeView() {
                     cancerTypeList,
                     selectedMedications,
                     selectedConditions,
-                    selectedCancerType
+                    selectedCancerType,
+                    HistologicalList,
+                    selectedHistologicalType
                 );
             })
         );
 
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
-    }, [desktopResolution, setdesktopResolution, selectedSex, selectedConditions, selectedMedications, selectedCancerType]);
+    }, [
+        desktopResolution,
+        setdesktopResolution,
+        selectedSex,
+        selectedConditions,
+        selectedMedications,
+        selectedCancerType,
+        selectedHistologicalType
+    ]);
 
     const screenWidth = desktopResolution ? '48%' : '100%';
     const headerLabels = {
@@ -386,6 +430,15 @@ function MCodeView() {
                                     dropDownItems={medicationList}
                                     selectOption={dropDownSelection}
                                     dropDownGroup="MEDICATIONS"
+                                />
+                                <DropDown
+                                    setListOpen={setListOpenHistological}
+                                    isListOpen={isListOpenHistological}
+                                    dropDownLabel="Histological Type"
+                                    currentSelection={selectedHistologicalType}
+                                    dropDownItems={HistologicalList}
+                                    selectOption={dropDownSelection}
+                                    dropDownGroup="HISTOLOGICAL"
                                 />
                             </Stack>
                         </Table>

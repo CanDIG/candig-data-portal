@@ -1,9 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { AgGridReact } from 'ag-grid-react';
-
-import { BASE_URL } from 'store/constant';
-import VariantsTableButton from './VariantsTableButton';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
@@ -25,10 +22,10 @@ function VariantsTable({ rowData, onChange }) {
         const { patientId, locationName, genomicSampleId, variantCount, samples, VCFFile } = row;
         return {
             'Patient ID': patientId,
-            'Location': locationName,
+            Location: locationName,
             'Genomic Sample ID': genomicSampleId,
             'Number of Variants': variantCount,
-            'Samples': samples,
+            Samples: samples,
             'VCF File': VCFFile
         };
     });

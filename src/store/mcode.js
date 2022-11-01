@@ -280,9 +280,9 @@ export const processCondtionsListData = (dataObject) => {
 };
 
 /**
- * Process data for condition list
+ * Process data for cancerType list
  * @param {*} dataObject
- * @returns a list of conditions valid for dropdown
+ * @returns a list of cancerType valid for dropdown
  */
 export const processCancerTypeListData = (dataObject) => {
     const list = {};
@@ -302,6 +302,43 @@ export const processCancerTypeListData = (dataObject) => {
                             if (key === cancerType[i]['Cancer type code']) {
                                 list[key] = `${cancerType[i]['Cancer type label']} ${cancerType[i]['Cancer type code']}`;
                                 // list[key] = patient?.code?.label;
+                            }
+                        }
+                    }
+                });
+            });
+            list.ALL = 'All';
+        }
+    });
+    return list;
+};
+
+/**
+ * Process data for Histological list
+ * @param {*} dataObject
+ * @returns a list of Histological valid for dropdown
+ */
+export const processHistologicalTypeListData = (dataObject) => {
+    const list = {};
+    // Parsing CancerType CSV into Dictionary
+    papa.parse(cancerTypeCSV, {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        // eslint-disable-next-line
+        complete: function (results) {
+            const HistologicalType = results.data;
+            dataObject.forEach((federatedResult) => {
+                federatedResult.results.forEach((patient) => {
+                    if (patient?.cancer_condition?.histology_morphology_behavior?.id !== undefined) {
+                        const key = patient?.cancer_condition?.histology_morphology_behavior?.id;
+                        if (!(key in list)) {
+                            for (let i = 0; i < HistologicalType.length; i += 1) {
+                                if (key === HistologicalType[i]['Tumour histological type code']) {
+                                    // eslint-disable-next-line
+                                    list[key] = `${HistologicalType[i]['Tumour histological type label']} ${HistologicalType[i]['Tumour histological type code']}`;
+                                    // list[key] = patient?.code?.label;
+                                }
                             }
                         }
                     }

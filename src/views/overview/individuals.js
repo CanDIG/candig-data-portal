@@ -34,7 +34,6 @@ function IndividualsOverview() {
 
     /* Aggregated count of federated data */
     function federationStatCount(data) {
-        let centerCount = 0;
         let hospitalCount = 0;
         let provinceCount = 0;
         let individualCount = 0;
@@ -43,7 +42,6 @@ function IndividualsOverview() {
         const gendersCount = {};
         const candigDataSouceCollection = {};
         data.results.forEach((stat) => {
-            centerCount += stat?.center_count ? stat?.center_count : 0;
             hospitalCount += stat?.location ? 1 : 0;
             provinceCount += stat?.location ? 1 : 0;
             individualCount += stat?.individual_count ? stat?.individual_count : 0;
