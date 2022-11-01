@@ -14,6 +14,11 @@ export const subjectColumns = [
         width: 150
     },
     {
+        field: 'histology_morphology_behavior',
+        headerName: 'Histology Morphology Behaviour',
+        width: 300
+    },
+    {
         field: 'genomic_id',
         headerName: 'Genome ID',
         width: 200
@@ -120,6 +125,10 @@ export const processMCodeMainData = (dataObject, site) => {
     row.genomic_id = dataObject?.genomics_report?.extra_properties?.genomic_id
         ? dataObject?.genomics_report?.extra_properties?.genomic_id
         : 'NA';
+    row.histology_morphology_behavior = dataObject?.cancer_condition?.histology_morphology_behavior?.id
+        ? `${dataObject?.cancer_condition?.histology_morphology_behavior?.label} ${dataObject?.cancer_condition?.histology_morphology_behavior?.id}`
+        : 'NA';
+
     return row;
 };
 
@@ -336,7 +345,9 @@ export const processHistologicalTypeListData = (dataObject) => {
                             for (let i = 0; i < HistologicalType.length; i += 1) {
                                 if (key === HistologicalType[i]['Tumour histological type code']) {
                                     // eslint-disable-next-line
-                                    list[key] = `${HistologicalType[i]['Tumour histological type label']} ${HistologicalType[i]['Tumour histological type code']}`;
+                                    list[
+                                        key
+                                    ] = `${HistologicalType[i]['Tumour histological type label']} ${HistologicalType[i]['Tumour histological type code']}`;
                                     // list[key] = patient?.code?.label;
                                 }
                             }

@@ -280,7 +280,7 @@ function MCodeView() {
                                     if (
                                         data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
                                         data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                            cancerType[k]['Tumour histological type code']
+                                        cancerType[k]['Tumour histological type code']
                                     ) {
                                         if (
                                             selectedHistologicalType ===
