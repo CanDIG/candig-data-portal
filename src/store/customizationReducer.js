@@ -71,7 +71,8 @@ const customizationReducer = (state = initialState, action) => {
                         selectedMedications: 'All',
                         selectedConditions: 'All',
                         selectedSex: 'All',
-                        selectedCancerType: 'All'
+                        selectedCancerType: 'All',
+                        selectedHistologicalType: 'All'
                     },
                     selectedClinicalSearchResults: {}
                 },

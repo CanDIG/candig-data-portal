@@ -96,28 +96,9 @@ function reducer(state, action) {
     }
 }
 
-function TreatingCentreMap({ datasetName, data }) {
+function TreatingCentreMap({ data }) {
     const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
-
-    function processJson(data) {
-        const dataCount = [];
-        Object.keys(data).forEach((name) => {
-            if (provShortCodes.includes(name)) {
-                const tempDataCount = [];
-                tempDataCount.push(hcProvCodes[provShortCodes.indexOf(name)]);
-                tempDataCount.push(data[name]);
-                dataCount.push(tempDataCount);
-            } else if (provFullNames.includes(name)) {
-                const tempDataCount = [];
-                tempDataCount.push(hcProvCodes[provFullNames.indexOf(name)]);
-                tempDataCount.push(data[name]);
-                dataCount.push(tempDataCount);
-            }
-        });
-
-        return dataCount;
-    }
 
     useEffect(() => {
         const payload = [];
@@ -180,7 +161,6 @@ function TreatingCentreMap({ datasetName, data }) {
 }
 
 TreatingCentreMap.propTypes = {
-    datasetName: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired
 };
 
