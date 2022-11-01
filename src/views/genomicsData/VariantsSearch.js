@@ -238,7 +238,10 @@ function VariantsSearch() {
                             patientCancerType = true;
                         } else {
                             for (let k = 0; k < cancerType.length; k += 1) {
-                                if (response?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']) {
+                                if (
+                                    response?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
+                                    response?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
+                                ) {
                                     if (
                                         selectedCancerType ===
                                             `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
