@@ -9,7 +9,7 @@ import TreatingCentreMap from 'views/overview/TreatingCentreMap';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
-import { fetchSummaryStats, fetchServers } from 'store/api';
+import { fetchFederationStat, fetchServers } from 'store/api';
 import { gridSpacing } from 'store/constant';
 
 // assets
@@ -19,6 +19,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import PublicIcon from '@mui/icons-material/Public';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { groupCount } from 'utils/utils';
+
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
 
 function IndividualsOverview() {
     const [isLoading, setLoading] = useState(true);
@@ -51,19 +55,19 @@ function IndividualsOverview() {
             }
             if (stat.gender) {
                 stat.gender.forEach((gender) => {
-                    if (gender.sex in gendersCount) {
-                        gendersCount[gender.sex] += gender.count;
-                    } else {
-                        gendersCount[gender.sex] = gender.count;
+                    if (gender.count > 0) {
+                        const genderSex = gender.sex ? toTitleCase(gender.sex) : 'Unknown';
+                        gendersCount[genderSex] = gendersCount[genderSex] ? gender.count + gendersCount[genderSex] : gender.count;
                     }
                 });
             }
             if (stat.ethnicity) {
                 stat.ethnicity.forEach((ethnicity) => {
-                    if (ethnicity.ethnicity in ethnicitiesCount) {
-                        ethnicitiesCount[ethnicity.ethnicity] += ethnicity.count;
-                    } else {
-                        ethnicitiesCount[ethnicity.ethnicity] = ethnicity.count;
+                    if (ethnicity.count > 0) {
+                        const ethnicityName = ethnicity.ethnicity ? toTitleCase(ethnicity.ethnicity) : 'Unknown';
+                        ethnicitiesCount[ethnicityName] = ethnicitiesCount[ethnicityName]
+                            ? ethnicity.count + ethnicitiesCount[ethnicityName]
+                            : ethnicity.count;
                     }
                 });
             }
@@ -89,8 +93,7 @@ function IndividualsOverview() {
 
     useEffect(() => {
         trackPromise(
-            /* If federated URL is set return federated call */
-            fetchSummaryStats('/api/moh_overview')
+            fetchFederationStat()
                 .then((data) => {
                     if (data.results) {
                         federationStatCount(data);
