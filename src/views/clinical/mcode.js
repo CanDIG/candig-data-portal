@@ -8,7 +8,7 @@ import papa from 'papaparse';
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box, fabClasses } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 
 // REDUX
 import { useSelector, useDispatch } from 'react-redux';
@@ -247,13 +247,17 @@ function MCodeView() {
                                 return true;
                             });
                             let patientMedication = false;
-                            data?.results[j]?.results[i]?.medication_statement.every((medication) => {
-                                if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
-                                    patientMedication = true;
-                                    return false;
-                                }
-                                return true;
-                            });
+                            if (selectedMedications === 'All') {
+                                patientMedication = true;
+                            } else {
+                                data?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                                    if (selectedMedications === medication?.medication_code.label) {
+                                        patientMedication = true;
+                                        return false;
+                                    }
+                                    return true;
+                                });
+                            }
                             let patientSex = false;
                             if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
                                 patientSex = true;
