@@ -196,7 +196,7 @@ function searchVariant(chromosome, start, end) {
             request_type: 'POST',
             endpoint_path: 'htsget/v1/variants/search',
             endpoint_payload: payload,
-            endpoint_service: 'htsget-app'
+            endpoint_service: 'htsget'
         })
     })
         .then((response) => {

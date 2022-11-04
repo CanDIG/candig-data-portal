@@ -8,7 +8,7 @@ import papa from 'papaparse';
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, fabClasses } from '@mui/material';
 
 // REDUX
 import { useSelector, useDispatch } from 'react-redux';
@@ -32,6 +32,7 @@ import Divider from '@mui/material/Divider';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import DropDown from '../../ui-component/DropDown';
+import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 
 // Styles
 const useStyles = makeStyles({
@@ -71,6 +72,7 @@ function MCodeView() {
     const events = useSelector((state) => state);
     const dispatch = useDispatch();
 
+    const [isLoading, setIsLoading] = React.useState(true);
     const [mcodeData, setMcodeData] = React.useState([]);
     const [rows, setRows] = React.useState([]);
     const [selectedPatient, setSelectedPatient] = React.useState('');
@@ -215,8 +217,9 @@ function MCodeView() {
     };
 
     React.useEffect(() => {
+        setIsLoading(true);
         trackPromise(
-            fetchFederationClinicalData('/api/mcodepackets').then((data) => {
+            fetchFederationClinicalData().then((data) => {
                 setMcodeData(data);
                 const tempRows = [];
                 for (let j = 0; j < data.results.length; j += 1) {
@@ -339,6 +342,7 @@ function MCodeView() {
                 setSexList(processSexListData(data.results));
                 setCancerTypeList(processCancerTypeListData(data.results));
                 setHistologicalList(processHistologicalTypeListData(data.results));
+                setIsLoading(false);
 
                 setRedux(
                     tempRows,
@@ -352,7 +356,8 @@ function MCodeView() {
                     HistologicalList,
                     selectedHistologicalType
                 );
-            })
+            }),
+            'table'
         );
 
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
@@ -460,36 +465,40 @@ function MCodeView() {
                     />
                 )}
 
-                <Grid container pt={6} justifyContent="center" alignItems="center">
-                    {desktopResolution && (
-                        <Grid item mr={2} sx={{ height: 600, width: '50%' }}>
-                            <DataGrid
-                                rows={rows}
-                                columns={subjectColumns}
-                                pageSize={7}
-                                rowsPerPageOptions={[7]}
-                                components={{ Toolbar: GridToolbar }}
-                                onRowClick={(rowData) => handleRowClick(rowData.row)}
-                                className={classes.scrollbar}
-                                disableSelectionOnClick
-                            />
+                {!isLoading ? (
+                    <Grid container pt={6} justifyContent="center" alignItems="center">
+                        {desktopResolution && (
+                            <Grid item mr={2} sx={{ height: 600, width: '50%' }}>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={subjectColumns}
+                                    pageSize={7}
+                                    rowsPerPageOptions={[7]}
+                                    components={{ Toolbar: GridToolbar }}
+                                    onRowClick={(rowData) => handleRowClick(rowData.row)}
+                                    className={classes.scrollbar}
+                                    disableSelectionOnClick
+                                />
+                            </Grid>
+                        )}
+                        <Grid item sx={{ width: screenWidth }}>
+                            <Box
+                                sx={{
+                                    border: 1,
+                                    borderColor: '#D3D3D3',
+                                    height: 600,
+                                    width: '100% ',
+                                    overflow: 'auto'
+                                }}
+                                p={2}
+                            >
+                                <ReactJson src={patientJSON} theme={jsonTheme} onDelete={false} onAdd={false} onEdit={false} />
+                            </Box>
                         </Grid>
-                    )}
-                    <Grid item sx={{ width: screenWidth }}>
-                        <Box
-                            sx={{
-                                border: 1,
-                                borderColor: '#D3D3D3',
-                                height: 600,
-                                width: '100% ',
-                                overflow: 'auto'
-                            }}
-                            p={2}
-                        >
-                            <ReactJson src={patientJSON} theme={jsonTheme} onDelete={false} onAdd={false} onEdit={false} />
-                        </Box>
                     </Grid>
-                </Grid>
+                ) : (
+                    <SearchIndicator area="table" />
+                )}
             </Grid>
         </MainCard>
     );
