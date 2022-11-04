@@ -115,18 +115,36 @@ export const medicationStatementColumns = [
  */
 export const processMCodeMainData = (dataObject, site) => {
     const row = {};
-    row.id = dataObject?.id ? dataObject?.id : null;
+
+    papa.parse(cancerTypeCSV, {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        // eslint-disable-next-line
+        complete: function (results) {
+            const HistologicalType = results.data;
+            for (let i = 0; i < HistologicalType.length; i += 1) {
+                if (
+                    dataObject?.cancer_condition?.histology_morphology_behavior?.id === HistologicalType[i]['Tumour histological type code']
+                ) {
+                    row.histology_morphology_behavior = `${HistologicalType[i]['Tumour histological type label']} ${dataObject?.cancer_condition?.histology_morphology_behavior?.id}`;
+                    break;
+                } else {
+                    row.histology_morphology_behavior = 'NA';
+                }
+            }
+        }
+    });
+
+    row.id = dataObject?.subject?.id ? dataObject?.subject?.id : null;
     row.site = site;
-    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.sex = (dataObject?.subject?.sex).toLowerCase() ? (dataObject?.subject?.sex).toLowerCase() : 'NA';
     row.deceased = dataObject?.subject?.deceased ? dataObject?.subject?.deceased : 'NA';
-    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
+    row.ethnicity = (dataObject?.subject?.ethnicity).toLowerCase() ? (dataObject?.subject?.ethnicity).toLowerCase() : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
     row.genomic_id = dataObject?.genomics_report?.extra_properties?.genomic_id
         ? dataObject?.genomics_report?.extra_properties?.genomic_id
-        : 'NA';
-    row.histology_morphology_behavior = dataObject?.cancer_condition?.histology_morphology_behavior?.id
-        ? `${dataObject?.cancer_condition?.histology_morphology_behavior?.label} ${dataObject?.cancer_condition?.histology_morphology_behavior?.id}`
         : 'NA';
 
     return row;
@@ -139,7 +157,7 @@ export const processMCodeMainData = (dataObject, site) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-    row.id = dataObject?.id ? dataObject?.id : null;
+    row.id = dataObject.subject?.id ? dataObject?.subject?.d : null;
     row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
@@ -257,9 +275,9 @@ export const processSexListData = (dataObject) => {
     const list = {};
     dataObject.forEach((federatedResult) => {
         federatedResult.results.forEach((patient) => {
-            const key = patient?.subject?.sex;
+            const key = (patient?.subject?.sex).toLowerCase();
             if (!(key in list)) {
-                list[key] = patient?.subject?.sex;
+                list[key] = (patient?.subject?.sex).toLowerCase();
             }
         });
     });

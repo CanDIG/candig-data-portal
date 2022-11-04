@@ -241,6 +241,9 @@ const ProfileSection = () => {
                                                     selected={selectedIndex === 4}
                                                     component={Link}
                                                     to="/auth/logout"
+                                                    onClick={() => {
+                                                        window.location.reload();
+                                                    }}
                                                 >
                                                     <ListItemIcon>
                                                         <IconLogout stroke={1.5} size="1.3rem" />

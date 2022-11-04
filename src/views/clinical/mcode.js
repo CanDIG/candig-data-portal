@@ -8,7 +8,7 @@ import papa from 'papaparse';
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Grid, Box, fabClasses } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 
 // REDUX
 import { useSelector, useDispatch } from 'react-redux';
@@ -71,6 +71,8 @@ function MCodeView() {
     const classes = useStyles();
     const events = useSelector((state) => state);
     const dispatch = useDispatch();
+    const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
+    const clinicalSearchPatients = useSelector((state) => state.customization.clinicalSearchResultPatients);
 
     const [isLoading, setIsLoading] = React.useState(true);
     const [mcodeData, setMcodeData] = React.useState([]);
@@ -78,6 +80,7 @@ function MCodeView() {
     const [selectedPatient, setSelectedPatient] = React.useState('');
     const [selectedPatientMobileInfo, setSelectedPatientMobileInfo] = React.useState({});
     const [cancerType, setCancerType] = React.useState([]);
+
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const [isListOpen, setListOpen] = React.useState(false);
@@ -90,19 +93,21 @@ function MCodeView() {
     const [isListOpenHistological, setListOpenHistological] = React.useState(false);
 
     // Dropdown patient table filtering current selection in dropdown
-    const [selectedMedications, setSelectedMedications] = React.useState('All');
-    const [selectedConditions, setSelectedConditions] = React.useState('All');
-    const [selectedSex, setSelectedSex] = React.useState('All');
-    const [selectedCancerType, setSelectedCancerType] = React.useState('All');
-    const [selectedHistologicalType, setSelectedHistologicalType] = React.useState('All');
+    const [selectedMedications, setSelectedMedications] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedMedications);
+    const [selectedConditions, setSelectedConditions] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedConditions);
+    const [selectedSex, setSelectedSex] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedSex);
+    const [selectedCancerType, setSelectedCancerType] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedCancerType);
+    const [selectedHistologicalType, setSelectedHistologicalType] = React.useState(
+        clinicalSearch.clinicalSearchDropDowns.selectedHistologicalType
+    );
     const [patientJSON, setPatientJSON] = React.useState([]);
 
     // Dropdown patient table list for filtering
-    const [medicationList, setMedicationList] = React.useState([]);
-    const [conditionList, setConditionList] = React.useState([]);
-    const [sexList, setSexList] = React.useState([]);
-    const [cancerTypeList, setCancerTypeList] = React.useState([]);
-    const [HistologicalList, setHistologicalList] = React.useState([]);
+    const [medicationList, setMedicationList] = React.useState(clinicalSearch.clinicalSearchDropDowns.medicationList);
+    const [conditionList, setConditionList] = React.useState(clinicalSearch.clinicalSearchDropDowns.conditionList);
+    const [sexList, setSexList] = React.useState(clinicalSearch.clinicalSearchDropDowns.sexList);
+    const [cancerTypeList, setCancerTypeList] = React.useState(clinicalSearch.clinicalSearchDropDowns.cancerTypeList);
+    const [HistologicalList, setHistologicalList] = React.useState(clinicalSearch.clinicalSearchDropDowns.HistologicalList);
 
     const jsonTheme = {
         base00: 'white',
@@ -122,6 +127,15 @@ function MCodeView() {
         base0E: '#00418A',
         base0F: '#00418A'
     };
+
+    function setClincalSearchPatients(data) {
+        dispatch({
+            type: 'SET_CLINICAL_SEARCH_PATIENTS',
+            payload: {
+                data
+            }
+        });
+    }
 
     function setRedux(
         rows,
@@ -179,7 +193,9 @@ function MCodeView() {
                     Ethnicity: federatedResults?.results[index]?.subject?.ethnicity
                         ? federatedResults?.results[index]?.subject?.ethnicity
                         : 'NA',
-                    Sex: federatedResults?.results[index]?.subject?.sex ? federatedResults?.results[index]?.subject?.sex : 'NA',
+                    Sex: (federatedResults?.results[index]?.subject?.sex).toLowerCase()
+                        ? (federatedResults?.results[index]?.subject?.sex).toLowerCase()
+                        : 'NA',
                     Deceased: federatedResults?.results[index]?.subject?.deceased
                         ? federatedResults?.results[index]?.subject?.deceased
                         : 'NA',
@@ -216,12 +232,161 @@ function MCodeView() {
         }
     };
 
+    // Filtering Data
+    React.useEffect(() => {
+        if (Object.keys(clinicalSearchPatients.data).length !== 0) {
+            const tempRows = [];
+            console.log(clinicalSearchPatients.data);
+            const data = clinicalSearchPatients.data;
+            for (let j = 0; j < data.results.length; j += 1) {
+                for (let i = 0; i < data.results[j].count; i += 1) {
+                    // Patient table filtering
+                    if (
+                        selectedConditions === 'All' &&
+                        selectedMedications === 'All' &&
+                        selectedSex === 'All' &&
+                        selectedCancerType === 'All' &&
+                        selectedHistologicalType === 'All'
+                    ) {
+                        // All patients
+                        if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
+                            tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                        }
+                    } else {
+                        // Filtered patients
+                        let patientCondition = false;
+                        data?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
+                            if (selectedConditions === 'All' || selectedConditions === bodySite.label) {
+                                patientCondition = true;
+                                return false;
+                            }
+                            return true;
+                        });
+                        let patientMedication = false;
+                        data?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                            if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
+                                patientMedication = true;
+                                return false;
+                            }
+                            return true;
+                        });
+                        let patientSex = false;
+                        if (selectedSex === 'All' || selectedSex === (data?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
+                            patientSex = true;
+                        }
+                        let patientCancerType = false;
+                        if (selectedCancerType === 'All') {
+                            patientCancerType = true;
+                        } else {
+                            for (let k = 0; k < cancerType.length; k += 1) {
+                                if (
+                                    data?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
+                                    data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
+                                ) {
+                                    if (
+                                        selectedCancerType ===
+                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                        selectedCancerType === 'NA'
+                                    ) {
+                                        patientCancerType = true;
+                                    }
+                                }
+                            }
+                        }
+                        let patientHistologicalType = false;
+                        if (selectedHistologicalType === 'All') {
+                            patientHistologicalType = true;
+                        } else {
+                            for (let k = 0; k < cancerType.length; k += 1) {
+                                if (
+                                    data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
+                                    data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
+                                        cancerType[k]['Tumour histological type code']
+                                ) {
+                                    if (
+                                        selectedHistologicalType ===
+                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                        selectedHistologicalType === 'NA'
+                                    ) {
+                                        patientHistologicalType = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (
+                            patientCondition &&
+                            patientMedication &&
+                            patientSex &&
+                            patientCancerType &&
+                            patientHistologicalType &&
+                            processMCodeMainData(data.results[j].results[i]).id !== null
+                        ) {
+                            tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                        }
+                    }
+                }
+            }
+            setRows(tempRows);
+            // Subtables
+            if (tempRows.length !== 0) {
+                let index;
+                data.results.forEach((federatedResults) => {
+                    index = federatedResults.results.findIndex((item) => item.id === tempRows[0].id);
+                    if (index !== -1) {
+                        setSelectedPatient(federatedResults.results[index].id);
+                        setPatientJSON(federatedResults.results[index], selectedPatient);
+                        if (tempRows[0].id !== null) {
+                            setSelectedPatientMobileInfo({
+                                Ethnicity: tempRows[0]?.ethnicity ? tempRows[0]?.ethnicity : 'NA',
+                                Sex: tempRows[0]?.sex ? tempRows[0]?.sex : 'NA',
+                                Deceased: tempRows[0]?.deceased ? tempRows[0]?.deceased : 'NA',
+                                Birthday: tempRows[0]?.date_of_birth ? tempRows[0]?.date_of_birth : 'NA',
+                                DeathDate: tempRows[0]?.date_of_death ? tempRows[0]?.date_of_death : 'NA'
+                            });
+                        }
+                    }
+                });
+            } else {
+                setSelectedPatient('None');
+                setPatientJSON({});
+            }
+
+            setListOpen(false);
+            // Dropdown patient table list for filtering
+            setMedicationList(processMedicationListData(data.results));
+            setConditionList(processCondtionsListData(data.results));
+            setSexList(processSexListData(data.results));
+            setCancerTypeList(processCancerTypeListData(data.results));
+            setHistologicalList(processHistologicalTypeListData(data.results));
+            setIsLoading(false);
+
+            setRedux(
+                tempRows,
+                medicationList,
+                conditionList,
+                sexList,
+                cancerTypeList,
+                selectedMedications,
+                selectedConditions,
+                selectedCancerType,
+                HistologicalList,
+                selectedHistologicalType
+            );
+        }
+    }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType, selectedHistologicalType]);
+
+    // Tracks Screensize
+    React.useEffect(() => {
+        window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
+    }, [desktopResolution, setdesktopResolution]);
+
     React.useEffect(() => {
         setIsLoading(true);
+        const tempRows = [];
         trackPromise(
             fetchFederationClinicalData().then((data) => {
                 setMcodeData(data);
-                const tempRows = [];
+                setClincalSearchPatients(data);
                 for (let j = 0; j < data.results.length; j += 1) {
                     for (let i = 0; i < data.results[j].count; i += 1) {
                         // Patient table filtering
@@ -255,7 +420,7 @@ function MCodeView() {
                                 return true;
                             });
                             let patientSex = false;
-                            if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
+                            if (selectedSex === 'All' || selectedSex === (data?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
                                 patientSex = true;
                             }
                             let patientCancerType = false;
@@ -359,19 +524,9 @@ function MCodeView() {
             }),
             'table'
         );
+    }, []);
 
-        window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
-    }, [
-        desktopResolution,
-        setdesktopResolution,
-        selectedSex,
-        selectedConditions,
-        selectedMedications,
-        selectedCancerType,
-        selectedHistologicalType
-    ]);
-
-    const screenWidth = desktopResolution ? '48%' : '100%';
+    // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const headerLabels = {
         Ethnicity: 'Ethnicity',
         Sex: 'Sex',
@@ -394,13 +549,6 @@ function MCodeView() {
                     <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
                         <Table>
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
-                                <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>
-                                    <span style={{ color: theme.palette.primary.main }}>
-                                        <b>Patient Id</b>
-                                    </span>
-                                    <br />
-                                    <span>{selectedPatient}</span>
-                                </Box>
                                 <DropDown
                                     setListOpen={setListOpenSex}
                                     isListOpen={isListOpenSex}
@@ -466,9 +614,9 @@ function MCodeView() {
                 )}
 
                 {!isLoading ? (
-                    <Grid container pt={6} justifyContent="center" alignItems="center">
+                    <Grid container direction="column" pt={6} justifyContent="center" alignItems="center">
                         {desktopResolution && (
-                            <Grid item mr={2} sx={{ height: 600, width: '50%' }}>
+                            <Grid item mr={2} sx={{ height: 600, width: '100%' }}>
                                 <DataGrid
                                     rows={rows}
                                     columns={subjectColumns}
@@ -481,16 +629,30 @@ function MCodeView() {
                                 />
                             </Grid>
                         )}
-                        <Grid item sx={{ width: screenWidth }}>
+                        <Grid item sx={{ width: '100%', position: 'relative' }}>
+                            <Box
+                                mr={2}
+                                ml={1}
+                                p={1}
+                                pr={5}
+                                sx={{ width: '125px', border: 1, borderRadius: 2, position: 'absolute', zIndex: 100, right: 15, top: 30 }}
+                            >
+                                <span style={{ color: theme.palette.primary.main }}>
+                                    <b>Patient Id</b>
+                                </span>
+                                <br />
+                                <span>{selectedPatient}</span>
+                            </Box>
                             <Box
                                 sx={{
                                     border: 1,
                                     borderColor: '#D3D3D3',
-                                    height: 600,
+                                    height: '800px',
                                     width: '100% ',
                                     overflow: 'auto'
                                 }}
                                 p={2}
+                                mt={2}
                             >
                                 <ReactJson src={patientJSON} theme={jsonTheme} onDelete={false} onAdd={false} onEdit={false} />
                             </Box>
