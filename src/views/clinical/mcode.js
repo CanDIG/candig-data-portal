@@ -247,7 +247,10 @@ function MCodeView() {
                                 });
                             }
                             let patientSex = false;
-                            if (selectedSex === 'All' || selectedSex === data?.results[j]?.results[i]?.subject.sex) {
+                            const patientSexValue = data?.results[j]?.results[i]?.subject?.sex
+                                ? data?.results[j]?.results[i]?.subject?.sex.toLowerCase()
+                                : 'male'; // just for demo purposes
+                            if (selectedSex === 'All' || selectedSex === patientSexValue) {
                                 patientSex = true;
                             }
                             let patientCancerType = false;

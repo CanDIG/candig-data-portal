@@ -115,11 +115,11 @@ export const medicationStatementColumns = [
  */
 export const processMCodeMainData = (dataObject, site) => {
     const row = {};
-    row.id = dataObject?.id ? dataObject?.id : null;
+    row.id = dataObject?.subject?.id ? dataObject?.subject?.id : null; // replace id with subject id, this fix meant for the demo and does not account for multiple subjects
     row.site = site;
-    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex.toLowerCase() : 'male';
     row.deceased = dataObject?.subject?.deceased ? dataObject?.subject?.deceased : 'NA';
-    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
+    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity.toLowerCase() : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
     row.genomic_id = dataObject?.genomics_report?.extra_properties?.genomic_id
@@ -128,7 +128,6 @@ export const processMCodeMainData = (dataObject, site) => {
     row.histology_morphology_behavior = dataObject?.cancer_condition?.histology_morphology_behavior?.id
         ? `${dataObject?.cancer_condition?.histology_morphology_behavior?.label} ${dataObject?.cancer_condition?.histology_morphology_behavior?.id}`
         : 'NA';
-
     return row;
 };
 
@@ -139,11 +138,11 @@ export const processMCodeMainData = (dataObject, site) => {
  */
 export const processSubjectData = (dataObject) => {
     const row = {};
-    row.id = dataObject?.id ? dataObject?.id : null;
-    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex : 'NA';
+    row.id = dataObject.subject?.id ? dataObject?.subject?.d : null;
+    row.sex = dataObject?.subject?.sex ? dataObject?.subject?.sex.toLowerCase() : 'male';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
-    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity : 'NA';
+    row.ethnicity = dataObject?.subject?.ethnicity ? dataObject?.subject?.ethnicity.toLowerCase() : 'NA';
     row.race = dataObject?.subject?.race ? dataObject?.subject?.race : 'NA';
 
     return [row];
@@ -257,9 +256,11 @@ export const processSexListData = (dataObject) => {
     const list = {};
     dataObject.forEach((federatedResult) => {
         federatedResult.results.forEach((patient) => {
-            const key = patient?.subject?.sex;
-            if (!(key in list)) {
-                list[key] = patient?.subject?.sex;
+            if (patient?.subject?.sex) {
+                const key = patient?.subject?.sex.toLowerCase();
+                if (!(key in list)) {
+                    list[key] = key;
+                }
             }
         });
     });
