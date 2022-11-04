@@ -14,11 +14,6 @@ export const subjectColumns = [
         width: 150
     },
     {
-        field: 'histology_morphology_behavior',
-        headerName: 'Histology Morphology Behaviour',
-        width: 300
-    },
-    {
         field: 'genomic_id',
         headerName: 'Genome ID',
         width: 200
@@ -115,26 +110,6 @@ export const medicationStatementColumns = [
  */
 export const processMCodeMainData = (dataObject, site) => {
     const row = {};
-
-    papa.parse(cancerTypeCSV, {
-        header: true,
-        download: true,
-        skipEmptyLines: true,
-        // eslint-disable-next-line
-        complete: function (results) {
-            const HistologicalType = results.data;
-            for (let i = 0; i < HistologicalType.length; i += 1) {
-                if (
-                    dataObject?.cancer_condition?.histology_morphology_behavior?.id === HistologicalType[i]['Tumour histological type code']
-                ) {
-                    row.histology_morphology_behavior = `${HistologicalType[i]['Tumour histological type label']} ${dataObject?.cancer_condition?.histology_morphology_behavior?.id}`;
-                    break;
-                } else {
-                    row.histology_morphology_behavior = 'NA';
-                }
-            }
-        }
-    });
 
     row.id = dataObject?.subject?.id ? dataObject?.subject?.id : null;
     row.site = site;
