@@ -186,7 +186,7 @@ function VariantsSearch() {
             setPatientList(clinicalSearch.selectedClinicalSearchResults);
         }
         trackPromise(
-            fetchFederationClinicalData('/api/mcodepackets').then((response) => {
+            fetchFederationClinicalData().then((response) => {
                 const patientData = [];
                 response.results.forEach((result) => {
                     result.results.forEach((patient) => {
