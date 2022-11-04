@@ -277,7 +277,8 @@ export const processCondtionsListData = (dataObject) => {
     dataObject.forEach((federatedResult) => {
         federatedResult.results.forEach((patient) => {
             patient?.cancer_condition?.body_site?.forEach((bodySite) => {
-                const key = bodySite?.id;
+                // const key = bodySite?.id;
+                const key = bodySite?.label; // using label instead of id since the id is not unique
                 if (!(key in list)) {
                     list[key] = bodySite?.label;
                 }
@@ -285,6 +286,8 @@ export const processCondtionsListData = (dataObject) => {
         });
     });
     list.ALL = 'All';
+    // remove abcd from the list, just for the demo
+    delete list.abcd;
     return list;
 };
 
