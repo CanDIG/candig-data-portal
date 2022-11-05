@@ -56,7 +56,9 @@ export function fetchFederationClinicalData() {
         body: JSON.stringify({
             request_type: 'GET',
             endpoint_path: 'api/mcodepackets',
-            endpoint_payload: {},
+            endpoint_payload: {
+                page_size: 200
+            },
             endpoint_service: 'katsu'
         })
     })
