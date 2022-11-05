@@ -18,8 +18,7 @@ import {
     processMedicationListData,
     processCondtionsListData,
     processSexListData,
-    processCancerTypeListData,
-    processHistologicalTypeListData
+    processCancerTypeListData
 } from 'store/mcode';
 
 // mui
@@ -88,23 +87,18 @@ function VariantsSearch() {
     const [isListOpenConditions, setListOpenConditions] = React.useState(false);
     const [isListOpenSex, setListOpenSex] = React.useState(false);
     const [isListOpenCancerType, setListOpenCancerType] = React.useState(false);
-    const [isListOpenHistological, setListOpenHistological] = React.useState(false);
 
     // Dropdown patient table filtering current selection in dropdown
     const [selectedMedications, setSelectedMedications] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedMedications);
     const [selectedConditions, setSelectedConditions] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedConditions);
     const [selectedSex, setSelectedSex] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedSex);
     const [selectedCancerType, setSelectedCancerType] = React.useState(clinicalSearch.clinicalSearchDropDowns.selectedCancerType);
-    const [selectedHistologicalType, setSelectedHistologicalType] = React.useState(
-        clinicalSearch.clinicalSearchDropDowns.selectedHistologicalType
-    );
 
     // Dropdown patient table list for filtering
     const [medicationList, setMedicationList] = React.useState(clinicalSearch.clinicalSearchDropDowns.medicationList);
     const [conditionList, setConditionList] = React.useState(clinicalSearch.clinicalSearchDropDowns.conditionList);
     const [sexList, setSexList] = React.useState(clinicalSearch.clinicalSearchDropDowns.sexList);
     const [cancerTypeList, setCancerTypeList] = React.useState(clinicalSearch.clinicalSearchDropDowns.cancerTypeList);
-    const [HistologicalList, setHistologicalList] = React.useState(clinicalSearch.clinicalSearchDropDowns.HistologicalList);
 
     /*
     Build the dropdown for chromosome
@@ -131,9 +125,7 @@ function VariantsSearch() {
         cancerTypeList,
         selectedMedications,
         selectedConditions,
-        selectedCancerType,
-        HistologicalList,
-        selectedHistologicalType
+        selectedCancerType
     ) {
         const tempClinicalSearchResults = [];
         rows.forEach((patient) => {
@@ -151,9 +143,7 @@ function VariantsSearch() {
                     sexList,
                     selectedSex,
                     cancerTypeList,
-                    selectedCancerType,
-                    HistologicalList,
-                    selectedHistologicalType
+                    selectedCancerType
                 }
             }
         });
@@ -172,9 +162,6 @@ function VariantsSearch() {
         } else if (dropDownGroup === 'CANCER TYPE') {
             setSelectedCancerType(selected);
             setListOpenCancerType(false);
-        } else if (dropDownGroup === 'HISTOLOGICAL') {
-            setSelectedHistologicalType(selected);
-            setListOpenHistological(false);
         }
     };
 
@@ -205,8 +192,7 @@ function VariantsSearch() {
                             selectedConditions === 'All' &&
                             selectedMedications === 'All' &&
                             selectedSex === 'All' &&
-                            selectedCancerType === 'All' &&
-                            selectedHistologicalType === 'All'
+                            selectedCancerType === 'All'
                         ) {
                             // All patients
                             if (processMCodeMainData(response.results[j].results[i], response.results[j].location[0]).id !== null) {
@@ -223,15 +209,22 @@ function VariantsSearch() {
                                 return true;
                             });
                             let patientMedication = false;
-                            response?.results[j]?.results[i]?.medication_statement.every((medication) => {
-                                if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
-                                    patientMedication = true;
-                                    return false;
-                                }
-                                return true;
-                            });
+                            if (selectedMedications === 'All') {
+                                patientMedication = true;
+                            } else {
+                                response?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                                    if (selectedMedications === medication?.medication_code.label) {
+                                        patientMedication = true;
+                                        return false;
+                                    }
+                                    return true;
+                                });
+                            }
                             let patientSex = false;
-                            if (selectedSex === 'All' || selectedSex === response?.results[j]?.results[i]?.subject.sex) {
+                            const patientSexValue = response?.results[j]?.results[i]?.subject?.sex
+                                ? response?.results[j]?.results[i]?.subject?.sex.toLowerCase()
+                                : 'male'; // just for demo purposes
+                            if (selectedSex === 'All' || selectedSex === patientSexValue) {
                                 patientSex = true;
                             }
                             let patientCancerType = false;
@@ -253,33 +246,11 @@ function VariantsSearch() {
                                     }
                                 }
                             }
-                            let patientHistologicalType = false;
-                            if (selectedHistologicalType === 'All') {
-                                patientHistologicalType = true;
-                            } else {
-                                for (let k = 0; k < cancerType.length; k += 1) {
-                                    if (
-                                        response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !==
-                                            undefined &&
-                                        response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                            cancerType[k]['Tumour histological type code']
-                                    ) {
-                                        if (
-                                            selectedHistologicalType ===
-                                                `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
-                                            selectedHistologicalType === 'NA'
-                                        ) {
-                                            patientHistologicalType = true;
-                                        }
-                                    }
-                                }
-                            }
                             if (
                                 patientCondition &&
                                 patientMedication &&
                                 patientSex &&
                                 patientCancerType &&
-                                patientHistologicalType &&
                                 processMCodeMainData(response.results[j].results[i]).id !== null
                             ) {
                                 tempRows.push(processMCodeMainData(response.results[j].results[i], response.results[j].location[0]));
@@ -298,7 +269,6 @@ function VariantsSearch() {
                 setConditionList(processCondtionsListData(response.results));
                 setSexList(processSexListData(response.results));
                 setCancerTypeList(processCancerTypeListData(response.results));
-                setHistologicalList(processHistologicalTypeListData(response.results));
                 setLoading(false);
 
                 setRedux(
@@ -309,14 +279,12 @@ function VariantsSearch() {
                     cancerTypeList,
                     selectedMedications,
                     selectedConditions,
-                    selectedCancerType,
-                    HistologicalList,
-                    selectedHistologicalType
+                    selectedCancerType
                 );
             }),
             'patientBox'
         );
-    }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType, selectedHistologicalType]);
+    }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType]);
 
     /**
      * This function handles the Search button
@@ -479,15 +447,6 @@ function VariantsSearch() {
                                 dropDownItems={medicationList}
                                 selectOption={dropDownSelection}
                                 dropDownGroup="MEDICATIONS"
-                            />
-                            <DropDown
-                                setListOpen={setListOpenHistological}
-                                isListOpen={isListOpenHistological}
-                                dropDownLabel="Histological Type"
-                                currentSelection={selectedHistologicalType}
-                                dropDownItems={HistologicalList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="HISTOLOGICAL"
                             />
                         </Stack>
                     </Grid>
