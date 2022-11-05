@@ -44,6 +44,13 @@ const customizationReducer = (state = initialState, action) => {
                     ...action.payload
                 }
             };
+        case 'SET_CLINICAL_SEARCH_PATIENTS':
+            return {
+                ...state,
+                clinicalSearchResultPatients: {
+                    ...action.payload
+                }
+            };
         case 'SET_SELECTED_DATASET':
             return {
                 ...state,
@@ -75,6 +82,9 @@ const customizationReducer = (state = initialState, action) => {
                         selectedHistologicalType: 'All'
                     },
                     selectedClinicalSearchResults: {}
+                },
+                clinicalSearchResultPatients: {
+                    data: {}
                 },
                 selectedDataset: '',
                 datasets: {},
