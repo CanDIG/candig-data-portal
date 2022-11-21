@@ -25,7 +25,6 @@ npm install
 The file `.env.development` is where you specify API Servers and site-specific variables.
 
 -   `REACT_APP_KATSU_API_SERVER`: Path to the Katsu API.
--   `REACT_APP_CANDIG_SERVER`: Path to the candig-server API.
 -   `REACT_APP_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
 -   `REACT_APP_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
 -   `GENERATE_SOURCEMAP`: Removes map fodlers from build when set to false

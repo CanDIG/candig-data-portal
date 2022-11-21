@@ -133,18 +133,7 @@ function VariantsSearch() {
         });
     }
 
-    function setRedux(
-        rows,
-        medicationList,
-        conditionList,
-        sexList,
-        cancerTypeList,
-        selectedMedications,
-        selectedConditions,
-        selectedCancerType,
-        HistologicalList,
-        selectedHistologicalType
-    ) {
+    function setRedux(rows) {
         const tempClinicalSearchResults = [];
         rows.forEach((patient) => {
             tempClinicalSearchResults.push({ id: patient.id, genomicId: patient.genomic_id });
@@ -296,18 +285,7 @@ function VariantsSearch() {
             setHistologicalList(processHistologicalTypeListData(response.results));
             setLoading(false);
 
-            setRedux(
-                tempRows,
-                medicationList,
-                conditionList,
-                sexList,
-                cancerTypeList,
-                selectedMedications,
-                selectedConditions,
-                selectedCancerType,
-                HistologicalList,
-                selectedHistologicalType
-            );
+            setRedux(tempRows);
         }
     }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType, selectedHistologicalType]);
 
@@ -435,22 +413,11 @@ function VariantsSearch() {
                 setHistologicalList(processHistologicalTypeListData(response.results));
                 setLoading(false);
 
-                setRedux(
-                    tempRows,
-                    medicationList,
-                    conditionList,
-                    sexList,
-                    cancerTypeList,
-                    selectedMedications,
-                    selectedConditions,
-                    selectedCancerType,
-                    HistologicalList,
-                    selectedHistologicalType
-                );
+                setRedux(tempRows);
             }),
             'patientBox'
         );
-    }, []);
+    }, [setRedux, cancerType]);
 
     /**
      * This function handles the Search button
