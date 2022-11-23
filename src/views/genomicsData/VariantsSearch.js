@@ -23,45 +23,12 @@ import {
 } from 'store/mcode';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme } from '@mui/styles';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 
-// Styles
-const useStyles = makeStyles({
-    dropdownItem: {
-        background: 'white',
-        paddingRight: '1.25em',
-        paddingLeft: '1.25em',
-        border: 'none',
-        width: 'fit-content(5em)',
-        '&:hover': {
-            background: '#2196f3',
-            color: 'white'
-        }
-    },
-    mobileRow: {
-        width: '700px'
-    },
-    scrollbar: {
-        scrollbarWidth: 'thin',
-        '&::-webkit-scrollbar': {
-            height: '0.4em',
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)'
-        }
-    }
-});
-
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
-    const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
     const events = useSelector((state) => state);
@@ -230,7 +197,7 @@ function VariantsSearch() {
                                 ) {
                                     if (
                                         selectedCancerType ===
-                                        `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
                                         selectedCancerType === 'NA'
                                     ) {
                                         patientCancerType = true;
@@ -246,11 +213,11 @@ function VariantsSearch() {
                                 if (
                                     response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
                                     response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                    cancerType[k]['Tumour histological type code']
+                                        cancerType[k]['Tumour histological type code']
                                 ) {
                                     if (
                                         selectedHistologicalType ===
-                                        `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
                                         selectedHistologicalType === 'NA'
                                     ) {
                                         patientHistologicalType = true;
@@ -357,7 +324,7 @@ function VariantsSearch() {
                                     ) {
                                         if (
                                             selectedCancerType ===
-                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                                `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
                                             selectedCancerType === 'NA'
                                         ) {
                                             patientCancerType = true;
@@ -372,13 +339,13 @@ function VariantsSearch() {
                                 for (let k = 0; k < cancerType.length; k += 1) {
                                     if (
                                         response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !==
-                                        undefined &&
+                                            undefined &&
                                         response?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                        cancerType[k]['Tumour histological type code']
+                                            cancerType[k]['Tumour histological type code']
                                     ) {
                                         if (
                                             selectedHistologicalType ===
-                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                                `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
                                             selectedHistologicalType === 'NA'
                                         ) {
                                             patientHistologicalType = true;
