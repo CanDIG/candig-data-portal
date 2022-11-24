@@ -137,18 +137,7 @@ function MCodeView() {
         });
     }
 
-    function setRedux(
-        rows,
-        medicationList,
-        conditionList,
-        sexList,
-        cancerTypeList,
-        selectedMedications,
-        selectedConditions,
-        selectedCancerType,
-        HistologicalList,
-        selectedHistologicalType
-    ) {
+    function setRedux(rows) {
         const tempClinicalSearchResults = [];
         rows.forEach((patient) => {
             tempClinicalSearchResults.push({ id: patient.id, genomicId: patient.genomic_id });
@@ -236,7 +225,6 @@ function MCodeView() {
     React.useEffect(() => {
         if (Object.keys(clinicalSearchPatients.data).length !== 0) {
             const tempRows = [];
-            console.log(clinicalSearchPatients.data);
             const data = clinicalSearchPatients.data;
             for (let j = 0; j < data.results.length; j += 1) {
                 for (let i = 0; i < data.results[j].count; i += 1) {
@@ -360,18 +348,7 @@ function MCodeView() {
             setHistologicalList(processHistologicalTypeListData(data.results));
             setIsLoading(false);
 
-            setRedux(
-                tempRows,
-                medicationList,
-                conditionList,
-                sexList,
-                cancerTypeList,
-                selectedMedications,
-                selectedConditions,
-                selectedCancerType,
-                HistologicalList,
-                selectedHistologicalType
-            );
+            setRedux(tempRows);
         }
     }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType, selectedHistologicalType]);
 
@@ -509,18 +486,7 @@ function MCodeView() {
                 setHistologicalList(processHistologicalTypeListData(data.results));
                 setIsLoading(false);
 
-                setRedux(
-                    tempRows,
-                    medicationList,
-                    conditionList,
-                    sexList,
-                    cancerTypeList,
-                    selectedMedications,
-                    selectedConditions,
-                    selectedCancerType,
-                    HistologicalList,
-                    selectedHistologicalType
-                );
+                setRedux(tempRows);
             }),
             'table'
         );

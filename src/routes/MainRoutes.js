@@ -15,15 +15,9 @@ const IndividualsOverview = Loadable(lazy(() => import('views/overview/individua
 
 // Clinical
 const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
-const PhenopacketsPage = Loadable(lazy(() => import('views/clinical/phenopackets')));
 
 // Genomic
-const FileDirectoryPage = Loadable(lazy(() => import('views/genomicsData/FileDirectory')));
 const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/VariantsSearch')));
-const ReadsSearchPage = Loadable(lazy(() => import('views/genomicsData/ReadsSearch')));
-const VcfBrowserPage = Loadable(lazy(() => import('views/genomicsData/VcfBrowser')));
-const BamBrowserPage = Loadable(lazy(() => import('views/genomicsData/BamBrowser')));
-const HtsgetBrowserPage = Loadable(lazy(() => import('views/genomicsData/HtsgetBrowser')));
 
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
@@ -51,32 +45,8 @@ const MainRoutes = {
             element: <McodePage />
         },
         {
-            path: `${basename}/phenopackets`,
-            element: <PhenopacketsPage />
-        },
-        {
-            path: `${basename}/file-directory`,
-            element: <FileDirectoryPage />
-        },
-        {
             path: `${basename}/variants-search`,
             element: <VariantsSearchPage />
-        },
-        {
-            path: `${basename}/reads-search`,
-            element: <ReadsSearchPage />
-        },
-        {
-            path: `${basename}/vcf-browser`,
-            element: <VcfBrowserPage />
-        },
-        {
-            path: `${basename}/bam-browser`,
-            element: <BamBrowserPage />
-        },
-        {
-            path: `${basename}/htsget-browser`,
-            element: <HtsgetBrowserPage />
         },
         {
             path: '*',

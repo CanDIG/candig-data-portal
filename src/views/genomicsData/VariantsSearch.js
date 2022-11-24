@@ -23,45 +23,12 @@ import {
 } from 'store/mcode';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme } from '@mui/styles';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 
-// Styles
-const useStyles = makeStyles({
-    dropdownItem: {
-        background: 'white',
-        paddingRight: '1.25em',
-        paddingLeft: '1.25em',
-        border: 'none',
-        width: 'fit-content(5em)',
-        '&:hover': {
-            background: '#2196f3',
-            color: 'white'
-        }
-    },
-    mobileRow: {
-        width: '700px'
-    },
-    scrollbar: {
-        scrollbarWidth: 'thin',
-        '&::-webkit-scrollbar': {
-            height: '0.4em',
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)'
-        }
-    }
-});
-
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
-    const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
     const events = useSelector((state) => state);
@@ -133,18 +100,7 @@ function VariantsSearch() {
         });
     }
 
-    function setRedux(
-        rows,
-        medicationList,
-        conditionList,
-        sexList,
-        cancerTypeList,
-        selectedMedications,
-        selectedConditions,
-        selectedCancerType,
-        HistologicalList,
-        selectedHistologicalType
-    ) {
+    function setRedux(rows) {
         const tempClinicalSearchResults = [];
         rows.forEach((patient) => {
             tempClinicalSearchResults.push({ id: patient.id, genomicId: patient.genomic_id });
@@ -296,18 +252,7 @@ function VariantsSearch() {
             setHistologicalList(processHistologicalTypeListData(response.results));
             setLoading(false);
 
-            setRedux(
-                tempRows,
-                medicationList,
-                conditionList,
-                sexList,
-                cancerTypeList,
-                selectedMedications,
-                selectedConditions,
-                selectedCancerType,
-                HistologicalList,
-                selectedHistologicalType
-            );
+            setRedux(tempRows);
         }
     }, [selectedSex, selectedConditions, selectedMedications, selectedCancerType, selectedHistologicalType]);
 
@@ -435,18 +380,7 @@ function VariantsSearch() {
                 setHistologicalList(processHistologicalTypeListData(response.results));
                 setLoading(false);
 
-                setRedux(
-                    tempRows,
-                    medicationList,
-                    conditionList,
-                    sexList,
-                    cancerTypeList,
-                    selectedMedications,
-                    selectedConditions,
-                    selectedCancerType,
-                    HistologicalList,
-                    selectedHistologicalType
-                );
+                setRedux(tempRows);
             }),
             'patientBox'
         );
