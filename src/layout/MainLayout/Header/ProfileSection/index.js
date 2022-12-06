@@ -239,7 +239,6 @@ const ProfileSection = () => {
                                                     className={classes.listItem}
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     selected={selectedIndex === 4}
-                                                    component={Link}
                                                     to="/auth/logout"
                                                 >
                                                     <ListItemIcon>
