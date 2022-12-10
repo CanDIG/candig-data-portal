@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { makeStyles, useTheme } from '@mui/styles';
@@ -239,7 +238,6 @@ const ProfileSection = () => {
                                                     className={classes.listItem}
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     selected={selectedIndex === 4}
-                                                    component={Link}
                                                     to="/auth/logout"
                                                 >
                                                     <ListItemIcon>
