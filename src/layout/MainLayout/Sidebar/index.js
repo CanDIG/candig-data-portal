@@ -60,12 +60,10 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                 </div>
             </Box>
             <BrowserView>
-                <PerfectScrollbar component="div" className={classes.ScrollHeight}>
-                </PerfectScrollbar>
+                <PerfectScrollbar component="div" className={classes.ScrollHeight} />
             </BrowserView>
             <MobileView>
-                <Box sx={{ px: 2 }}>
-                </Box>
+                <Box sx={{ px: 2 }} />
             </MobileView>
         </>
     );

@@ -162,15 +162,19 @@ function MCodeView() {
         });
     }
     // Parsing CancerType CSV into Dictionary
-    React.useEffect(() => papa.parse(cancerTypeCSV, {
-        header: true,
-        download: true,
-        skipEmptyLines: true,
-        // eslint-disable-next-line
-        complete: function (results) {
-            setCancerType(results.data);
-        }
-    }), []);
+    React.useEffect(
+        () =>
+            papa.parse(cancerTypeCSV, {
+                header: true,
+                download: true,
+                skipEmptyLines: true,
+                // eslint-disable-next-line
+                complete: function (results) {
+                    setCancerType(results.data);
+                }
+            }),
+        []
+    );
     // Subtable selection of patient
     const handleRowClick = (row) => {
         let index;
@@ -273,7 +277,7 @@ function MCodeView() {
                                 ) {
                                     if (
                                         selectedCancerType ===
-                                        `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
                                         selectedCancerType === 'NA'
                                     ) {
                                         patientCancerType = true;
@@ -289,11 +293,11 @@ function MCodeView() {
                                 if (
                                     data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
                                     data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                    cancerType[k]['Tumour histological type code']
+                                        cancerType[k]['Tumour histological type code']
                                 ) {
                                     if (
                                         selectedHistologicalType ===
-                                        `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
                                         selectedHistologicalType === 'NA'
                                     ) {
                                         patientHistologicalType = true;
@@ -411,7 +415,7 @@ function MCodeView() {
                                     ) {
                                         if (
                                             selectedCancerType ===
-                                            `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                                `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
                                             selectedCancerType === 'NA'
                                         ) {
                                             patientCancerType = true;
@@ -427,11 +431,11 @@ function MCodeView() {
                                     if (
                                         data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
                                         data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                        cancerType[k]['Tumour histological type code']
+                                            cancerType[k]['Tumour histological type code']
                                     ) {
                                         if (
                                             selectedHistologicalType ===
-                                            `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                                `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
                                             selectedHistologicalType === 'NA'
                                         ) {
                                             patientHistologicalType = true;

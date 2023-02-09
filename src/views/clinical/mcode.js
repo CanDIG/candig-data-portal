@@ -162,15 +162,19 @@ function MCodeView() {
         });
     }
     // Parsing CancerType CSV into Dictionary
-    React.useEffect(() => papa.parse(cancerTypeCSV, {
-        header: true,
-        download: true,
-        skipEmptyLines: true,
-        // eslint-disable-next-line
-        complete: function (results) {
-            setCancerType(results.data);
-        }
-    }), []);
+    React.useEffect(
+        () =>
+            papa.parse(cancerTypeCSV, {
+                header: true,
+                download: true,
+                skipEmptyLines: true,
+                // eslint-disable-next-line
+                complete: function (results) {
+                    setCancerType(results.data);
+                }
+            }),
+        []
+    );
     // Subtable selection of patient
     const handleRowClick = (row) => {
         let index;
