@@ -18,13 +18,13 @@ function ErrorNotFoundPage() {
             <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ minHeight: '100%' }}>
                 <img src={errorImages[index]} alt="Error 404" width="40%" />
                 <Typography variant="h4" gutterBottom component="div" m={4}>
-                    Sorry, there was a problem with your request. You can redirect to the Overview page below or choose from the sidebar on
+                    Sorry, there was a problem with your request. You can redirect to the Summary page below or choose from the sidebar on
                     the left.
                 </Typography>
                 <Grid container direction="row" justifyContent="center" spacing="12">
                     <Grid item>
-                        <Button href="/individuals-overview" variant="contained" color="primary">
-                            Overview
+                        <Button href="/summary" variant="contained" color="primary">
+                            Summary
                         </Button>
                     </Grid>
                     {/* <Grid item>

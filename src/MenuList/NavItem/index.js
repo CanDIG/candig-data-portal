@@ -18,27 +18,25 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 // style constant
 const useStyles = makeStyles((theme) => ({
     listIcon: {
-        minWidth: '18px',
+        minWidth: '14px',
         marginTop: 'auto',
         marginBottom: 'auto'
     },
     listCustomIconSub: {
-        width: '6px',
-        height: '6px'
+        width: '4px',
+        height: '4px'
     },
     listCustomIconSubActive: {
-        width: '8px',
-        height: '8px'
+        width: '4px',
+        height: '4px'
     },
     listItem: {
-        marginBottom: '5px',
         alignItems: 'center'
     },
     listItemNoBack: {
-        marginBottom: '5px',
         backgroundColor: 'transparent !important',
-        paddingTop: '8px',
-        paddingBottom: '8px',
+        paddingTop: '4px',
+        paddingBottom: '4px',
         alignItems: 'flex-start'
     },
     subMenuCaption: {
@@ -56,7 +54,7 @@ const NavItem = ({ item, level }) => {
 
     const Icon = item.icon;
     const itemIcon = item.icon ? (
-        <Icon stroke={1.5} size="1.3rem" className={classes.listCustomIcon} />
+        <Icon stroke={1} size="1.3rem" className={classes.listCustomIcon} />
     ) : (
         <FiberManualRecordIcon
             className={
@@ -101,16 +99,15 @@ const NavItem = ({ item, level }) => {
             {...listItemProps}
             disabled={item.disabled}
             className={level > 1 ? classes.listItemNoBack : classes.listItem}
-            sx={{ borderRadius: `${customization.borderRadius}px` }}
+            sx={{ borderRadius: `${customization.borderRadius}px`, height: '34px' }}
             selected={customization.isOpen.findIndex((id) => id === item.id) > -1}
             onClick={() => itemHandler(item.id)}
             target={itemTarget}
-            style={{ paddingLeft: `${level * 23}px` }}
         >
             <ListItemIcon className={itemIconClass}>{itemIcon}</ListItemIcon>
             <ListItemText
                 primary={
-                    <Typography variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h5' : 'body1'} color="inherit">
+                    <Typography variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h6' : 'subtitle2'} color="inherit">
                         {item.title}
                     </Typography>
                 }

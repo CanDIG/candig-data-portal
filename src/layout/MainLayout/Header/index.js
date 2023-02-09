@@ -7,6 +7,7 @@ import LogoSection from '../LogoSection';
 // import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 // import NotificationSection from './NotificationSection';
+import MenuList from '../../../MenuList';
 
 // assets
 import { IconMenu2 } from '@tabler/icons';
@@ -44,17 +45,21 @@ const Header = ({ handleLeftDrawerToggle }) => {
     return (
         <>
             {/* logo & toggler button */}
-            <div className={classes.boxContainer}>
-                <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
-                    <LogoSection />
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <div className={classes.boxContainer}>
+                    <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
+                        <LogoSection />
+                    </Box>
+                    <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                        <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
+                            <IconMenu2 stroke={1.5} size="1.3rem" />
+                        </Avatar>
+                    </ButtonBase>
+                </div>
+                <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
+                    <MenuList />
                 </Box>
-                <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
-                    <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
-                        <IconMenu2 stroke={1.5} size="1.3rem" />
-                    </Avatar>
-                </ButtonBase>
-            </div>
-
+            </Box>
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
             <div className={classes.grow} />
