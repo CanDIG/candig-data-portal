@@ -43,8 +43,6 @@ const NavGroup = ({ item }) => {
         }
     });
 
-    console.log(items);
-
     return (
         <>
             <List
