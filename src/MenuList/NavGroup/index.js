@@ -46,18 +46,19 @@ const NavGroup = ({ item }) => {
     return (
         <>
             <List
-                subheader={
-                    item.title && (
-                        <Typography variant="caption" className={classes.menuCaption} display="block" gutterBottom>
-                            {item.title}
-                            {item.caption && (
-                                <Typography variant="caption" className={classes.subMenuCaption} display="block" gutterBottom>
-                                    {item.caption}
-                                </Typography>
-                            )}
-                        </Typography>
-                    )
-                }
+            // Adds bold header grouping best used in sidebar
+            // subheader={
+            //     item.title && (
+            //         <Typography variant="caption" className={classes.menuCaption} display="block" gutterBottom>
+            //             {item.title}
+            //             {item.caption && (
+            //                 <Typography variant="caption" className={classes.subMenuCaption} display="block" gutterBottom>
+            //                     {item.caption}
+            //                 </Typography>
+            //             )}
+            //         </Typography>
+            //     )
+            // }
             >
                 {items}
             </List>

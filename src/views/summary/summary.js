@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 // import { useTheme, makeStyles } from '@mui/styles';
 import { Grid } from '@mui/material';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
-import CustomOfflineChart from 'views/overview/CustomOfflineChart';
-import TreatingCentreMap from 'views/overview/TreatingCentreMap';
+import CustomOfflineChart from 'views/summary/CustomOfflineChart';
+import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 import { trackPromise } from 'react-promise-tracker';
 
 // project imports
@@ -24,7 +24,7 @@ function toTitleCase(str) {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 }
 
-function IndividualsOverview() {
+function Summary() {
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
     const [provinceCounter, setProvinceCount] = useState(0);
@@ -212,4 +212,4 @@ function IndividualsOverview() {
     );
 }
 
-export default IndividualsOverview;
+export default Summary;

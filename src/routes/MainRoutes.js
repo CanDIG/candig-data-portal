@@ -10,14 +10,17 @@ import config from 'config';
 // import basename
 const { basename } = config;
 
-// Overview routing
-const IndividualsOverview = Loadable(lazy(() => import('views/overview/individuals')));
+// Summary routing
+const Summary = Loadable(lazy(() => import('views/summary/summary')));
 
 // Clinical
 const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
 
 // Genomic
 const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/VariantsSearch')));
+
+// Clinical & Genomic Search
+const ClinicalGenomicSearch = Loadable(lazy(() => import('views/clinicalGenomic/clinicalGenomicSearch')));
 
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
@@ -30,15 +33,15 @@ const MainRoutes = {
     children: [
         {
             path: `/`,
-            element: <IndividualsOverview />
+            element: <Summary />
         },
         {
             path: `${basename}/`,
-            element: <IndividualsOverview />
+            element: <Summary />
         },
         {
-            path: `${basename}/individuals-overview`,
-            element: <IndividualsOverview />
+            path: `${basename}/summary`,
+            element: <Summary />
         },
         {
             path: `${basename}/mcode`,
@@ -47,6 +50,10 @@ const MainRoutes = {
         {
             path: `${basename}/variants-search`,
             element: <VariantsSearchPage />
+        },
+        {
+            path: `${basename}/clinicalGenomicSearch`,
+            element: <ClinicalGenomicSearch />
         },
         {
             path: '*',

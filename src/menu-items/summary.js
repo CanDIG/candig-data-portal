@@ -13,20 +13,20 @@ const icons = {
 
 // ===========================|| Clinical MENU ITEMS ||=========================== //
 
-const overview = {
-    id: 'overview',
-    title: 'Overview',
+const summary = {
+    id: 'summary',
+    title: 'Summary',
     type: 'group',
     children: [
         {
             id: 'summary',
             title: 'Summary',
             type: 'item',
-            url: `${basename}/individuals-overview`,
+            url: `${basename}/summary`,
             icon: icons.IconReportMedical,
             breadcrumbs: false
         }
     ]
 };
 
-export default overview;
+export default summary;
