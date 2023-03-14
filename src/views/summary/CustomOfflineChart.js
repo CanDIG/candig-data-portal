@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// mui
+import { useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -6,6 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
+import { xAxis } from 'store/constant';
 
 window.Highcharts = Highcharts;
 
@@ -26,13 +30,28 @@ function splitString(newString) {
  * @param {string} datasetName
  * @param {array} dataObject
  */
-function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject }) {
+
+function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject, xAxis }) {
+    const theme = useTheme();
     const events = useSelector((state) => state);
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
         },
-        colors: ['#2196f3', '#90caf9', '#37ca50', '#aaffb8', '#ffc107'],
+        colors: [
+            theme.palette.primary[200],
+            theme.palette.primary.main,
+            theme.palette.primary.dark,
+            theme.palette.primary[800],
+            theme.palette.secondary[200],
+            theme.palette.secondary.main,
+            theme.palette.secondary.dark,
+            theme.palette.secondary[800],
+            theme.palette.tertiary[200],
+            theme.palette.tertiary.main,
+            theme.palette.tertiary.dark,
+            theme.palette.tertiary[800]
+        ],
         chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
         title: {
             text: splitString(barTitle)
@@ -84,7 +103,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
                     enabled: false
                 },
                 series: [{ data, colorByPoint: true, showInLegend: false }],
-                xAxis: { categories }
+                xAxis: xAxis
             });
         }
 
@@ -107,7 +126,8 @@ CustomOfflineChart.propTypes = {
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.number).isRequired
+    dataObject: PropTypes.objectOf(PropTypes.number).isRequired,
+    xAxis: PropTypes.array
 };
 
 CustomOfflineChart.defaultProps = {

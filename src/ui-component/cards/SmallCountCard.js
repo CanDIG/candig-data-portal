@@ -87,11 +87,13 @@ const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
                 >
                     <List className={classes.padding}>
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
-                            <ListItemAvatar>
-                                <Avatar variant="rounded" className={classes.avatar}>
-                                    {icon}
-                                </Avatar>
-                            </ListItemAvatar>
+                            {icon &&
+                                <ListItemAvatar>
+                                    <Avatar variant="rounded" className={classes.avatar}>
+                                        {icon}
+                                    </Avatar>
+                                </ListItemAvatar>
+                            }
                             <ListItemText
                                 className={classes.padding}
                                 sx={{

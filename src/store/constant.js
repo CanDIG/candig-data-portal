@@ -28,8 +28,6 @@ export const CLIN_METADATA = [
     'tumourboards'
 ];
 
-export const genomicsFileTypes = ['variantSets', 'readGroupSets', 'referenceSets', 'featureSets'];
-
 // Highcharts Map requires a specific set of codes for provinces
 // and territories, as represented by hcProvCodes below.
 export const hcProvCodes = [

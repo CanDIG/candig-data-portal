@@ -5,12 +5,14 @@ import HighchartsMap from 'highcharts/modules/map';
 import mapDataCanada from '@highcharts/map-collection/countries/ca/ca-all.geo.json';
 import PropTypes from 'prop-types';
 
+// mui
+import { useTheme } from '@mui/styles';
+
 import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import MainCard from 'ui-component/cards/MainCard';
 
 // Initialize HighchartsMap
 HighchartsMap(Highcharts);
-
 const initialState = {
     title: {
         text: 'CanDIG Data Source'
@@ -25,7 +27,7 @@ const initialState = {
     },
     colorAxis: {
         min: 0,
-        minColor: '#E6E7E8',
+        minColor: '#E4FFE9',
         maxColor: '#36B84C'
     },
     series: [
@@ -35,12 +37,11 @@ const initialState = {
             mapData: mapDataCanada,
             states: {
                 hover: {
-                    color: '#BADA55'
+                    color: '#1E88E5'
                 }
             },
-            dataLabels: {
-                enabled: false,
-                format: '{point.name}'
+            tooltip: {
+                pointFormat: '<b>{point.name}</b><br>- 850 Hospitals<br>- 95 Patients<br>- 2 Cohorts'
             }
         }
     ]
@@ -67,6 +68,7 @@ const provFullNames = [
 ];
 
 function reducer(state, action) {
+    const theme = useTheme();
     switch (action.type) {
         case 'addSeries':
             return {
@@ -80,12 +82,11 @@ function reducer(state, action) {
                             mapData: mapDataCanada,
                             states: {
                                 hover: {
-                                    color: '#BADA55'
+                                    color: theme.palette.primary.main
                                 }
                             },
-                            dataLabels: {
-                                enabled: false,
-                                format: '{point.name}'
+                            tooltip: {
+                                pointFormat: '<b>{point.name}</b><br>- Hospitals<br>- Patients<br>- Cohorts'
                             }
                         }
                     ]

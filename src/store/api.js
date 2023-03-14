@@ -29,7 +29,7 @@ export function fetchFederationStat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             request_type: 'GET',
-            endpoint_path: 'api/moh_overview',
+            endpoint_path: 'moh/v1/discovery/overview',
             endpoint_payload: {},
             endpoint_service: 'katsu'
         })
