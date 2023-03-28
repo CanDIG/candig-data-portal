@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useTheme } from '@mui/styles';
 
 // mui
 import { makeStyles } from '@mui/styles';
@@ -14,8 +15,8 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 // style constant
 const useStyles = makeStyles((theme) => ({
     card: {
-        backgroundColor: ({ dark }) => (dark ? theme.palette.primary.dark : null),
-        color: ({ dark }) => (dark ? theme.palette.primary.light : null),
+        backgroundColor: 'white',
+        color: ({ color }) => (color ? theme.palette.primary.light : null),
         overflow: 'hidden',
         position: 'relative',
         '&:after': {
@@ -23,9 +24,9 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: ({ dark }) =>
-                dark
-                    ? `linear-gradient(210.04deg, ${theme.palette.primary[200]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`
+            background: ({ color }) =>
+                color
+                    ? `linear-gradient(210.04deg, ${color} -50.94%, rgba(144, 202, 249, 0) 83.49%)`
                     : `linear-gradient(210.04deg, ${theme.palette.grey[700]} -50.94%, rgba(144, 202, 249, 0) 83.49%)`,
             borderRadius: '50%',
             // top: '160px',
@@ -37,9 +38,9 @@ const useStyles = makeStyles((theme) => ({
             position: 'absolute',
             width: '210px',
             height: '210px',
-            background: ({ dark }) =>
-                dark
-                    ? `linear-gradient(140.9deg, ${theme.palette.primary[200]} -14.02%, rgba(144, 202, 249, 0) 77.58%)`
+            background: ({ color }) =>
+                color
+                    ? `linear-gradient(140.9deg, ${color} -14.02%, rgba(144, 202, 249, 0) 77.58%)`
                     : `linear-gradient(140.9deg, ${theme.palette.grey[700]} -14.02%, rgba(144, 202, 249, 0) 70.50%)`,
             borderRadius: '50%',
             top: '-160px',
@@ -52,14 +53,15 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
-        backgroundColor: ({ dark }) => (dark ? theme.palette.primary[800] : theme.palette.grey[300]),
-        color: ({ dark }) => (dark ? '#fff' : theme.palette.grey[700])
+        backgroundColor: ({ color }) => (color ? 'white' : theme.palette.grey[300]),
+        color: ({ color }) => (color ? color : theme.palette.grey[700]),
+        border: ({ color }) => (color ? '1px solid' : null),
     },
     primary: {
-        color: ({ dark }) => (dark ? '#fff' : null)
+        color: ({ color }) => (color ? 'black' : '#fff')
     },
     secondary: {
-        color: ({ dark }) => (dark ? theme.palette.primary.light : theme.palette.grey[500]),
+        color: ({ color }) => (color ? theme.palette.grey[500] : 'white'),
         marginTop: '5px'
     },
     padding: {
@@ -70,9 +72,9 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| INDIVIDUALS - SMALL COUNT CARD ||=========================== //
 
-const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
+const SmallCountCard = ({ isLoading, title, count, icon, color }) => {
     const events = useSelector((state) => state);
-    const classes = useStyles({ dark });
+    const classes = useStyles({ color });
 
     return (
         <>
@@ -80,7 +82,7 @@ const SmallCountCard = ({ isLoading, title, count, dark, icon }) => {
                 <TotalIncomeCard />
             ) : (
                 <MainCard
-                    border={false}
+                    border={true}
                     sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
                     className={classes.card}
                     contentClass={classes.content}
@@ -123,8 +125,8 @@ SmallCountCard.propTypes = {
     isLoading: PropTypes.bool,
     title: PropTypes.string,
     count: PropTypes.any,
-    dark: PropTypes.bool,
-    icon: PropTypes.any
+    icon: PropTypes.any,
+    color: PropTypes.string
 };
 
 export default SmallCountCard;

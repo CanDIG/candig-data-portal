@@ -39,33 +39,10 @@ const initialState = {
                 hover: {
                     color: '#1E88E5'
                 }
-            },
-            tooltip: {
-                pointFormat: '<b>{point.name}</b><br>- 850 Hospitals<br>- 95 Patients<br>- 2 Cohorts'
             }
         }
     ]
 };
-
-// Highcharts Map requires a specific set of codes for provinces
-// and territories, as represented by hcProvCodes below.
-const hcProvCodes = ['ca-ab', 'ca-bc', 'ca-mb', 'ca-nb', 'ca-nl', 'ca-nt', 'ca-ns', 'ca-nu', 'ca-on', 'ca-pe', 'ca-qc', 'ca-sk', 'ca-yt'];
-const provShortCodes = ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'];
-const provFullNames = [
-    'Alberta',
-    'British Columbia',
-    'Manitoba',
-    'New Brunswick',
-    'Newfoundland and Labrador',
-    'Northwest Territories',
-    'Nova Scotia',
-    'Nunavut',
-    'Ontario',
-    'Prince Edward Island',
-    'Quebec',
-    'Saskatchewan',
-    'Yukon Territory'
-];
 
 function reducer(state, action) {
     const theme = useTheme();
@@ -97,7 +74,7 @@ function reducer(state, action) {
     }
 }
 
-function TreatingCentreMap({ data }) {
+function TreatingCentreMap({ data, hospitals, patients, cohorts }) {
     const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
 
@@ -117,39 +94,6 @@ function TreatingCentreMap({ data }) {
         trackPromise(updateChart);
     }, [data]);
 
-    // useEffect(() => {
-    // Mimic the didUpdate function
-    // try {
-    //     if (datasetId) {
-    //         trackPromise(
-    //             getCountsFederation(datasetId, 'enrollments', 'treatingCentreProvince')
-    //                 .then((data) => {
-    //                     let dataCount;
-    //
-    //                     if (data) {
-    //                         if (!data.results[0].enrollments[0]) {
-    //                             throw new Error();
-    //                         }
-    //                         const merged = mergeFederatedResults(data);
-    //                         const { treatingCentreProvince } = merged[0].enrollments[0];
-    //
-    //                         dataCount = processJson(treatingCentreProvince);
-    //                     }
-    //                     dispatchChartOptions({ type: 'addSeries', payload: dataCount });
-    //                 }).catch(() => {
-    //                 notify(
-    //                     notifyEl,
-    //                     'Some resources you requested were not available.',
-    //                     'warning',
-    //                 );
-    //                 dispatchChartOptions({ type: 'addSeries', payload: [] });
-    //             }),
-    //         );
-    //     }
-    // } catch (err) {
-    //     console.log(err);
-    // }
-    // }, [datasetName]);
     return (
         <MainCard>
             {promiseInProgress ? (

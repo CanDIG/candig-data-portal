@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
 import { Grid } from '@mui/material';
+import { useTheme } from '@mui/styles';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
@@ -15,27 +16,32 @@ import { gridSpacing } from 'store/constant';
 // assets
 import HiveIcon from '@mui/icons-material/Hive';
 // import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import PersonIcon from '@mui/icons-material/Person';
 import PublicIcon from '@mui/icons-material/Public';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { groupCount } from 'utils/utils';
+
+// Test data
+import { AGE, primarySite, cancerType, cohortByNode, fullClinicalData, fullGenomicData } from '../../store/constant';
+import { theme } from 'highcharts';
 
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 }
 
 function Summary() {
+    const theme = useTheme();
     const [isLoading, setLoading] = useState(true);
     const [individualCounter, setIndividualCount] = useState(0);
     const [provinceCounter, setProvinceCount] = useState(0);
     const [hospitalCounter, setHospitalCount] = useState(0);
     const [cohortCounter, setCohortCount] = useState(0);
-    const [serverObject, setServerObject] = useState({ '': 0 });
     const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
     const [genderObject, setGenderObject] = useState({ '': 0 });
     const [canDigDataSource, setCanDigDataSource] = useState({});
-    const [didFetch, setDidFetch] = useState(false);
-
+    const [nodeStatus, setNodeStatus] = useState(true);
     /* Aggregated count of federated data */
     function federationStatCount(data) {
         let hospitalCount = 0;
@@ -100,7 +106,6 @@ function Summary() {
                     } else {
                         summaryStats(data);
                     }
-                    setDidFetch(true);
                 })
                 .catch(() => {
                     // pass
@@ -111,136 +116,142 @@ function Summary() {
                 })
         );
 
-        trackPromise(
-            fetchServers()
-                .then((data) => {
-                    /* Aggregated federated server data */
-                    const SERVER_DATA = {
-                        'Known Peers': Object.keys(data).length,
-                        'Queried Peers': 2,
-                        'Successful Communications': 1
-                    };
-                    setServerObject(SERVER_DATA);
-                })
-                .catch(() => {
-                    // pass
-                    /* Local site data in the event of no federated URL */
-                    const SERVER_DATA = {
-                        'Known Peers': 1,
-                        'Queried Peers': 1,
-                        'Successful Communications': 1
-                    };
-                    setServerObject(SERVER_DATA);
-                })
-        );
-
         setLoading(false);
-    }, [didFetch]);
+    }, []);
 
     return (
-        <Grid container sx={{ gap: 1 }}>
-            <Grid container xs={12} sm={12} md={12} lg={12} sx={{ gap: 1 }}>
-                <Grid container xs={12} sm={12} md={6} lg={true} sx={{ gap: 1 }}>
-                    <Grid item xs={true} sm={true} md={true} lg={true}>
-                        <SmallCountCard title="Nodes" count={'1/2'} dark={false} />
+        <Grid container spacing={1}>
+            {nodeStatus ? (
+                <Grid container xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
+                    <Grid item xs={true} sm={true} md={true} lg={true} pr={1}>
+                        <SmallCountCard
+                            title="Nodes"
+                            count={'1/2'}
+                            icon={<CheckCircleOutlineIcon fontSize="inherit" />}
+                            color={theme.palette.secondary.main}
+                        />
                     </Grid>
                     <Grid item xs={true} sm={true} md={true} lg={true}>
-                        <SmallCountCard title="Connection Error" count={'1/2'} dark={false} />
+                        <SmallCountCard
+                            title="Connection Error"
+                            count={'1/2'}
+                            icon={<WarningAmberIcon fontSize="inherit" />}
+                            color={theme.palette.error.main}
+                        />
                     </Grid>
                 </Grid>
-                <Grid item xs={12} sm={12} md={true} lg={3}>
-                    <SmallCountCard
-                        isLoading={isLoading}
-                        title="Number of Patients"
-                        count={individualCounter}
-                        primary
-                        icon={<PersonIcon fontSize="inherit" />}
-                    />
-                </Grid>
+            ) : (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <SmallCountCard
-                        isLoading={isLoading}
-                        title="Provinces"
-                        count={provinceCounter}
-                        dark={false}
-                        icon={<PublicIcon fontSize="inherit" />}
+                        title="Nodes"
+                        count={'2'}
+                        icon={<CheckCircleOutlineIcon fontSize="inherit" />}
+                        color={theme.palette.secondary.main}
                     />
+
                 </Grid>
-                <Grid item xs={12} sm={12} md={true} lg={3}>
-                    <SmallCountCard
-                        title="Hospitals"
-                        count={hospitalCounter}
-                        dark={false}
-                        icon={<AccountBalanceIcon fontSize="inherit" />}
-                    />
-                </Grid>
+            )}
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    isLoading={isLoading}
+                    title="Number of Patients"
+                    count={individualCounter}
+                    primary
+                    icon={<PersonIcon fontSize="inherit" />}
+                    color={theme.palette.primary.main}
+                />
             </Grid>
-            <Grid container lg={12} sx={{ gap: 1 }}>
-                <Grid item xs={12} sm={12} md={12} lg={true}>
-                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    title="Hospitals"
+                    count={hospitalCounter}
+                    icon={<AccountBalanceIcon fontSize="inherit" />}
+                    color={theme.palette.secondary.main}
+                />
             </Grid>
-            <Grid container lg={12} sx={{ gap: 1 }}>
-                <Grid item xs={12} sm={12} md={12} lg={true}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={true}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={AGE}
-                        xAxis={xAxis}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                    />
-                </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    isLoading={isLoading}
+                    title="Provinces"
+                    count={provinceCounter}
+                    icon={<PublicIcon fontSize="inherit" />}
+                    color={theme.palette.tertiary.main}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={6} >
+                <TreatingCentreMap datasetName="" data={canDigDataSource} />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={AGE}
+                    chartType="bar"
+                    barTitle="Age Range Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Age Ranges"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={primarySite}
+                    chartType="bar"
+                    barTitle="Treatment Type Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Treatment Type"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={cancerType}
+                    chartType="bar"
+                    barTitle="Cancer Type Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Cancer Type"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={cohortByNode}
+                    chartType="bar"
+                    barTitle="Distribution of Cohort by Node"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Number of Patients per Node"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={fullClinicalData}
+                    chartType="bar"
+                    barTitle="Cases with Complete Clinical Data"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Cases with Complete Clinical Data"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={fullGenomicData}
+                    chartType="bar"
+                    barTitle="Cases with Complete Genomic Data"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Cases with Complete Genomic Data"
+                />
             </Grid>
         </Grid>
     );

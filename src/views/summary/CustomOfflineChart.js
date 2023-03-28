@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // mui
 import { useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
-import Highcharts from 'highcharts';
+import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -31,7 +31,7 @@ function splitString(newString) {
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject, xAxis }) {
+function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
     const theme = useTheme();
     const events = useSelector((state) => state);
     const [chartOptions, setChartOptions] = useState({
@@ -56,9 +56,8 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
         title: {
             text: splitString(barTitle)
         },
-        subtitle: {
-            text: datasetName
-        }
+        xAxis: { title: { text: xAxisTitle } },
+        yAxis: { title: { text: yAxisTitle } }
     });
 
     useEffect(() => {
@@ -98,20 +97,69 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
                 data.push(dataObject[key]);
                 return key;
             });
+
             setChartOptions({
                 credits: {
                     enabled: false
                 },
                 series: [{ data, colorByPoint: true, showInLegend: false }],
-                xAxis: xAxis
+                xAxis: { categories },
+                tooltip: {
+                    pointFormat: '<b>{point.name}:</b> {point.y}'
+                }
             });
         }
 
-        if (chartType === 'pie') {
-            createPieChart();
-        } else {
-            createBarChart();
+        /*
+        * Create Stacked Bar chart from props
+        */
+
+        function createStackedBarChart() {
+            const data = new Map();
+            const categories = [];
+            let i = 0;
+
+            Object.keys(dataObject).map((key) => {
+                categories.push(key);
+                Object.keys(dataObject[key]).map((cohort) => {
+                    if (data.has(cohort)) {
+                        data.get(cohort).splice(i, 1, dataObject[key][cohort])
+                    } else {
+                        data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
+                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
+                    }
+                });
+                i++;
+            });
+
+            const stackSeries = [];
+            for (let [key, value] of data) {
+                stackSeries.push({ name: key, data: value });
+            };
+
+            setChartOptions({
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                legend: { enabled: false },
+                series: stackSeries,
+                xAxis: { categories }
+            });
         }
+        console.log("Chart type " + chart);
+        if (chart === "pie") {
+            createPieChart();
+        } else if (chart === 'bar') {
+            createBarChart();
+        } else {
+            createStackedBarChart();
+        }
+
     }, [datasetName, dataObject, chartType]);
 
     return (
@@ -123,6 +171,7 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
 
 CustomOfflineChart.propTypes = {
     chartType: PropTypes.string.isRequired,
+    chart: PropTypes.string.isRequired,
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,

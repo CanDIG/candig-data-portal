@@ -87,18 +87,6 @@ export function fetchClinicalData(URL) {
 }
 
 /*
-Fetch peer servers from CanDIG federation service 
-*/
-export function fetchServers() {
-    return fetch(`${federation}/servers`, {}).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        return {};
-    });
-}
-
-/*
 Fetch variant for a specific Dataset Id; start; and reference name; and returns a promise
  * @param {number}... Start
  * @param {number}... End
