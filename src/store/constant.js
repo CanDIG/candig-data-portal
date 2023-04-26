@@ -98,6 +98,7 @@ export const highchartsMapInitialState = {
 // List of referenceNames
 
 export const ListOfReferenceNames = [
+    'All',
     '1',
     '2',
     '3',

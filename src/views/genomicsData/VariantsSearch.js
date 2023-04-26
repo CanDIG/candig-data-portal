@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import { useState, useEffect } from 'react';
-import MainCard from 'ui-component/cards/MainCard';
 import { Grid, Button, FormControl, InputLabel, Input, NativeSelect, Box } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import VariantsTable from 'ui-component/Tables/VariantsTable';
@@ -490,171 +489,81 @@ function VariantsSearch() {
 
     return (
         <>
-            <MainCard
-                title="Variants Search"
-                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
-            >
-                <AlertComponent
-                    open={open}
-                    setOpen={setOpen}
-                    text={alertMessage}
-                    severity={alertSeverity}
-                    variant="filled"
-                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
-                />
-                {!isLoading ? (
-                    <Grid container direction="row">
-                        <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
-                            <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>
-                                <span style={{ color: theme.palette.primary.main }}>
-                                    <b>Total Patients</b>
-                                </span>
-                                <br />
-                                <span>{patientList.length}</span>
-                            </Box>
-                            <DropDown
-                                setListOpen={setListOpenSex}
-                                isListOpen={isListOpenSex}
-                                dropDownLabel="Sex"
-                                currentSelection={selectedSex}
-                                dropDownItems={sexList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="SEX"
-                            />
-                            <DropDown
-                                setListOpen={setListOpenCancerType}
-                                isListOpen={isListOpenCancerType}
-                                dropDownLabel="Cancer Type"
-                                currentSelection={selectedCancerType}
-                                dropDownItems={cancerTypeList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="CANCER TYPE"
-                            />
-                            <DropDown
-                                setListOpen={setListOpenConditions}
-                                isListOpen={isListOpenConditions}
-                                dropDownLabel="Body Site"
-                                currentSelection={selectedConditions}
-                                dropDownItems={conditionList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="CONDITIONS"
-                            />
-                            <DropDown
-                                setListOpen={setListOpenMedications}
-                                isListOpen={isListOpenMedications}
-                                dropDownLabel="Medications"
-                                currentSelection={selectedMedications}
-                                dropDownItems={medicationList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="MEDICATIONS"
-                            />
-                            <DropDown
-                                setListOpen={setListOpenHistological}
-                                isListOpen={isListOpenHistological}
-                                dropDownLabel="Histological Type"
-                                currentSelection={selectedHistologicalType}
-                                dropDownItems={HistologicalList}
-                                selectOption={dropDownSelection}
-                                dropDownGroup="HISTOLOGICAL"
-                            />
-                        </Stack>
-                    </Grid>
-                ) : (
-                    <SearchIndicator area="patientBox" />
-                )}
-                <Grid container direction="column" className="content">
-                    <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
-                        <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
-                            <Grid item sx={{ minWidth: 150 }}>
-                                <FormControl fullWidth variant="standard">
-                                    <InputLabel id="ref-gene-label">Reference Genome</InputLabel>
-                                    <NativeSelect required id="genome">
-                                        <option value="gh38">gh38</option>
-                                        <option value="gh37">gh37</option>
-                                    </NativeSelect>
-                                </FormControl>
-                            </Grid>
-                            <Grid item sx={{ minWidth: 150 }}>
-                                <FormControl fullWidth variant="standard">
-                                    <InputLabel id="chr-label">Chromosome</InputLabel>
-                                    <NativeSelect required id="chromosome">
-                                        {chrSelectBuilder()}
-                                    </NativeSelect>
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <InputLabel for="start">Start</InputLabel>
-                                    <Input required type="number" id="start" />
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <InputLabel for="end">End</InputLabel>
-                                    <Input required type="number" id="end" />
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
-                                    >
-                                        Search
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <Button
-                                        variant="contained"
-                                        disabled={!showIGVButton}
-                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
-                                        onClick={toggleIGVWindow}
-                                    >
-                                        View in IGV
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <Button
-                                        variant="contained"
-                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
-                                        onClick={() => {
-                                            alert('This feature is not available yet');
-                                        }}
-                                    >
-                                        View in cBioPortal
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <FormControl variant="standard">
-                                    <Button
-                                        variant="contained"
-                                        sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
-                                        onClick={() => {
-                                            alert('This feature is not available yet');
-                                        }}
-                                    >
-                                        Data Analysis
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                    </form>
-
-                    {displayVariantsTable ? (
-                        <VariantsTable rowData={rowData} onChange={onCheckboxSelectionChanged} />
-                    ) : (
-                        <SearchIndicator area="table" />
-                    )}
-
-                    {isIGVWindowOpen && <IGViewer closeWindow={toggleIGVWindow} options={IGVOptions} />}
+            <AlertComponent
+                open={open}
+                setOpen={setOpen}
+                text={alertMessage}
+                severity={alertSeverity}
+                variant="filled"
+                fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+            />
+            {!isLoading ? (
+                <Grid container direction="row">
+                    <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+                        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2 }}>
+                            <span style={{ color: theme.palette.primary.main }}>
+                                <b>Total Patients</b>
+                            </span>
+                            <br />
+                            <span>{patientList.length}</span>
+                        </Box>
+                        <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
+                                <Box mr={2} ml={1} p={1} pr={5}>
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel id="ref-gene-label">Reference Genome</InputLabel>
+                                        <NativeSelect required id="genome">
+                                            <option value="gh38">gh38</option>
+                                            <option value="gh37">gh37</option>
+                                        </NativeSelect>
+                                    </FormControl>
+                                </Box>
+                                <Box mr={2} ml={1} p={1} pr={5}>
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel id="chr-label">Chromosome</InputLabel>
+                                        <NativeSelect required id="chromosome">
+                                            {chrSelectBuilder()}
+                                        </NativeSelect>
+                                    </FormControl>
+                                </Box>
+                                <Box mr={2} ml={1} p={1} pr={5}>
+                                    <FormControl variant="standard">
+                                        <InputLabel for="start">Start</InputLabel>
+                                        <Input required type="number" id="start" />
+                                    </FormControl>
+                                </Box>
+                                <Box mr={2} ml={1} p={1} pr={5}>
+                                    <FormControl variant="standard">
+                                        <InputLabel for="end">End</InputLabel>
+                                        <Input required type="number" id="end" />
+                                    </FormControl>
+                                </Box>
+                                <Box mr={2} ml={1} p={1} pr={5}>
+                                    <FormControl variant="standard">
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            sx={{ borderRadius: events.customization.borderRadius * 0.15 }}
+                                        >
+                                            Search
+                                        </Button>
+                                    </FormControl>
+                                </Box>
+                            </Stack>
+                        </form>
+                    </Stack>
                 </Grid>
-            </MainCard>
+            ) : (
+                <SearchIndicator area="patientBox" />
+            )}
+
+            {displayVariantsTable ? (
+                <VariantsTable rowData={rowData} onChange={onCheckboxSelectionChanged} />
+            ) : (
+                <SearchIndicator area="table" />
+            )}
+
+            {isIGVWindowOpen && <IGViewer closeWindow={toggleIGVWindow} options={IGVOptions} />}
         </>
     );
 }
