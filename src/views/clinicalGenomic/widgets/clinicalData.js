@@ -516,7 +516,7 @@ function ClinicalData() {
         <MainCard title="mCode Data" sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <Grid container direction="row">
                 {selectedPatient && desktopResolution && (
-                    <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
+                    <TableContainer className={classes.mobileRow + " "  +classes.scrollbar}>
                         <Table>
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
                                 <DropDown

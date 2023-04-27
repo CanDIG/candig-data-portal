@@ -10,13 +10,12 @@ function PatientCounts(props) {
         {/* Header */}
         {/* Individual counts*/}
         {sitesContext["sites"].map((site) => 
-            <>
+            <React.Fragment key={site}>
                 <PatientCountSingle
                     site={site}
-                    key={site}
                     />
                 <br />
-            </>
+            </React.Fragment>
         )}
     </>;
 }

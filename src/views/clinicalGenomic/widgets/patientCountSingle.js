@@ -6,6 +6,7 @@ import {
     Button,
     CardHeader,
     Divider,
+    Grid,
     Stack,
     Typography
 } from "@mui/material";
@@ -13,7 +14,8 @@ import { useTheme, makeStyles } from '@mui/styles';
 
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => {
+    return ({
     patientEntry: {
         // React center span?
     },
@@ -22,14 +24,19 @@ const useStyles = makeStyles((theme) => ({
         width: 120
     },
     locked: {
-        backgroundColor: "#e4e4e4"
+        backgroundColor: theme.palette.action.disabledBackground
     },
     button: {
         // Right-aligned
         float: "right",
         marginLeft: "auto"
+    },
+    divider: {
+        borderColor: theme.palette.primary.main,
+        marginTop: 20,
+        marginBottom: 4,
     }
-}));
+})});
 
 function PatientCountSingle(props) {
     const { site } = props;
@@ -55,37 +62,49 @@ function PatientCountSingle(props) {
     let cohorts = searchResults[site]["cohorts"];
     let locked = searchResults[site]["locked"];
 
-    return <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2 }} className={locked ? classes.locked : ""}>
-        <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2}>
-            <Box mr={2} ml={1} p={1} pr={5} className={classes.siteName}>
+    let avatarProps = locked ? {
+        // If we're locked out, gray out the avatar
+        sx: { bgcolor: theme.palette.action.disabled }
+    } : {};
+
+    return <Box mr={2} ml={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }} className={locked ? classes.locked : ""}>
+        <Grid container justifyContent="center" alignItems="center" spacing={2}>
+            <Grid item xs={2}>
                 <CardHeader
                     avatar={
-                        <Avatar>{site.slice(0,1).toUpperCase()}</Avatar>
+                        <Avatar
+                            {...avatarProps} >
+                            {site.slice(0,1).toUpperCase()}
+                        </Avatar>
                     }
-                    title={site}
+                    title={<b>{site}</b>}
                     />
-            </Box>
-            <Box mr={2} ml={1} p={1} pr={5}>
-                <Typography className={classes.patientEntry}>{totalPatients}</Typography>
-            </Box>
-            <Box mr={2} ml={1} p={1} pr={5}>
-                <Typography className={classes.patientEntry}>{patientsInSearch}</Typography>
-            </Box>
-            <Box mr={2} ml={1} p={1} pr={5}>
-                <Typography className={classes.patientEntry}>{cohorts}</Typography>
-            </Box>
-            <Box mr={2} ml={1} p={1} pr={5} className={classes.button}>
+            </Grid>
+            <Divider flexItem orientation="vertical" className={classes.divider}/>
+            <Grid item xs={2}>
+                <Typography align="center" className={classes.patientEntry}>{totalPatients}</Typography>
+            </Grid>
+            <Divider flexItem orientation="vertical" className={classes.divider}/>
+            <Grid item xs={2}>
+                <Typography align="center" className={classes.patientEntry}>{patientsInSearch}</Typography>
+            </Grid>
+            <Divider flexItem orientation="vertical" className={classes.divider}/>
+            <Grid item xs={2}>
+                <Typography align="center" className={classes.patientEntry}>{cohorts}</Typography>
+            </Grid>
+            <Divider flexItem orientation="vertical" className={classes.divider}/>
+            <Grid item xs={1} ml={"auto"} className={classes.button}>
                 {locked ?
                     <Button
                         type="submit"
                         variant="contained"
                         sx={{ borderRadius: 1.8 }}
                         >
-                        Request Access
+                        Request&nbsp;Access
                     </Button>
                 : <></>}
-            </Box>
-        </Stack>
+            </Grid>
+        </Grid>
     </Box>;
 }
 

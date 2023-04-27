@@ -18,12 +18,10 @@ import PivotTable from './widgets/pivotTable';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
-        position: 'fixed',
+        position: 'sticky',
         backgroundColor: "white",
-        width: '100%'
-    },
-    spacer: {
-        height: 100
+        width: '100%',
+        zIndex: 101
     },
     spaceBetween: {
         height: 30
@@ -50,8 +48,6 @@ function ClinicalGenomicSearch() {
                     {/* For now, until I figure out how to make it its own card */}
                     <Divider />
                 </div>
-                {/* Spacer for the sticky top to work */}
-                <div className={classes.spacer} />
                 {/* Patient Counts */}
                 <div id="counts">
                     <h3>Patient Counts</h3>

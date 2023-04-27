@@ -528,13 +528,13 @@ function VariantsSearch() {
                                 </Box>
                                 <Box mr={2} ml={1} p={1} pr={5}>
                                     <FormControl variant="standard">
-                                        <InputLabel for="start">Start</InputLabel>
+                                        <InputLabel>Start</InputLabel>
                                         <Input required type="number" id="start" />
                                     </FormControl>
                                 </Box>
                                 <Box mr={2} ml={1} p={1} pr={5}>
                                     <FormControl variant="standard">
-                                        <InputLabel for="end">End</InputLabel>
+                                        <InputLabel>End</InputLabel>
                                         <Input required type="number" id="end" />
                                     </FormControl>
                                 </Box>
