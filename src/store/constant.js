@@ -3,7 +3,7 @@
  */
 
 // Fake Data
-export const AGE = {
+export const diagnosis_age_count = {
     "0-19 Years": 10,
     "20-29 Years": 20,
     "30-39 Years": 40,
@@ -14,7 +14,7 @@ export const AGE = {
     "80+ Years": 15
 }
 
-export const primarySite = {
+export const treatment_type_count = {
     "Palate": 1,
     "Rectosigmoid junction": 1,
     "Tonsil": 3,
@@ -26,7 +26,7 @@ export const primarySite = {
     "Gum": 3
 };
 
-export const cancerType = {
+export const cancer_type_count = {
     "Breast C50.9": 50,
     "Ovary C56.9": 5,
     "Trachea C33": 30,

@@ -45,7 +45,6 @@ const initialState = {
 };
 
 function reducer(state, action) {
-    const theme = useTheme();
     switch (action.type) {
         case 'addSeries':
             return {
@@ -57,11 +56,6 @@ function reducer(state, action) {
                             type: 'map',
                             name: 'Province',
                             mapData: mapDataCanada,
-                            states: {
-                                hover: {
-                                    color: theme.palette.primary.main
-                                }
-                            },
                             tooltip: {
                                 pointFormat: '<b>{point.name}</b><br>- Hospitals<br>- Patients<br>- Cohorts'
                             }

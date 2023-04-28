@@ -9,7 +9,6 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
-import { xAxis } from 'store/constant';
 
 window.Highcharts = Highcharts;
 
@@ -37,19 +36,18 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
-        },
-        colors: [
+        }, colors: [
             theme.palette.primary[200],
-            theme.palette.primary.main,
-            theme.palette.primary.dark,
-            theme.palette.primary[800],
             theme.palette.secondary[200],
-            theme.palette.secondary.main,
-            theme.palette.secondary.dark,
-            theme.palette.secondary[800],
             theme.palette.tertiary[200],
+            theme.palette.primary.main,
+            theme.palette.secondary.main,
             theme.palette.tertiary.main,
+            theme.palette.primary.dark,
+            theme.palette.secondary.dark,
             theme.palette.tertiary.dark,
+            theme.palette.primary[800],
+            theme.palette.secondary[800],
             theme.palette.tertiary[800]
         ],
         chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
@@ -60,16 +58,30 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         yAxis: { title: { text: yAxisTitle } }
     });
 
+
     useEffect(() => {
         /*
          * Create a Pie chart from props
          */
-
         function createPieChart() {
             const options = {
                 credits: {
                     enabled: false
                 },
+                colors: [
+                    theme.palette.primary[200],
+                    theme.palette.primary.main,
+                    theme.palette.primary.dark,
+                    theme.palette.primary[800],
+                    theme.palette.secondary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[200],
+                    theme.palette.tertiary.main,
+                    theme.palette.tertiary.dark,
+                    theme.palette.tertiary[800]
+                ],
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -93,6 +105,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         function createBarChart() {
             const data = [];
 
+            // See dataObject type
             const categories = Object.keys(dataObject).map((key) => {
                 data.push(dataObject[key]);
                 return key;
@@ -102,6 +115,9 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 credits: {
                     enabled: false
                 },
+                colors: [
+                    theme.palette.primary.dark
+                ],
                 series: [{ data, colorByPoint: true, showInLegend: false }],
                 xAxis: { categories },
                 tooltip: {
@@ -141,6 +157,21 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 credits: {
                     enabled: false
                 },
+                colors: [
+
+                    theme.palette.secondary[200],
+                    theme.palette.tertiary[200],
+                    theme.palette.primary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.tertiary.main,
+                    theme.palette.primary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.tertiary.dark,
+                    theme.palette.primary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[800],
+                    theme.palette.primary[800],
+                ],
                 plotOptions: {
                     series: {
                         stacking: 'normal'
@@ -151,7 +182,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 xAxis: { categories }
             });
         }
-        console.log("Chart type " + chart);
+
         if (chart === "pie") {
             createPieChart();
         } else if (chart === 'bar') {
@@ -175,7 +206,7 @@ CustomOfflineChart.propTypes = {
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.number).isRequired,
+    dataObject: PropTypes.objectOf(PropTypes.any).isRequired,
     xAxis: PropTypes.array
 };
 

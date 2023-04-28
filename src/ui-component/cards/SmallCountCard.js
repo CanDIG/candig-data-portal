@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { useTheme } from '@mui/styles';
 
 // mui
 import { makeStyles } from '@mui/styles';

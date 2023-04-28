@@ -11,25 +11,25 @@ export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
 Fetch katsu calls
 */
 export function fetchKatsu(URL) {
-    return fetch(`${katsu}${URL}`)
-        .then((response) => response.json())
-        .then((data) =>
-            fetch(`${katsu}${URL}?page_size=${data.count}`) // Page size by default is 25 set page size to count to returns all
-                .then((response) => response.json())
-                .then((data) => data)
-        );
+    return fetch(`${katsu}/moh/v1/discovery/overview/${URL}`)
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
 }
 
 /*
 Fetch the federation service 
 */
-export function fetchFederationStat() {
+export function fetchFederationStat(endpoint) {
     return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             request_type: 'GET',
-            endpoint_path: 'moh/v1/discovery/overview',
+            endpoint_path: `moh/v1/discovery/overview${endpoint}`,
             endpoint_payload: {},
             endpoint_service: 'katsu'
         })
