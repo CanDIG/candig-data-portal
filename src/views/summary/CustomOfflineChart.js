@@ -10,16 +10,12 @@ import MainCard from 'ui-component/cards/MainCard';
 // REDUX
 import { useSelector } from 'react-redux';
 
+// Project import
+import { splitString } from 'utils/utils';
+
 window.Highcharts = Highcharts;
 
-/*
- * Transform a camelCase string to a capital spaced string
- */
-function splitString(newString) {
-    const splitted = newString.replace(/([a-z])([A-Z])/g, '$1 $2');
-    const capitalized = splitted.charAt(0).toUpperCase() + splitted.substr(1);
-    return capitalized;
-}
+
 
 /*
  * Component for offline chart
@@ -33,6 +29,10 @@ function splitString(newString) {
 function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
     const theme = useTheme();
     const events = useSelector((state) => state);
+    let dataSum = 0;
+    for (const count in dataObject) {
+        dataSum += count;
+    }
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -121,7 +121,18 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 series: [{ data, colorByPoint: true, showInLegend: false }],
                 xAxis: { categories },
                 tooltip: {
-                    pointFormat: '<b>{point.name}:</b> {point.y}'
+                    useHTML: true,
+                    formatter: function () {
+                        var dataSum = 0,
+                            pcnt;
+
+                        this.series.points.forEach(function (point) {
+                            dataSum += point.y;
+                        });
+
+                        pcnt = (this.y / dataSum) * 100;
+                        return '<b>' + this.point.category + '</b>' + '<br> - ' + this.y + ' <br> - ' + Highcharts.numberFormat(pcnt) + '%';
+                    }
                 }
             });
         }
@@ -179,7 +190,10 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 },
                 legend: { enabled: false },
                 series: stackSeries,
-                xAxis: { categories }
+                xAxis: { categories },
+                tooltip: {
+                    pointFormat: '<b>{point.name}:</b> {point.y}'
+                }
             });
         }
 

@@ -57,7 +57,7 @@ function reducer(state, action) {
                             name: 'Province',
                             mapData: mapDataCanada,
                             tooltip: {
-                                pointFormat: '<b>{point.name}</b><br>- Hospitals<br>- Patients<br>- Cohorts'
+                                pointFormat: '<b>{point.name}</b><br>- Patients {point.value}'
                             }
                         }
                     ]
@@ -67,8 +67,7 @@ function reducer(state, action) {
             throw new Error();
     }
 }
-
-function TreatingCentreMap({ data, hospitals, patients, cohorts }) {
+function TreatingCentreMap({ data }) {
     const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
 

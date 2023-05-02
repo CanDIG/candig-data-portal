@@ -7,10 +7,10 @@ import useTheme from '@mui/styles/useTheme';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
-import { trackPromise } from 'react-promise-tracker';
 
 // project imports
 import { fetchFederationStat } from 'store/api';
+import { aggregateObj, aggregateObjStack } from 'utils/utils';
 
 // assets
 import {
@@ -18,23 +18,17 @@ import {
     CheckCircleOutline,
     WarningAmber,
     Person,
-    Public,
-    AccountBalance
+    Public
 } from '@mui/icons-material';
 
 // Test data
 import { fullClinicalData, fullGenomicData } from '../../store/constant';
-
-function toTitleCase(str) {
-    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-}
 
 function Summary() {
     const theme = useTheme();
     const [isLoading, setLoading] = useState(true);
 
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [hospitalCounter, setHospitalCount] = useState(0);
     const [individual_count, setIndividualCount] = useState({});
     const [cancer_type_count, setCancerTypeCount] = useState({});
     const [treatment_type_count, setTreatmentTypeCount] = useState({});
@@ -47,64 +41,37 @@ function Summary() {
     const [sites, setSites] = useState(0);
     const [totalSites, setTotalSites] = useState(0);
 
-
     const [canDigDataSource, setCanDigDataSource] = useState({});
     const [nodeStatus, setNodeStatus] = useState(true);
 
-    /* Object Aggregation */
-    function aggregateObj(stat, aggregateObj) {
-        const count = aggregateObj;
-        for (const key in stat) {
-            if (count.hasOwnProperty(key)) {
-                count[key] += stat[key];
-            } else {
-                count[key] = stat[key];
-            }
-        }
-        delete count.location;
-        return count;
-
-    }
-
-    /* Object Aggregation for Stack Bar chart */
-    function aggregateObjStack(stat, Object) {
-        const count = Object;
-        count[stat.location[0]] = stat;
-        delete count[stat.location[0]].location;
-        return count;
-    }
-
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
-        let hospitalCount = 0;
-        let provinceCount = 0;
         const candigDataSouceCollection = {};
 
 
         if (data.results) {
-            console.log(data);
+            // Fake Server with same URL
+            data.results[0].location[0] = "UHN";
+            data.results[0].location[1] = "Ontario";
+            data.results[0].location[2] = "ca-on";
+
+            let count = [];
             data.results.forEach((stat) => {
 
-                hospitalCount += stat?.location ? 1 : 0;
-                provinceCount += stat?.location ? 1 : 0;
-
+                count++;
                 switch (endpoint) {
                     case '/individual_count':
                         setIndividualCount(aggregateObj(stat, individual_count));
                         if (stat.location) {
-                            console.log(stat);
                             candigDataSouceCollection[stat.location[2]] = stat.individual_count;
-                            setCanDigDataSource(candigDataSouceCollection);
+
+                            if (count === data.results.length) {
+                                setCanDigDataSource(candigDataSouceCollection);
+                            }
                         }
                         break;
-                    case '/cohorts_count':
+                    case '/cohort_count':
                         setCohortCount(aggregateObj(stat, cohort_count));
-                        break;
-                    case '/hospital_count':
-                        hospitalCount += stat?.location ? 1 : 0;
-                        break;
-                    case '/province_count':
-                        provinceCount += stat?.location ? 1 : 0;
                         break;
                     case '/patients_per_cohort':
                         // Different aggregation must be used to stack the bar chart
@@ -115,21 +82,23 @@ function Summary() {
                         break;
                     case '/treatment_type_count':
                         setTreatmentTypeCount(aggregateObj(stat, treatment_type_count));
+                        console.log("treatment: " + JSON.stringify(treatment_type_count));
                         break;
                     case '/diagnosis_age_count':
                         setDiagnosisAgeCount(aggregateObj(stat, diagnosis_age_count));
                         break;
                 }
-
             });
         }
-
-        setProvinceCount(provinceCount);
-        setHospitalCount(hospitalCount);
     }
 
     function federationNode(data) {
         const nodeMap = new Map();
+
+        if (data.message) {
+            setProvinceCount((data.message).length);
+        }
+
         data.message.forEach((message) => {
             const msg = message.split(" ");
             if (msg[0] === "Success!") {
@@ -142,6 +111,7 @@ function Summary() {
         setSites(nodeMap.get("Active"));
         setConnectionError(nodeMap.get("Error"));
         setTotalSites(nodeMap.get("Active") + nodeMap.get("Error"));
+
         if (nodeMap.get("Error") >= 1) {
             setNodeStatus(true);
         } else {
@@ -151,9 +121,6 @@ function Summary() {
 
 
     useEffect(() => {
-        // For each url in list fetch the data
-        // const loadData = async () => {
-        //     setLoading(true);
         function fetchData(endpoint) {
             fetchFederationStat(endpoint)
                 .then((data) => {
@@ -168,6 +135,7 @@ function Summary() {
                     setLoading(false);
                 }).finally(() => setLoading(false));
         };
+
         fetchData('/individual_count')
         setTimeout(() => {
             fetchData('/cancer_type_count');
@@ -176,7 +144,6 @@ function Summary() {
             fetchData('/cohort_count');
         }, 3000);
         setTimeout(() => {
-            // fetchData('/gender_count');
             fetchData('/patients_per_cohort');
         }, 3750);
         setTimeout(() => {
@@ -186,10 +153,6 @@ function Summary() {
             fetchData('/diagnosis_age_count');
         }, 9250)
 
-        // }
-
-        // loadData();
-        // setLoading(false);
     }, []);
 
     return (
@@ -236,9 +199,9 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
-                    title="Hospitals"
-                    count={hospitalCounter}
-                    icon={<AccountBalance fontSize="inherit" />}
+                    title="Cohorts"
+                    count={cohort_count.cohort_count}
+                    icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
             </Grid>
@@ -251,9 +214,11 @@ function Summary() {
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={6} >
-                <TreatingCentreMap datasetName="" data={canDigDataSource} />
-            </Grid>
+            {(Object.keys(canDigDataSource).length !== 0 && cohort_count) &&
+                <Grid item xs={12} sm={12} md={12} lg={6} >
+                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
+                </Grid>
+            }
             {Object.keys(diagnosis_age_count).length !== 0 &&
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
