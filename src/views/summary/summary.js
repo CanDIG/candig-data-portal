@@ -82,7 +82,6 @@ function Summary() {
                         break;
                     case '/treatment_type_count':
                         setTreatmentTypeCount(aggregateObj(stat, treatment_type_count));
-                        console.log("treatment: " + JSON.stringify(treatment_type_count));
                         break;
                     case '/diagnosis_age_count':
                         setDiagnosisAgeCount(aggregateObj(stat, diagnosis_age_count));
