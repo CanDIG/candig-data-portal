@@ -1,24 +1,69 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { useSearchResultsReaderContext } from '../SearchResultsContext';
+import PropTypes from 'prop-types';
+
+import { useSearchResultsReaderContext, useSearchResultsWriterContext } from '../SearchResultsContext';
 
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
     Tab,
     Tabs
 } from "@mui/material";
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles((theme) => ({
+    tab: {
+        minWidth: 40
+    }
+}));
 
 function Sidebar(props) {
-    const [selectedtab, setSelectedTab] = useState();
-    const resultsContext = useSearchResultsReaderContext();
-    console.log(resultsContext);
-    //const resultsContext = {sites: ["BCGSC", "UHN"]};
+    const { cohorts, primarySites, sites, treatments, radiation,  } = props;
+    const [selectedtab, setSelectedTab] = useState("All");
+    const classes = useStyles();
 
-    return <Tabs value={selectedtab} onChange={setSelectedTab}>
-        <Tab label="All" />
-        <Tab label="Clinical" />
-        <Tab label="Genomic" />
+    return <>
+    <Tabs value={selectedtab} onChange={setSelectedTab}>
+        <Tab className={classes.tab} value="All" label="All" />
+        <Tab className={classes.tab} value="Clinical" label="Clinical" />
+        <Tab className={classes.tab} value="Genomic" label="Genomic" />
     </Tabs>
+    <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+        <FormLabel>Node</FormLabel>
+        <FormGroup>
+            {sites.map((site) => (
+                <FormControlLabel
+                    label={site}
+                    control={
+                    <Checkbox checked={false} />}
+                    />
+                    ))}
+        </FormGroup>
+    </FormControl>
+    <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+        <FormLabel>Cohort</FormLabel>
+        <FormGroup>
+            {cohorts.map((cohort) => (
+                <FormControlLabel
+                    label={cohort}
+                    control={
+                    <Checkbox checked={false} />}
+                    />
+                    ))}
+        </FormGroup>
+    </FormControl>
+    </>;
 }
 
-export default DataVisualization;
+Sidebar.propTypes = {
+    sites: PropTypes.array
+};
+
+export default Sidebar;
 

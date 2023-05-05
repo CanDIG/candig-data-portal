@@ -15,6 +15,8 @@ import PatientCounts from './widgets/patientCounts.js';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
 import PivotTable from './widgets/pivotTable';
+import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
+import Sidebar from './widgets/sidebar.js';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
@@ -31,6 +33,12 @@ const useStyles = makeStyles((theme) => ({
 function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
     const classes = useStyles();
+    const sidebarWriter = useSidebarWriterContext();
+
+    // When we load, set the sidebar component
+    useEffect(() => {
+        sidebarWriter(<Sidebar sites={["BCGSC", "UHN"]}/>);
+    }, []);
 
     return <SearchResultsProvider>
         <FederationSitesProvider>

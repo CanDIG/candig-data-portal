@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useFederationSitesReaderContext } from '../FederationSitesContext';
+import { useSearchResultsContext } from '../SearchResultsContext';
 import PatientCountSingle from "./patientCountSingle";
 
 function PatientCounts(props) {
-    //const sitesContext = useFederationSitesReaderContext();
+    //const sitesContext = useSearchResultsContext();
     const sitesContext = {sites: ["BCGSC", "UHN"]}
 
     return <>

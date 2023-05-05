@@ -1,6 +1,6 @@
 import React from "react";
 
-const DEFAULT_STATE = {};
+const DEFAULT_STATE = <></>;
 
 const SidebarReaderContext = React.createContext(DEFAULT_STATE);
 const SidebarWriterContext = React.createContext();
