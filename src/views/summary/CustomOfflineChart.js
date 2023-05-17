@@ -15,8 +15,6 @@ import { splitString } from 'utils/utils';
 
 window.Highcharts = Highcharts;
 
-
-
 /*
  * Component for offline chart
  * @param {string} chartType
@@ -36,7 +34,8 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
-        }, colors: [
+        },
+        colors: [
             theme.palette.primary[200],
             theme.palette.secondary[200],
             theme.palette.tertiary[200],
@@ -57,7 +56,6 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         xAxis: { title: { text: xAxisTitle } },
         yAxis: { title: { text: yAxisTitle } }
     });
-
 
     useEffect(() => {
         /*
@@ -115,9 +113,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 credits: {
                     enabled: false
                 },
-                colors: [
-                    theme.palette.primary.dark
-                ],
+                colors: [theme.palette.primary.dark],
                 series: [{ data, colorByPoint: true, showInLegend: false }],
                 xAxis: { categories },
                 tooltip: {
@@ -138,8 +134,8 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         }
 
         /*
-        * Create Stacked Bar chart from props
-        */
+         * Create Stacked Bar chart from props
+         */
 
         function createStackedBarChart() {
             const data = new Map();
@@ -150,7 +146,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 categories.push(key);
                 Object.keys(dataObject[key]).map((cohort) => {
                     if (data.has(cohort)) {
-                        data.get(cohort).splice(i, 1, dataObject[key][cohort])
+                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
                     } else {
                         data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
                         data.get(cohort).splice(i, 1, dataObject[key][cohort]);
@@ -162,14 +158,13 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             const stackSeries = [];
             for (let [key, value] of data) {
                 stackSeries.push({ name: key, data: value });
-            };
+            }
 
             setChartOptions({
                 credits: {
                     enabled: false
                 },
                 colors: [
-
                     theme.palette.secondary[200],
                     theme.palette.tertiary[200],
                     theme.palette.primary[200],
@@ -181,7 +176,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                     theme.palette.primary.dark,
                     theme.palette.secondary[800],
                     theme.palette.tertiary[800],
-                    theme.palette.primary[800],
+                    theme.palette.primary[800]
                 ],
                 plotOptions: {
                     series: {
@@ -197,14 +192,13 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             });
         }
 
-        if (chart === "pie") {
+        if (chart === 'pie') {
             createPieChart();
         } else if (chart === 'bar') {
             createBarChart();
         } else {
             createStackedBarChart();
         }
-
     }, [datasetName, dataObject, chartType]);
 
     return (

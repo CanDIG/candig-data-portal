@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         ...theme.typography.largeAvatar,
         backgroundColor: ({ color }) => (color ? 'white' : theme.palette.grey[300]),
         color: ({ color }) => (color ? color : theme.palette.grey[700]),
-        border: ({ color }) => (color ? '1px solid' : null),
+        border: ({ color }) => (color ? '1px solid' : null)
     },
     primary: {
         color: ({ color }) => (color ? 'black' : '#fff')
@@ -88,13 +88,13 @@ const SmallCountCard = ({ isLoading, title, count, icon, color }) => {
                 >
                     <List className={classes.padding}>
                         <ListItem alignItems="center" disableGutters className={classes.padding}>
-                            {icon &&
+                            {icon && (
                                 <ListItemAvatar>
                                     <Avatar variant="rounded" className={classes.avatar}>
                                         {icon}
                                     </Avatar>
                                 </ListItemAvatar>
-                            }
+                            )}
                             <ListItemText
                                 className={classes.padding}
                                 sx={{

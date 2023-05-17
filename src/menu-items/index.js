@@ -10,7 +10,7 @@ import summary from './summary';
 // ===========================|| MENU ITEMS ||=========================== //
 
 const menuItems = {
-    items: [summary, clinicalGenomicSearch, clinical, genomicsData /* pages, utilities, other */]
+    items: [summary, clinicalGenomicSearch /* pages, utilities, other */]
 };
 
 export default menuItems;

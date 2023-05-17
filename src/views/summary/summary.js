@@ -13,16 +13,10 @@ import { fetchFederationStat } from 'store/api';
 import { aggregateObj, aggregateObjStack } from 'utils/utils';
 
 // assets
-import {
-    Hive,
-    CheckCircleOutline,
-    WarningAmber,
-    Person,
-    Public
-} from '@mui/icons-material';
+import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
 // Test data
-import { fullClinicalData, fullGenomicData } from '../../store/constant';
+import { fullClinicalData, fullGenomicData, diagnosis_age_count } from '../../store/constant';
 
 function Summary() {
     const theme = useTheme();
@@ -34,7 +28,7 @@ function Summary() {
     const [treatment_type_count, setTreatmentTypeCount] = useState({});
     const [cohort_count, setCohortCount] = useState({});
     const [patients_per_cohort, setPatientsPerCohort] = useState({});
-    const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
+    //const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -48,16 +42,15 @@ function Summary() {
     function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
 
-
         if (data.results) {
             // Fake Server with same URL
-            data.results[0].location[0] = "UHN";
-            data.results[0].location[1] = "Ontario";
-            data.results[0].location[2] = "ca-on";
+            data.results[0].location[0] = 'UHN';
+            data.results[0].location[1] = 'Ontario';
+            data.results[0].location[2] = 'ca-on';
 
             let count = [];
             data.results.forEach((stat) => {
-
+                // Federation aggregate count of stats
                 count++;
                 switch (endpoint) {
                     case '/individual_count':
@@ -74,7 +67,6 @@ function Summary() {
                         setCohortCount(aggregateObj(stat, cohort_count));
                         break;
                     case '/patients_per_cohort':
-                        // Different aggregation must be used to stack the bar chart
                         setPatientsPerCohort(aggregateObjStack(stat, patients_per_cohort));
                         break;
                     case '/cancer_type_count':
@@ -92,50 +84,56 @@ function Summary() {
     }
 
     function federationNode(data) {
+        console.log(data);
         const nodeMap = new Map();
 
+        // Set Site Count/Provinces
         if (data.message) {
-            setProvinceCount((data.message).length);
+            setProvinceCount(data.message.length);
         }
 
+        // Count Node Status
         data.message.forEach((message) => {
-            const msg = message.split(" ");
-            if (msg[0] === "Success!") {
-                nodeMap.set("Active", nodeMap.get("Active") ? nodeMap.get("Active") + 1 : 1);
+            const msg = message.split(' ');
+            if (msg[0] === 'Success!') {
+                nodeMap.set('Active', nodeMap.get('Active') ? nodeMap.get('Active') + 1 : 1);
             } else {
-                nodeMap.set("Error", nodeMap.get("Error") ? nodeMap.get("Error") + 1 : 1);
+                nodeMap.set('Error', nodeMap.get('Error') ? nodeMap.get('Error') + 1 : 1);
             }
         });
 
-        setSites(nodeMap.get("Active"));
-        setConnectionError(nodeMap.get("Error"));
-        setTotalSites(nodeMap.get("Active") + nodeMap.get("Error"));
+        // Set node status information
+        setSites(nodeMap.get('Active'));
+        setConnectionError(nodeMap.get('Error'));
+        setTotalSites(nodeMap.get('Active') + nodeMap.get('Error'));
 
-        if (nodeMap.get("Error") >= 1) {
+        // Set rendering of node status
+        if (nodeMap.get('Error') >= 1) {
             setNodeStatus(true);
         } else {
             setNodeStatus(false);
         }
     }
 
-
     useEffect(() => {
         function fetchData(endpoint) {
             fetchFederationStat(endpoint)
                 .then((data) => {
                     federationStatCount(data, endpoint);
-                    if (endpoint === "/individual_count") {
+                    if (endpoint === '/individual_count') {
                         federationNode(data);
                     }
-                }).catch((error) => {
+                })
+                .catch((error) => {
                     // pass
                     console.log('Error fetching data : ', error);
 
                     setLoading(false);
-                }).finally(() => setLoading(false));
-        };
+                })
+                .finally(() => setLoading(false));
+        }
 
-        fetchData('/individual_count')
+        fetchData('/individual_count');
         setTimeout(() => {
             fetchData('/cancer_type_count');
         }, 250);
@@ -150,8 +148,7 @@ function Summary() {
         }, 6500);
         setTimeout(() => {
             fetchData('/diagnosis_age_count');
-        }, 9250)
-
+        }, 9250);
     }, []);
 
     return (
@@ -183,7 +180,6 @@ function Summary() {
                         icon={<CheckCircleOutline fontSize="inherit" />}
                         color={theme.palette.secondary.main}
                     />
-
                 </Grid>
             )}
             <Grid item xs={12} sm={12} md={6} lg={3}>
@@ -213,12 +209,12 @@ function Summary() {
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            {(Object.keys(canDigDataSource).length !== 0 && cohort_count) &&
-                <Grid item xs={12} sm={12} md={12} lg={6} >
+            {Object.keys(canDigDataSource).length !== 0 && cohort_count && (
+                <Grid item xs={12} sm={12} md={12} lg={6}>
                     <TreatingCentreMap datasetName="" data={canDigDataSource} />
                 </Grid>
-            }
-            {Object.keys(diagnosis_age_count).length !== 0 &&
+            )}
+            {Object.keys(diagnosis_age_count).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -231,8 +227,8 @@ function Summary() {
                         yAxisTitle="Number of Patients"
                     />
                 </Grid>
-            }
-            {Object.keys(treatment_type_count).length !== 0 &&
+            )}
+            {Object.keys(treatment_type_count).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -245,8 +241,8 @@ function Summary() {
                         yAxisTitle="Number of Patients"
                     />
                 </Grid>
-            }
-            {Object.keys(cancer_type_count).length !== 0 &&
+            )}
+            {Object.keys(cancer_type_count).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -259,8 +255,8 @@ function Summary() {
                         yAxisTitle="Number of Patients"
                     />
                 </Grid>
-            }
-            {Object.keys(patients_per_cohort).length !== 0 &&
+            )}
+            {Object.keys(patients_per_cohort).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -273,8 +269,8 @@ function Summary() {
                         yAxisTitle="Number of Patients per Node"
                     />
                 </Grid>
-            }
-            {Object.keys(fullClinicalData).length !== 0 &&
+            )}
+            {Object.keys(fullClinicalData).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -287,8 +283,8 @@ function Summary() {
                         yAxisTitle="Cases with Complete Clinical Data"
                     />
                 </Grid>
-            }
-            {Object.keys(fullGenomicData).length !== 0 &&
+            )}
+            {Object.keys(fullGenomicData).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
@@ -301,8 +297,8 @@ function Summary() {
                         yAxisTitle="Cases with Complete Genomic Data"
                     />
                 </Grid>
-            }
-        </Grid >
+            )}
+        </Grid>
     );
 }
 

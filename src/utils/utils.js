@@ -1,7 +1,7 @@
 /* Object Aggregation
  * @param {object} stat: The object to aggregate
  * @param {object} aggregateObj: The object to aggregate into
- * @return an object with different values of the queried property 
+ * @return an object with different values of the queried property
  * being the key, and frequency being the value.
  * This function is used for the pie and bar charts
  */
@@ -16,15 +16,14 @@ export function aggregateObj(stat, aggregateObj) {
     }
     delete count.location;
     return count;
-
 }
 
-/* Object Aggregation for Stack Bar chart 
+/* Object Aggregation for Stack Bar chart
  * @param {object} stat: The object to aggregate
  * @param {object} Object: The object to aggregate into
  * @return an object with different values of the queried property
  * being the key, and frequency being the value.
- * This function is used for the stack bar chart 
+ * This function is used for the stack bar chart
  */
 export function aggregateObjStack(stat, Object) {
     const count = Object;
@@ -33,7 +32,7 @@ export function aggregateObjStack(stat, Object) {
     return count;
 }
 
-/* Title Case function 
+/* Title Case function
  * @param {string} str: The string to transform
  * @return a string with the first letter of each word capitalized
  */

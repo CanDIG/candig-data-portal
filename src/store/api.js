@@ -11,13 +11,12 @@ export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
 Fetch katsu calls
 */
 export function fetchKatsu(URL) {
-    return fetch(`${katsu}/moh/v1/discovery/overview/${URL}`)
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return {};
-        })
+    return fetch(`${katsu}/moh/v1/discovery/overview/${URL}`).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        return {};
+    });
 }
 
 /*
