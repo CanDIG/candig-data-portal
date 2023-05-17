@@ -65,7 +65,7 @@ const useStyles = makeStyles({
     }
 });
 
-function MCodeView() {
+function ClinicalView() {
     const theme = useTheme();
     const classes = useStyles();
     const events = useSelector((state) => state);
@@ -637,4 +637,4 @@ function MCodeView() {
     );
 }
 
-export default MCodeView;
+export default ClinicalView;
