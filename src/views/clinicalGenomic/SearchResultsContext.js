@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const DEFAULT_RESULTS_STATE = {};
 const DEFAULT_QUERY_STATE = {};
@@ -15,18 +15,18 @@ const SearchQueryWriterContext = React.createContext();
  * @returns {Object} a React component with the search results provider
  */
 export function SearchResultsProvider(props) {
-  const [data, setData] = React.useState(DEFAULT_RESULTS_STATE);
-  const [query, setQuery] = React.useState(DEFAULT_QUERY_STATE);
-  const {additionalSearchData, ...rest} = props
+    const [data, setData] = React.useState(DEFAULT_RESULTS_STATE);
+    const [query, setQuery] = React.useState(DEFAULT_QUERY_STATE);
+    const { additionalSearchData, ...rest } = props;
 
-  return (
-    <SearchQueryReaderContext.Provider value={{query, ...additionalSearchData}}>
-      <SearchQueryWriterContext.Provider value={setQuery}>
-        <SearchResultsReaderContext.Provider value={{...data}}>
-          <SearchResultsWriterContext.Provider value={setData} {...rest}/>
-        </SearchResultsReaderContext.Provider>
-      </SearchQueryWriterContext.Provider>
-    </SearchQueryReaderContext.Provider>
+    return (
+        <SearchQueryReaderContext.Provider value={{ query, ...additionalSearchData }}>
+            <SearchQueryWriterContext.Provider value={setQuery}>
+                <SearchResultsReaderContext.Provider value={{ ...data }}>
+                    <SearchResultsWriterContext.Provider value={setData} {...rest} />
+                </SearchResultsReaderContext.Provider>
+            </SearchQueryWriterContext.Provider>
+        </SearchQueryReaderContext.Provider>
     );
 }
 
@@ -36,13 +36,13 @@ export function SearchResultsProvider(props) {
  * @throws an error if it is not within a SearchResultsProvider
  */
 export function useSearchResultsReaderContext() {
-  const context = React.useContext(SearchResultsReaderContext);
+    const context = React.useContext(SearchResultsReaderContext);
 
-  if (context == undefined) {
-    throw new Error("useSearchResultsReaderContext must be used within a SearchResultsProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSearchResultsReaderContext must be used within a SearchResultsProvider');
+    }
 
-  return context;
+    return context;
 }
 
 /**
@@ -51,15 +51,14 @@ export function useSearchResultsReaderContext() {
  * @throws an error if it is not within a SearchResultsProvider
  */
 export function useSearchResultsWriterContext() {
-  const context = React.useContext(SearchResultsWriterContext);
+    const context = React.useContext(SearchResultsWriterContext);
 
-  if (context == undefined) {
-    throw new Error("useSearchResultsWriterContext must be used within a SearchResultsProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSearchResultsWriterContext must be used within a SearchResultsProvider');
+    }
 
-  return context;
+    return context;
 }
-
 
 /**
  * Obtain the context reader of the parent search page.
@@ -67,13 +66,13 @@ export function useSearchResultsWriterContext() {
  * @throws an error if it is not within a SearchResultsProvider
  */
 export function useSearchQueryReaderContext() {
-  const context = React.useContext(SearchQueryReaderContext);
+    const context = React.useContext(SearchQueryReaderContext);
 
-  if (context == undefined) {
-    throw new Error("useSearchQueryReaderContext must be used within a SearchResultsProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSearchQueryReaderContext must be used within a SearchResultsProvider');
+    }
 
-  return context;
+    return context;
 }
 
 /**
@@ -82,11 +81,11 @@ export function useSearchQueryReaderContext() {
  * @throws an error if it is not within a SearchResultsProvider
  */
 export function useSearchQueryWriterContext() {
-  const context = React.useContext(SearchQueryWriterContext);
+    const context = React.useContext(SearchQueryWriterContext);
 
-  if (context == undefined) {
-    throw new Error("useSearchQueryWriterContext must be used within a SearchResultsProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSearchQueryWriterContext must be used within a SearchResultsProvider');
+    }
 
-  return context;
+    return context;
 }

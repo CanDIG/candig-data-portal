@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { trackPromise } from 'react-promise-tracker';
 
-import { useSearchResultsWriterContext, useSearchQueryReaderContext } from "../SearchResultsContext";
+import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederationStat, fetchFederationClinicalData } from 'store/api';
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
@@ -14,7 +14,7 @@ function SearchHandler() {
     useEffect(() => {
         trackPromise(
             fetchFederationStat().then((data) => {
-                writer((old) => ({...old, federation: data}));
+                writer((old) => ({ ...old, federation: data }));
             }),
             'federation'
         );
@@ -24,11 +24,11 @@ function SearchHandler() {
     useEffect(() => {
         trackPromise(
             fetchFederationClinicalData().then((data) => {
-                writer((old) => ({...old, mcode: data}));
+                writer((old) => ({ ...old, mcode: data }));
             }),
             'clinical'
         );
-    }, [JSON.stringify(reader)])
+    }, [JSON.stringify(reader)]);
 
     // We don't really implement a graphical component
     return <></>;

@@ -1,28 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import {
-    Divider,
-    Link
-} from "@mui/material";
+import { Divider, Link } from '@mui/material';
 
 import { useTheme, makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import { SearchResultsProvider } from "./SearchResultsContext.js";
-import VariantsSearch from "../genomicsData/VariantsSearch.js";
+import { SearchResultsProvider } from './SearchResultsContext.js';
+import VariantsSearch from '../genomicsData/VariantsSearch.js';
 import PatientCounts from './widgets/patientCounts.js';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
 import PivotTable from './widgets/pivotTable';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar.js';
-import { PRIMARY_SITES, COHORTS } from "store/constant";
+import { PRIMARY_SITES, COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler.js';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
         position: 'sticky',
-        backgroundColor: "white",
+        backgroundColor: 'white',
         width: '100%',
         zIndex: 101
     },
@@ -38,16 +35,17 @@ function ClinicalGenomicSearch() {
 
     // When we load, set the sidebar component
     useEffect(() => {
-        sidebarWriter(<Sidebar sites={["BCGSC", "UHN"]} cohorts={COHORTS}/>);
+        sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
     }, []);
 
-    return <SearchResultsProvider>
+    return (
+        <SearchResultsProvider>
             {/* Top bar */}
             <SearchHandler />
             <MainCard
                 title="Federated Search"
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
-                >
+            >
                 <div id="stickytop" className={classes.stickytop}>
                     <Divider />
                     {/* Genomic Searchbar */}
@@ -86,7 +84,8 @@ function ClinicalGenomicSearch() {
                     <h3>Genomic Data</h3>
                 </div>
             </MainCard>
-    </SearchResultsProvider>;
+        </SearchResultsProvider>
+    );
 }
 
 export default ClinicalGenomicSearch;

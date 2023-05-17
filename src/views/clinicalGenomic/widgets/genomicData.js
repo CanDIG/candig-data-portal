@@ -30,7 +30,7 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import DropDown from '../../../ui-component/DropDown';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
-import { useSearchResultsReaderContext } from "../SearchResultsContext";
+import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Styles
 const useStyles = makeStyles({
@@ -368,7 +368,7 @@ function GenomicData() {
         setClincalSearchPatients(searchResults);
 
         // Do not continue if there are not yet any search results
-        if (typeof(searchResults) == undefined || searchResults == null || !('results' in searchResults)) {
+        if (typeof searchResults == undefined || searchResults == null || !('results' in searchResults)) {
             return;
         }
         for (let j = 0; j < data.results.length; j += 1) {
@@ -417,8 +417,7 @@ function GenomicData() {
                                 data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
                             ) {
                                 if (
-                                    selectedCancerType ===
-                                        `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                    selectedCancerType === `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
                                     selectedCancerType === 'NA'
                                 ) {
                                     patientCancerType = true;

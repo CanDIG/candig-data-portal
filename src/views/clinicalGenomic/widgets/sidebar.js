@@ -15,7 +15,7 @@ import {
     FormGroup,
     Tab,
     Tabs
-} from "@mui/material";
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,43 +25,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Sidebar(props) {
-    const { cohorts, primarySites, sites, treatments, radiation  } = props;
-    const [selectedtab, setSelectedTab] = useState("All");
+    const { cohorts, primarySites, sites, treatments, radiation } = props;
+    const [selectedtab, setSelectedTab] = useState('All');
     const classes = useStyles();
 
-    return <>
-    <Tabs value={selectedtab} onChange={setSelectedTab}>
-        <Tab className={classes.tab} value="All" label="All" />
-        <Tab className={classes.tab} value="Clinical" label="Clinical" />
-        <Tab className={classes.tab} value="Genomic" label="Genomic" />
-    </Tabs>
-    <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
-        <FormLabel>Node</FormLabel>
-        <FormGroup>
-            {sites.map((site) => (
-                <FormControlLabel
-                    label={site}
-                    control={
-                    <Checkbox checked={false} />}
-                    key={site}
-                    />
+    return (
+        <>
+            <Tabs value={selectedtab} onChange={setSelectedTab}>
+                <Tab className={classes.tab} value="All" label="All" />
+                <Tab className={classes.tab} value="Clinical" label="Clinical" />
+                <Tab className={classes.tab} value="Genomic" label="Genomic" />
+            </Tabs>
+            <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+                <FormLabel>Node</FormLabel>
+                <FormGroup>
+                    {sites.map((site) => (
+                        <FormControlLabel label={site} control={<Checkbox checked={false} />} key={site} />
                     ))}
-        </FormGroup>
-    </FormControl>
-    <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
-        <FormLabel>Cohort</FormLabel>
-        <FormGroup>
-            {cohorts.map((cohort) => (
-                <FormControlLabel
-                    label={cohort}
-                    control={
-                    <Checkbox checked={false} />}
-                    key={cohort}
-                    />
+                </FormGroup>
+            </FormControl>
+            <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+                <FormLabel>Cohort</FormLabel>
+                <FormGroup>
+                    {cohorts.map((cohort) => (
+                        <FormControlLabel label={cohort} control={<Checkbox checked={false} />} key={cohort} />
                     ))}
-        </FormGroup>
-    </FormControl>
-    </>;
+                </FormGroup>
+            </FormControl>
+        </>
+    );
 }
 
 Sidebar.propTypes = {
@@ -70,4 +62,3 @@ Sidebar.propTypes = {
 };
 
 export default Sidebar;
-
