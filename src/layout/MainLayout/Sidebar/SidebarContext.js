@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const DEFAULT_STATE = <></>;
 
@@ -11,13 +11,13 @@ const SidebarWriterContext = React.createContext();
  * @returns {Object} a React component with the sidebar
  */
 export function SidebarProvider(props) {
-  const [data, setData] = React.useState(DEFAULT_STATE);
-  const {additionalSearchData, ...rest} = props
+    const [data, setData] = React.useState(DEFAULT_STATE);
+    const { additionalSearchData, ...rest } = props;
 
-  return (
-    <SidebarReaderContext.Provider value={{...data, ...additionalSearchData}}>
-      <SidebarWriterContext.Provider value={setData} {...rest}/>
-    </SidebarReaderContext.Provider>
+    return (
+        <SidebarReaderContext.Provider value={{ ...data, ...additionalSearchData }}>
+            <SidebarWriterContext.Provider value={setData} {...rest} />
+        </SidebarReaderContext.Provider>
     );
 }
 
@@ -27,13 +27,13 @@ export function SidebarProvider(props) {
  * @throws an error if it is not within a SidebarProvider
  */
 export function useSidebarReaderContext() {
-  const context = React.useContext(SidebarReaderContext);
+    const context = React.useContext(SidebarReaderContext);
 
-  if (context == undefined) {
-    throw new Error("useSidebarReaderContext must be used within a SidebarProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSidebarReaderContext must be used within a SidebarProvider');
+    }
 
-  return context;
+    return context;
 }
 
 /**
@@ -42,11 +42,11 @@ export function useSidebarReaderContext() {
  * @throws an error if it is not within a SidebarProvider
  */
 export function useSidebarWriterContext() {
-  const context = React.useContext(SidebarWriterContext);
+    const context = React.useContext(SidebarWriterContext);
 
-  if (context == undefined) {
-    throw new Error("useSidebarWriterContext must be used within a SidebarProvider")
-  }
+    if (context == undefined) {
+        throw new Error('useSidebarWriterContext must be used within a SidebarProvider');
+    }
 
-  return context;
+    return context;
 }

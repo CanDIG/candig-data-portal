@@ -24,36 +24,36 @@ export function fetchKatsu(URL) {
 Fetch the federation service 
 */
 const testOverviewData = {
-    "cohort_count": 2,
-    "individual_count": 148,
-    "ethnicity": [
-      {
-        "ethnicity": "ASKU",
-        "count": 126
-      },
-      {
-        "ethnicity": "",
-        "count": 22
-      }
+    cohort_count: 2,
+    individual_count: 148,
+    ethnicity: [
+        {
+            ethnicity: 'ASKU',
+            count: 126
+        },
+        {
+            ethnicity: '',
+            count: 22
+        }
     ],
-    "gender": [
-      {
-        "sex": null,
-        "count": 0
-      },
-      {
-        "sex": "Male",
-        "count": 56
-      },
-      {
-        "sex": "Female",
-        "count": 88
-      }
+    gender: [
+        {
+            sex: null,
+            count: 0
+        },
+        {
+            sex: 'Male',
+            count: 56
+        },
+        {
+            sex: 'Female',
+            count: 88
+        }
     ]
-  };
+};
 
 export function fetchFederationStat() {
-    return new Promise( (resolve, reject) => resolve(testOverviewData) );
+    return new Promise((resolve, reject) => resolve(testOverviewData));
     return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
@@ -2865,7 +2865,7 @@ const testData = {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return new Promise( (resolve, reject) => resolve(testData) );
+    return new Promise((resolve, reject) => resolve(testData));
     return fetch(`${federation}/search`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
