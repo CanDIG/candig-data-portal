@@ -11,6 +11,7 @@ import {
     Checkbox,
     FormControl,
     FormControlLabel,
+    FormLabel,
     FormGroup,
     Tab,
     Tabs
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Sidebar(props) {
-    const { cohorts, primarySites, sites, treatments, radiation,  } = props;
+    const { cohorts, primarySites, sites, treatments, radiation  } = props;
     const [selectedtab, setSelectedTab] = useState("All");
     const classes = useStyles();
 
@@ -42,6 +43,7 @@ function Sidebar(props) {
                     label={site}
                     control={
                     <Checkbox checked={false} />}
+                    key={site}
                     />
                     ))}
         </FormGroup>
@@ -54,6 +56,7 @@ function Sidebar(props) {
                     label={cohort}
                     control={
                     <Checkbox checked={false} />}
+                    key={cohort}
                     />
                     ))}
         </FormGroup>
@@ -62,6 +65,7 @@ function Sidebar(props) {
 }
 
 Sidebar.propTypes = {
+    cohorts: PropTypes.array,
     sites: PropTypes.array
 };
 

@@ -15,7 +15,6 @@ import { useSelector, useDispatch } from 'react-redux';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { fetchFederationClinicalData } from 'store/api';
 import {
     subjectColumns,
     processMCodeMainData,
@@ -26,13 +25,13 @@ import {
     processHistologicalTypeListData
 } from 'store/mcode';
 import SingleRowTable from 'ui-component/SingleRowTable';
-import { trackPromise } from 'react-promise-tracker';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import DropDown from '../../../ui-component/DropDown';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
+import { useSearchResultsReaderContext } from "../SearchResultsContext";
 
 // Styles
 const useStyles = makeStyles({
@@ -66,7 +65,7 @@ const useStyles = makeStyles({
     }
 });
 
-function ClinicalData() {
+function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
     const events = useSelector((state) => state);
@@ -108,6 +107,8 @@ function ClinicalData() {
     const [sexList, setSexList] = React.useState(clinicalSearch.clinicalSearchDropDowns.sexList);
     const [cancerTypeList, setCancerTypeList] = React.useState(clinicalSearch.clinicalSearchDropDowns.cancerTypeList);
     const [HistologicalList, setHistologicalList] = React.useState(clinicalSearch.clinicalSearchDropDowns.HistologicalList);
+
+    const searchResults = useSearchResultsReaderContext().mcode;
 
     const jsonTheme = {
         base00: 'white',
@@ -364,103 +365,107 @@ function ClinicalData() {
     React.useEffect(() => {
         setIsLoading(true);
         const tempRows = [];
-        trackPromise(
-            fetchFederationClinicalData().then((data) => {
-                setMcodeData(data);
-                setClincalSearchPatients(data);
-                for (let j = 0; j < data.results.length; j += 1) {
-                    for (let i = 0; i < data.results[j].count; i += 1) {
-                        // Patient table filtering
-                        if (
-                            selectedConditions === 'All' &&
-                            selectedMedications === 'All' &&
-                            selectedSex === 'All' &&
-                            selectedCancerType === 'All' &&
-                            selectedHistologicalType === 'All'
-                        ) {
-                            // All patients
-                            if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
-                                tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
-                            }
-                        } else {
-                            // Filtered patients
-                            let patientCondition = false;
-                            data?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
-                                if (selectedConditions === 'All' || selectedConditions === bodySite.label) {
-                                    patientCondition = true;
-                                    return false;
-                                }
-                                return true;
-                            });
-                            let patientMedication = false;
-                            data?.results[j]?.results[i]?.medication_statement.every((medication) => {
-                                if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
-                                    patientMedication = true;
-                                    return false;
-                                }
-                                return true;
-                            });
-                            let patientSex = false;
-                            if (selectedSex === 'All' || selectedSex === (data?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
-                                patientSex = true;
-                            }
-                            let patientCancerType = false;
-                            if (selectedCancerType === 'All') {
-                                patientCancerType = true;
-                            } else {
-                                for (let k = 0; k < cancerType.length; k += 1) {
-                                    if (
-                                        data?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
-                                        data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
-                                    ) {
-                                        if (
-                                            selectedCancerType ===
-                                                `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
-                                            selectedCancerType === 'NA'
-                                        ) {
-                                            patientCancerType = true;
-                                        }
-                                    }
-                                }
-                            }
-                            let patientHistologicalType = false;
-                            if (selectedHistologicalType === 'All') {
-                                patientHistologicalType = true;
-                            } else {
-                                for (let k = 0; k < cancerType.length; k += 1) {
-                                    if (
-                                        data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
-                                        data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
-                                            cancerType[k]['Tumour histological type code']
-                                    ) {
-                                        if (
-                                            selectedHistologicalType ===
-                                                `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
-                                            selectedHistologicalType === 'NA'
-                                        ) {
-                                            patientHistologicalType = true;
-                                        }
-                                    }
-                                }
-                            }
+        setMcodeData(searchResults);
+        setClincalSearchPatients(searchResults);
+
+        // Do not continue if there are not yet any search results
+        if (typeof(searchResults) == undefined || searchResults == null || !('results' in searchResults)) {
+            return;
+        }
+
+        for (let j = 0; j < searchResults.results.length; j += 1) {
+            for (let i = 0; i < searchResults.results[j].count; i += 1) {
+                // Patient table filtering
+                if (
+                    selectedConditions === 'All' &&
+                    selectedMedications === 'All' &&
+                    selectedSex === 'All' &&
+                    selectedCancerType === 'All' &&
+                    selectedHistologicalType === 'All'
+                ) {
+                    // All patients
+                    if (processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]).id !== null) {
+                        tempRows.push(processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]));
+                    }
+                } else {
+                    // Filtered patients
+                    let patientCondition = false;
+                    searchResults?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
+                        if (selectedConditions === 'All' || selectedConditions === bodySite.label) {
+                            patientCondition = true;
+                            return false;
+                        }
+                        return true;
+                    });
+                    let patientMedication = false;
+                    searchResults?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                        if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
+                            patientMedication = true;
+                            return false;
+                        }
+                        return true;
+                    });
+                    let patientSex = false;
+                    if (selectedSex === 'All' || selectedSex === (searchResults?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
+                        patientSex = true;
+                    }
+                    let patientCancerType = false;
+                    if (selectedCancerType === 'All') {
+                        patientCancerType = true;
+                    } else {
+                        for (let k = 0; k < cancerType.length; k += 1) {
                             if (
-                                patientCondition &&
-                                patientMedication &&
-                                patientSex &&
-                                patientCancerType &&
-                                patientHistologicalType &&
-                                processMCodeMainData(data.results[j].results[i]).id !== null
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
                             ) {
-                                tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                                if (
+                                    selectedCancerType ===
+                                        `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
+                                    selectedCancerType === 'NA'
+                                ) {
+                                    patientCancerType = true;
+                                }
                             }
                         }
                     }
+                    let patientHistologicalType = false;
+                    if (selectedHistologicalType === 'All') {
+                        patientHistologicalType = true;
+                    } else {
+                        for (let k = 0; k < cancerType.length; k += 1) {
+                            if (
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
+                                    cancerType[k]['Tumour histological type code']
+                            ) {
+                                if (
+                                    selectedHistologicalType ===
+                                        `${cancerType[k]['Tumour histological type label']} ${cancerType[k]['Tumour histological type code']}` ||
+                                    selectedHistologicalType === 'NA'
+                                ) {
+                                    patientHistologicalType = true;
+                                }
+                            }
+                        }
+                    }
+                    if (
+                        patientCondition &&
+                        patientMedication &&
+                        patientSex &&
+                        patientCancerType &&
+                        patientHistologicalType &&
+                        processMCodeMainData(searchResults.results[j].results[i]).id !== null
+                    ) {
+                        tempRows.push(processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]));
+                    }
                 }
-                setRows(tempRows);
-                // Subtables
-                if (tempRows.length !== 0) {
-                    let index;
-                    data.results.forEach((federatedResults) => {
+            }
+        }
+        setRows(tempRows);
+        // Subtables
+        if (tempRows.length !== 0) {
+            let index;
+            searchResults.results.forEach((federatedResults) => {
                         index = federatedResults.results.findIndex((item) => item.id === tempRows[0].id);
                         if (index !== -1) {
                             setSelectedPatient(federatedResults.results[index].id);
@@ -483,18 +488,15 @@ function ClinicalData() {
 
                 setListOpen(false);
                 // Dropdown patient table list for filtering
-                setMedicationList(processMedicationListData(data.results));
-                setConditionList(processCondtionsListData(data.results));
-                setSexList(processSexListData(data.results));
-                setCancerTypeList(processCancerTypeListData(data.results));
-                setHistologicalList(processHistologicalTypeListData(data.results));
+                setMedicationList(processMedicationListData(searchResults.results));
+                setConditionList(processCondtionsListData(searchResults.results));
+                setSexList(processSexListData(searchResults.results));
+                setCancerTypeList(processCancerTypeListData(searchResults.results));
+                setHistologicalList(processHistologicalTypeListData(searchResults.results));
                 setIsLoading(false);
-
+        
                 setRedux(tempRows);
-            }),
-            'table'
-        );
-    }, []);
+            }, [JSON.stringify(searchResults)]);
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const headerLabels = {
@@ -629,11 +631,11 @@ function ClinicalData() {
                         </Grid>
                     </Grid>
                 ) : (
-                    <SearchIndicator area="table" />
+                    <SearchIndicator area="federation" />
                 )}
             </Grid>
         </MainCard>
     );
 }
 
-export default ClinicalData;
+export default MCodeView;
