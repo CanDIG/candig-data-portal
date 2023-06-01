@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Divider, Link } from '@mui/material';
 
-import { useTheme, makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import { SearchResultsProvider } from './SearchResultsContext.js';
 import VariantsSearch from '../genomicsData/VariantsSearch.js';
 import PatientCounts from './widgets/patientCounts.js';
 import DataVisualization from './widgets/dataVisualization';
@@ -39,7 +38,7 @@ function ClinicalGenomicSearch() {
     }, []);
 
     return (
-        <SearchResultsProvider>
+        <>
             {/* Top bar */}
             <SearchHandler />
             <MainCard
@@ -84,7 +83,7 @@ function ClinicalGenomicSearch() {
                     <h3>Genomic Data</h3>
                 </div>
             </MainCard>
-        </SearchResultsProvider>
+        </>
     );
 }
 

@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
+import { SearchResultsProvider } from './SearchResultsContext.js';
 
 // style + assets
 import './assets/scss/style.scss';
@@ -16,9 +17,11 @@ import './assets/scss/style.scss';
 
 ReactDOM.render(
     <Provider store={store}>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+        <SearchResultsProvider>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </SearchResultsProvider>
     </Provider>,
     document.getElementById('root')
 );
