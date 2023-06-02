@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
-import { SearchResultsProvider } from './SearchResultsContext.js';
+import { SearchResultsProvider } from 'views/clinicalGenomic/SearchResultsContext';
 
 // style + assets
 import './assets/scss/style.scss';
