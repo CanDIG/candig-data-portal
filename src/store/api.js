@@ -15,8 +15,13 @@ export function fetchKatsu(URL) {
         if (response.ok) {
             return response.json();
         }
-        return {};
-    });
+        console.log("Katsu: " + response);
+        return
+    })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
 }
 
 /*
@@ -37,7 +42,8 @@ export function fetchFederationStat(endpoint) {
             if (response.ok) {
                 return response.json();
             }
-            return {};
+            console.log("Federation Stats: " + response);
+            return
         })
         .catch((error) => {
             console.log('Error:', error);

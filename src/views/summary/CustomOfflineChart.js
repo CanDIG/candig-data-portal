@@ -142,17 +142,14 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             const categories = [];
             let i = 0;
 
-            Object.keys(dataObject).map((key) => {
+            Object.keys(dataObject).forEach((key, i) => {
                 categories.push(key);
-                Object.keys(dataObject[key]).map((cohort) => {
-                    if (data.has(cohort)) {
-                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
-                    } else {
+                Object.keys(dataObject[key]).forEach((cohort) => {
+                    if (!data.has(cohort)) {
                         data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
-                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
                     }
+                    data.get(cohort).splice(i, 1, dataObject[key][cohort]);
                 });
-                i++;
             });
 
             const stackSeries = [];
