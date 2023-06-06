@@ -13,7 +13,7 @@ function SearchHandler() {
     // Query 1: always have the federation sites query results available
     useEffect(() => {
         trackPromise(
-            fetchFederationStat().then((data) => {
+            fetchFederationStat("/patients_per_cohort").then((data) => {
                 writer((old) => ({ ...old, federation: data }));
             }),
             'federation'

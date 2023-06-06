@@ -20,27 +20,27 @@ export function fetchKatsu(URL) {
         );
 }
 
-export function fetchFederationStat() {
+export function fetchFederationStat(endpoint) {
     return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: 'v2/discovery/overview/patients_per_cohort',
+            path: `v2/discovery/overview${endpoint}`,
             payload: {},
             service: 'katsu'
         })
     })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return {};
-        })
-        .catch((error) => {
-            console.log('Error:', error);
-            return 'error';
-        });
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        return {};
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+        return 'error';
+    });
 }
 
 /*
