@@ -17,6 +17,7 @@ import Customization from '../Customization';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
 import { SET_MENU } from 'store/actions';
+import { SidebarProvider } from './Sidebar/SidebarContext';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
@@ -95,37 +96,41 @@ const MainLayout = () => {
 
     return (
         <div className={classes.root}>
-            <CssBaseline />
-            {/* header */}
-            <AppBar
-                enableColorOnDark
-                position="fixed"
-                color="inherit"
-                elevation={0}
-                className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
-            >
-                <Toolbar>
-                    <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-                </Toolbar>
-            </AppBar>
+            <SidebarProvider>
+                <CssBaseline />
+                {/* header */}
+                <AppBar
+                    enableColorOnDark
+                    position="fixed"
+                    color="inherit"
+                    elevation={0}
+                    className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
+                >
+                    <Toolbar>
+                        <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+                    </Toolbar>
+                </AppBar>
 
-            {/* drawer */}
-            <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+                {/* drawer */}
+                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle}>
+                    <div>Test</div>
+                </Sidebar>
 
-            {/* main content */}
-            <main
-                className={clsx([
-                    classes.content,
-                    {
-                        [classes.contentShift]: leftDrawerOpened
-                    }
-                ])}
-            >
-                {/* breadcrumb */}
-                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                <Outlet />
-            </main>
-            <Customization />
+                {/* main content */}
+                <main
+                    className={clsx([
+                        classes.content,
+                        {
+                            [classes.contentShift]: leftDrawerOpened
+                        }
+                    ])}
+                >
+                    {/* breadcrumb */}
+                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                    <Outlet />
+                </main>
+                <Customization />
+            </SidebarProvider>
         </div>
     );
 };

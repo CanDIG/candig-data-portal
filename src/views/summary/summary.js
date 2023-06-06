@@ -19,6 +19,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PublicIcon from '@mui/icons-material/Public';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { groupCount } from 'utils/utils';
+import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
@@ -35,6 +36,12 @@ function Summary() {
     const [genderObject, setGenderObject] = useState({ '': 0 });
     const [canDigDataSource, setCanDigDataSource] = useState({});
     const [didFetch, setDidFetch] = useState(false);
+
+    // Clear the sidebar, if available
+    const sidebarWriter = useSidebarWriterContext();
+    useEffect(() => {
+        sidebarWriter(<></>);
+    }, []);
 
     /* Aggregated count of federated data */
     function federationStatCount(data) {
