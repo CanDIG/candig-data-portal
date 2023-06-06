@@ -31,28 +31,15 @@ const useStyles = makeStyles((theme) => {
 });
 
 function PatientCountSingle(props) {
-    const { site } = props;
+    const { site, searchResults } = props;
     const theme = useTheme();
     const classes = useStyles();
-    //const searchResults = useSearchResultsReaderContext();
-    const searchResults = {
-        BCGSC: {
-            totalPatients: 850,
-            patientsInSearch: 250,
-            cohorts: 1,
-            locked: false
-        },
-        UHN: {
-            totalPatients: 250,
-            patientsInSearch: 120,
-            cohorts: 8,
-            locked: true
-        }
-    };
-    let totalPatients = searchResults[site]['totalPatients'];
-    let patientsInSearch = searchResults[site]['patientsInSearch'];
-    let cohorts = searchResults[site]['cohorts'];
-    let locked = searchResults[site]['locked'];
+
+    console.log(searchResults);
+    let totalPatients = Object.values(searchResults['results'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
+    let patientsInSearch = 0; //searchResults[site]['patientsInSearch'];
+    let numCohorts = Object.values(searchResults['results'])?.length || 0;
+    let locked = false; //searchResults['locked'];
 
     let avatarProps = locked
         ? {
@@ -88,7 +75,7 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {cohorts}
+                        {numCohorts}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />

@@ -53,7 +53,7 @@ const sections = [
     },
     {
         id: "clinical",
-        header: "Patient Counts",
+        header: "Clinical Data",
         component: <ClinicalData />
     },
     {

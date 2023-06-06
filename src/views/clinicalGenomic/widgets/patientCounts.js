@@ -3,19 +3,21 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
 
 function PatientCounts(props) {
-    const sitesContext = useSearchResultsReaderContext();
+    const sitesContext = useSearchResultsReaderContext()?.federation;
     console.log(sitesContext);
 
     return (
         <>
             {/* Header */}
             {/* Individual counts*/}
-            {sitesContext?.['sites']?.map((site) => (
-                <React.Fragment key={site}>
-                    <PatientCountSingle site={site} />
-                    <br />
-                </React.Fragment>
-            )) || <></>}
+            {Array.isArray(sitesContext) ?
+                sitesContext.map((searchResults) => (
+                    <React.Fragment key={searchResults?.location?.name}>
+                        <PatientCountSingle site={searchResults?.location?.name} searchResults={searchResults} />
+                        <br />
+                    </React.Fragment>
+                ))
+            : <></>}
         </>
     );
 }
