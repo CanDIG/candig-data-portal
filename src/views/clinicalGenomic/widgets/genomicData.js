@@ -371,8 +371,8 @@ function GenomicData() {
         if (typeof searchResults == undefined || searchResults == null || !('results' in searchResults)) {
             return;
         }
-        for (let j = 0; j < data.results.length; j += 1) {
-            for (let i = 0; i < data.results[j].count; i += 1) {
+        for (let j = 0; j < searchResults.results.length; j += 1) {
+            for (let i = 0; i < searchResults.results[j].count; i += 1) {
                 // Patient table filtering
                 if (
                     selectedConditions === 'All' &&
@@ -382,13 +382,13 @@ function GenomicData() {
                     selectedHistologicalType === 'All'
                 ) {
                     // All patients
-                    if (processMCodeMainData(data.results[j].results[i], data.results[j].location[0]).id !== null) {
-                        tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                    if (processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]).id !== null) {
+                        tempRows.push(processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]));
                     }
                 } else {
                     // Filtered patients
                     let patientCondition = false;
-                    data?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
+                    searchResults?.results[j]?.results[i]?.cancer_condition?.body_site?.every((bodySite) => {
                         if (selectedConditions === 'All' || selectedConditions === bodySite.label) {
                             patientCondition = true;
                             return false;
@@ -396,7 +396,7 @@ function GenomicData() {
                         return true;
                     });
                     let patientMedication = false;
-                    data?.results[j]?.results[i]?.medication_statement.every((medication) => {
+                    searchResults?.results[j]?.results[i]?.medication_statement.every((medication) => {
                         if (selectedMedications === 'All' || selectedMedications === medication?.medication_code.label) {
                             patientMedication = true;
                             return false;
@@ -404,7 +404,7 @@ function GenomicData() {
                         return true;
                     });
                     let patientSex = false;
-                    if (selectedSex === 'All' || selectedSex === (data?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
+                    if (selectedSex === 'All' || selectedSex === (searchResults?.results[j]?.results[i]?.subject.sex).toLowerCase()) {
                         patientSex = true;
                     }
                     let patientCancerType = false;
@@ -413,8 +413,8 @@ function GenomicData() {
                     } else {
                         for (let k = 0; k < cancerType.length; k += 1) {
                             if (
-                                data?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
-                                data?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.code?.id !== undefined &&
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.code?.id === cancerType[k]['Cancer type code']
                             ) {
                                 if (
                                     selectedCancerType === `${cancerType[k]['Cancer type label']} ${cancerType[k]['Cancer type code']}` ||
@@ -431,8 +431,8 @@ function GenomicData() {
                     } else {
                         for (let k = 0; k < cancerType.length; k += 1) {
                             if (
-                                data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
-                                data?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id !== undefined &&
+                                searchResults?.results[j]?.results[i]?.cancer_condition?.histology_morphology_behavior?.id ===
                                     cancerType[k]['Tumour histological type code']
                             ) {
                                 if (
@@ -451,9 +451,9 @@ function GenomicData() {
                         patientSex &&
                         patientCancerType &&
                         patientHistologicalType &&
-                        processMCodeMainData(data.results[j].results[i]).id !== null
+                        processMCodeMainData(searchResults.results[j].results[i]).id !== null
                     ) {
-                        tempRows.push(processMCodeMainData(data.results[j].results[i], data.results[j].location[0]));
+                        tempRows.push(processMCodeMainData(searchResults.results[j].results[i], searchResults.results[j].location[0]));
                     }
                 }
             }
@@ -462,7 +462,7 @@ function GenomicData() {
         // Subtables
         if (tempRows.length !== 0) {
             let index;
-            data.results.forEach((federatedResults) => {
+            searchResults.results.forEach((federatedResults) => {
                 index = federatedResults.results.findIndex((item) => item.id === tempRows[0].id);
                 if (index !== -1) {
                     setSelectedPatient(federatedResults.results[index].id);
@@ -485,11 +485,11 @@ function GenomicData() {
 
         setListOpen(false);
         // Dropdown patient table list for filtering
-        setMedicationList(processMedicationListData(data.results));
-        setConditionList(processCondtionsListData(data.results));
-        setSexList(processSexListData(data.results));
-        setCancerTypeList(processCancerTypeListData(data.results));
-        setHistologicalList(processHistologicalTypeListData(data.results));
+        setMedicationList(processMedicationListData(searchResults.results));
+        setConditionList(processCondtionsListData(searchResults.results));
+        setSexList(processSexListData(searchResults.results));
+        setCancerTypeList(processCancerTypeListData(searchResults.results));
+        setHistologicalList(processHistologicalTypeListData(searchResults.results));
         setIsLoading(false);
 
         setRedux(tempRows);

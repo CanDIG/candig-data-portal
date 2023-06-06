@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Divider, Link } from '@mui/material';
+import { AppBar, Button, Divider, Link, Toolbar } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
@@ -14,6 +14,7 @@ import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/Sidebar
 import Sidebar from './widgets/sidebar.js';
 import { PRIMARY_SITES, COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler.js';
+import GenomicData from './widgets/genomicData.js';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
@@ -24,8 +25,42 @@ const useStyles = makeStyles((theme) => ({
     },
     spaceBetween: {
         height: 30
+    },
+    anchor: {
+        display: "block",
+        position: "relative",
+        top: -82,   // Height of the header
+        visibility: "hidden"
     }
 }));
+
+const sections = [
+    {
+        id: "counts",
+        header: "Patient Counts",
+        component: <PatientCounts />
+    },
+    {
+        id: "visualization",
+        header: "Data Visualization",
+        component: <DataVisualization />
+    },
+    {
+        id: "clinical",
+        header: "Patient Counts",
+        component: <ClinicalData />
+    },
+    {
+        id: "pivot",
+        header: "Pivot Table",
+        component: <PivotTable />
+    },
+    {
+        id: "genomic",
+        header: "Genomic Data",
+        component: <GenomicData />
+    },
+]
 
 function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
@@ -40,6 +75,19 @@ function ClinicalGenomicSearch() {
     return (
         <>
             {/* Top bar */}
+            <AppBar position="static">
+                <Toolbar>
+                    {sections.map((section) =>
+                        <Button
+                            onClick={() => {window.location.href = "#" + section.id;}}
+                            sx={{ my: 2, color: 'white', display: 'block' }}
+                            key={section.id}
+                        >
+                            {section.header}
+                        </Button>
+                    )}
+                </Toolbar>
+            </AppBar>
             <SearchHandler />
             <MainCard
                 title="Federated Search"
@@ -54,34 +102,14 @@ function ClinicalGenomicSearch() {
                     {/* For now, until I figure out how to make it its own card */}
                     <Divider />
                 </div>
-                {/* Patient Counts */}
-                <div id="counts">
-                    <h3>Patient Counts</h3>
-                    <PatientCounts />
-                </div>
-                <div className={classes.spaceBetween} />
-                {/* Data visualization */}
-                <div id="visualization">
-                    <h3>Data Visualization</h3>
-                    <DataVisualization />
-                </div>
-                <div className={classes.spaceBetween} />
-                {/* Clinical Data */}
-                <div id="clinical">
-                    <h3>Clinical Data</h3>
-                    <ClinicalData />
-                </div>
-                <div className={classes.spaceBetween} />
-                {/* Pivot Table */}
-                <div id="pivot">
-                    <h3>Pivot Table</h3>
-                    <PivotTable />
-                </div>
-                <div className={classes.spaceBetween} />
-                {/* Genomic Data (JSON view) */}
-                <div id="genomic">
-                    <h3>Genomic Data</h3>
-                </div>
+                {sections.map((section) =>
+                    <div>
+                        <a class="anchor" id={section.id} className={classes.anchor}></a>
+                        <h3>{section.header}</h3>
+                        {section.component}
+                        <div className={classes.spaceBetween} />
+                    </div>
+                )}
             </MainCard>
         </>
     );
