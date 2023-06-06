@@ -154,6 +154,49 @@ const UIColor = () => {
                     </SubCard>
                 </Grid>
                 <Grid item xs={12}>
+                    <SubCard title="Tertiary Color">
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} sm={6} md={4} lg={2}>
+                                <ColorBox
+                                    bgcolor={theme.palette.tertiary.light}
+                                    data={{ label: 'Shade-50', color: theme.palette.tertiary.light }}
+                                    title="tertiary.light"
+                                    dark
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={4} lg={2}>
+                                <ColorBox
+                                    bgcolor={theme.palette.tertiary[200]}
+                                    data={{ label: 'Shade-200', color: theme.palette.tertiary[200] }}
+                                    title="tertiary[200]"
+                                    dark
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={4} lg={2}>
+                                <ColorBox
+                                    bgcolor={theme.palette.tertiary.main}
+                                    data={{ label: 'Shade-500', color: theme.palette.tertiary.main }}
+                                    title="tertiary.main"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={4} lg={2}>
+                                <ColorBox
+                                    bgcolor={theme.palette.tertiary.dark}
+                                    data={{ label: 'Shade-600', color: theme.palette.tertiary.dark }}
+                                    title="tertiary.dark"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={4} lg={2}>
+                                <ColorBox
+                                    bgcolor={theme.palette.tertiary[800]}
+                                    data={{ label: 'Shade-800', color: theme.palette.tertiary[800] }}
+                                    title="tertiary[800]"
+                                />
+                            </Grid>
+                        </Grid>
+                    </SubCard>
+                </Grid>
+                <Grid item xs={12}>
                     <SubCard title="Success Color">
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} sm={6} md={4} lg={2}>

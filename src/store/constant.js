@@ -2,6 +2,85 @@
  * All the constants should go on this file
  */
 
+// Fake Data
+export const diagnosis_age_count = {
+    '0-19 Years': 10,
+    '20-29 Years': 20,
+    '30-39 Years': 40,
+    '40-49 Years': 60,
+    '50-59 Years': 50,
+    '60-69 Years': 55,
+    '70-79 Years': 20,
+    '80+ Years': 15
+};
+
+export const treatment_type_count = {
+    Palate: 1,
+    'Rectosigmoid junction': 1,
+    Tonsil: 3,
+    'Other and unspecified parts of mouth': 1,
+    Oropharynx: 1,
+    'Parotid gland': 2,
+    'Other and unspecified parts of tongue': 1,
+    'Other and unspecified parts of biliary tract': 1,
+    Gum: 3
+};
+
+export const cancer_type_count = {
+    'Breast C50.9': 50,
+    'Ovary C56.9': 5,
+    'Trachea C33': 30,
+    'Cardia C16.0': 20,
+    'Pancreas C25.9': 40,
+    'Colon C18': 60,
+    'Tonsil C09': 50
+};
+
+export const cohortByNode = {
+    BCGSC: {
+        POG: 50
+    },
+    UHN: {
+        POG: 67,
+        Inspire: 30,
+        Biocan: 50,
+        Biodiva: 30
+    },
+    C3G: {
+        MOCK: 50
+    }
+};
+
+export const fullGenomicData = {
+    BCGSC: {
+        POG: 5
+    },
+    UHN: {
+        POG: 5,
+        Inspire: 10,
+        Biocan: 5,
+        Biodiva: 10
+    },
+    C3G: {
+        MOCK: 20
+    }
+};
+
+export const fullClinicalData = {
+    BCGSC: {
+        POG: 10
+    },
+    UHN: {
+        POG: 50,
+        Inspire: 10,
+        Biocan: 30,
+        Biodiva: 20
+    },
+    C3G: {
+        MOCK: 40
+    }
+};
+
 // Roles
 export const SITE = process.env.REACT_APP_SITE_LOCATION;
 
@@ -31,8 +110,6 @@ export const CLIN_METADATA = [
     'treatments',
     'tumourboards'
 ];
-
-export const genomicsFileTypes = ['variantSets', 'readGroupSets', 'referenceSets', 'featureSets'];
 
 // Highcharts Map requires a specific set of codes for provinces
 // and territories, as represented by hcProvCodes below.

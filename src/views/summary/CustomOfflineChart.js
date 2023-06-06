@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react';
+
+// mui
+import { useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
-import Highcharts from 'highcharts';
+import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
 
-window.Highcharts = Highcharts;
+// Project import
+import { splitString } from 'utils/utils';
 
-/*
- * Transform a camelCase string to a capital spaced string
- */
-function splitString(newString) {
-    const splitted = newString.replace(/([a-z])([A-Z])/g, '$1 $2');
-    const capitalized = splitted.charAt(0).toUpperCase() + splitted.substr(1);
-    return capitalized;
-}
+window.Highcharts = Highcharts;
 
 /*
  * Component for offline chart
@@ -26,32 +23,63 @@ function splitString(newString) {
  * @param {string} datasetName
  * @param {array} dataObject
  */
-function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObject }) {
+
+function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
+    const theme = useTheme();
     const events = useSelector((state) => state);
+    let dataSum = 0;
+    for (const count in dataObject) {
+        dataSum += count;
+    }
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
         },
-        colors: ['#2196f3', '#90caf9', '#37ca50', '#aaffb8', '#ffc107'],
+        colors: [
+            theme.palette.primary[200],
+            theme.palette.secondary[200],
+            theme.palette.tertiary[200],
+            theme.palette.primary.main,
+            theme.palette.secondary.main,
+            theme.palette.tertiary.main,
+            theme.palette.primary.dark,
+            theme.palette.secondary.dark,
+            theme.palette.tertiary.dark,
+            theme.palette.primary[800],
+            theme.palette.secondary[800],
+            theme.palette.tertiary[800]
+        ],
         chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
         title: {
             text: splitString(barTitle)
         },
-        subtitle: {
-            text: datasetName
-        }
+        xAxis: { title: { text: xAxisTitle } },
+        yAxis: { title: { text: yAxisTitle } }
     });
 
     useEffect(() => {
         /*
          * Create a Pie chart from props
          */
-
         function createPieChart() {
             const options = {
                 credits: {
                     enabled: false
                 },
+                colors: [
+                    theme.palette.primary[200],
+                    theme.palette.primary.main,
+                    theme.palette.primary.dark,
+                    theme.palette.primary[800],
+                    theme.palette.secondary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[200],
+                    theme.palette.tertiary.main,
+                    theme.palette.tertiary.dark,
+                    theme.palette.tertiary[800]
+                ],
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -75,23 +103,98 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
         function createBarChart() {
             const data = [];
 
+            // See dataObject type
             const categories = Object.keys(dataObject).map((key) => {
                 data.push(dataObject[key]);
                 return key;
             });
+
             setChartOptions({
                 credits: {
                     enabled: false
                 },
+                colors: [theme.palette.primary.dark],
                 series: [{ data, colorByPoint: true, showInLegend: false }],
-                xAxis: { categories }
+                xAxis: { categories },
+                tooltip: {
+                    useHTML: true,
+                    formatter: function () {
+                        var dataSum = 0,
+                            pcnt;
+
+                        this.series.points.forEach(function (point) {
+                            dataSum += point.y;
+                        });
+
+                        pcnt = (this.y / dataSum) * 100;
+                        return '<b>' + this.point.category + '</b>' + '<br> - ' + this.y + ' <br> - ' + Highcharts.numberFormat(pcnt) + '%';
+                    }
+                }
             });
         }
 
-        if (chartType === 'pie') {
+        /*
+         * Create Stacked Bar chart from props
+         */
+
+        function createStackedBarChart() {
+            const data = new Map();
+            const categories = [];
+            let i = 0;
+
+            Object.keys(dataObject).forEach((key, i) => {
+                categories.push(key);
+                Object.keys(dataObject[key]).forEach((cohort) => {
+                    if (!data.has(cohort)) {
+                        data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
+                    }
+                    data.get(cohort).splice(i, 1, dataObject[key][cohort]);
+                });
+            });
+
+            const stackSeries = [];
+            for (let [key, value] of data) {
+                stackSeries.push({ name: key, data: value });
+            }
+
+            setChartOptions({
+                credits: {
+                    enabled: false
+                },
+                colors: [
+                    theme.palette.secondary[200],
+                    theme.palette.tertiary[200],
+                    theme.palette.primary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.tertiary.main,
+                    theme.palette.primary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.tertiary.dark,
+                    theme.palette.primary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[800],
+                    theme.palette.primary[800]
+                ],
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                legend: { enabled: false },
+                series: stackSeries,
+                xAxis: { categories },
+                tooltip: {
+                    pointFormat: '<b>{point.name}:</b> {point.y}'
+                }
+            });
+        }
+
+        if (chart === 'pie') {
             createPieChart();
-        } else {
+        } else if (chart === 'bar') {
             createBarChart();
+        } else {
+            createStackedBarChart();
         }
     }, [datasetName, dataObject, chartType]);
 
@@ -104,10 +207,12 @@ function CustomOfflineChart({ chartType, barTitle, height, datasetName, dataObje
 
 CustomOfflineChart.propTypes = {
     chartType: PropTypes.string.isRequired,
+    chart: PropTypes.string.isRequired,
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.number).isRequired
+    dataObject: PropTypes.objectOf(PropTypes.any).isRequired,
+    xAxis: PropTypes.array
 };
 
 CustomOfflineChart.defaultProps = {

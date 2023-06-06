@@ -47,7 +47,7 @@ export function theme(customization) {
                 xs: 0,
                 sm: 600,
                 md: 960,
-                lg: 1280,
+                lg: 1465,
                 xl: 1920
             }
         },

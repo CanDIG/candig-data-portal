@@ -2,40 +2,43 @@ import { useState, useEffect } from 'react';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import useTheme from '@mui/styles/useTheme';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
-import { trackPromise } from 'react-promise-tracker';
 
 // project imports
-import { fetchFederationStat, fetchServers } from 'store/api';
-import { gridSpacing } from 'store/constant';
+import { fetchFederationStat } from 'store/api';
+import { aggregateObj, aggregateObjStack } from 'utils/utils';
 
 // assets
-import HiveIcon from '@mui/icons-material/Hive';
-// import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import PersonIcon from '@mui/icons-material/Person';
-import PublicIcon from '@mui/icons-material/Public';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import { groupCount } from 'utils/utils';
+import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
+
+// Test data
+import { fullClinicalData, fullGenomicData, diagnosis_age_count } from '../../store/constant';
+
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 
-function toTitleCase(str) {
-    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-}
-
 function Summary() {
+    const theme = useTheme();
     const [isLoading, setLoading] = useState(true);
-    const [individualCounter, setIndividualCount] = useState(0);
+
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [hospitalCounter, setHospitalCount] = useState(0);
-    const [cohortCounter, setCohortCount] = useState(0);
-    const [serverObject, setServerObject] = useState({ '': 0 });
-    const [ethnicityObject, setEthnicityObject] = useState({ '': 0 });
-    const [genderObject, setGenderObject] = useState({ '': 0 });
+    const [individual_count, setIndividualCount] = useState({});
+    const [cancer_type_count, setCancerTypeCount] = useState({});
+    const [treatment_type_count, setTreatmentTypeCount] = useState({});
+    const [cohort_count, setCohortCount] = useState({});
+    const [patients_per_cohort, setPatientsPerCohort] = useState({});
+    // const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
+    // const [fullClinicalData, setFullClinicalData] = useState({});
+    // const [fullGenomicData, setFullGenomicData] = useState({});
+    const [connectionError, setConnectionError] = useState(0);
+    const [sites, setSites] = useState(0);
+    const [totalSites, setTotalSites] = useState(0);
+
     const [canDigDataSource, setCanDigDataSource] = useState({});
-    const [didFetch, setDidFetch] = useState(false);
+    const [nodeStatus, setNodeStatus] = useState(true);
 
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
@@ -44,177 +47,265 @@ function Summary() {
     }, []);
 
     /* Aggregated count of federated data */
-    function federationStatCount(data) {
-        let hospitalCount = 0;
-        let provinceCount = 0;
-        let individualCount = 0;
-        let cohortCount = 0;
-        const ethnicitiesCount = {};
-        const gendersCount = {};
+    function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
-        data.results.forEach((stat) => {
-            hospitalCount += stat?.location ? 1 : 0;
-            provinceCount += stat?.location ? 1 : 0;
-            individualCount += stat?.individual_count ? stat?.individual_count : 0;
-            cohortCount += stat?.cohort_count ? stat?.cohort_count : 0;
-            if (stat.location) {
-                candigDataSouceCollection[stat.location[2]] = stat?.individual_count ? stat?.individual_count : 0;
-            }
-            if (stat.gender) {
-                stat.gender.forEach((gender) => {
-                    if (gender.count > 0) {
-                        const genderSex = gender.sex ? toTitleCase(gender.sex) : 'Unknown';
-                        gendersCount[genderSex] = gendersCount[genderSex] ? gender.count + gendersCount[genderSex] : gender.count;
-                    }
-                });
-            }
-            if (stat.ethnicity) {
-                stat.ethnicity.forEach((ethnicity) => {
-                    if (ethnicity.count > 0) {
-                        const ethnicityName = ethnicity.ethnicity ? toTitleCase(ethnicity.ethnicity) : 'Unknown';
-                        ethnicitiesCount[ethnicityName] = ethnicitiesCount[ethnicityName]
-                            ? ethnicity.count + ethnicitiesCount[ethnicityName]
-                            : ethnicity.count;
-                    }
-                });
-            }
-        });
-        setProvinceCount(provinceCount);
-        setHospitalCount(hospitalCount);
-        setIndividualCount(individualCount);
-        setCohortCount(cohortCount);
-        setEthnicityObject(ethnicitiesCount);
-        setGenderObject(gendersCount);
-        setCanDigDataSource(candigDataSouceCollection);
+
+        if (data.results) {
+            // Fake Server with same URL
+            data.results[0].location[0] = 'UHN';
+            data.results[0].location[1] = 'Ontario';
+            data.results[0].location[2] = 'ca-on';
+
+            let count = [];
+            data.results.forEach((stat) => {
+                // Federation aggregate count of stats
+                count++;
+                switch (endpoint) {
+                    case '/individual_count':
+                        setIndividualCount(aggregateObj(stat, individual_count));
+                        if (stat.location) {
+                            candigDataSouceCollection[stat.location[2]] = stat.individual_count;
+
+                            if (count === data.results.length) {
+                                setCanDigDataSource(candigDataSouceCollection);
+                            }
+                        }
+                        break;
+                    case '/cohort_count':
+                        setCohortCount(aggregateObj(stat, cohort_count));
+                        break;
+                    case '/patients_per_cohort':
+                        setPatientsPerCohort(aggregateObjStack(stat, patients_per_cohort));
+                        break;
+                    case '/cancer_type_count':
+                        setCancerTypeCount(aggregateObj(stat, cancer_type_count));
+                        break;
+                    case '/treatment_type_count':
+                        setTreatmentTypeCount(aggregateObj(stat, treatment_type_count));
+                        break;
+                    case '/diagnosis_age_count':
+                        setDiagnosisAgeCount(aggregateObj(stat, diagnosis_age_count));
+                        break;
+                }
+            });
+        }
     }
 
-    /* Setting summary page to local site data */
-    function summaryStats(data) {
-        setProvinceCount(data?.province_count ? data?.province_count : 0);
-        setHospitalCount(data?.hospital_count ? data?.hospital_count : 0);
-        setIndividualCount(data?.individual_count ? data?.individual_count : 0);
-        setCohortCount(data?.cohort_count ? data?.cohort_count : 0);
-        setEthnicityObject(groupCount(data.ethnicity, 'ethnicity'));
-        setGenderObject(groupCount(data.gender, 'sex'));
+    function federationNode(data) {
+        console.log(data);
+        const nodeMap = new Map();
+
+        // Set Site Count/Provinces
+        if (data.message) {
+            setProvinceCount(data.message.length);
+        }
+
+        // Count Node Status
+        data.message.forEach((message) => {
+            const msg = message.split(' ');
+            if (msg[0] === 'Success!') {
+                nodeMap.set('Active', nodeMap.get('Active') ? nodeMap.get('Active') + 1 : 1);
+            } else {
+                nodeMap.set('Error', nodeMap.get('Error') ? nodeMap.get('Error') + 1 : 1);
+            }
+        });
+
+        // Set node status information
+        setSites(nodeMap.get('Active'));
+        setConnectionError(nodeMap.get('Error'));
+        setTotalSites(nodeMap.get('Active') + nodeMap.get('Error'));
+
+        // Set rendering of node status
+        if (nodeMap.get('Error') >= 1) {
+            setNodeStatus(true);
+        } else {
+            setNodeStatus(false);
+        }
     }
 
     useEffect(() => {
-        trackPromise(
-            fetchFederationStat()
+        function fetchData(endpoint) {
+            fetchFederationStat(endpoint)
                 .then((data) => {
-                    if (data.results) {
-                        federationStatCount(data);
-                    } else {
-                        summaryStats(data);
+                    federationStatCount(data, endpoint);
+                    if (endpoint === '/individual_count') {
+                        federationNode(data);
                     }
-                    setDidFetch(true);
                 })
-                .catch(() => {
+                .catch((error) => {
                     // pass
-                    setProvinceCount('Not Available');
-                    setHospitalCount('Not Available');
-                    setIndividualCount('Not Available');
-                    setCohortCount('Not Available');
-                })
-        );
+                    console.log('Error fetching data : ', error);
 
-        trackPromise(
-            fetchServers()
-                .then((data) => {
-                    /* Aggregated federated server data */
-                    const SERVER_DATA = {
-                        'Known Peers': Object.keys(data).length,
-                        'Queried Peers': 2,
-                        'Successful Communications': 1
-                    };
-                    setServerObject(SERVER_DATA);
+                    setLoading(false);
                 })
-                .catch(() => {
-                    // pass
-                    /* Local site data in the event of no federated URL */
-                    const SERVER_DATA = {
-                        'Known Peers': 1,
-                        'Queried Peers': 1,
-                        'Successful Communications': 1
-                    };
-                    setServerObject(SERVER_DATA);
-                })
-        );
+                .finally(() => setLoading(false));
+        }
 
-        setLoading(false);
-    }, [didFetch]);
+        fetchData('/individual_count');
+        setTimeout(() => {
+            fetchData('/cancer_type_count');
+        }, 250);
+        setTimeout(() => {
+            fetchData('/cohort_count');
+        }, 3000);
+        setTimeout(() => {
+            fetchData('/patients_per_cohort');
+        }, 3750);
+        setTimeout(() => {
+            fetchData('/treatment_type_count');
+        }, 6500);
+        setTimeout(() => {
+            fetchData('/diagnosis_age_count');
+        }, 9250);
+    }, []);
 
     return (
-        <Grid container>
-            <Grid container xs={12} pb={2.5}>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
-                    <Grid item xs={12} pb={3} pr={2}>
+        <Grid container spacing={1}>
+            {nodeStatus ? (
+                <Grid container xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
+                    <Grid item xs={true} sm={true} md={true} lg={true} pr={1}>
                         <SmallCountCard
-                            isLoading={isLoading}
-                            title="Provinces"
-                            count={provinceCounter}
-                            dark={false}
-                            icon={<PublicIcon fontSize="inherit" />}
+                            title="Nodes"
+                            count={`${sites}/${totalSites}`}
+                            icon={<CheckCircleOutline fontSize="inherit" />}
+                            color={theme.palette.secondary.main}
                         />
                     </Grid>
-                    <Grid item xs={12} pb={2} pr={2}>
-                        <TreatingCentreMap datasetName="" data={canDigDataSource} />
-                    </Grid>
-                </Grid>
-                <Grid container spacing={2} xs={12} sm={6} md={6} lg={6}>
-                    <Grid item xs={12}>
+                    <Grid item xs={true} sm={true} md={true} lg={true}>
                         <SmallCountCard
-                            title="Hospitals"
-                            count={hospitalCounter}
-                            dark={false}
-                            icon={<AccountBalanceIcon fontSize="inherit" />}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <CustomOfflineChart
-                            datasetName=""
-                            dataObject={serverObject}
-                            chartType="bar"
-                            barTitle="Server Status"
-                            height="186px; auto"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallCountCard title="Cohorts" count={cohortCounter} dark={false} icon={<HiveIcon fontSize="inherit" />} />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <SmallCountCard
-                            isLoading={isLoading}
-                            title="Number of Individuals"
-                            count={individualCounter}
-                            primary
-                            icon={<PersonIcon fontSize="inherit" />}
+                            title="Connection Error"
+                            count={`${connectionError}/${totalSites}`}
+                            icon={<WarningAmber fontSize="inherit" />}
+                            color={theme.palette.error.main}
                         />
                     </Grid>
                 </Grid>
+            ) : (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <SmallCountCard
+                        title="Nodes"
+                        count={sites}
+                        icon={<CheckCircleOutline fontSize="inherit" />}
+                        color={theme.palette.secondary.main}
+                    />
+                </Grid>
+            )}
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    isLoading={isLoading}
+                    title="Number of Patients"
+                    count={individual_count.individual_count}
+                    primary
+                    icon={<Person fontSize="inherit" />}
+                    color={theme.palette.primary.main}
+                />
             </Grid>
-            <Grid item xs={12}>
-                <Grid container spacing={gridSpacing}>
-                    <Grid item xs={12} md={8}>
-                        <CustomOfflineChart
-                            datasetName=""
-                            dataObject={ethnicityObject}
-                            chartType="bar"
-                            barTitle="Distribution of Ethnicity"
-                            height="520px; auto"
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <CustomOfflineChart
-                            datasetName=""
-                            dataObject={genderObject}
-                            chartType="pie"
-                            barTitle="Distribution of Gender"
-                            height="500px; auto"
-                        />
-                    </Grid>
-                </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    title="Cohorts"
+                    count={cohort_count.cohort_count}
+                    icon={<Hive fontSize="inherit" />}
+                    color={theme.palette.secondary.main}
+                />
             </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <SmallCountCard
+                    isLoading={isLoading}
+                    title="Provinces"
+                    count={provinceCounter}
+                    icon={<Public fontSize="inherit" />}
+                    color={theme.palette.tertiary.main}
+                />
+            </Grid>
+            {Object.keys(canDigDataSource).length !== 0 && cohort_count && (
+                <Grid item xs={12} sm={12} md={12} lg={6}>
+                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
+                </Grid>
+            )}
+            {Object.keys(diagnosis_age_count).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={diagnosis_age_count}
+                        chartType="bar"
+                        barTitle="Age Range Distribution"
+                        height="400px; auto"
+                        chart="bar"
+                        xAxisTitle="Age Ranges"
+                        yAxisTitle="Number of Patients"
+                    />
+                </Grid>
+            )}
+            {Object.keys(treatment_type_count).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={treatment_type_count}
+                        chartType="bar"
+                        barTitle="Treatment Type Distribution"
+                        height="400px; auto"
+                        chart="bar"
+                        xAxisTitle="Treatment Type"
+                        yAxisTitle="Number of Patients"
+                    />
+                </Grid>
+            )}
+            {Object.keys(cancer_type_count).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={cancer_type_count}
+                        chartType="bar"
+                        barTitle="Cancer Type Distribution"
+                        height="400px; auto"
+                        chart="bar"
+                        xAxisTitle="Cancer Type"
+                        yAxisTitle="Number of Patients"
+                    />
+                </Grid>
+            )}
+            {Object.keys(patients_per_cohort).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={patients_per_cohort}
+                        chartType="bar"
+                        barTitle="Distribution of Cohort by Node"
+                        height="400px; auto"
+                        chart="stackedBarChart"
+                        xAxisTitle="Sites"
+                        yAxisTitle="Number of Patients per Node"
+                    />
+                </Grid>
+            )}
+            {Object.keys(fullClinicalData).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={fullClinicalData}
+                        chartType="bar"
+                        barTitle="Cases with Complete Clinical Data"
+                        height="400px; auto"
+                        chart="stackedBarChart"
+                        xAxisTitle="Sites"
+                        yAxisTitle="Cases with Complete Clinical Data"
+                    />
+                </Grid>
+            )}
+            {Object.keys(fullGenomicData).length !== 0 && (
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        datasetName=""
+                        dataObject={fullGenomicData}
+                        chartType="bar"
+                        barTitle="Cases with Complete Genomic Data"
+                        height="400px; auto"
+                        chart="stackedBarChart"
+                        xAxisTitle="Sites"
+                        yAxisTitle="Cases with Complete Genomic Data"
+                    />
+                </Grid>
+            )}
         </Grid>
     );
 }

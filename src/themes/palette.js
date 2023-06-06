@@ -22,6 +22,13 @@ export default function themePalette(theme) {
             200: theme.colors.secondary200,
             800: theme.colors.secondary800
         },
+        tertiary: {
+            light: theme.colors.tertiaryLight,
+            main: theme.colors.tertiaryMain,
+            dark: theme.colors.tertiaryDark,
+            200: theme.colors.tertiary200,
+            800: theme.colors.tertiary800
+        },
         error: {
             light: theme.colors.errorLight,
             main: theme.colors.errorMain,
