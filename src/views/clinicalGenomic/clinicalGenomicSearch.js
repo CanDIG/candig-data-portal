@@ -113,8 +113,8 @@ function ClinicalGenomicSearch() {
                     <Divider />
                 </div>
                 {sections.map((section) =>
-                    <div>
-                        <a class="anchor" id={section.id} className={classes.anchor}></a>
+                    <div key={section.id}>
+                        <a id={section.id} className={classes.anchor}></a>
                         <h3>{section.header}</h3>
                         {section.component}
                         <div className={classes.spaceBetween} />
