@@ -1,7 +1,7 @@
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
-export const federation = process.env.REACT_APP_FEDERATION_API_SERVER + "/v1";
+export const federation = process.env.REACT_APP_FEDERATION_API_SERVER + '/v1';
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const TYK_URL = process.env.REACT_APP_TYK_SERVER;

@@ -18,7 +18,7 @@ import GenomicData from './widgets/genomicData.js';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
-        position: "static",
+        position: 'static',
         backgroundColor: 'white',
         width: '100%',
         zIndex: 1100,
@@ -29,44 +29,44 @@ const useStyles = makeStyles((theme) => ({
         height: 30
     },
     anchor: {
-        display: "block",
-        position: "relative",
-        top: -82,   // Height of the header
-        visibility: "hidden"
+        display: 'block',
+        position: 'relative',
+        top: -82, // Height of the header
+        visibility: 'hidden'
     },
     navigationLink: {
-        float: "right",
-        textAlign: "right"
+        float: 'right',
+        textAlign: 'right'
     }
 }));
 
 const sections = [
     {
-        id: "counts",
-        header: "Patient Counts",
+        id: 'counts',
+        header: 'Patient Counts',
         component: <PatientCounts />
     },
     {
-        id: "visualization",
-        header: "Data Visualization",
+        id: 'visualization',
+        header: 'Data Visualization',
         component: <DataVisualization />
     },
     {
-        id: "clinical",
-        header: "Clinical Data",
+        id: 'clinical',
+        header: 'Clinical Data',
         component: <ClinicalData />
     },
     {
-        id: "pivot",
-        header: "Pivot Table",
+        id: 'pivot',
+        header: 'Pivot Table',
         component: <PivotTable />
     },
     {
-        id: "genomic",
-        header: "Genomic Data",
+        id: 'genomic',
+        header: 'Genomic Data',
         component: <GenomicData />
-    },
-]
+    }
+];
 
 function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
@@ -86,9 +86,11 @@ function ClinicalGenomicSearch() {
                     <Typography variant="h5" sx={{ flexGrow: 1 }}>
                         Federated Search
                     </Typography>
-                    {sections.map((section) =>
+                    {sections.map((section) => (
                         <Button
-                            onClick={() => {window.location.href = "#" + section.id;}}
+                            onClick={() => {
+                                window.location.href = '#' + section.id;
+                            }}
                             sx={{ my: 2, display: 'block' }}
                             key={section.id}
                             className={classes.navigationLink}
@@ -96,13 +98,11 @@ function ClinicalGenomicSearch() {
                         >
                             {section.header}
                         </Button>
-                    )}
+                    ))}
                 </Toolbar>
             </AppBar>
             <SearchHandler />
-            <MainCard
-                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
-            >
+            <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
                 <div>
                     <Divider />
                     {/* Genomic Searchbar */}
@@ -112,14 +112,14 @@ function ClinicalGenomicSearch() {
                     {/* For now, until I figure out how to make it its own card */}
                     <Divider />
                 </div>
-                {sections.map((section) =>
+                {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor}></a>
                         <h3>{section.header}</h3>
                         {section.component}
                         <div className={classes.spaceBetween} />
                     </div>
-                )}
+                ))}
             </MainCard>
         </>
     );
