@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Divider, Link, Toolbar } from '@mui/material';
+import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
@@ -18,10 +18,12 @@ import GenomicData from './widgets/genomicData.js';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
-        position: 'sticky',
+        position: "static",
         backgroundColor: 'white',
         width: '100%',
-        zIndex: 101
+        zIndex: 1100,
+        top: 110,
+        borderRadius: 12
     },
     spaceBetween: {
         height: 30
@@ -31,6 +33,10 @@ const useStyles = makeStyles((theme) => ({
         position: "relative",
         top: -82,   // Height of the header
         visibility: "hidden"
+    },
+    navigationLink: {
+        float: "right",
+        textAlign: "right"
     }
 }));
 
@@ -75,13 +81,18 @@ function ClinicalGenomicSearch() {
     return (
         <>
             {/* Top bar */}
-            <AppBar position="static">
+            <AppBar component="nav" className={classes.stickytop}>
                 <Toolbar>
+                    <Typography variant="h5" sx={{ flexGrow: 1 }}>
+                        Federated Search
+                    </Typography>
                     {sections.map((section) =>
                         <Button
                             onClick={() => {window.location.href = "#" + section.id;}}
-                            sx={{ my: 2, color: 'white', display: 'block' }}
+                            sx={{ my: 2, display: 'block' }}
                             key={section.id}
+                            className={classes.navigationLink}
+                            variant="text"
                         >
                             {section.header}
                         </Button>
@@ -90,10 +101,9 @@ function ClinicalGenomicSearch() {
             </AppBar>
             <SearchHandler />
             <MainCard
-                title="Federated Search"
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}
             >
-                <div id="stickytop" className={classes.stickytop}>
+                <div>
                     <Divider />
                     {/* Genomic Searchbar */}
                     <div id="searchbar">
