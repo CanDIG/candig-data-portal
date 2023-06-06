@@ -13,12 +13,6 @@ const { basename } = config;
 // Summary routing
 const Summary = Loadable(lazy(() => import('views/summary/summary')));
 
-// Clinical
-const McodePage = Loadable(lazy(() => import('views/clinical/mcode')));
-
-// Genomic
-const VariantsSearchPage = Loadable(lazy(() => import('views/genomicsData/VariantsSearch')));
-
 // Clinical & Genomic Search
 const ClinicalGenomicSearch = Loadable(lazy(() => import('views/clinicalGenomic/clinicalGenomicSearch')));
 
@@ -42,14 +36,6 @@ const MainRoutes = {
         {
             path: `${basename}/summary`,
             element: <Summary />
-        },
-        {
-            path: `${basename}/mcode`,
-            element: <McodePage />
-        },
-        {
-            path: `${basename}/variants-search`,
-            element: <VariantsSearchPage />
         },
         {
             path: `${basename}/clinicalGenomicSearch`,

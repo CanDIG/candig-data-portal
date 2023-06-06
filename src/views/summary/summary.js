@@ -18,6 +18,8 @@ import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/ico
 // Test data
 import { fullClinicalData, fullGenomicData, diagnosis_age_count } from '../../store/constant';
 
+import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
+
 function Summary() {
     const theme = useTheme();
     const [isLoading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ function Summary() {
     const [treatment_type_count, setTreatmentTypeCount] = useState({});
     const [cohort_count, setCohortCount] = useState({});
     const [patients_per_cohort, setPatientsPerCohort] = useState({});
-    //const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
+    // const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -37,6 +39,12 @@ function Summary() {
 
     const [canDigDataSource, setCanDigDataSource] = useState({});
     const [nodeStatus, setNodeStatus] = useState(true);
+
+    // Clear the sidebar, if available
+    const sidebarWriter = useSidebarWriterContext();
+    useEffect(() => {
+        sidebarWriter(<></>);
+    }, []);
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {

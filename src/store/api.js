@@ -1,7 +1,7 @@
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
-export const federation = process.env.REACT_APP_FEDERATION_API_SERVER;
+export const federation = process.env.REACT_APP_FEDERATION_API_SERVER + '/v1';
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
@@ -24,26 +24,22 @@ export function fetchKatsu(URL) {
         });
 }
 
-/*
-Fetch the federation service 
-*/
 export function fetchFederationStat(endpoint) {
-    return fetch(`${federation}/search`, {
+    return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            request_type: 'GET',
-            endpoint_path: `moh/v1/discovery/overview${endpoint}`,
-            endpoint_payload: {},
-            endpoint_service: 'katsu'
+            method: 'GET',
+            path: `v2/discovery/overview${endpoint}`,
+            payload: {},
+            service: 'katsu'
         })
     })
         .then((response) => {
             if (response.ok) {
                 return response.json();
             }
-            console.log("Federation Stats: " + response);
-            return
+            return {};
         })
         .catch((error) => {
             console.log('Error:', error);
@@ -55,14 +51,14 @@ export function fetchFederationStat(endpoint) {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/search`, {
+    return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            request_type: 'GET',
-            endpoint_path: 'api/mcodepackets',
-            endpoint_payload: {},
-            endpoint_service: 'katsu'
+            method: 'GET',
+            path: 'api/mcodepackets',
+            payload: {},
+            service: 'katsu'
         })
     })
         .then((response) => {
@@ -107,14 +103,14 @@ export function searchVariant(chromosome, start, end) {
             }
         ]
     };
-    return fetch(`${federation}/search`, {
+    return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            request_type: 'POST',
-            endpoint_path: 'htsget/v1/variants/search',
-            endpoint_payload: payload,
-            endpoint_service: 'htsget'
+            method: 'POST',
+            path: 'htsget/v1/variants/search',
+            payload: payload,
+            service: 'htsget'
         })
     })
         .then((response) => {

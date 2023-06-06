@@ -1,6 +1,4 @@
-import clinical from './clinical';
 import clinicalGenomicSearch from './clinicalGenomicSearch';
-import genomicsData from './genomicsData';
 import summary from './summary';
 
 // import pages from './pages';

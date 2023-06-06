@@ -11,6 +11,7 @@ import { BrowserView, MobileView } from 'react-device-detect';
 // project imports
 import LogoSection from '../LogoSection';
 import { drawerWidth } from 'store/constant';
+import { useSidebarReaderContext } from './SidebarContext.js';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +52,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
     const classes = useStyles();
     const theme = useTheme();
     const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
+    const sidebarContext = useSidebarReaderContext();
 
     const drawer = (
         <>
@@ -60,7 +62,11 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                 </div>
             </Box>
             <BrowserView>
-                <PerfectScrollbar component="div" className={classes.ScrollHeight} />
+                <PerfectScrollbar component="div" className={classes.ScrollHeight}>
+                    {/* The following is required for a warning to not be thrown,
+                        however, it's unclear why this scrollbar has no content in the first place.*/}
+                    {sidebarContext}
+                </PerfectScrollbar>
             </BrowserView>
             <MobileView>
                 <Box sx={{ px: 2 }} />

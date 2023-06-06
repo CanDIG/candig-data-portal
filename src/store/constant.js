@@ -87,6 +87,10 @@ export const SITE = process.env.REACT_APP_SITE_LOCATION;
 // API URL where the Dashboard get all the data
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 
+export const PRIMARY_SITES = ['Breast', 'Trachea', 'Panceas'];
+
+export const COHORTS = ['POG', 'Inspire', 'Biocan', 'Biodiva', 'Compass', 'Palms', 'IO-Alines'];
+
 export const CLIN_METADATA = [
     'patients',
     'samples',
@@ -175,6 +179,7 @@ export const highchartsMapInitialState = {
 // List of referenceNames
 
 export const ListOfReferenceNames = [
+    'All',
     '1',
     '2',
     '3',
