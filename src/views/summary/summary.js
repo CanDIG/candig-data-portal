@@ -16,7 +16,7 @@ import { aggregateObj, aggregateObjStack } from 'utils/utils';
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
 // Test data
-import { fullClinicalData, fullGenomicData, diagnosis_age_count } from '../../store/constant';
+import { fullClinicalData, fullGenomicData } from '../../store/constant';
 
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 
@@ -30,7 +30,7 @@ function Summary() {
     const [treatment_type_count, setTreatmentTypeCount] = useState({});
     const [cohort_count, setCohortCount] = useState({});
     const [patients_per_cohort, setPatientsPerCohort] = useState({});
-    // const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
+    const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -50,41 +50,42 @@ function Summary() {
     function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
 
-        if (data.results) {
+        if (data[0].results) {
             // Fake Server with same URL
-            data.results[0].location[0] = 'UHN';
-            data.results[0].location[1] = 'Ontario';
-            data.results[0].location[2] = 'ca-on';
+            data[0].location[0] = 'UHN';
+            data[0].location[1] = 'Ontario';
+            data[0].location[2] = 'ca-on';
 
             let count = [];
-            data.results.forEach((stat) => {
+            data.forEach((stat) => {
                 // Federation aggregate count of stats
                 count++;
                 switch (endpoint) {
                     case '/individual_count':
-                        setIndividualCount(aggregateObj(stat, individual_count));
+                        setIndividualCount(aggregateObj(stat.results, individual_count));
                         if (stat.location) {
-                            candigDataSouceCollection[stat.location[2]] = stat.individual_count;
+                            candigDataSouceCollection[stat.location[2]] = stat.results.individual_count;
 
-                            if (count === data.results.length) {
+                            if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
                             }
                         }
+
                         break;
                     case '/cohort_count':
-                        setCohortCount(aggregateObj(stat, cohort_count));
+                        setCohortCount(aggregateObj(stat.results, cohort_count));
                         break;
                     case '/patients_per_cohort':
                         setPatientsPerCohort(aggregateObjStack(stat, patients_per_cohort));
                         break;
                     case '/cancer_type_count':
-                        setCancerTypeCount(aggregateObj(stat, cancer_type_count));
+                        setCancerTypeCount(aggregateObj(stat.results, cancer_type_count));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount(aggregateObj(stat, treatment_type_count));
+                        setTreatmentTypeCount(aggregateObj(stat.results, treatment_type_count));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount(aggregateObj(stat, diagnosis_age_count));
+                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosis_age_count));
                         break;
                 }
             });
@@ -92,18 +93,16 @@ function Summary() {
     }
 
     function federationNode(data) {
-        console.log(data);
         const nodeMap = new Map();
 
         // Set Site Count/Provinces
-        if (data.message) {
-            setProvinceCount(data.message.length);
+        if (data) {
+            setProvinceCount(data?.length);
         }
 
         // Count Node Status
-        data.message.forEach((message) => {
-            const msg = message.split(' ');
-            if (msg[0] === 'Success!') {
+        data?.forEach((status) => {
+            if (status.status === 200) {
                 nodeMap.set('Active', nodeMap.get('Active') ? nodeMap.get('Active') + 1 : 1);
             } else {
                 nodeMap.set('Error', nodeMap.get('Error') ? nodeMap.get('Error') + 1 : 1);

@@ -14,7 +14,6 @@ export function aggregateObj(stat, aggregateObj) {
             count[key] = stat[key];
         }
     }
-    delete count.location;
     return count;
 }
 
@@ -28,7 +27,6 @@ export function aggregateObj(stat, aggregateObj) {
 export function aggregateObjStack(stat, Object) {
     const count = Object;
     count[stat.location[0]] = stat;
-    delete count[stat.location[0]].location;
     return count;
 }
 
