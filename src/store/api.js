@@ -49,6 +49,32 @@ export function fetchFederationStat(endpoint) {
 }
 
 /*
+Generic querying for federation
+*/
+export function fetchFederation(path, service) {
+    return fetch(`${federation}/fanout`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'GET',
+            path: path,
+            payload: {},
+            service: service
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
+}
+
+/*
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {

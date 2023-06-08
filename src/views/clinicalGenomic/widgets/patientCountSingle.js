@@ -1,44 +1,46 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
-import { Avatar, Box, Button, CardHeader, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, CardHeader, Divider, Grid, Typography } from '@mui/material';
 import { useTheme, makeStyles } from '@mui/styles';
-
-import { useSearchResultsReaderContext } from '../SearchResultsContext';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 
 const useStyles = makeStyles((theme) => {
-    return {
-        patientEntry: {
-            // React center span?
-        },
-        siteName: {
-            // Left-aligned
-            width: 120
-        },
-        locked: {
-            backgroundColor: theme.palette.action.disabledBackground
-        },
-        button: {
-            // Right-aligned
-            float: 'right',
-            marginLeft: 'auto'
-        },
-        divider: {
-            borderColor: theme.palette.primary.main,
-            marginTop: 20,
-            marginBottom: 4
-        }
-    };
+return {
+    patientEntry: {
+        // React center span?
+    },
+    siteName: {
+        // Left-aligned
+        width: 120
+    },
+    locked: {
+        backgroundColor: theme.palette.action.disabledBackground
+    },
+    button: {
+        // Right-aligned
+        float: 'right',
+        marginLeft: 'auto'
+    },
+    divider: {
+        borderColor: theme.palette.primary.main,
+        marginTop: 20,
+        marginBottom: 4
+    }
+};
 });
 
 function PatientCountSingle(props) {
-    const { site, searchResults } = props;
+    const { site, counts } = props;
     const theme = useTheme();
     const classes = useStyles();
+    const [expanded, setExpanded] = useState(false);
 
-    console.log(searchResults);
-    let totalPatients = Object.values(searchResults['results'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
-    let patientsInSearch = 0; //searchResults[site]['patientsInSearch'];
-    let numCohorts = Object.values(searchResults['results'])?.length || 0;
+    console.log(counts);
+
+    let totalPatients = Object.values(counts['totals'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
+    let patientsInSearch = Object.values(counts['counts'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
+    let numCohorts = Object.values(counts['totals'])?.length || 0;
     let locked = false; //searchResults['locked'];
 
     let avatarProps = locked
@@ -80,15 +82,51 @@ function PatientCountSingle(props) {
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={1} ml={'auto'} className={classes.button}>
-                    {locked ? (
-                        <Button type="submit" variant="contained" sx={{ borderRadius: 1.8 }}>
-                            Request&nbsp;Access
-                        </Button>
-                    ) : (
-                        <></>
-                    )}
+                    {
+                        numCohorts > 1 ? 
+                            <Button onClick={_ => setExpanded(old => !old)} variant="contained" sx={{ borderRadius: 1.8 }}>
+                                {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
+                            </Button>
+                        : <></>
+                    }
                 </Grid>
             </Grid>
+
+            {expanded ? Object.keys(counts['totals']).map((cohort) => (
+                <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort}>
+                    <Grid item xs={2}>
+                        <Typography variant="h5" align="center" className={classes.patientEntry}>
+                            {cohort}
+                        </Typography>
+                    </Grid>
+                    <Divider flexItem orientation="vertical" className={classes.divider} />
+                    <Grid item xs={2}>
+                        <Typography align="center" className={classes.patientEntry}>
+                            {counts['totals'][cohort]}
+                        </Typography>
+                    </Grid>
+                    <Divider flexItem orientation="vertical" className={classes.divider} />
+                    <Grid item xs={2}>
+                        <Typography align="center" className={classes.patientEntry}>
+                            {counts['counts']?.[cohort] || 0}
+                        </Typography>
+                    </Grid>
+                    <Divider flexItem orientation="vertical" className={classes.divider} />
+                    <Grid item xs={2}>
+                        {/* Num cohorts doesn't make any sense here */}
+                    </Grid>
+                    <Divider flexItem orientation="vertical" className={classes.divider} />
+                    <Grid item xs={1} ml={'auto'} className={classes.button}>
+                        {locked ? (
+                            <Button type="submit" variant="contained" sx={{ borderRadius: 1.8 }}>
+                                Request&nbsp;Access
+                            </Button>
+                        ) : (
+                            <></>
+                        )}
+                    </Grid>
+                </Grid>
+            )) : <></>}
         </Box>
     );
 }

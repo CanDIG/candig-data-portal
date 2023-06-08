@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederationClinicalData } from 'store/api';
+import { fetchFederationStat, fetchFederation } from 'store/api';
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
 function SearchHandler() {
@@ -22,8 +22,9 @@ function SearchHandler() {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
+        let url = "v2/authorized/donors?" + new URLSearchParams(reader["query"]).toString();
         trackPromise(
-            fetchFederationClinicalData().then((data) => {
+            fetchFederation(url, "katsu").then((data) => {
                 writer((old) => ({ ...old, mcode: data }));
             }),
             'clinical'
