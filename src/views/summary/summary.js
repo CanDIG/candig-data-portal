@@ -50,7 +50,7 @@ function Summary() {
     function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
 
-        if (data[0].results) {
+        if (data) {
             // Fake Server with same URL
             // data[0].location[0] = 'UHN';
             // data[0].location[1] = 'Ontario';
