@@ -52,9 +52,9 @@ function Summary() {
 
         if (data[0].results) {
             // Fake Server with same URL
-            data[0].location[0] = 'UHN';
-            data[0].location[1] = 'Ontario';
-            data[0].location[2] = 'ca-on';
+            // data[0].location[0] = 'UHN';
+            // data[0].location[1] = 'Ontario';
+            // data[0].location[2] = 'ca-on';
 
             let count = [];
             data.forEach((stat) => {
