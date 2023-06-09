@@ -36,8 +36,8 @@ function PatientCounts(props) {
             let counts = {};
             if (Array.isArray(searchResults)) {
                 let match = searchResults.find(search => entry.location.name === search.location.name);
-                // Aggregate by cohort (program_id)
-                match?.results?.forEach((donor) => {
+                // Iterate through each donor in this site
+                match?.results?.["results"]?.forEach((donor) => {
                     if (donor["program_id"] in counts) {
                         counts[donor["program_id"]] += 1;
                     } else {

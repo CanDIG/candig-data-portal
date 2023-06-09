@@ -25,7 +25,7 @@ function SearchHandler() {
         let url = "v2/authorized/donors?" + new URLSearchParams(reader["query"]).toString();
         trackPromise(
             fetchFederation(url, "katsu").then((data) => {
-                writer((old) => ({ ...old, mcode: data }));
+                writer((old) => ({ ...old, clinical: data }));
             }),
             'clinical'
         );
