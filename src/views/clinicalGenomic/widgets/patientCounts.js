@@ -28,8 +28,6 @@ function PatientCounts(props) {
     // Generate the map of site->cohort->numbers
     // First, we need to match each site within federation with the site within clinical
     let siteData = [];
-    console.log(sites);
-    console.log(searchResults);
     if (Array.isArray(sites)) {
         siteData = sites.map((entry) => {
             // Find this site within our search results

@@ -10,6 +10,9 @@ return {
     patientEntry: {
         // React center span?
     },
+    container: {
+        height: 80
+    },
     siteName: {
         // Left-aligned
         width: 120
@@ -58,7 +61,7 @@ function PatientCountSingle(props) {
             sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}
             className={locked ? classes.locked : ''}
         >
-            <Grid container justifyContent="center" alignItems="center" spacing={2}>
+            <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
                 <Grid item xs={2}>
                     <CardHeader avatar={<Avatar {...avatarProps}>{site.slice(0, 1).toUpperCase()}</Avatar>} title={<b>{site}</b>} />
                 </Grid>
@@ -93,10 +96,10 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded ? Object.keys(counts['totals']).map((cohort) => (
-                <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort}>
+                <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort} className={classes.container}>
                     <Grid item xs={2}>
                         <Typography variant="h5" align="center" className={classes.patientEntry}>
-                            {cohort}
+                            <b>{cohort}</b>
                         </Typography>
                     </Grid>
                     <Divider flexItem orientation="vertical" className={classes.divider} />
