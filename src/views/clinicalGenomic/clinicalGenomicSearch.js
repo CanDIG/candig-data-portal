@@ -57,8 +57,8 @@ const sections = [
         component: <ClinicalData />
     },
     {
-        id: 'pivot',
-        header: 'Pivot Table',
+        id: 'patient',
+        header: 'Patient View',
         component: <PivotTable />
     },
     {

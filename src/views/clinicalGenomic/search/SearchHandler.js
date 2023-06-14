@@ -22,7 +22,7 @@ function SearchHandler() {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
-        let url = "v2/authorized/donors?" + new URLSearchParams(reader["query"]).toString();
+        let url = "v2/authorized/donor_with_clinical_data?" + new URLSearchParams(reader["query"]).toString();
         trackPromise(
             fetchFederation(url, "katsu").then((data) => {
                 writer((old) => ({ ...old, clinical: data }));

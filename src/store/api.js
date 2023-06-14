@@ -78,6 +78,8 @@ export function fetchFederation(path, service) {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
+    // Until I can debug the Tyk error
+    return new Promise((resolve) => resolve({}));
     return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },

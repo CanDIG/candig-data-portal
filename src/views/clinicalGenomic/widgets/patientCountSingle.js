@@ -39,8 +39,6 @@ function PatientCountSingle(props) {
     const classes = useStyles();
     const [expanded, setExpanded] = useState(false);
 
-    console.log(counts);
-
     let totalPatients = Object.values(counts['totals'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
     let patientsInSearch = Object.values(counts['counts'])?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
     let numCohorts = Object.values(counts['totals'])?.length || 0;
