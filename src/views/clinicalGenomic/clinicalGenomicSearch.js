@@ -9,7 +9,7 @@ import VariantsSearch from '../genomicsData/VariantsSearch.js';
 import PatientCounts from './widgets/patientCounts.js';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
-import PivotTable from './widgets/pivotTable';
+import PatientView from './widgets/patientView.js';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar.js';
 import { PRIMARY_SITES, COHORTS } from 'store/constant';
@@ -59,7 +59,7 @@ const sections = [
     {
         id: 'patient',
         header: 'Patient View',
-        component: <PivotTable />
+        component: <PatientView />
     },
     {
         id: 'genomic',

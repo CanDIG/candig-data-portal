@@ -13,6 +13,9 @@ const useStyles = makeStyles((theme) => {
         label: {
             textTransform: "capitalize",
             display: "inline-flex"
+        },
+        searchMatch: {
+            backgroundColor: "#FFFF00"
         }
     };
     });
@@ -157,13 +160,27 @@ function isObject(obj) {
     return (typeof obj === 'object' && obj !== null);
 }
 
+// Apply highlighting to a term if it is a string and the search expression exists
+function applyHighlight(term, searchExp, highlightClass) {
+    if (searchExp && typeof(term) === "string") {
+        let splitText = term.split(searchExp);
+        return splitText.map((text) => searchExp.test(text) ? <span className={highlightClass}>{text}</span> : text);
+    }
+    return term;
+}
+
 const JSONTree = (props) => {
-    const {id, label, json} = props;
+    const {id, label, json, searchExp} = props;
     const classes = useStyles();
     let value = (typeof(json) === "number" || typeof(json) === "string") ? json :
                 (typeof(json) === "boolean" ? String(json) : "");
-    // Convert the label into a prettier variant
+
+    // Convert the label into a human-readable format
     let prettyLabel = typeof(label) === "string" ? label.replaceAll("_", " ") : label;
+
+    // Search highlighting on label
+    prettyLabel = applyHighlight(prettyLabel, searchExp, classes.searchMatch);
+    value = applyHighlight(value, searchExp, classes.searchMatch);
 
     return <TreeItem nodeId={id} label={
         <Box sx={{ justifyContent: "flex-start", alignItems: 'center', p: 0.5, pr: 0 }}>
@@ -176,12 +193,12 @@ const JSONTree = (props) => {
         {Array.isArray(json) ? 
             // Displaying an array: return recursive JSONTrees, prefixed by their index
             (json.length > 0 ? json.map((value, i) =>
-                <JSONTree id={id + "/" + i} label={i} json={value} key={i} />
-            ) : <JSONTree id={id + "/empty"} label="empty" json={""} />)
+                <JSONTree id={id + "/" + i} label={i} json={value} key={i} searchExp={searchExp} />
+            ) : <JSONTree id={id + "/empty"} label="empty" json={""} key={"empty"} searchExp={searchExp} />)
         : isObject(json) ?
             // Displaying an object: return recursive JSONTrees, prefixed by their key
             Object.keys(json).map((key) =>
-                <JSONTree id={id + "/" + key} label={key} json={json[key]} key={key} />
+                <JSONTree id={id + "/" + key} label={key} json={json[key]} key={key} searchExp={searchExp} />
             )
         :
             // Displaying a single value -- we just need the outer TreeItem
@@ -190,63 +207,61 @@ const JSONTree = (props) => {
     </TreeItem>
 }
 
-function PivotTable(props) {
+function PatientView(props) {
     const resultsContext = useSearchResultsReaderContext();
     const patient = TEST_PATIENT; // resultsContext.selectedPatient;
     const [expanded, setExpanded] = useState([]);
-    const [search, setSearch] = useState([]);
-    console.log(expanded);
 
-    const getAllChildIDs = (json, prefix) => {
+    // When searching: search, then prune the results
+    const [search, setSearch] = useState("");
+    const [prunedPatient, setPrunedPatient] = useState({});
+
+    const getAllChildIDs = (json, prefix, includeValues) => {
         if (Array.isArray(json)) {
             return [prefix].concat(
-                json.map((value, i) => getAllChildIDs(value, prefix + "/" + i))
+                json.map((value, i) => getAllChildIDs(value, prefix + "/" + i, includeValues))
                 ).flat(1);
         } else if (isObject(json)) {
             return [prefix].concat(
-                Object.keys(json).map((key) => getAllChildIDs(json[key], prefix + "/" + key))
+                Object.keys(json).map((key) => getAllChildIDs(json[key], prefix + "/" + key, includeValues))
                 ).flat(1);
         }
-        return [];
+        return includeValues ? [prefix + ":" + (typeof json === "string" ? json.toLowerCase() : json)] : [];
     }
 
     // Prune the patient entry according to search
-    let prunedPatient = patient;
-    if (search) {
-        console.log(search);
-        const recursivePrune = (json) => {
-            if (Array.isArray(json)) {
-                // Create a new array with pruned children
-                let retVal = json.map((child) => recursivePrune(child)).filter((child) => child !== undefined);
-                return retVal.length <= 0 ? undefined : retVal;
-            } else if (isObject(json)) {
-                // Find any key that matches the search
-                let retVal = {};
-                Object.keys(json).forEach(
-                    (key) => {
-                        if (key.indexOf(search) > 0) {
-                            // include all children of a matching parent
-                            retVal[key] = json[key];
-                        }
+    const recursivePrune = (json, searchTerm) => {
+        if (Array.isArray(json)) {
+            // Create a new array with pruned children
+            let retVal = json.map((child) => recursivePrune(child, searchTerm)).filter((child) => child !== undefined);
+            return retVal.length <= 0 ? undefined : retVal;
+        } else if (isObject(json)) {
+            // Find any key that matches the search
+            let retVal = {};
+            Object.keys(json).forEach(
+                (key) => {
+                    if (key.indexOf(searchTerm) >= 0) {
+                        // include all children of a matching parent
+                        retVal[key] = json[key];
+                        return;
+                    }
 
-                        // For all non-valid keys, there might be a valid child -- recurse downwards and prune
-                        let childObj = recursivePrune(json[key]);
-                        if (childObj !== undefined) {
-                            retVal[key] = childObj;
-                        }
-                    });
-                return Object.keys(retVal) > 0 ? retVal : undefined;
-            } else if (typeof json === "string" && json.indexOf(search) > 0) {
-                return json;
-            }
-            return undefined;
+                    // For all non-valid keys, there might be a valid child -- recurse downwards and prune
+                    let childObj = recursivePrune(json[key], searchTerm);
+                    if (childObj !== undefined) {
+                        retVal[key] = childObj;
+                    }
+                });
+            return Object.keys(retVal).length > 0 ? retVal : undefined;
+        } else if (typeof json === "string" && json.indexOf(searchTerm) >= 0) {
+            return json;
         }
-      prunedPatient = recursivePrune(patient);
+        return undefined;
     }
 
     const handleExpandAll = () => {
         setExpanded( (old) =>
-          old.length === 0 ? getAllChildIDs(prunedPatient, ".") : []
+          old.length === 0 ? getAllChildIDs(prunedPatient, ".", false) : []
         );
     };
 
@@ -254,22 +269,75 @@ function PivotTable(props) {
         setExpanded(nodeIds);
     };
 
+    // Change the currently-searched-for term
+    const handleSearch = (searchTerm) => {
+        // Prune our patient object based on the search
+        let searchTermProcessed = searchTerm.toLowerCase().replaceAll(" ", "_");
+        setSearch(searchTermProcessed);
+
+        if (searchTerm !== "") {
+            // If the user is searching for something, prune the tree to only matching terms
+            let pruned = recursivePrune(patient, searchTermProcessed);
+            setPrunedPatient(pruned);
+
+            // Also automatically expand the tree (so the user can see results)
+            // However, we can't just get _all_ child IDs, because if a parent matches
+            // but not its children, we want to keep the parent collapsed.
+            let childIDs = getAllChildIDs(prunedPatient, ".", true)
+                // Does the search term appear _after_ the last /?
+                .filter((key) => key.lastIndexOf(searchTermProcessed) > key.lastIndexOf("/"))
+                .map((key) => {
+                    // If we have a value, grab everything up to the value
+                    let truncatedKey = key.split(":");
+                    if (truncatedKey.length > 2) {
+                        truncatedKey = truncatedKey.slice(0, truncatedKey-1);
+                    }
+                    truncatedKey = truncatedKey.join(":");
+
+                    // Create a list of all of the parents, up to the parent
+                    let splitKey = truncatedKey.split("/");
+                    return splitKey.map((_, index) => 
+                        splitKey.slice(0, index).join("/")
+                    );
+                }).flat(1);
+            // Remove duplicates
+            childIDs = Array.from(new Set(childIDs));
+            console.log(getAllChildIDs(prunedPatient, ".", true)
+            .map((key) => key + " / " + key.lastIndexOf(searchTermProcessed) + " / " + key.lastIndexOf("/")));
+            console.log(childIDs);
+            setExpanded(childIDs);
+        } else {
+            // Otherwise, clear the prunedPatient view
+            setPrunedPatient(patient);
+        }
+    }
+
+    // When the patient changes, we need to update the pruned view according to search
+    useEffect(() => {
+        if (search !== "") {
+            setPrunedPatient(recursivePrune(patient, search));
+        } else {
+            // Otherwise, just reset the prunedPatient view to the patient view
+            setPrunedPatient(patient);
+        }
+    }, [JSON.stringify(patient)]);
+
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2 }}>
             <Box sx={{ display: "flex", alignItems: 'center', p: 0.5, pr: 0 }}>
                 <Typography variant="h5" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                     Patient Info
                 </Typography>
-                <Button onClick={handleExpandAll}>
-                  {expanded.length === 0 ? 'Expand all' : 'Collapse all'}
-                </Button>
                 <TextField
                     id="filled-search"
                     label="Search"
                     type="search"
                     variant="filled"
-                    onChange={(event) => {setSearch(event.target.value)}}
+                    onChange={(event) => {handleSearch(event.target.value)}}
                     />
+                <Button onClick={handleExpandAll}>
+                  {expanded.length === 0 ? 'Expand all' : 'Collapse all'}
+                </Button>
             </Box>
             {prunedPatient ?
                 <TreeView
@@ -278,7 +346,12 @@ function PivotTable(props) {
                     expanded={expanded}
                     onNodeToggle={handleToggle}
                     >
-                    <JSONTree id="." label={"Patient " + (prunedPatient?.submitter_donor_id || "")} json={prunedPatient} />
+                    <JSONTree
+                        id="."
+                        label={"Patient " + (patient?.submitter_donor_id || "")}
+                        json={prunedPatient}
+                        searchExp={search ? new RegExp("(" + search + ")", "gi") : undefined}
+                        />
                 </TreeView>
             :
                 <Typography>Please select a patient to see results</Typography>
@@ -287,4 +360,4 @@ function PivotTable(props) {
     );
 }
 
-export default PivotTable;
+export default PatientView;
