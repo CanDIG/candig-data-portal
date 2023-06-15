@@ -6,7 +6,7 @@
  * This function is used for the pie and bar charts
  */
 export function aggregateObj(stat, aggregateObj) {
-    const count = aggregateObj;
+    const count = { ...aggregateObj };
     for (const key in stat) {
         if (count.hasOwnProperty(key)) {
             count[key] += stat[key];
@@ -25,7 +25,7 @@ export function aggregateObj(stat, aggregateObj) {
  * This function is used for the stack bar chart
  */
 export function aggregateObjStack(stat, Object) {
-    const count = Object;
+    const count = { ...Object };
     count[stat.location[0]] = stat;
     return count;
 }
