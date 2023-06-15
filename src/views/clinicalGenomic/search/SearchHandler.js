@@ -13,7 +13,7 @@ function SearchHandler() {
     // Query 1: always have the federation sites query results available
     useEffect(() => {
         trackPromise(
-            fetchFederationStat("/patients_per_cohort").then((data) => {
+            fetchFederationStat('/patients_per_cohort').then((data) => {
                 writer((old) => ({ ...old, federation: data }));
             }),
             'federation'
@@ -22,9 +22,9 @@ function SearchHandler() {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
-        let url = "v2/authorized/donor_with_clinical_data?" + new URLSearchParams(reader["query"]).toString();
+        const url = `v2/authorized/donor_with_clinical_data?${new URLSearchParams(reader.query)}`;
         trackPromise(
-            fetchFederation(url, "katsu").then((data) => {
+            fetchFederation(url, 'katsu').then((data) => {
                 writer((old) => ({ ...old, clinical: data }));
             }),
             'clinical'

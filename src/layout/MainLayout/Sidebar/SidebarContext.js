@@ -29,7 +29,7 @@ export function SidebarProvider(props) {
 export function useSidebarReaderContext() {
     const context = React.useContext(SidebarReaderContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSidebarReaderContext must be used within a SidebarProvider');
     }
 
@@ -44,7 +44,7 @@ export function useSidebarReaderContext() {
 export function useSidebarWriterContext() {
     const context = React.useContext(SidebarWriterContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSidebarWriterContext must be used within a SidebarProvider');
     }
 

@@ -1,7 +1,7 @@
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
-export const federation = process.env.REACT_APP_FEDERATION_API_SERVER + '/v1';
+export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
@@ -57,9 +57,9 @@ export function fetchFederation(path, service) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: path,
+            path,
             payload: {},
-            service: service
+            service
         })
     })
         .then((response) => {
@@ -138,7 +138,7 @@ export function searchVariant(chromosome, start, end) {
         body: JSON.stringify({
             method: 'POST',
             path: 'htsget/v1/variants/search',
-            payload: payload,
+            payload,
             service: 'htsget'
         })
     })
