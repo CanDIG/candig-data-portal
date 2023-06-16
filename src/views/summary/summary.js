@@ -25,12 +25,12 @@ function Summary() {
     const [isLoading, setLoading] = useState(true);
 
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [individual_count, setIndividualCount] = useState({});
-    const [cancer_type_count, setCancerTypeCount] = useState({});
-    const [treatment_type_count, setTreatmentTypeCount] = useState({});
-    const [cohort_count, setCohortCount] = useState({});
-    const [patients_per_cohort, setPatientsPerCohort] = useState({});
-    const [diagnosis_age_count, setDiagnosisAgeCount] = useState({});
+    const [individualCount, setIndividualCount] = useState({});
+    const [cancerTypeCount, setCancerTypeCount] = useState({});
+    const [treatmentTypeCount, setTreatmentTypeCount] = useState({});
+    const [cohortCount, setCohortCount] = useState({});
+    const [patientsPerCohort, setPatientsPerCohort] = useState({});
+    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState({});
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -59,12 +59,12 @@ function Summary() {
             let count = 0;
             data.forEach((stat) => {
                 // Federation aggregate count of stats
-                count++;
+                count += 1;
                 switch (endpoint) {
                     case '/individual_count':
-                        setIndividualCount(aggregateObj(stat.results, individual_count));
+                        setIndividualCount(aggregateObj(stat.results, individualCount));
                         if (stat.location) {
-                            candigDataSouceCollection[stat.location["province-code"]] = stat.results.individual_count;
+                            candigDataSouceCollection[stat.location['province-code']] = stat.results.individual_count;
 
                             if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
@@ -73,19 +73,22 @@ function Summary() {
 
                         break;
                     case '/cohort_count':
-                        setCohortCount(aggregateObj(stat.results, cohort_count));
+                        setCohortCount(aggregateObj(stat.results, cohortCount));
                         break;
                     case '/patients_per_cohort':
-                        setPatientsPerCohort(aggregateObjStack(stat, patients_per_cohort));
+                        setPatientsPerCohort(aggregateObjStack(stat, patientsPerCohort));
                         break;
                     case '/cancer_type_count':
-                        setCancerTypeCount(aggregateObj(stat.results, cancer_type_count));
+                        setCancerTypeCount(aggregateObj(stat.results, cancerTypeCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount(aggregateObj(stat.results, treatment_type_count));
+                        setTreatmentTypeCount(aggregateObj(stat.results, treatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosis_age_count));
+                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosisAgeCount));
+                        break;
+                    default:
+                        console.log(`Unknown endpoint: ${endpoint}`);
                         break;
                 }
             });
@@ -162,7 +165,7 @@ function Summary() {
         <Grid container spacing={1}>
             {nodeStatus ? (
                 <Grid container xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
-                    <Grid item xs={true} sm={true} md={true} lg={true} pr={1}>
+                    <Grid item xs sm md lg pr={1}>
                         <SmallCountCard
                             title="Nodes"
                             count={`${sites}/${totalSites}`}
@@ -170,7 +173,7 @@ function Summary() {
                             color={theme.palette.secondary.main}
                         />
                     </Grid>
-                    <Grid item xs={true} sm={true} md={true} lg={true}>
+                    <Grid item xs sm md lg>
                         <SmallCountCard
                             title="Connection Error"
                             count={`${connectionError}/${totalSites}`}
@@ -193,7 +196,7 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Number of Patients"
-                    count={individual_count.individual_count}
+                    count={individualCount.individual_count}
                     primary
                     icon={<Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
@@ -202,7 +205,7 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     title="Cohorts"
-                    count={cohort_count.cohort_count}
+                    count={cohortCount.cohort_count}
                     icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
@@ -216,16 +219,16 @@ function Summary() {
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            {Object.keys(canDigDataSource).length !== 0 && cohort_count && (
+            {Object.keys(canDigDataSource).length !== 0 && cohortCount && (
                 <Grid item xs={12} sm={12} md={12} lg={6}>
                     <TreatingCentreMap datasetName="" data={canDigDataSource} />
                 </Grid>
             )}
-            {Object.keys(diagnosis_age_count).length !== 0 && (
+            {Object.keys(diagnosisAgeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
-                        dataObject={diagnosis_age_count}
+                        dataObject={diagnosisAgeCount}
                         chartType="bar"
                         barTitle="Age Range Distribution"
                         height="400px; auto"
@@ -235,11 +238,11 @@ function Summary() {
                     />
                 </Grid>
             )}
-            {Object.keys(treatment_type_count).length !== 0 && (
+            {Object.keys(treatmentTypeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
-                        dataObject={treatment_type_count}
+                        dataObject={treatmentTypeCount}
                         chartType="bar"
                         barTitle="Treatment Type Distribution"
                         height="400px; auto"
@@ -249,11 +252,11 @@ function Summary() {
                     />
                 </Grid>
             )}
-            {Object.keys(cancer_type_count).length !== 0 && (
+            {Object.keys(cancerTypeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
-                        dataObject={cancer_type_count}
+                        dataObject={cancerTypeCount}
                         chartType="bar"
                         barTitle="Cancer Type Distribution"
                         height="400px; auto"
@@ -263,11 +266,11 @@ function Summary() {
                     />
                 </Grid>
             )}
-            {Object.keys(patients_per_cohort).length !== 0 && (
+            {Object.keys(patientsPerCohort).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
                         datasetName=""
-                        dataObject={patients_per_cohort}
+                        dataObject={patientsPerCohort}
                         chartType="bar"
                         barTitle="Distribution of Cohort by Node"
                         height="400px; auto"

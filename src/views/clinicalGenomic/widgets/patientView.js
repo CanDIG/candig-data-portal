@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     searchMatch: {
         backgroundColor: '#FFFF00'
-    },
+    }
 }));
 
 function isObject(obj) {

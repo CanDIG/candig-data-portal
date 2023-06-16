@@ -74,7 +74,6 @@ function ClinicalView() {
 
                 return patient;
             });
-        console.log(rows);
     }
 
     const jsonTheme = {

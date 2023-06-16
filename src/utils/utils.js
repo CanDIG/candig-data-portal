@@ -7,13 +7,13 @@
  */
 export function aggregateObj(stat, aggregateObj) {
     const count = { ...aggregateObj };
-    for (const key in stat) {
-        if (count.hasOwnProperty(key)) {
+    Object.keys(stat).forEach((key) => {
+        if (key in count) {
             count[key] += stat[key];
         } else {
             count[key] = stat[key];
         }
-    }
+    });
     return count;
 }
 

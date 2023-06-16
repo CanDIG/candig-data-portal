@@ -2,7 +2,7 @@
  * All the constants should go on this file
  */
 
-// Fake Data
+/* // Fake Data
 export const diagnosis_age_count = {
     '0-19 Years': 10,
     '20-29 Years': 20,
@@ -34,7 +34,7 @@ export const cancer_type_count = {
     'Pancreas C25.9': 40,
     'Colon C18': 60,
     'Tonsil C09': 50
-};
+}; */
 
 export const cohortByNode = {
     BCGSC: {

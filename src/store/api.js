@@ -16,11 +16,11 @@ export function fetchKatsu(URL) {
             if (response.ok) {
                 return response.json();
             }
-            console.log('Katsu: ' + response);
-            return;
+            console.log(`Katsu: ${response}`);
+            throw new Error(`Katsu: ${response}`);
         })
         .catch((error) => {
-            console.log('Error:', error);
+            console.log(`Error: ${error}`);
             return 'error';
         });
 }
@@ -43,7 +43,7 @@ export function fetchFederationStat(endpoint) {
             return {};
         })
         .catch((error) => {
-            console.log('Error:', error);
+            console.log(`Error: ${error}`);
             return 'error';
         });
 }
@@ -69,7 +69,7 @@ export function fetchFederation(path, service) {
             return {};
         })
         .catch((error) => {
-            console.log('Error:', error);
+            console.log(`Error: ${error}`);
             return 'error';
         });
 }
@@ -80,7 +80,7 @@ Fetch the federation service for clinical search data
 export function fetchFederationClinicalData() {
     // Until I can debug the Tyk error
     return new Promise((resolve) => resolve({}));
-    return fetch(`${federation}/fanout`, {
+    /* return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,7 +99,7 @@ export function fetchFederationClinicalData() {
         .catch((error) => {
             console.log('Error:', error);
             return 'error';
-        });
+        }); */
 }
 
 /*
