@@ -38,7 +38,7 @@ export function SearchResultsProvider(props) {
 export function useSearchResultsReaderContext() {
     const context = React.useContext(SearchResultsReaderContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSearchResultsReaderContext must be used within a SearchResultsProvider');
     }
 
@@ -53,7 +53,7 @@ export function useSearchResultsReaderContext() {
 export function useSearchResultsWriterContext() {
     const context = React.useContext(SearchResultsWriterContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSearchResultsWriterContext must be used within a SearchResultsProvider');
     }
 
@@ -68,7 +68,7 @@ export function useSearchResultsWriterContext() {
 export function useSearchQueryReaderContext() {
     const context = React.useContext(SearchQueryReaderContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSearchQueryReaderContext must be used within a SearchResultsProvider');
     }
 
@@ -83,7 +83,7 @@ export function useSearchQueryReaderContext() {
 export function useSearchQueryWriterContext() {
     const context = React.useContext(SearchQueryWriterContext);
 
-    if (context == undefined) {
+    if (context === undefined) {
         throw new Error('useSearchQueryWriterContext must be used within a SearchResultsProvider');
     }
 

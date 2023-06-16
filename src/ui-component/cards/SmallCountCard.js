@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: ({ color }) => (color ? 'white' : theme.palette.grey[300]),
-        color: ({ color }) => (color ? color : theme.palette.grey[700]),
+        color: ({ color }) => color || theme.palette.grey[700],
         border: ({ color }) => (color ? '1px solid' : null)
     },
     primary: {
@@ -81,7 +81,7 @@ const SmallCountCard = ({ isLoading, title, count, icon, color }) => {
                 <TotalIncomeCard />
             ) : (
                 <MainCard
-                    border={true}
+                    border
                     sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
                     className={classes.card}
                     contentClass={classes.content}

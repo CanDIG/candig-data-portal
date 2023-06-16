@@ -5,16 +5,16 @@ import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import VariantsSearch from '../genomicsData/VariantsSearch.js';
-import PatientCounts from './widgets/patientCounts.js';
+import VariantsSearch from '../genomicsData/VariantsSearch';
+import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
-import PivotTable from './widgets/pivotTable';
+import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
-import Sidebar from './widgets/sidebar.js';
+import Sidebar from './widgets/sidebar';
 import { PRIMARY_SITES, COHORTS } from 'store/constant';
-import SearchHandler from './search/SearchHandler.js';
-import GenomicData from './widgets/genomicData.js';
+import SearchHandler from './search/SearchHandler';
+import GenomicData from './widgets/genomicData';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
@@ -57,9 +57,9 @@ const sections = [
         component: <ClinicalData />
     },
     {
-        id: 'pivot',
-        header: 'Pivot Table',
-        component: <PivotTable />
+        id: 'patient',
+        header: 'Patient View',
+        component: <PatientView />
     },
     {
         id: 'genomic',
@@ -89,7 +89,7 @@ function ClinicalGenomicSearch() {
                     {sections.map((section) => (
                         <Button
                             onClick={() => {
-                                window.location.href = '#' + section.id;
+                                window.location.href = `#${section.id}`;
                             }}
                             sx={{ my: 2, display: 'block' }}
                             key={section.id}
@@ -114,7 +114,9 @@ function ClinicalGenomicSearch() {
                 </div>
                 {sections.map((section) => (
                     <div key={section.id}>
-                        <a id={section.id} className={classes.anchor}></a>
+                        <a id={section.id} className={classes.anchor} aria-hidden="true">
+                            &nbsp;
+                        </a>
                         <h3>{section.header}</h3>
                         {section.component}
                         <div className={classes.spaceBetween} />

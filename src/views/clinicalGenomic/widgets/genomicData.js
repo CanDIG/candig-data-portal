@@ -368,7 +368,7 @@ function GenomicData() {
         setClincalSearchPatients(searchResults);
 
         // Do not continue if there are not yet any search results
-        if (typeof searchResults == undefined || searchResults == null || !('results' in searchResults)) {
+        if (typeof searchResults === 'undefined' || searchResults === null || !('results' in searchResults)) {
             return;
         }
         for (let j = 0; j < searchResults.results.length; j += 1) {

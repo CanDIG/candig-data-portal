@@ -1,7 +1,7 @@
 // API Server constant
 /* eslint-disable camelcase */
 export const katsu = process.env.REACT_APP_KATSU_API_SERVER;
-export const federation = process.env.REACT_APP_FEDERATION_API_SERVER + '/v1';
+export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
@@ -16,11 +16,11 @@ export function fetchKatsu(URL) {
             if (response.ok) {
                 return response.json();
             }
-            console.log('Katsu: ' + response);
-            return;
+            console.log(`Katsu: ${response}`);
+            throw new Error(`Katsu: ${response}`);
         })
         .catch((error) => {
-            console.log('Error:', error);
+            console.log(`Error: ${error}`);
             return 'error';
         });
 }
@@ -43,7 +43,33 @@ export function fetchFederationStat(endpoint) {
             return {};
         })
         .catch((error) => {
-            console.log('Error:', error);
+            console.log(`Error: ${error}`);
+            return 'error';
+        });
+}
+
+/*
+Generic querying for federation
+*/
+export function fetchFederation(path, service) {
+    return fetch(`${federation}/fanout`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'GET',
+            path,
+            payload: {},
+            service
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .catch((error) => {
+            console.log(`Error: ${error}`);
             return 'error';
         });
 }
@@ -52,7 +78,9 @@ export function fetchFederationStat(endpoint) {
 Fetch the federation service for clinical search data
 */
 export function fetchFederationClinicalData() {
-    return fetch(`${federation}/fanout`, {
+    // Until I can debug the Tyk error
+    return new Promise((resolve) => resolve({}));
+    /* return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,7 +99,7 @@ export function fetchFederationClinicalData() {
         .catch((error) => {
             console.log('Error:', error);
             return 'error';
-        });
+        }); */
 }
 
 /*
@@ -110,7 +138,7 @@ export function searchVariant(chromosome, start, end) {
         body: JSON.stringify({
             method: 'POST',
             path: 'htsget/v1/variants/search',
-            payload: payload,
+            payload,
             service: 'htsget'
         })
     })

@@ -27,10 +27,7 @@ window.Highcharts = Highcharts;
 function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
     const theme = useTheme();
     const events = useSelector((state) => state);
-    let dataSum = 0;
-    for (const count in dataObject) {
-        dataSum += count;
-    }
+
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -118,16 +115,18 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 xAxis: { categories },
                 tooltip: {
                     useHTML: true,
-                    formatter: function () {
-                        var dataSum = 0,
-                            pcnt;
+                    formatter: () => {
+                        let dataSum;
 
-                        this.series.points.forEach(function (point) {
+                        // Highcharts needs us to use 'this' to access series data, but eslint dislikes this
+                        /* eslint-disable react/no-this-in-sfc */
+                        this.series.points.forEach((point) => {
                             dataSum += point.y;
                         });
 
-                        pcnt = (this.y / dataSum) * 100;
-                        return '<b>' + this.point.category + '</b>' + '<br> - ' + this.y + ' <br> - ' + Highcharts.numberFormat(pcnt) + '%';
+                        const pcnt = (this.y / dataSum) * 100;
+                        return `<b> ${this.point.category}</b><br> - ${this.y} <br> - ${Highcharts.numberFormat(pcnt)}%`;
+                        /* eslint-enable react/no-this-in-sfc */
                     }
                 }
             });
@@ -140,7 +139,6 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         function createStackedBarChart() {
             const data = new Map();
             const categories = [];
-            let i = 0;
 
             Object.keys(dataObject).forEach((key, i) => {
                 categories.push(key);
@@ -153,9 +151,9 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             });
 
             const stackSeries = [];
-            for (let [key, value] of data) {
+            data.forEach((value, key) => {
                 stackSeries.push({ name: key, data: value });
-            }
+            });
 
             setChartOptions({
                 credits: {
@@ -211,8 +209,7 @@ CustomOfflineChart.propTypes = {
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.any).isRequired,
-    xAxis: PropTypes.array
+    dataObject: PropTypes.objectOf(PropTypes.any).isRequired
 };
 
 CustomOfflineChart.defaultProps = {
