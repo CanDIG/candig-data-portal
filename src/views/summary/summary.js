@@ -164,22 +164,24 @@ function Summary() {
     return (
         <Grid container spacing={1}>
             {nodeStatus ? (
-                <Grid container pt={1} pl={1}>
-                    <Grid item xs sm md lg pr={1}>
-                        <SmallCountCard
-                            title="Nodes"
-                            count={`${sites}/${totalSites}`}
-                            icon={<CheckCircleOutline fontSize="inherit" />}
-                            color={theme.palette.secondary.main}
-                        />
-                    </Grid>
-                    <Grid item xs sm md lg>
-                        <SmallCountCard
-                            title="Connection Error"
-                            count={`${connectionError}/${totalSites}`}
-                            icon={<WarningAmber fontSize="inherit" />}
-                            color={theme.palette.error.main}
-                        />
+                <Grid item xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
+                    <Grid container>
+                        <Grid item xs={6} pr={1}>
+                            <SmallCountCard
+                                title="Nodes"
+                                count={`${sites}/${totalSites}`}
+                                icon={<CheckCircleOutline fontSize="inherit" />}
+                                color={theme.palette.secondary.main}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <SmallCountCard
+                                title="Connection Error"
+                                count={`${connectionError}/${totalSites}`}
+                                icon={<WarningAmber fontSize="inherit" />}
+                                color={theme.palette.error.main}
+                            />
+                        </Grid>
                     </Grid>
                 </Grid>
             ) : (
