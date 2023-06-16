@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { TreeView, TreeItem } from '@mui/lab';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     searchMatch: {
         backgroundColor: '#FFFF00'
-    }
+    },
 }));
 
 function isObject(obj) {
@@ -91,6 +91,7 @@ function PatientView(props) {
     // When searching: search, then prune the results
     const [search, setSearch] = useState('');
     const [prunedPatient, setPrunedPatient] = useState({});
+    const theme = useTheme();
 
     const getAllChildIDs = (json, prefix, includeValues) => {
         if (Array.isArray(json)) {
@@ -203,16 +204,16 @@ function PatientView(props) {
     );
 
     return (
-        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2 }}>
+        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+                <Typography variant="h2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
                     Patient Info
                 </Typography>
                 <TextField
                     id="filled-search"
                     label="Search"
                     type="search"
-                    variant="filled"
+                    variant="outlined"
                     onChange={(event) => {
                         handleSearch(event.target.value);
                     }}
