@@ -214,6 +214,7 @@ function PatientView(props) {
                     label="Search"
                     type="search"
                     variant="outlined"
+                    size="small"
                     onChange={(event) => {
                         handleSearch(event.target.value);
                     }}
