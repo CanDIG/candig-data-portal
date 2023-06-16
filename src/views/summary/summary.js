@@ -164,7 +164,7 @@ function Summary() {
     return (
         <Grid container spacing={1}>
             {nodeStatus ? (
-                <Grid container xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
+                <Grid container pt={1} pl={1}>
                     <Grid item xs sm md lg pr={1}>
                         <SmallCountCard
                             title="Nodes"
