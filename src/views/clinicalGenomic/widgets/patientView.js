@@ -58,9 +58,23 @@ const JSONTree = (props) => {
             );
     } else if (isObject(json)) {
         // Displaying an object: return recursive JSONTrees, prefixed by their key
-        innerItem = Object.keys(json).map((key) => (
-            <JSONTree id={`${id}/${key}`} label={key} json={json[key]} key={key} searchExp={searchExp} />
-        ));
+        innerItem = Object.keys(json)
+            // Sort by whether or not the value is an array/object first, then alphabetically
+            .sort((keyA, keyB) => {
+                const aHasChildren = Array.isArray(json[keyA]) || isObject(json[keyA]);
+                const bHasChildren = Array.isArray(json[keyB]) || isObject(json[keyB]);
+                if (aHasChildren && !bHasChildren) {
+                    return 1;
+                }
+                if (bHasChildren && !aHasChildren) {
+                    return -1;
+                }
+                if (keyA === keyB) {
+                    return 0;
+                }
+                return keyA <= keyB ? -1 : 1;
+            })
+            .map((key) => <JSONTree id={`${id}/${key}`} label={key} json={json[key]} key={key} searchExp={searchExp} />);
     } else {
         // Displaying a single value -- we just need the outer TreeItem
     }
