@@ -116,10 +116,14 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 tooltip: {
                     useHTML: true,
                     formatter: () => {
-                        let dataSum;
-
                         // Highcharts needs us to use 'this' to access series data, but eslint dislikes this
                         /* eslint-disable react/no-this-in-sfc */
+                        let dataSum;
+
+                        if (!this?.series?.points) {
+                            return '';
+                        }
+
                         this.series.points.forEach((point) => {
                             dataSum += point.y;
                         });
@@ -139,7 +143,6 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         function createStackedBarChart() {
             const data = new Map();
             const categories = [];
-
             Object.keys(dataObject).forEach((key, i) => {
                 categories.push(key);
                 Object.keys(dataObject[key]).forEach((cohort) => {

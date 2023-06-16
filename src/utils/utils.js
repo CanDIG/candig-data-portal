@@ -26,7 +26,7 @@ export function aggregateObj(stat, aggregateObj) {
  */
 export function aggregateObjStack(stat, Object) {
     const count = { ...Object };
-    count[stat.location[0]] = stat;
+    count[stat.location.name] = stat;
     return count;
 }
 
