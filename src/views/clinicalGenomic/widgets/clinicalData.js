@@ -8,7 +8,7 @@ import papa from 'papaparse';
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Paper } from '@mui/material';
+import { Box } from '@mui/material';
 
 // REDUX
 
@@ -64,16 +64,16 @@ function ClinicalView() {
     let rows = [];
     if (searchResults) {
         rows = searchResults
-            .map((site) => site.results?.results)
-            .filter((entry) => entry !== undefined)
-            .flat(1)
-            .map((patient, index) => {
+            ?.map((site) => site.results?.results)
+            ?.filter((entry) => entry !== undefined)
+            ?.flat(1)
+            ?.map((patient, index) => {
                 // Make sure each row has an ID and a deceased status
                 patient.id = index;
                 patient.deceased = !!patient.date_of_death;
 
                 return patient;
-            });
+            }) || [];
     }
 
     const jsonTheme = {
@@ -106,25 +106,25 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', width: 110 },
-        { field: 'sex_at_birth', headerName: 'Sex At Birth', width: 85 },
-        { field: 'deceased', headerName: 'Deceased', width: 85 },
-        { field: 'date_of_birth', headerName: 'Date of Birth', width: 100 },
-        { field: 'date_of_death', headerName: 'Date of Death', width: 110 }
+        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220 },
+        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170 },
+        { field: 'deceased', headerName: 'Deceased', minWidth: 170 },
+        { field: 'date_of_birth', headerName: 'Date of Birth', minWidth: 200 },
+        { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220 }
     ];
 
     return (
-        <MainCard title="mCode Data">
-            <div style={{ height: 300, width: '100%' }}>
+        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+            <div style={{ height: 510, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pageSize={7}
-                    rowsPerPageOptions={[7]}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
                 />
             </div>
-        </MainCard>
+        </Box>
     );
 }
 
