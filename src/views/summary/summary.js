@@ -57,7 +57,7 @@ function Summary() {
             // data[0].location[2] = 'ca-on';
 
             let count = 0;
-            data.forEach((stat) => {
+            data?.forEach((stat) => {
                 // Federation aggregate count of stats
                 count += 1;
                 switch (endpoint) {

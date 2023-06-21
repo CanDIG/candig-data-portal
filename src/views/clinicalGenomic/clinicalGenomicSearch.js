@@ -117,7 +117,6 @@ function ClinicalGenomicSearch() {
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
                             &nbsp;
                         </a>
-                        <h3>{section.header}</h3>
                         {section.component}
                         <div className={classes.spaceBetween} />
                     </div>
