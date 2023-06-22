@@ -63,9 +63,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             </Box>
             <BrowserView>
                 <PerfectScrollbar component="div" className={classes.ScrollHeight}>
-                    {/* The following is required for a warning to not be thrown,
-                        however, it's unclear why this scrollbar has no content in the first place. */}
-                    {sidebarContext}
+                    {sidebarContext || <></>}
                 </PerfectScrollbar>
             </BrowserView>
             <MobileView>
