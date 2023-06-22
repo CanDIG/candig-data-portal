@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DEFAULT_STATE = <></>;
+const DEFAULT_STATE = false;
 
 const SidebarReaderContext = React.createContext(DEFAULT_STATE);
 const SidebarWriterContext = React.createContext();
@@ -12,10 +12,10 @@ const SidebarWriterContext = React.createContext();
  */
 export function SidebarProvider(props) {
     const [data, setData] = React.useState(DEFAULT_STATE);
-    const { additionalSearchData, ...rest } = props;
+    const { ...rest } = props;
 
     return (
-        <SidebarReaderContext.Provider value={{ ...data, ...additionalSearchData }}>
+        <SidebarReaderContext.Provider value={data}>
             <SidebarWriterContext.Provider value={setData} {...rest} />
         </SidebarReaderContext.Provider>
     );

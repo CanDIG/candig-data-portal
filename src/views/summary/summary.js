@@ -43,7 +43,7 @@ function Summary() {
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
     useEffect(() => {
-        sidebarWriter(<></>);
+        sidebarWriter(undefined);
     }, []);
 
     /* Aggregated count of federated data */

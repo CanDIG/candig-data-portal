@@ -63,17 +63,18 @@ function ClinicalView() {
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
-        rows = searchResults
-            ?.map((site) => site.results?.results)
-            ?.filter((entry) => entry !== undefined)
-            ?.flat(1)
-            ?.map((patient, index) => {
-                // Make sure each row has an ID and a deceased status
-                patient.id = index;
-                patient.deceased = !!patient.date_of_death;
+        rows =
+            searchResults
+                ?.map((site) => site.results?.results)
+                ?.filter((entry) => entry !== undefined)
+                ?.flat(1)
+                ?.map((patient, index) => {
+                    // Make sure each row has an ID and a deceased status
+                    patient.id = index;
+                    patient.deceased = !!patient.date_of_death;
 
-                return patient;
-            }) || [];
+                    return patient;
+                }) || [];
     }
 
     const jsonTheme = {

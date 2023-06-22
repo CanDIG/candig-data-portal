@@ -11,6 +11,7 @@ import MenuList from '../../../MenuList';
 
 // assets
 import { IconMenu2 } from '@tabler/icons';
+import { useSidebarReaderContext } from '../Sidebar/SidebarContext';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = ({ handleLeftDrawerToggle }) => {
     const classes = useStyles();
+    const sidebar = useSidebarReaderContext();
 
     return (
         <>
@@ -50,11 +52,15 @@ const Header = ({ handleLeftDrawerToggle }) => {
                     <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
                         <LogoSection />
                     </Box>
-                    <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
-                        <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
-                            <IconMenu2 stroke={1.5} size="1.3rem" />
-                        </Avatar>
-                    </ButtonBase>
+                    {sidebar ? (
+                        <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                            <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
+                                <IconMenu2 stroke={1.5} size="1.3rem" />
+                            </Avatar>
+                        </ButtonBase>
+                    ) : (
+                        <></>
+                    )}
                 </div>
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
