@@ -112,9 +112,7 @@ const MainLayout = () => {
                 </AppBar>
 
                 {/* drawer */}
-                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle}>
-                    <div>Test</div>
-                </Sidebar>
+                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
                 {/* main content */}
                 <main
