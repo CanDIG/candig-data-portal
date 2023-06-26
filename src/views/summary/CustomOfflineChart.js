@@ -79,7 +79,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                 });
 
                 const stackSeries = [];
-                data.forEach((value, key) => {
+                data?.forEach((value, key) => {
                     stackSeries.push({ name: key, data: value });
                 });
                 const stackedTheme = grayscale
