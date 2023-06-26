@@ -154,7 +154,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             });
 
             const stackSeries = [];
-            data.forEach((value, key) => {
+            data?.forEach((value, key) => {
                 stackSeries.push({ name: key, data: value });
             });
 
