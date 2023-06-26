@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -83,20 +83,21 @@ const MainLayout = () => {
     const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 
     // Handle left drawer
-    const leftDrawerOpened = useSelector((state) => state.customization.opened);
+    const [sidebarContent, setSidebarContent] = useState(false);
+    const leftDrawerOpened = useSelector((state) => state.customization.opened) && sidebarContent;
     const dispatch = useDispatch();
     const handleLeftDrawerToggle = () => {
         dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         dispatch({ type: SET_MENU, opened: !matchDownMd });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd]);
 
     return (
         <div className={classes.root}>
-            <SidebarProvider>
+            <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
                 <AppBar

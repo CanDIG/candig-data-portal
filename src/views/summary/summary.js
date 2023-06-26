@@ -43,14 +43,14 @@ function Summary() {
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
     useEffect(() => {
-        sidebarWriter(undefined);
+        sidebarWriter(null);
     }, []);
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
 
-        if (data) {
+        if (data && Array.isArray(data)) {
             // Fake Server with same URL
             // data[0].location[0] = 'UHN';
             // data[0].location[1] = 'Ontario';
