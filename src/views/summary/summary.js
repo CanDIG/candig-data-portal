@@ -129,7 +129,7 @@ function Summary() {
 
     useEffect(() => {
         function fetchData(endpoint) {
-            fetchFederationStat(endpoint)
+            return fetchFederationStat(endpoint)
                 .then((data) => {
                     federationStatCount(data, endpoint);
                     if (endpoint === '/individual_count') {
@@ -139,28 +139,16 @@ function Summary() {
                 .catch((error) => {
                     // pass
                     console.log('Error fetching data : ', error);
-
-                    setLoading(false);
-                })
-                .finally(() => setLoading(false));
+                });
         }
 
-        fetchData('/individual_count');
-        setTimeout(() => {
-            fetchData('/cancer_type_count');
-        }, 250);
-        setTimeout(() => {
-            fetchData('/cohort_count');
-        }, 3000);
-        setTimeout(() => {
-            fetchData('/patients_per_cohort');
-        }, 3750);
-        setTimeout(() => {
-            fetchData('/treatment_type_count');
-        }, 6500);
-        setTimeout(() => {
-            fetchData('/diagnosis_age_count');
-        }, 9250);
+        fetchData('/individual_count')
+            .then(() => fetchData('/cancer_type_count'))
+            .then(() => fetchData('/cohort_count'))
+            .then(() => fetchData('/patients_per_cohort'))
+            .then(() => fetchData('/treatment_type_count'))
+            .then(() => fetchData('/diagnosis_age_count'))
+            .finally(() => setLoading(false));
     }, []);
 
     return (
@@ -246,6 +234,8 @@ function Summary() {
                     height="400px; auto"
                     loading={treatmentTypeCount === undefined}
                     dropDown={false}
+                    orderByFrequency
+                    cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
@@ -257,6 +247,8 @@ function Summary() {
                     height="400px; auto"
                     dropDown={false}
                     loading={cancerTypeCount === undefined}
+                    orderByFrequency
+                    cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
@@ -268,6 +260,8 @@ function Summary() {
                     height="400px; auto"
                     dropDown={false}
                     loading={patientsPerCohort === undefined}
+                    orderByFrequency
+                    cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
@@ -279,6 +273,8 @@ function Summary() {
                     height="400px; auto"
                     dropDown={false}
                     loading={fullClinicalData === undefined}
+                    orderByFrequency
+                    cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
@@ -290,6 +286,8 @@ function Summary() {
                     height="400px; auto"
                     dropDown={false}
                     loading={fullGenomicData === undefined}
+                    orderByFrequency
+                    cutoff={10}
                 />
             </Grid>
         </Grid>
