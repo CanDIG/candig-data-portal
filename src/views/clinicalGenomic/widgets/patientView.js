@@ -49,13 +49,12 @@ const JSONTree = (props) => {
     // Determine how we're going to display what's inside of the TreeItem:
     let innerItem;
     if (Array.isArray(json)) {
-        // Displaying an array: return recursive JSONTrees, prefixed by their index
-        innerItem =
-            json.length > 0 ? (
-                json.map((value, i) => <JSONTree id={`${id}/${i}`} label={i} json={value} key={i} searchExp={searchExp} />)
-            ) : (
-                <JSONTree id={`${id}/empty`} label="empty" json="" key="empty" searchExp={searchExp} />
-            );
+        if (json.length > 0) {
+            // Displaying an array: return recursive JSONTrees, prefixed by their index
+            innerItem = json.map((value, i) => <JSONTree id={`${id}/${i}`} label={i} json={value} key={i} searchExp={searchExp} />);
+        } else {
+            value = '[empty]';
+        }
     } else if (isObject(json)) {
         // Displaying an object: return recursive JSONTrees, prefixed by their key
         innerItem = Object.keys(json)

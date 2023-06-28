@@ -1,17 +1,18 @@
 /* Object Aggregation
  * @param {object} stat: The object to aggregate
  * @param {object} aggregateObj: The object to aggregate into
+ * * @param {func} aggregator: A function that grabs the numerical value from stat
  * @return an object with different values of the queried property
  * being the key, and frequency being the value.
  * This function is used for the pie and bar charts
  */
-export function aggregateObj(stat, aggregateObj) {
+export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
     const count = { ...aggregateObj };
     Object.keys(stat).forEach((key) => {
         if (key in count) {
-            count[key] += stat[key];
+            count[key] += aggregator(stat, key);
         } else {
-            count[key] = stat[key];
+            count[key] = aggregator(stat, key);
         }
     });
     return count;
@@ -20,13 +21,14 @@ export function aggregateObj(stat, aggregateObj) {
 /* Object Aggregation for Stack Bar chart
  * @param {object} stat: The object to aggregate
  * @param {object} Object: The object to aggregate into
+ * @param {func} aggregator: A function that grabs the numerical value from stat
  * @return an object with different values of the queried property
  * being the key, and frequency being the value.
  * This function is used for the stack bar chart
  */
-export function aggregateObjStack(stat, Object) {
+export function aggregateObjStack(stat, Object, aggregator = (object) => object) {
     const count = { ...Object };
-    count[stat.location.name] = stat;
+    count[stat.location.name] = aggregator(stat);
     return count;
 }
 

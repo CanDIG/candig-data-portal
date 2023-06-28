@@ -3,7 +3,7 @@ import React from 'react';
 const DEFAULT_STATE = false;
 
 const SidebarReaderContext = React.createContext(DEFAULT_STATE);
-const SidebarWriterContext = React.createContext();
+const SidebarWriterContext = React.createContext(() => console.log('Not yet loaded'));
 
 /**
  * A context provider for anything that relies on knowing what goes in the sidebar
@@ -11,8 +11,7 @@ const SidebarWriterContext = React.createContext();
  * @returns {Object} a React component with the sidebar
  */
 export function SidebarProvider(props) {
-    const [data, setData] = React.useState(DEFAULT_STATE);
-    const { ...rest } = props;
+    const { data, setData, ...rest } = props;
 
     return (
         <SidebarReaderContext.Provider value={data}>

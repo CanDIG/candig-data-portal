@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { createRef, useState, useEffect } from 'react';
 
 // mui
 import { useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
@@ -24,9 +25,13 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
+function CustomOfflineChart(props) {
+    const { chartType, chart, barTitle, height, loading, datasetName, dataObject, xAxisTitle, yAxisTitle } = props;
     const theme = useTheme();
     const events = useSelector((state) => state);
+    const chartRef = createRef();
+
+    NoDataToDisplay(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -199,9 +204,20 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         }
     }, [datasetName, dataObject, chartType]);
 
+    // Control whether or not this element is currently loading
+    useEffect(() => {
+        const chartObj = chartRef?.current?.chart;
+
+        if (loading) {
+            chartObj?.showLoading();
+        } else {
+            chartObj?.hideLoading();
+        }
+    }, [loading]);
+
     return (
         <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
-            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+            <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
         </MainCard>
     );
 }

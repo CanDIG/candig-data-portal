@@ -25,12 +25,12 @@ function Summary() {
     const [isLoading, setLoading] = useState(true);
 
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [individualCount, setIndividualCount] = useState({});
-    const [cancerTypeCount, setCancerTypeCount] = useState({});
-    const [treatmentTypeCount, setTreatmentTypeCount] = useState({});
-    const [cohortCount, setCohortCount] = useState({});
-    const [patientsPerCohort, setPatientsPerCohort] = useState({});
-    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState({});
+    const [individualCount, setIndividualCount] = useState(undefined);
+    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
+    const [cohortCount, setCohortCount] = useState(undefined);
+    const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
+    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -73,19 +73,21 @@ function Summary() {
 
                         break;
                     case '/cohort_count':
-                        setCohortCount(aggregateObj(stat.results, cohortCount));
+                        setCohortCount((oldCohortCount) => aggregateObj(stat.results, oldCohortCount));
                         break;
                     case '/patients_per_cohort':
-                        setPatientsPerCohort(aggregateObjStack(stat, patientsPerCohort));
+                        setPatientsPerCohort((oldPatientsPerCohort) =>
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                        );
                         break;
                     case '/cancer_type_count':
-                        setCancerTypeCount(aggregateObj(stat.results, cancerTypeCount));
+                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount(aggregateObj(stat.results, treatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);
@@ -198,7 +200,7 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Number of Patients"
-                    count={individualCount.individual_count}
+                    count={individualCount?.individual_count || 0}
                     primary
                     icon={<Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
@@ -207,7 +209,7 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     title="Cohorts"
-                    count={cohortCount.cohort_count}
+                    count={cohortCount?.cohort_count || 0}
                     icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
@@ -216,100 +218,92 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Provinces"
-                    count={provinceCounter}
+                    count={provinceCounter || 0}
                     icon={<Public fontSize="inherit" />}
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            {Object.keys(canDigDataSource).length !== 0 && cohortCount && (
-                <Grid item xs={12} sm={12} md={12} lg={6}>
-                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
-                </Grid>
-            )}
-            {Object.keys(diagnosisAgeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={diagnosisAgeCount}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
-                        height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Age Ranges"
-                        yAxisTitle="Number of Patients"
-                    />
-                </Grid>
-            )}
-            {Object.keys(treatmentTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={treatmentTypeCount}
-                        chartType="bar"
-                        barTitle="Treatment Type Distribution"
-                        height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Treatment Type"
-                        yAxisTitle="Number of Patients"
-                    />
-                </Grid>
-            )}
-            {Object.keys(cancerTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={cancerTypeCount}
-                        chartType="bar"
-                        barTitle="Cancer Type Distribution"
-                        height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Cancer Type"
-                        yAxisTitle="Number of Patients"
-                    />
-                </Grid>
-            )}
-            {Object.keys(patientsPerCohort).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={patientsPerCohort}
-                        chartType="bar"
-                        barTitle="Distribution of Cohort by Node"
-                        height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Number of Patients per Node"
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullClinicalData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={fullClinicalData}
-                        chartType="bar"
-                        barTitle="Cases with Complete Clinical Data"
-                        height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Cases with Complete Clinical Data"
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullGenomicData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        datasetName=""
-                        dataObject={fullGenomicData}
-                        chartType="bar"
-                        barTitle="Cases with Complete Genomic Data"
-                        height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Cases with Complete Genomic Data"
-                    />
-                </Grid>
-            )}
+            <Grid item xs={12} sm={12} md={12} lg={6}>
+                <TreatingCentreMap datasetName="" data={canDigDataSource} />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={diagnosisAgeCount || {}}
+                    loading={diagnosisAgeCount === undefined}
+                    chartType="bar"
+                    barTitle="Age Range Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Age Ranges"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={treatmentTypeCount || {}}
+                    loading={treatmentTypeCount === undefined}
+                    chartType="bar"
+                    barTitle="Treatment Type Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Treatment Type"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={cancerTypeCount || {}}
+                    loading={cancerTypeCount === undefined}
+                    chartType="bar"
+                    barTitle="Cancer Type Distribution"
+                    height="400px; auto"
+                    chart="bar"
+                    xAxisTitle="Cancer Type"
+                    yAxisTitle="Number of Patients"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={patientsPerCohort || {}}
+                    loading={patientsPerCohort === undefined}
+                    chartType="bar"
+                    barTitle="Distribution of Cohort by Node"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Number of Patients per Node"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={fullClinicalData || {}}
+                    loading={fullClinicalData === undefined}
+                    chartType="bar"
+                    barTitle="Cases with Complete Clinical Data"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Cases with Complete Clinical Data"
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    datasetName=""
+                    dataObject={fullGenomicData || {}}
+                    loading={fullGenomicData === undefined}
+                    chartType="bar"
+                    barTitle="Cases with Complete Genomic Data"
+                    height="400px; auto"
+                    chart="stackedBarChart"
+                    xAxisTitle="Sites"
+                    yAxisTitle="Cases with Complete Genomic Data"
+                />
+            </Grid>
         </Grid>
     );
 }
