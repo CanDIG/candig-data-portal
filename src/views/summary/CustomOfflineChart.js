@@ -6,12 +6,17 @@ import PropTypes from 'prop-types';
 import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import MainCard from 'ui-component/cards/MainCard';
+import { Box, Typography, Grid, IconButton } from '@mui/material';
 
 // REDUX
 import { useSelector } from 'react-redux';
 
 // Project import
 import { splitString } from 'utils/utils';
+// assets
+import { IconTrash } from '@tabler/icons';
+
+import { DataVisualization } from 'store/constant';
 
 window.Highcharts = Highcharts;
 
@@ -24,9 +29,13 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, dataObject, xAxisTitle, yAxisTitle }) {
+function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, dropDown }) {
     const theme = useTheme();
     const events = useSelector((state) => state);
+    const [chart, setChart] = useState(chartType);
+    const [chartData, setChartData] = useState(data);
+    const validCharts = ['bar', 'line', 'scatter', 'column'];
+    const validStackedCharts = ['patients_per_cohort', 'full_clinical_data', 'full_genomic_data'];
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -45,13 +54,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
             theme.palette.primary[800],
             theme.palette.secondary[800],
             theme.palette.tertiary[800]
-        ],
-        chart: { type: chartType, height, style: { fontFamily: `'Roboto', sans-serif` } },
-        title: {
-            text: splitString(barTitle)
-        },
-        xAxis: { title: { text: xAxisTitle } },
-        yAxis: { title: { text: yAxisTitle } }
+        ]
     });
 
     useEffect(() => {
@@ -78,16 +81,25 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                     theme.palette.tertiary[800]
                 ],
                 chart: {
+                    type: chart,
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
                     plotShadow: false
+                },
+                title: {
+                    text: DataVisualization[chartData].title
+                },
+                xAxis: { title: { text: DataVisualization[chartData].xAxis } },
+                yAxis: { title: { text: DataVisualization[chartData].yAxis } },
+                tooltip: {
+                    pointFormat: '<b>{point.name}:</b> {point.y}'
                 }
             };
             options.series = [
                 {
-                    data: Object.keys(dataObject).map((key) => ({
+                    data: Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => ({
                         name: key,
-                        y: dataObject[key]
+                        y: dataObject === '' ? dataVis[chartData][key] : dataObject[key]
                     }))
                 }
             ];
@@ -99,10 +111,22 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
          */
         function createBarChart() {
             const data = [];
-
+            /* Expected dataObject Shape */
+            /*
+                {
+                    "0-19 Years": 10,
+                    "20-29 Years": 20,
+                    "30-39 Years": 40,
+                    "40-49 Years": 60,
+                    "50-59 Years": 50,
+                    "60-69 Years": 55,
+                    "70-79 Years": 20,
+                    "80+ Years": 15
+                }
+            */
             // See dataObject type
-            const categories = Object.keys(dataObject).map((key) => {
-                data.push(dataObject[key]);
+            const categories = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => {
+                data.push(dataObject === '' ? dataVis[chartData][key] : dataObject[key]);
                 return key;
             });
 
@@ -110,19 +134,24 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 credits: {
                     enabled: false
                 },
+                chart: {
+                    type: chart
+                },
+
+                title: {
+                    text: DataVisualization[chartData].title
+                },
+                xAxis: { title: { text: DataVisualization[chartData].xAxis }, categories },
+                yAxis: { title: { text: DataVisualization[chartData].yAxis } },
                 colors: [theme.palette.primary.dark],
                 series: [{ data, colorByPoint: true, showInLegend: false }],
-                xAxis: { categories },
                 tooltip: {
                     useHTML: true,
-                    formatter: () => {
-                        // Highcharts needs us to use 'this' to access series data, but eslint dislikes this
-                        /* eslint-disable react/no-this-in-sfc */
+                    // Highcharts needs us to use 'this' to access series data, but eslint dislikes this
+                    /* eslint-disable react/no-this-in-sfc */
+                    /* eslint-disable object-shorthand */
+                    formatter: function () {
                         let dataSum;
-
-                        if (!this?.series?.points) {
-                            return '';
-                        }
 
                         this.series.points.forEach((point) => {
                             dataSum += point.y;
@@ -131,6 +160,7 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                         const pcnt = (this.y / dataSum) * 100;
                         return `<b> ${this.point.category}</b><br> - ${this.y} <br> - ${Highcharts.numberFormat(pcnt)}%`;
                         /* eslint-enable react/no-this-in-sfc */
+                        /* eslint-enable object-shorthand */
                     }
                 }
             });
@@ -143,6 +173,8 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
         function createStackedBarChart() {
             const data = new Map();
             const categories = [];
+            dataObject = dataObject === '' ? dataVis[chartData] : dataObject;
+
             Object.keys(dataObject).forEach((key, i) => {
                 categories.push(key);
                 Object.keys(dataObject[key]).forEach((cohort) => {
@@ -162,6 +194,15 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 credits: {
                     enabled: false
                 },
+                chart: {
+                    type: chart,
+                    height
+                },
+                title: {
+                    text: DataVisualization[chartData].title
+                },
+                xAxis: { title: { text: DataVisualization[chartData].xAxis }, categories },
+                yAxis: { title: { text: DataVisualization[chartData].yAxis } },
                 colors: [
                     theme.palette.secondary[200],
                     theme.palette.tertiary[200],
@@ -183,40 +224,85 @@ function CustomOfflineChart({ chartType, chart, barTitle, height, datasetName, d
                 },
                 legend: { enabled: false },
                 series: stackSeries,
-                xAxis: { categories },
                 tooltip: {
                     pointFormat: '<b>{point.name}:</b> {point.y}'
                 }
             });
         }
 
-        if (chart === 'pie') {
-            createPieChart();
-        } else if (chart === 'bar') {
+        if (validStackedCharts.includes(chartData)) {
+            createStackedBarChart();
+        } else if (validCharts.includes(chart)) {
             createBarChart();
         } else {
-            createStackedBarChart();
+            createPieChart();
         }
-    }, [datasetName, dataObject, chartType]);
+    }, [dataVis, chart, chartData]);
 
+    /* eslint-disable jsx-a11y/no-onchange */
     return (
-        <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
-            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-        </MainCard>
+        <Box sx={{ position: 'relative' }}>
+            {dropDown && (
+                <IconButton
+                    color="error"
+                    size="small"
+                    sx={{
+                        background: 'white',
+                        border: 1,
+                        borderRadius: '100%',
+                        borderColor: theme.palette.error.main,
+                        boxShadow: theme.shadows[8],
+                        position: 'absolute',
+                        zIndex: '1000',
+                        padding: '0.10em',
+                        left: -5,
+                        top: -10
+                    }}
+                >
+                    <IconTrash />
+                </IconButton>
+            )}
+            <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
+                <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+                {dropDown && (
+                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <label htmlFor="types">
+                            Chart Types:
+                            <select value={chart} name="types" id="types" onChange={(event) => setChart(event.target.value)}>
+                                <option value="bar">Bar</option>
+                                <option value="line">Line</option>
+                                <option value="column">Column</option>
+                                <option value="scatter">Scatter</option>
+                                <option value="pie">Pie</option>
+                                <option value="bar">Stacked Bar</option>
+                            </select>
+                        </label>
+                        <label htmlFor="types">
+                            Data:
+                            <select value={chartData} name="types" id="types" onChange={(event) => setChartData(event.target.value)}>
+                                <option value="patients_per_cohort">Distribution of Cohort by Node</option>
+                                <option value="full_clinical_data">Complete Clinical Data</option>
+                                <option value="full_genomic_data">Complete Genomic Data</option>
+                                <option value="diagnosis_age_count">Age</option>
+                                <option value="treatment_type_count">Treatment</option>
+                                <option value="cancer_type_count">Cancer type</option>
+                            </select>
+                        </label>
+                    </Box>
+                )}
+            </MainCard>
+        </Box>
     );
 }
 
 CustomOfflineChart.propTypes = {
-    chartType: PropTypes.string.isRequired,
-    chart: PropTypes.string.isRequired,
-    barTitle: PropTypes.string.isRequired,
+    dropDown: PropTypes.bool.isRequired,
     height: PropTypes.string,
-    datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.any).isRequired
+    dataVis: PropTypes.any,
+    dataObject: PropTypes.any
 };
 
 CustomOfflineChart.defaultProps = {
-    datasetName: '',
     height: '200px; auto'
 };
 

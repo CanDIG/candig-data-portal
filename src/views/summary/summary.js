@@ -229,84 +229,72 @@ function Summary() {
             {Object.keys(diagnosisAgeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={diagnosisAgeCount}
-                        chartType="bar"
-                        barTitle="Age Range Distribution"
+                        data="diagnosis_age_count"
+                        dataVis=""
                         height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Age Ranges"
-                        yAxisTitle="Number of Patients"
+                        chartType="bar"
+                        dropDown={false}
                     />
                 </Grid>
             )}
             {Object.keys(treatmentTypeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={treatmentTypeCount}
+                        data="treatment_type_count"
+                        dataVis=""
                         chartType="bar"
-                        barTitle="Treatment Type Distribution"
                         height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Treatment Type"
-                        yAxisTitle="Number of Patients"
+                        dropDown={false}
                     />
                 </Grid>
             )}
             {Object.keys(cancerTypeCount).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={cancerTypeCount}
+                        data="cancer_type_count"
+                        dataVis=""
                         chartType="bar"
-                        barTitle="Cancer Type Distribution"
                         height="400px; auto"
-                        chart="bar"
-                        xAxisTitle="Cancer Type"
-                        yAxisTitle="Number of Patients"
+                        dropDown={false}
                     />
                 </Grid>
             )}
             {Object.keys(patientsPerCohort).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={patientsPerCohort}
+                        data="patients_per_cohort"
+                        dataVis=""
                         chartType="bar"
-                        barTitle="Distribution of Cohort by Node"
                         height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Number of Patients per Node"
+                        dropDown={false}
                     />
                 </Grid>
             )}
             {Object.keys(fullClinicalData).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={fullClinicalData}
+                        data="full_clinical_data"
+                        dataVis=""
                         chartType="bar"
-                        barTitle="Cases with Complete Clinical Data"
                         height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Cases with Complete Clinical Data"
+                        dropDown={false}
                     />
                 </Grid>
             )}
             {Object.keys(fullGenomicData).length !== 0 && (
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <CustomOfflineChart
-                        datasetName=""
                         dataObject={fullGenomicData}
+                        data="full_genomic_data"
+                        dataVis=""
                         chartType="bar"
-                        barTitle="Cases with Complete Genomic Data"
                         height="400px; auto"
-                        chart="stackedBarChart"
-                        xAxisTitle="Sites"
-                        yAxisTitle="Cases with Complete Genomic Data"
+                        dropDown={false}
                     />
                 </Grid>
             )}

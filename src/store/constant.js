@@ -2,8 +2,9 @@
  * All the constants should go on this file
  */
 
-/* // Fake Data
-export const diagnosis_age_count = {
+/* Fake Data */
+
+export const diagnosisAgeCount = {
     '0-19 Years': 10,
     '20-29 Years': 20,
     '30-39 Years': 40,
@@ -14,7 +15,7 @@ export const diagnosis_age_count = {
     '80+ Years': 15
 };
 
-export const treatment_type_count = {
+export const treatmentTypeCount = {
     Palate: 1,
     'Rectosigmoid junction': 1,
     Tonsil: 3,
@@ -26,7 +27,7 @@ export const treatment_type_count = {
     Gum: 3
 };
 
-export const cancer_type_count = {
+export const cancerTypeCount = {
     'Breast C50.9': 50,
     'Ovary C56.9': 5,
     'Trachea C33': 30,
@@ -34,7 +35,7 @@ export const cancer_type_count = {
     'Pancreas C25.9': 40,
     'Colon C18': 60,
     'Tonsil C09': 50
-}; */
+};
 
 export const cohortByNode = {
     BCGSC: {
@@ -81,12 +82,6 @@ export const fullClinicalData = {
     }
 };
 
-// Roles
-export const SITE = process.env.REACT_APP_SITE_LOCATION;
-
-// API URL where the Dashboard get all the data
-export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
-
 export const PRIMARY_SITES = ['Breast', 'Trachea', 'Panceas'];
 
 export const COHORTS = ['POG', 'Inspire', 'Biocan', 'Biodiva', 'Compass', 'Palms', 'IO-Alines'];
@@ -110,6 +105,57 @@ export const CLIN_METADATA = [
     'treatments',
     'tumourboards'
 ];
+/* End Fake Data */
+
+// Roles
+export const SITE = process.env.REACT_APP_SITE_LOCATION;
+
+// API URL where the Dashboard get all the data
+export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
+
+// Clinical & Genomic Search Page
+export const DataVisualization = {
+    gender_count: {
+        title: 'Gender Distribution',
+        xAxis: 'Gender',
+        yAxis: 'Number of Patients'
+    },
+    diagnosis_age_count: {
+        title: ' Age Range Distribution',
+        xAxis: 'Age Range',
+        yAxis: 'Number of Patients'
+    },
+    treatment_type_count: {
+        title: 'Treatment Type Distribution',
+        xAxis: 'Treatment Type',
+        yAxis: 'Number of Patients'
+    },
+    cancer_type_count: {
+        title: 'Cancer Type Distribution',
+        xAxis: 'Cancer Type',
+        yAxis: 'Number of Patients'
+    },
+    patients_per_cohort: {
+        title: 'Distribution of Cohort by Node',
+        xAxis: 'Site',
+        yAxis: 'Number of Patients'
+    },
+    cohort_by_node: {
+        title: 'Distribution of Cohort by Node',
+        xAxis: 'Site',
+        yAxis: 'Number of Patients'
+    },
+    full_clinical_data: {
+        title: 'Complete Clinical Data',
+        xAxis: 'Site',
+        yAxis: 'Number of Patients'
+    },
+    full_genomic_data: {
+        title: 'Complete Genomic Data',
+        xAxis: 'Site',
+        yAxis: 'Number of Patients'
+    }
+};
 
 // Highcharts Map requires a specific set of codes for provinces
 // and territories, as represented by hcProvCodes below.
