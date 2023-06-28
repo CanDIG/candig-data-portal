@@ -25,12 +25,12 @@ function Summary() {
     const [isLoading, setLoading] = useState(true);
 
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [individualCount, setIndividualCount] = useState({});
-    const [cancerTypeCount, setCancerTypeCount] = useState({});
-    const [treatmentTypeCount, setTreatmentTypeCount] = useState({});
-    const [cohortCount, setCohortCount] = useState({});
-    const [patientsPerCohort, setPatientsPerCohort] = useState({});
-    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState({});
+    const [individualCount, setIndividualCount] = useState(undefined);
+    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
+    const [cohortCount, setCohortCount] = useState(undefined);
+    const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
+    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -73,19 +73,21 @@ function Summary() {
 
                         break;
                     case '/cohort_count':
-                        setCohortCount(aggregateObj(stat.results, cohortCount));
+                        setCohortCount((oldCohortCount) => aggregateObj(stat.results, oldCohortCount));
                         break;
                     case '/patients_per_cohort':
-                        setPatientsPerCohort(aggregateObjStack(stat, patientsPerCohort));
+                        setPatientsPerCohort((oldPatientsPerCohort) =>
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                        );
                         break;
                     case '/cancer_type_count':
-                        setCancerTypeCount(aggregateObj(stat.results, cancerTypeCount));
+                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount(aggregateObj(stat.results, treatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);
@@ -198,7 +200,7 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Number of Patients"
-                    count={individualCount.individual_count}
+                    count={individualCount?.individual_count || 0}
                     primary
                     icon={<Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
@@ -207,7 +209,7 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     title="Cohorts"
-                    count={cohortCount.cohort_count}
+                    count={cohortCount?.cohort_count || 0}
                     icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
@@ -216,88 +218,80 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Provinces"
-                    count={provinceCounter}
+                    count={provinceCounter || 0}
                     icon={<Public fontSize="inherit" />}
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            {Object.keys(canDigDataSource).length !== 0 && cohortCount && (
-                <Grid item xs={12} sm={12} md={12} lg={6}>
-                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
-                </Grid>
-            )}
-            {Object.keys(diagnosisAgeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={diagnosisAgeCount}
-                        data="diagnosis_age_count"
-                        dataVis=""
-                        height="400px; auto"
-                        chartType="bar"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(treatmentTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={treatmentTypeCount}
-                        data="treatment_type_count"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(cancerTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={cancerTypeCount}
-                        data="cancer_type_count"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(patientsPerCohort).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={patientsPerCohort}
-                        data="patients_per_cohort"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullClinicalData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={fullClinicalData}
-                        data="full_clinical_data"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullGenomicData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={fullGenomicData}
-                        data="full_genomic_data"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
+            <Grid item xs={12} sm={12} md={12} lg={6}>
+                <TreatingCentreMap datasetName="" data={canDigDataSource} />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    data="diagnosis_age_count"
+                    dataObject={diagnosisAgeCount || {}}
+                    dataVis=""
+                    height="400px; auto"
+                    loading={diagnosisAgeCount === undefined}
+                    chartType="bar"
+                    dropDown={false}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={treatmentTypeCount || {}}
+                    data="treatment_type_count"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    loading={treatmentTypeCount === undefined}
+                    dropDown={false}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={cancerTypeCount || {}}
+                    data="cancer_type_count"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={cancerTypeCount === undefined}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={patientsPerCohort || {}}
+                    data="patients_per_cohort"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={patientsPerCohort === undefined}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={fullClinicalData || {}}
+                    data="full_clinical_data"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={fullClinicalData === undefined}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={fullGenomicData || {}}
+                    data="full_genomic_data"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={fullGenomicData === undefined}
+                />
+            </Grid>
         </Grid>
     );
 }

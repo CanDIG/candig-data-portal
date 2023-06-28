@@ -123,6 +123,7 @@ function ClinicalView() {
                     pageSize={10}
                     rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
+                    hideFooterSelectedRowCount
                 />
             </div>
         </Box>

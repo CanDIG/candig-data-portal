@@ -84,7 +84,7 @@ const MainLayout = () => {
 
     // Handle left drawer
     const [sidebarContent, setSidebarContent] = useState(false);
-    const leftDrawerOpened = useSelector((state) => state.customization.opened) && sidebarContent;
+    const leftDrawerOpened = useSelector((state) => state.customization.opened) && !!sidebarContent;
     const dispatch = useDispatch();
     const handleLeftDrawerToggle = () => {
         dispatch({ type: SET_MENU, opened: !leftDrawerOpened });

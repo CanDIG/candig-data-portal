@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
+import { createRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 // MUI
 import { useTheme } from '@mui/styles';
 import { Box, IconButton } from '@mui/material';
+import Highcharts, { map } from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
+import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
@@ -29,13 +33,17 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit }) {
+function CustomOfflineChart(props) {
+    const { chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, loading, orderByFrequency, cutoff } = props;
     const theme = useTheme();
 
     // State management
     const events = useSelector((state) => state);
     const [chart, setChart] = useState(chartType);
     const [chartData, setChartData] = useState(data);
+    const chartRef = createRef();
+
+    NoDataToDisplay(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -76,11 +84,19 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                         }
                         data.get(cohort).splice(i, 1, dataObject[key][cohort]);
                     });
+
+                // Order & truncate the categories by the data
+                if (orderByFrequency) {
+                    categories.sort((a, b) => dataObject[b] - dataObject[a]);
+                }
+                if (cutoff) {
+                    categories = categories.slice(0, cutoff);
+                }
                 });
 
                 const stackSeries = [];
                 data?.forEach((value, key) => {
-                    stackSeries.push({ name: key, data: value });
+                    stackSeries.push({ name: key, data: value, dataSorting: { enabled: orderByFrequency } });
                 });
 
                 setChartOptions({
@@ -220,6 +236,17 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
 
     /* eslint-disable jsx-a11y/no-onchange */
 
+    // Control whether or not this element is currently loading
+    useEffect(() => {
+        const chartObj = chartRef?.current?.chart;
+
+        if (loading) {
+            chartObj?.showLoading();
+        } else {
+            chartObj?.hideLoading();
+        }
+    }, [loading]);
+
     return (
         <Box sx={{ position: 'relative' }}>
             {edit && (
@@ -244,7 +271,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                 </IconButton>
             )}
             <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
-                <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+                <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
                 {dropDown && (
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         {validStackedCharts.includes(chartData) ? (
@@ -313,6 +340,8 @@ CustomOfflineChart.propTypes = {
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
     onRemoveChart: PropTypes.func
+    orderByFrequency: PropTypes.bool,
+    cutoff: PropTypes.number
 };
 
 CustomOfflineChart.defaultProps = {
