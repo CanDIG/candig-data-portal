@@ -26,7 +26,8 @@ window.Highcharts = Highcharts;
  */
 
 function CustomOfflineChart(props) {
-    const { chartType, chart, barTitle, height, loading, datasetName, dataObject, xAxisTitle, yAxisTitle } = props;
+    const { chartType, chart, barTitle, height, loading, datasetName, dataObject, xAxisTitle, yAxisTitle, orderByFrequency, cutoff } =
+        props;
     const theme = useTheme();
     const events = useSelector((state) => state);
     const chartRef = createRef();
@@ -103,10 +104,19 @@ function CustomOfflineChart(props) {
          * Create Bar chart from props
          */
         function createBarChart() {
-            const data = [];
+            let categories = Object.keys(dataObject);
+
+            // Order & truncate the categories by the data
+            if (orderByFrequency) {
+                categories.sort((a, b) => dataObject[b] - dataObject[a]);
+            }
+            if (cutoff) {
+                categories = categories.slice(0, cutoff);
+            }
 
             // See dataObject type
-            const categories = Object.keys(dataObject).map((key) => {
+            const data = [];
+            categories = categories.map((key) => {
                 data.push(dataObject[key]);
                 return key;
             });
@@ -146,8 +156,8 @@ function CustomOfflineChart(props) {
          */
 
         function createStackedBarChart() {
-            const data = new Map();
             const categories = [];
+            const data = new Map();
             Object.keys(dataObject).forEach((key, i) => {
                 categories.push(key);
                 Object.keys(dataObject[key]).forEach((cohort) => {
@@ -160,7 +170,7 @@ function CustomOfflineChart(props) {
 
             const stackSeries = [];
             data?.forEach((value, key) => {
-                stackSeries.push({ name: key, data: value });
+                stackSeries.push({ name: key, data: value, dataSorting: { enabled: orderByFrequency } });
             });
 
             setChartOptions({
@@ -228,7 +238,9 @@ CustomOfflineChart.propTypes = {
     barTitle: PropTypes.string.isRequired,
     height: PropTypes.string,
     datasetName: PropTypes.string,
-    dataObject: PropTypes.objectOf(PropTypes.any).isRequired
+    dataObject: PropTypes.objectOf(PropTypes.any).isRequired,
+    orderByFrequency: PropTypes.bool,
+    cutoff: PropTypes.number
 };
 
 CustomOfflineChart.defaultProps = {
