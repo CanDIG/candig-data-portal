@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1100,
         top: 110,
         borderRadius: 12,
-        height:
+        height: 100
     },
     sidebarOffset: {
         width: 'calc(100% - 320px)',
