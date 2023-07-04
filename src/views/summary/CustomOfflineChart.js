@@ -172,7 +172,6 @@ function CustomOfflineChart(props) {
             data?.forEach((value, key) => {
                 stackSeries.push({ name: key, data: value });
             });
-            console.log(dataObject);
 
             setChartOptions({
                 credits: {
