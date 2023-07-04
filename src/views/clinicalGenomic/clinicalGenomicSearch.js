@@ -18,12 +18,23 @@ import GenomicData from './widgets/genomicData';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
-        position: 'static',
+        position: 'fixed',
         backgroundColor: 'white',
-        width: '100%',
         zIndex: 1100,
         top: 110,
-        borderRadius: 12
+        borderRadius: 12,
+        height:
+    },
+    sidebarOffset: {
+        width: 'calc(100% - 320px)',
+        left: 280
+    },
+    noSidebarOffset: {
+        width: 'calc(100% - 80px)',
+        left: 40
+    },
+    headerSpacing: {
+        height: 100
     },
     spaceBetween: {
         height: 30
@@ -72,6 +83,7 @@ function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
     const classes = useStyles();
     const sidebarWriter = useSidebarWriterContext();
+    const sidebarOpened = useSelector((state) => state.customization.opened);
 
     // When we load, set the sidebar component
     useEffect(() => {
@@ -81,7 +93,12 @@ function ClinicalGenomicSearch() {
     return (
         <>
             {/* Top bar */}
-            <AppBar component="nav" className={classes.stickytop}>
+            <AppBar
+                component="nav"
+                className={`${classes.stickytop} ${classes.headerSpacing} ${
+                    sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
+                }`}
+            >
                 <Toolbar>
                     <Typography variant="h5" sx={{ flexGrow: 1 }}>
                         Federated Search
@@ -101,8 +118,10 @@ function ClinicalGenomicSearch() {
                     ))}
                 </Toolbar>
             </AppBar>
+            {/* Empty div to make sure the header takes up space */}
             <SearchHandler />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
+                <div className={classes.headerSpacing} />
                 <div>
                     <Divider />
                     {/* Genomic Searchbar */}
