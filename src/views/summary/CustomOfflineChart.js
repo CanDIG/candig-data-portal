@@ -1,7 +1,7 @@
-import { createRef, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { createRef, useCallback, useState, useEffect } from 'react';
 
 // MUI
+import PropTypes from 'prop-types';
 import { useTheme } from '@mui/styles';
 import { Box, IconButton } from '@mui/material';
 import Highcharts, { map } from 'highcharts';
@@ -96,7 +96,7 @@ function CustomOfflineChart(props) {
 
                 const stackSeries = [];
                 data?.forEach((value, key) => {
-                    stackSeries.push({ name: key, data: value, dataSorting: { enabled: orderByFrequency } });
+                    stackSeries.push({ name: key, data: value });
                 });
 
                 setChartOptions({
@@ -218,7 +218,7 @@ function CustomOfflineChart(props) {
         }
 
         createChart();
-    }, [dataVis, chart, chartData]);
+    }, [dataVis, chart, chartData, JSON.stringify(dataObject)]);
 
     function setCookieDataVisChart(event) {
         // Set cookie for Data Visualization Chart Type
@@ -247,7 +247,7 @@ function CustomOfflineChart(props) {
         }
     }, [loading]);
 
-    return (
+    return useCallback(
         <Box sx={{ position: 'relative' }}>
             {edit && (
                 <IconButton
@@ -330,7 +330,8 @@ function CustomOfflineChart(props) {
                     </Box>
                 )}
             </MainCard>
-        </Box>
+        </Box>,
+        [JSON.stringify(props), JSON.stringify(chartOptions)]
     );
 }
 
