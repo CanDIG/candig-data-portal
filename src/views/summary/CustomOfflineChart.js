@@ -1,4 +1,4 @@
-import { createRef, useState, useEffect } from 'react';
+import { createRef, useCallback, useState, useEffect } from 'react';
 
 // mui
 import { useTheme } from '@mui/styles';
@@ -170,8 +170,9 @@ function CustomOfflineChart(props) {
 
             const stackSeries = [];
             data?.forEach((value, key) => {
-                stackSeries.push({ name: key, data: value, dataSorting: { enabled: orderByFrequency } });
+                stackSeries.push({ name: key, data: value });
             });
+            console.log(dataObject);
 
             setChartOptions({
                 credits: {
@@ -212,7 +213,7 @@ function CustomOfflineChart(props) {
         } else {
             createStackedBarChart();
         }
-    }, [datasetName, dataObject, chartType]);
+    }, [datasetName, JSON.stringify(dataObject), chartType]);
 
     // Control whether or not this element is currently loading
     useEffect(() => {
@@ -225,10 +226,11 @@ function CustomOfflineChart(props) {
         }
     }, [loading]);
 
-    return (
+    return useCallback(
         <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
             <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
-        </MainCard>
+        </MainCard>,
+        [JSON.stringify(props), JSON.stringify(chartOptions)]
     );
 }
 
