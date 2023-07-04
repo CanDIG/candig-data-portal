@@ -10,12 +10,16 @@ function SearchHandler() {
     const reader = useSearchQueryReaderContext();
     const writer = useSearchResultsWriterContext();
 
-    // Query 1: always have the federation sites query results available
+    // Query 1: always have the federation sites and authorized programs query results available
     useEffect(() => {
         trackPromise(
             fetchFederationStat('/patients_per_cohort').then((data) => {
                 writer((old) => ({ ...old, federation: data }));
-            }),
+            })
+                .then(() => fetchFederation('v2/authorized/programs', 'katsu'))
+                .then((data) => {
+                    writer((old) => ({ ...old, programs: data }));
+                }),
             'federation'
         );
     }, []);
