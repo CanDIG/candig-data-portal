@@ -13,9 +13,14 @@ function SearchHandler() {
     // Query 1: always have the federation sites and authorized programs query results available
     useEffect(() => {
         trackPromise(
-            fetchFederationStat('/patients_per_cohort').then((data) => {
-                writer((old) => ({ ...old, federation: data }));
-            })
+            fetchFederation('v2/discovery/sidebar_list', 'katsu')
+                .then((data) => {
+                    writer((old) => ({ ...old, sidebar: data }));
+                })
+                .then(() => fetchFederationStat('/patients_per_cohort'))
+                .then((data) => {
+                    writer((old) => ({ ...old, federation: data }));
+                })
                 .then(() => fetchFederation('v2/authorized/programs', 'katsu'))
                 .then((data) => {
                     writer((old) => ({ ...old, programs: data }));
