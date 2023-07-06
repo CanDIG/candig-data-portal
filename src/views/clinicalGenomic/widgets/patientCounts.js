@@ -22,6 +22,7 @@ function PatientCounts(props) {
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
     const searchResults = context?.clinical;
+    const programs = context?.programs;
 
     // Generate the map of site->cohort->numbers
     // First, we need to match each site within federation with the site within clinical
@@ -42,11 +43,19 @@ function PatientCounts(props) {
                 });
             }
 
+            let unlockedPrograms = [];
+            if (Array.isArray(programs)) {
+                unlockedPrograms = programs
+                    .filter((search) => entry.location.name === search.location.name)?.[0]
+                    ?.results?.results?.map((program) => program.program_id);
+            }
+
             // Return the data that PatientCountSingle needs
             return {
                 location: entry.location.name,
                 counts,
-                totals: entry?.results || {}
+                totals: entry?.results || {},
+                unlockedPrograms
             };
         });
     }
