@@ -11,8 +11,6 @@ import { Box, Typography, Grid, IconButton } from '@mui/material';
 // REDUX
 import { useSelector } from 'react-redux';
 
-// Project import
-import { splitString } from 'utils/utils';
 // assets
 import { IconTrash } from '@tabler/icons';
 
@@ -29,7 +27,7 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, dropDown }) {
+function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, dropDown, callBack, edit }) {
     const theme = useTheme();
     const events = useSelector((state) => state);
     const [chart, setChart] = useState(chartType);
@@ -61,6 +59,8 @@ function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, drop
         /*
          * Create a Pie chart from props
          */
+        console.log(chartData);
+        console.log(DataVisualization[chartData].title);
         function createPieChart() {
             const options = {
                 credits: {
@@ -239,10 +239,16 @@ function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, drop
         }
     }, [dataVis, chart, chartData]);
 
+    function RemoveChart() {
+        // Remove chart from parent
+        console.log('Remove Chart', chartData);
+        callBack();
+    }
+
     /* eslint-disable jsx-a11y/no-onchange */
     return (
         <Box sx={{ position: 'relative' }}>
-            {dropDown && (
+            {edit && (
                 <IconButton
                     color="error"
                     size="small"
@@ -257,6 +263,9 @@ function CustomOfflineChart({ chartType, data, height, dataVis, dataObject, drop
                         padding: '0.10em',
                         left: -5,
                         top: -10
+                    }}
+                    onClick={() => {
+                        RemoveChart();
                     }}
                 >
                     <IconTrash />
@@ -299,7 +308,8 @@ CustomOfflineChart.propTypes = {
     dropDown: PropTypes.bool.isRequired,
     height: PropTypes.string,
     dataVis: PropTypes.any,
-    dataObject: PropTypes.any
+    dataObject: PropTypes.any,
+    callBack: PropTypes.func
 };
 
 CustomOfflineChart.defaultProps = {

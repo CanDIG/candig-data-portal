@@ -1,19 +1,48 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { useSearchResultsReaderContext } from '../SearchResultsContext';
-import { Box, Typography, Grid, IconButton } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+// MUI
+import { Box, Grid, IconButton } from '@mui/material';
+import { useTheme } from '@mui/styles';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
+// Componenets
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
-import { diagnosisAgeCount } from 'store/constant';
+import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // assets
-import { IconEdit } from '@tabler/icons';
+import { IconEdit, IconX, IconPlus } from '@tabler/icons';
 
 function DataVisualization(props) {
     const resultsContext = useSearchResultsReaderContext();
     const theme = useTheme();
-    // const resultsContext = {sites: ["BCGSC", "UHN"]};
+    const [edit, setEdit] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [dropDownValue, setDropDownValue] = useState('patients_per_cohort');
+    const [dataVisArray, setDataVisArray] = useState([
+        'diagnosis_age_count',
+        'treatment_type_count',
+        'cancer_type_count',
+        'patients_per_cohort'
+    ]);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    function removeChart(index) {
+        const newArray = [...dataVisArray];
+        newArray.splice(index, 1);
+        setDataVisArray(newArray);
+    }
 
     const dataVis = {
         diagnosis_age_count: {
@@ -104,6 +133,68 @@ function DataVisualization(props) {
         }
     };
 
+    function AddChart(value) {
+        setOpen(false);
+        const newArray = [...dataVisArray];
+        console.log(value);
+        newArray.push(value);
+        setDataVisArray(newArray);
+    }
+    /* eslint-disable jsx-a11y/no-onchange */
+    function returnChartDialog() {
+        return (
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Create New Chart</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Select chart data for new chart from dropdown below. You can add multiple charts to the page.
+                    </DialogContentText>
+                    <form>
+                        <label htmlFor="types">
+                            Data:
+                            <select
+                                value={dropDownValue}
+                                name="types"
+                                id="types"
+                                onChange={(event) => setDropDownValue(event.target.value)}
+                            >
+                                <option value="patients_per_cohort">Distribution of Cohort by Node</option>
+                                <option value="full_clinical_data">Complete Clinical Data</option>
+                                <option value="full_genomic_data">Complete Genomic Data</option>
+                                <option value="diagnosis_age_count">Age</option>
+                                <option value="treatment_type_count">Treatment</option>
+                                <option value="cancer_type_count">Cancer type</option>
+                            </select>
+                        </label>
+                    </form>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={() => AddChart(dropDownValue)}>Confirm</Button>
+                    </DialogActions>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+
+    function returnDataVisArray() {
+        const data = dataVisArray.map((item, index) => (
+            <Grid item xs={12} sm={12} md={6} lg={3} key={item}>
+                <CustomOfflineChart
+                    dataObject=""
+                    dataVis={dataVis}
+                    data={item}
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown
+                    callBack={() => removeChart(index)}
+                    edit={edit}
+                />
+            </Grid>
+        ));
+
+        return data;
+    }
+
     return (
         <Box
             mr={1}
@@ -133,51 +224,35 @@ function DataVisualization(props) {
                     right: -15,
                     top: -25
                 }}
+                onClick={() => setEdit(!edit)}
             >
-                <IconEdit />
+                {!edit ? <IconEdit /> : <IconX />}
             </IconButton>
             <Grid container spacing={1} alignItems="center" justifyContent="center">
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataVis={dataVis}
-                        dataObject=""
-                        data="diagnosis_age_count"
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject=""
-                        dataVis={dataVis}
-                        data="treatment_type_count"
-                        chartType="line"
-                        height="400px; auto"
-                        dropDown
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject=""
-                        dataVis={dataVis}
-                        data="cancer_type_count"
-                        chartType="column"
-                        height="400px; auto"
-                        dropDown
-                    />
-                </Grid>
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject=""
-                        dataVis={dataVis}
-                        data="patients_per_cohort"
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown
-                    />
-                </Grid>
+                {returnDataVisArray()}
             </Grid>
+            {edit && (
+                <IconButton
+                    color="primary"
+                    size="large"
+                    sx={{
+                        background: 'white',
+                        border: 1,
+                        borderRadius: '100%',
+                        borderColor: theme.palette.primary.main,
+                        boxShadow: theme.shadows[8],
+                        position: 'absolute',
+                        zIndex: '1000',
+                        padding: '0.5em',
+                        right: 50,
+                        top: -25
+                    }}
+                    onClick={() => handleClickOpen()}
+                >
+                    <IconPlus />
+                </IconButton>
+            )}
+            {returnChartDialog()}
         </Box>
     );
 }
