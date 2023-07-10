@@ -14,7 +14,7 @@ import { Box } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { useSearchResultsReaderContext, useSearchResultsWriterContext } from '../SearchResultsContext';
+import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Styles
 const useStyles = makeStyles({
@@ -58,11 +58,12 @@ function ClinicalView() {
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResults = useSearchResultsReaderContext().clinical;
-    const writerContext = useSearchResultsWriterContext();
+    const writerContext = useSearchQueryWriterContext();
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
+        console.log(searchResults);
         rows =
             searchResults
                 ?.map((site) => site.results?.results)
@@ -97,7 +98,7 @@ function ClinicalView() {
     };
 
     const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, selectedPatient: row }));
+        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
     };
 
     // Tracks Screensize
