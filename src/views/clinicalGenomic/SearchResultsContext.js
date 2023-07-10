@@ -17,13 +17,12 @@ const SearchQueryWriterContext = React.createContext();
 export function SearchResultsProvider(props) {
     const [data, setData] = React.useState(DEFAULT_RESULTS_STATE);
     const [query, setQuery] = React.useState(DEFAULT_QUERY_STATE);
-    const { additionalSearchData, ...rest } = props;
 
     return (
-        <SearchQueryReaderContext.Provider value={{ query, ...additionalSearchData }}>
+        <SearchQueryReaderContext.Provider value={query}>
             <SearchQueryWriterContext.Provider value={setQuery}>
-                <SearchResultsReaderContext.Provider value={{ ...data }}>
-                    <SearchResultsWriterContext.Provider value={setData} {...rest} />
+                <SearchResultsReaderContext.Provider value={data}>
+                    <SearchResultsWriterContext.Provider value={setData} {...props} />
                 </SearchResultsReaderContext.Provider>
             </SearchQueryWriterContext.Provider>
         </SearchQueryReaderContext.Provider>

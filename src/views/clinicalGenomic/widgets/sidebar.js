@@ -67,7 +67,7 @@ function StyledCheckboxList(props) {
         getID.then((id) => {
             if (isChecked) {
                 setChecked((old) => ({ ...old, [option]: true }));
-                onWrite((old) => ({ ...old, [groupName]: [...(old?.[groupName] || []), id] }));
+                onWrite((old) => ({ ...old, query: { [groupName]: [...(old?.query?.[groupName] || []), id] } }));
             } else {
                 setChecked((old) => {
                     const { [option]: _, ...rest } = old;
@@ -81,8 +81,8 @@ function StyledCheckboxList(props) {
                         return rest;
                     }
 
-                    // Otherwise remove our entry from the list
-                    return { ...old, [groupName]: retVal };
+                    // Otherwise remove just our entry from the list
+                    return { ...old, query: { [groupName]: retVal } };
                 });
             }
         });
@@ -126,7 +126,10 @@ function Sidebar(props) {
     const immunotherapyDrugNames = ExtractSidebarElements('immunotherapy_drug_names');
     const hormoneTherapyDrugNames = ExtractSidebarElements('hormone_therapy_drug_names');
 
-    const remap = (url, returnName) => fetchFederation(url, 'katsu').then((data) => data?.[0]?.results?.results?.[0]?.[returnName]);
+    const remap = (url, returnName) =>
+        fetchFederation(url, 'katsu').then(
+            (data) => data?.map((loc) => loc?.results?.results?.map((result) => result[returnName]) || []) || []
+        );
 
     return (
         <>

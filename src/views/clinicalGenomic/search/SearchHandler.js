@@ -31,14 +31,33 @@ function SearchHandler() {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
-        const url = `v2/authorized/donor_with_clinical_data?${new URLSearchParams(reader.query)}`;
+        const searchParams = new URLSearchParams();
+        // Parse out search parameters according to what they are:
+        if (reader.query) {
+            Object.keys(reader.query).forEach((key) => {
+                searchParams.append(key, Array.isArray(reader.query[key]) ? reader.query[key].join(',') : reader.query[key]);
+            });
+        }
+        const url = `v2/authorized/donors?${searchParams}`;
         trackPromise(
             fetchFederation(url, 'katsu').then((data) => {
                 writer((old) => ({ ...old, clinical: data }));
             }),
             'clinical'
         );
-    }, [JSON.stringify(reader)]);
+    }, [JSON.stringify(reader.query)]);
+
+    // Query 3: when the selected donor changes, re-query the server
+    console.log(reader);
+    useEffect(() => {
+        const url = `v2/authorized/donor_with_clinical_data?submitter_donor_id=${reader.donorID}`;
+        trackPromise(
+            fetchFederation(url, 'katsu').then((data) => {
+                writer((old) => ({ ...old, donor: data }));
+            }),
+            'donor'
+        );
+    }, [JSON.stringify(reader.donorID)]);
 
     // We don't really implement a graphical component
     return <></>;
