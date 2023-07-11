@@ -160,7 +160,7 @@ function Sidebar(props) {
                     options={chemotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="chemotherapy"
-                    remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'id')}
+                    remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_treatment_id')}
                 />
             </SidebarGroup>
             <SidebarGroup name="Immunotherapy">
@@ -168,7 +168,7 @@ function Sidebar(props) {
                     options={immunotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="immunotherapy"
-                    remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'id')}
+                    remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_treatment_id')}
                 />
             </SidebarGroup>
             <SidebarGroup name="Hormone Therapy">
@@ -176,7 +176,7 @@ function Sidebar(props) {
                     options={hormoneTherapyDrugNames}
                     onWrite={writerContext}
                     groupName="hormone_therapy"
-                    remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'id')}
+                    remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_treatment_id')}
                 />
             </SidebarGroup>
         </>
