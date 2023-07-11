@@ -233,7 +233,6 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     loading={treatmentTypeCount === undefined}
-                    dropDown={false}
                     orderByFrequency
                     cutoff={10}
                 />

@@ -63,7 +63,6 @@ function ClinicalView() {
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
-        console.log(searchResults);
         rows =
             searchResults
                 ?.map((site) => site.results?.results)

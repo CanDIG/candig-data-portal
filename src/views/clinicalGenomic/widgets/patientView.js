@@ -98,7 +98,7 @@ const JSONTree = (props) => {
 
 function PatientView(props) {
     const resultsContext = useSearchResultsReaderContext();
-    const patient = resultsContext.selectedPatient;
+    const patient = resultsContext.donor?.[0]?.results?.results?.[0];
     const [expanded, setExpanded] = useState(['.']);
 
     // When searching: search, then prune the results
