@@ -108,7 +108,6 @@ function DataVisualization(props) {
 
     // Top 4 keys from dataVis
     const topKeys = Object.keys(dataVis).slice(0, 4);
-    console.log(topKeys);
 
     // Cookies
     const [dataValue, setDataValue] = useState(
@@ -144,10 +143,8 @@ function DataVisualization(props) {
 
     function AddChart(data, chartType) {
         setOpen(false);
-        const newdataVisData = [...dataVisData];
-        const newDataVisChartType = [...dataVisChartType];
-        newdataVisData.push(data);
-        newDataVisChartType.push(chartType);
+        const newdataVisData = [...dataVisData, data];
+        const newDataVisChartType = [...dataVisChartType, chartType];
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
@@ -211,7 +208,7 @@ function DataVisualization(props) {
                     chartType={dataVisChartType[index]}
                     height="400px; auto"
                     dropDown
-                    callBack={() => removeChart(index)}
+                    onRemoveChart={() => removeChart(index)}
                     edit={edit}
                 />
             </Grid>

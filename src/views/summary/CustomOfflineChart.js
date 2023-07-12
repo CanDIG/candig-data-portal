@@ -29,7 +29,7 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, callBack, edit }) {
+function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit }) {
     const theme = useTheme();
 
     // State management
@@ -204,12 +204,6 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
         createChart();
     }, [dataVis, chart, chartData]);
 
-    function RemoveChart() {
-        // Remove chart from parent
-        // Parent(s): DataVisualization.js
-        callBack();
-    }
-
     function setCookieDataVisChart(event) {
         // Set cookie for Data Visualization Chart Type
         const dataVisChart = JSON.parse(Cookies.get('dataVisChartType'));
@@ -244,9 +238,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                         left: -5,
                         top: -10
                     }}
-                    onClick={() => {
-                        RemoveChart();
-                    }}
+                    onClick={onRemoveChart}
                 >
                     <IconTrash />
                 </IconButton>
@@ -320,7 +312,7 @@ CustomOfflineChart.propTypes = {
     height: PropTypes.string,
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
-    callBack: PropTypes.func
+    onRemoveChart: PropTypes.func
 };
 
 CustomOfflineChart.defaultProps = {
