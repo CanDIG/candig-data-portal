@@ -53,7 +53,7 @@ function SidebarGroup(props) {
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, remap, onWrite, options } = props;
+    const { groupName, isDonorList, remap, onWrite, options } = props;
     const [checked, setChecked] = useState({});
     const classes = useStyles();
 
@@ -64,25 +64,51 @@ function StyledCheckboxList(props) {
             getID = remap(option);
         }
 
-        getID.then((id) => {
+        getID.then((ids) => {
+            // Remove duplicates
+            if (Array.isArray(ids)) {
+                ids = Array.from(new Set(ids?.flat(1)));
+            }
+
             if (isChecked) {
                 setChecked((old) => ({ ...old, [option]: true }));
-                onWrite((old) => ({ ...old, query: { [groupName]: [...(old?.query?.[groupName] || []), id] } }));
+                // This appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
+                onWrite((old) => {
+                    if (isDonorList) {
+                        return {
+                            ...old,
+                            donorLists: {
+                                ...old.donorLists,
+                                [groupName]: {
+                                    ...old.donorLists?.[groupName],
+                                    [option]: ids
+                                }
+                            }
+                        };
+                    }
+                    return { ...old, query: { groupName: ids } };
+                });
             } else {
                 setChecked((old) => {
                     const { [option]: _, ...rest } = old;
                     return rest;
                 });
                 onWrite((old) => {
-                    const retVal = old?.[groupName]?.filter((name) => name !== id);
+                    if (!isDonorList) {
+                        const retVal = old?.query.filter((name) => name !== groupName);
+                        return { ...old, query: retVal };
+                    }
+
+                    const retVal = Object.entries(old?.donorLists?.[groupName])?.filter(([key]) => key !== option);
+
                     // Remove the list entirely if we are the last one
                     if (retVal.length <= 0) {
-                        const { [groupName]: _, ...rest } = old;
-                        return rest;
+                        const { [groupName]: _, ...rest } = old?.donorLists;
+                        return { ...old, donorLists: rest };
                     }
 
                     // Otherwise remove just our entry from the list
-                    return { ...old, query: { [groupName]: retVal } };
+                    return { ...old, donorLists: { [groupName]: Object.fromEntries(retVal) } };
                 });
             }
         });
@@ -149,7 +175,8 @@ function Sidebar(props) {
                     options={treatmentTypes}
                     onWrite={writerContext}
                     groupName="treatment"
-                    remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_treatment_id')}
+                    remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
+                    isDonorList
                 />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
@@ -160,7 +187,8 @@ function Sidebar(props) {
                     options={chemotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="chemotherapy"
-                    remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_treatment_id')}
+                    remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_donor_id')}
+                    isDonorList
                 />
             </SidebarGroup>
             <SidebarGroup name="Immunotherapy">
@@ -168,7 +196,8 @@ function Sidebar(props) {
                     options={immunotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="immunotherapy"
-                    remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_treatment_id')}
+                    remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_donor_id')}
+                    isDonorList
                 />
             </SidebarGroup>
             <SidebarGroup name="Hormone Therapy">
@@ -176,7 +205,8 @@ function Sidebar(props) {
                     options={hormoneTherapyDrugNames}
                     onWrite={writerContext}
                     groupName="hormone_therapy"
-                    remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_treatment_id')}
+                    remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_donor_id')}
+                    isDonorList
                 />
             </SidebarGroup>
         </>
