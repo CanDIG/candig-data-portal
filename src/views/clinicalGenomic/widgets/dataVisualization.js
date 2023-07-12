@@ -160,10 +160,10 @@ function DataVisualization(props) {
                 <DialogTitle>Create New Chart</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Select chart data for new chart from dropdown below. You can add multiple charts to the page.
+                        Please select the data and chart type for the new chart from the dropdown below
                     </DialogContentText>
                     <form>
-                        <label htmlFor="types">
+                        <label htmlFor="types" style={{ paddingRight: '2em' }}>
                             Data:
                             <select value={dataValue} name="types" id="types" onChange={(event) => setDataValue(event.target.value)}>
                                 {Object.keys(dataVis).map((key) => (
