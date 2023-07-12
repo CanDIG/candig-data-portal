@@ -159,12 +159,10 @@ function DataVisualization(props) {
             <Dialog open={open} onClose={handleToggleDialog}>
                 <DialogTitle>Create New Chart</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        Please select the data and chart type for the new chart from the dropdowns below
-                    </DialogContentText>
+                    <DialogContentText pb={1}>Please select the data and chart type from the dropdowns below</DialogContentText>
                     <form>
-                        <label htmlFor="types" style={{ paddingRight: '2em' }}>
-                            Data:
+                        <label htmlFor="types" style={{ paddingRight: '1em' }}>
+                            Data: &nbsp;
                             <select value={dataValue} name="types" id="types" onChange={(event) => setDataValue(event.target.value)}>
                                 {Object.keys(dataVis).map((key) => (
                                     <option key={key} value={key}>
@@ -175,14 +173,14 @@ function DataVisualization(props) {
                         </label>
                         {validStackedCharts.includes(dataValue) ? (
                             <label htmlFor="types">
-                                Chart Types:
+                                Chart Types: &nbsp;
                                 <select value="bar" name="types" id="types" onChange={(event) => setChartType(event.target.value)}>
                                     <option value="bar">Stacked Bar</option>
                                 </select>
                             </label>
                         ) : (
                             <label htmlFor="types">
-                                Chart Types:
+                                Chart Types: &nbsp;
                                 <select value={chartType} name="types" id="types" onChange={(event) => setChartType(event.target.value)}>
                                     <option value="bar">Bar</option>
                                     <option value="line">Line</option>
