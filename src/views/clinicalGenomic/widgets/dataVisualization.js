@@ -160,7 +160,7 @@ function DataVisualization(props) {
                 <DialogTitle>Create New Chart</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Please select the data and chart type for the new chart from the dropdown below
+                        Please select the data and chart type for the new chart from the dropdowns below
                     </DialogContentText>
                     <form>
                         <label htmlFor="types" style={{ paddingRight: '2em' }}>
