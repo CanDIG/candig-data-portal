@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTheme } from '@mui/styles';
 
 // MUI
 import { Box, Grid, IconButton } from '@mui/material';
-import { useTheme } from '@mui/styles';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,40 +10,22 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 
-// Componenets
+// Third-party libraries
+import Cookies from 'js-cookie';
+import { IconEdit, IconX, IconPlus } from '@tabler/icons';
+
+// Custom Components and context
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
-// assets
-import { IconEdit, IconX, IconPlus } from '@tabler/icons';
+// Constants
+import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 
 function DataVisualization(props) {
+    // Hooks
     const resultsContext = useSearchResultsReaderContext();
-    const theme = useTheme();
-    const [edit, setEdit] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [dropDownValue, setDropDownValue] = useState('patients_per_cohort');
-    const [dataVisArray, setDataVisArray] = useState([
-        'diagnosis_age_count',
-        'treatment_type_count',
-        'cancer_type_count',
-        'patients_per_cohort'
-    ]);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    function removeChart(index) {
-        const newArray = [...dataVisArray];
-        newArray.splice(index, 1);
-        setDataVisArray(newArray);
-    }
-
+    // Plan for context below see current dataVis for expected shape
+    // const dataVis = context?.dataVis;
     const dataVis = {
         diagnosis_age_count: {
             '0-19 Years': 10,
@@ -74,20 +56,6 @@ function DataVisualization(props) {
             'Pancreas C25.9': 40,
             'Colon C18': 60,
             'Tonsil C09': 50
-        },
-        cohort_by_node: {
-            BCGSC: {
-                POG: 50
-            },
-            UHN: {
-                POG: 67,
-                Inspire: 30,
-                Biocan: 50,
-                Biodiva: 30
-            },
-            C3G: {
-                MOCK: 50
-            }
         },
         patients_per_cohort: {
             BCGSC: {
@@ -132,18 +100,63 @@ function DataVisualization(props) {
             }
         }
     };
+    const theme = useTheme();
 
-    function AddChart(value) {
+    // State management
+    const [edit, setEdit] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    // Top 4 keys from dataVis
+    const topKeys = Object.keys(dataVis).slice(0, 4);
+    console.log(topKeys);
+
+    // Cookies
+    const [dataValue, setDataValue] = useState(
+        Cookies.get('dataVisData') ? JSON.parse(Cookies.get('dataVisData'))[0] : 'patients_per_cohort'
+    );
+    const [chartType, setChartType] = useState(Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType'))[0] : 'bar');
+    const [dataVisData, setdataVisData] = useState(Cookies.get('dataVisData') ? JSON.parse(Cookies.get('dataVisData')) : topKeys);
+    const [dataVisChartType, setDataVisChartType] = useState(
+        Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
+    );
+
+    // Intial cookie setting if there are none
+    useEffect(() => {
+        if (!Cookies.get('dataVisData') && !Cookies.get('dataVisChartType')) {
+            const charts = topKeys.map(() => 'bar');
+            Cookies.set('dataVisChartType', JSON.stringify(charts), { expires: 365 });
+            Cookies.set('dataVisData', JSON.stringify(topKeys), { expires: 365 });
+        }
+    }, []);
+
+    const handleToggleDialog = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    function removeChart(index) {
+        const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
+        const newdataVisData = dataVisData.slice(0, index).concat(dataVisData.slice(index + 1));
+        setDataVisChartType(newDataVisChartType);
+        setdataVisData(newdataVisData);
+        Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
+        Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+    }
+
+    function AddChart(data, chartType) {
         setOpen(false);
-        const newArray = [...dataVisArray];
-        console.log(value);
-        newArray.push(value);
-        setDataVisArray(newArray);
+        const newdataVisData = [...dataVisData];
+        const newDataVisChartType = [...dataVisChartType];
+        newdataVisData.push(data);
+        newDataVisChartType.push(chartType);
+        setDataVisChartType(newDataVisChartType);
+        setdataVisData(newdataVisData);
+        Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
+        Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
     }
     /* eslint-disable jsx-a11y/no-onchange */
     function returnChartDialog() {
         return (
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={open} onClose={handleToggleDialog}>
                 <DialogTitle>Create New Chart</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -152,38 +165,52 @@ function DataVisualization(props) {
                     <form>
                         <label htmlFor="types">
                             Data:
-                            <select
-                                value={dropDownValue}
-                                name="types"
-                                id="types"
-                                onChange={(event) => setDropDownValue(event.target.value)}
-                            >
-                                <option value="patients_per_cohort">Distribution of Cohort by Node</option>
-                                <option value="full_clinical_data">Complete Clinical Data</option>
-                                <option value="full_genomic_data">Complete Genomic Data</option>
-                                <option value="diagnosis_age_count">Age</option>
-                                <option value="treatment_type_count">Treatment</option>
-                                <option value="cancer_type_count">Cancer type</option>
+                            <select value={dataValue} name="types" id="types" onChange={(event) => setDataValue(event.target.value)}>
+                                {Object.keys(dataVis).map((key) => (
+                                    <option key={key} value={key}>
+                                        {DataVisualizationChartInfo[key].title}
+                                    </option>
+                                ))}
                             </select>
                         </label>
+                        {validStackedCharts.includes(dataValue) ? (
+                            <label htmlFor="types">
+                                Chart Types:
+                                <select value="bar" name="types" id="types" onChange={(event) => setChartType(event.target.value)}>
+                                    <option value="bar">Stacked Bar</option>
+                                </select>
+                            </label>
+                        ) : (
+                            <label htmlFor="types">
+                                Chart Types:
+                                <select value={chartType} name="types" id="types" onChange={(event) => setChartType(event.target.value)}>
+                                    <option value="bar">Bar</option>
+                                    <option value="line">Line</option>
+                                    <option value="column">Column</option>
+                                    <option value="scatter">Scatter</option>
+                                    <option value="pie">Pie</option>
+                                </select>
+                            </label>
+                        )}
                     </form>
                     <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={() => AddChart(dropDownValue)}>Confirm</Button>
+                        <Button onClick={handleToggleDialog}>Cancel</Button>
+                        <Button onClick={() => AddChart(dataValue, chartType)}>Confirm</Button>
                     </DialogActions>
                 </DialogContent>
             </Dialog>
         );
     }
 
-    function returnDataVisArray() {
-        const data = dataVisArray.map((item, index) => (
-            <Grid item xs={12} sm={12} md={6} lg={3} key={item}>
+    function returndataVisData() {
+        const data = dataVisData.map((item, index) => (
+            <Grid item xs={12} sm={12} md={6} lg={3} key={item + index}>
                 <CustomOfflineChart
                     dataObject=""
                     dataVis={dataVis}
                     data={item}
-                    chartType="bar"
+                    index={index}
+                    chartType={dataVisChartType[index]}
                     height="400px; auto"
                     dropDown
                     callBack={() => removeChart(index)}
@@ -229,7 +256,7 @@ function DataVisualization(props) {
                 {!edit ? <IconEdit /> : <IconX />}
             </IconButton>
             <Grid container spacing={1} alignItems="center" justifyContent="center">
-                {returnDataVisArray()}
+                {returndataVisData()}
             </Grid>
             {edit && (
                 <IconButton
@@ -247,7 +274,7 @@ function DataVisualization(props) {
                         right: 50,
                         top: -25
                     }}
-                    onClick={() => handleClickOpen()}
+                    onClick={() => handleToggleDialog()}
                 >
                     <IconPlus />
                 </IconButton>

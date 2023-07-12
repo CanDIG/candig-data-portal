@@ -114,7 +114,7 @@ export const SITE = process.env.REACT_APP_SITE_LOCATION;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 
 // Clinical & Genomic Search Page
-export const DataVisualization = {
+export const DataVisualizationChartInfo = {
     gender_count: {
         title: 'Gender Distribution',
         xAxis: 'Gender',
@@ -140,22 +140,19 @@ export const DataVisualization = {
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     },
-    cohort_by_node: {
-        title: 'Distribution of Cohort by Node',
-        xAxis: 'Site',
-        yAxis: 'Number of Patients'
-    },
     full_clinical_data: {
-        title: 'Complete Clinical Data',
+        title: 'Example of Complete Clinical Data',
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     },
     full_genomic_data: {
-        title: 'Complete Genomic Data',
+        title: 'Example of Complete Genomic Data',
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     }
 };
+export const validCharts = ['bar', 'line', 'scatter', 'column'];
+export const validStackedCharts = ['patients_per_cohort', 'full_clinical_data', 'full_genomic_data'];
 
 // Highcharts Map requires a specific set of codes for provinces
 // and territories, as represented by hcProvCodes below.
