@@ -235,7 +235,6 @@ function Summary() {
                         height="400px; auto"
                         chartType="bar"
                         dropDown={false}
-                        colours
                     />
                 </Grid>
             )}
@@ -248,7 +247,6 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
-                        colours
                     />
                 </Grid>
             )}
@@ -261,7 +259,6 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
-                        colours
                     />
                 </Grid>
             )}
@@ -274,7 +271,6 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
-                        colours
                     />
                 </Grid>
             )}
@@ -287,7 +283,7 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
-                        colours={false}
+                        grayscale
                     />
                 </Grid>
             )}
@@ -300,7 +296,7 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
-                        colours={false}
+                        grayscale
                     />
                 </Grid>
             )}

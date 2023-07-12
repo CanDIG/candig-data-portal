@@ -211,7 +211,7 @@ function DataVisualization(props) {
                     dropDown
                     onRemoveChart={() => removeChart(index)}
                     edit={edit}
-                    colours={!completenessData.includes(item)}
+                    grayscale={completenessData.includes(item)}
                 />
             </Grid>
         ));
