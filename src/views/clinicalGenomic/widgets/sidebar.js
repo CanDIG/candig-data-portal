@@ -3,16 +3,17 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
     Checkbox,
     FormControl,
     FormControlLabel,
     FormLabel,
     FormGroup,
+    RadioGroup,
+    Radio,
     Tab,
-    Tabs
+    Tabs,
+    Autocomplete,
+    TextField
 } from '@mui/material';
 import { TreeView } from '@mui/lab';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
@@ -129,6 +130,65 @@ function StyledCheckboxList(props) {
         />
     ));
 }
+// A group of genomics data
+// Keeping this separate from the rest as it's all somewhat self-contained
+// NB: Should maybe go into a separate .js file
+function GenomicsGroup(props) {
+    const { chromosomes, genes, onWrite } = props;
+    const classes = useStyles();
+    const referenceGenomes = ['hg38', 'hg36'];
+    const [selectedGenome, setSelectedGenome] = useState('hg38');
+    const [selectedChromosomes, setSelectedChromosomes] = useState([]);
+    const [selectedGenes, setSelectedGenes] = useState([]);
+    const [startPos, setStartPos] = useState(undefined);
+    const [endPos, setEndPos] = useState(undefined);
+
+    const HandleChange = (event, changer) => {
+        changer(event.target.value);
+        onWrite((old) => ({ ...old, genomic: { genome: selectedGenome } }));
+    };
+
+    console.log(chromosomes);
+    console.log(genes);
+
+    return (
+        <>
+            <SidebarGroup name="Reference Genome">
+                <RadioGroup onChange={(event) => HandleChange(event, setSelectedGenome)} value={selectedGenome}>
+                    {referenceGenomes.map((genome) => (
+                        <FormControlLabel
+                            label={genome}
+                            control={<Radio className={classes.checkbox} />}
+                            key={genome}
+                            value={genome}
+                            className={classes.checkboxLabel}
+                        />
+                    ))}
+                </RadioGroup>
+            </SidebarGroup>
+            <SidebarGroup name="Chromosome">
+                <Autocomplete
+                    options={chromosomes || []}
+                    onChange={(event) => HandleChange(event, setSelectedChromosomes)}
+                    renderInput={(params) => <TextField {...params} />}
+                    value={selectedChromosomes}
+                />
+            </SidebarGroup>
+            <SidebarGroup name="Gene Search">
+                <Autocomplete
+                    options={genes || []}
+                    onChange={(event) => HandleChange(event, setSelectedGenes)}
+                    renderInput={(params) => <TextField {...params} />}
+                    value={selectedGenes}
+                />
+            </SidebarGroup>
+            <SidebarGroup name="Position">
+                <TextField label="Start" type="number" />
+                <TextField label="End" type="number" />
+            </SidebarGroup>
+        </>
+    );
+}
 
 function Sidebar(props) {
     const [selectedtab, setSelectedTab] = useState('All');
@@ -136,6 +196,8 @@ function Sidebar(props) {
     const writerContext = useSearchQueryWriterContext();
     const classes = useStyles();
 
+    // Fill up a list of options from the results of a Katsu query
+    // This includes treatment types within the dataset, etc.
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
 
@@ -151,6 +213,13 @@ function Sidebar(props) {
     const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');
     const immunotherapyDrugNames = ExtractSidebarElements('immunotherapy_drug_names');
     const hormoneTherapyDrugNames = ExtractSidebarElements('hormone_therapy_drug_names');
+    const chromosomes = [];
+    const genes = readerContext?.genes;
+    for (let i = 0; i < 23; i += 1) {
+        chromosomes.push(i);
+    }
+    chromosomes.push('X');
+    chromosomes.push('Y');
 
     const remap = (url, returnName) =>
         fetchFederation(url, 'katsu').then(
@@ -170,6 +239,7 @@ function Sidebar(props) {
             <SidebarGroup name="Cohort">
                 <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" />
             </SidebarGroup>
+            <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} />
             <SidebarGroup name="Treatment">
                 <StyledCheckboxList
                     options={treatmentTypes}

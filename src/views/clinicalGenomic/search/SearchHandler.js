@@ -53,6 +53,11 @@ function SearchHandler() {
                 .then(() => fetchFederation('v2/authorized/programs', 'katsu'))
                 .then((data) => {
                     writer((old) => ({ ...old, programs: data }));
+                })
+                .then(() => fetch('/genomics/htsget/v1/genes'))
+                .then((response) => (response.ok ? response.json() : console.log(response)))
+                .then((data) => {
+                    writer((old) => ({ ...old, genes: data?.results }));
                 }),
             'federation'
         );
@@ -76,6 +81,7 @@ function SearchHandler() {
             });
         }
 
+        let finalList = null;
         if (reader.donorLists && Object.keys(reader.donorLists).length > 0) {
             const allLists = Object.keys(reader.donorLists)?.map((key) =>
                 // Lists from the same queries are OR'd together
@@ -84,7 +90,7 @@ function SearchHandler() {
 
             // Lists from different queries are AND'd together
             const toQuery = allLists[0];
-            const finalList = toQuery.filter((donor) => allLists.every((list) => list.includes(donor)));
+            finalList = toQuery.filter((donor) => allLists.every((list) => list.includes(donor)));
 
             // TODO: Figure out pagination (again)
             searchParams.append('donors', finalList.join(','));
@@ -103,7 +109,7 @@ function SearchHandler() {
                 // Recursively query the genomics data until we have all the data we need
                 // NB: This needs to be moved to the backend somewhere. The UI should not be responsible for this.
                 const CLINICAL_PAGE_SIZE = 10;
-                searchVariant('chr21', 0, 100000);
+                searchVariant(reader.genome?.referenceName, reader.genome?.start, reader.genome?.end, reader.genome?.assemblyId);
             });
 
         if (lastPromise === null) {
@@ -111,7 +117,7 @@ function SearchHandler() {
         } else {
             lastPromise.then(donorQueryPromise);
         }
-    }, [JSON.stringify(reader.query), JSON.stringify(reader.donorLists)]);
+    }, [JSON.stringify(reader.query), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic)]);
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
