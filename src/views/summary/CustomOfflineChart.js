@@ -29,7 +29,7 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit }) {
+function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, grayscale }) {
     const theme = useTheme();
 
     // State management
@@ -82,6 +82,29 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                 data.forEach((value, key) => {
                     stackSeries.push({ name: key, data: value });
                 });
+                const stackedTheme = grayscale
+                    ? [
+                          theme.palette.grey[200],
+                          theme.palette.grey[300],
+                          theme.palette.grey[500],
+                          theme.palette.grey[600],
+                          theme.palette.grey[700],
+                          theme.palette.grey[900]
+                      ]
+                    : [
+                          theme.palette.secondary[200],
+                          theme.palette.tertiary[200],
+                          theme.palette.primary[200],
+                          theme.palette.secondary.main,
+                          theme.palette.tertiary.main,
+                          theme.palette.primary.main,
+                          theme.palette.secondary.dark,
+                          theme.palette.tertiary.dark,
+                          theme.palette.primary.dark,
+                          theme.palette.secondary[800],
+                          theme.palette.tertiary[800],
+                          theme.palette.primary[800]
+                      ];
 
                 setChartOptions({
                     credits: {
@@ -96,20 +119,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
-                    colors: [
-                        theme.palette.secondary[200],
-                        theme.palette.tertiary[200],
-                        theme.palette.primary[200],
-                        theme.palette.secondary.main,
-                        theme.palette.tertiary.main,
-                        theme.palette.primary.main,
-                        theme.palette.secondary.dark,
-                        theme.palette.tertiary.dark,
-                        theme.palette.primary.dark,
-                        theme.palette.secondary[800],
-                        theme.palette.tertiary[800],
-                        theme.palette.primary[800]
-                    ],
+                    colors: stackedTheme,
                     plotOptions: {
                         series: {
                             stacking: 'normal'
@@ -251,7 +261,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                             <label htmlFor="types">
                                 Chart Types:
                                 <select
-                                    value={chart}
+                                    value="bar"
                                     name="types"
                                     id="types"
                                     onChange={(event) => {
@@ -278,7 +288,6 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                                     <option value="line">Line</option>
                                     <option value="column">Column</option>
                                     <option value="scatter">Scatter</option>
-                                    <option value="pie">Pie</option>
                                 </select>
                             </label>
                         )}
@@ -312,7 +321,8 @@ CustomOfflineChart.propTypes = {
     height: PropTypes.string,
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
-    onRemoveChart: PropTypes.func
+    onRemoveChart: PropTypes.func,
+    grayscale: PropTypes.bool
 };
 
 CustomOfflineChart.defaultProps = {

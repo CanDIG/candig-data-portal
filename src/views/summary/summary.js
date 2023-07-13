@@ -283,6 +283,7 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
+                        grayscale
                     />
                 </Grid>
             )}
@@ -295,6 +296,7 @@ function Summary() {
                         chartType="bar"
                         height="400px; auto"
                         dropDown={false}
+                        grayscale
                     />
                 </Grid>
             )}
