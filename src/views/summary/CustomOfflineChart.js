@@ -4,10 +4,6 @@ import { createRef, useCallback, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/styles';
 import { Box, IconButton } from '@mui/material';
-import Highcharts, { map } from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
-import MainCard from 'ui-component/cards/MainCard';
 
 // REDUX
 import { useSelector } from 'react-redux';
@@ -16,6 +12,7 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import { IconTrash } from '@tabler/icons';
 
 // Custon Components and constants
