@@ -70,25 +70,25 @@ function CustomOfflineChart(props) {
             if (validStackedCharts.includes(chartData)) {
                 // Stacked Bar Chart
                 const data = new Map();
-                const categories = [];
-                dataObject = dataObject === '' ? dataVis[chartData] : dataObject;
+                let categories = [];
+                const thisData = dataObject === '' ? dataVis[chartData] : dataObject;
 
-                Object.keys(dataObject).forEach((key, i) => {
+                Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
-                    Object.keys(dataObject[key]).forEach((cohort) => {
+                    Object.keys(thisData[key]).forEach((cohort) => {
                         if (!data.has(cohort)) {
-                            data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
+                            data.set(cohort, new Array(Object.keys(thisData).length).fill(0));
                         }
-                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
+                        data.get(cohort).splice(i, 1, thisData[key][cohort]);
                     });
 
-                // Order & truncate the categories by the data
-                if (orderByFrequency) {
-                    categories.sort((a, b) => dataObject[b] - dataObject[a]);
-                }
-                if (cutoff) {
-                    categories = categories.slice(0, cutoff);
-                }
+                    // Order & truncate the categories by the data
+                    if (orderByFrequency) {
+                        categories.sort((a, b) => thisData[b] - thisData[a]);
+                    }
+                    if (cutoff) {
+                        categories = categories.slice(0, cutoff);
+                    }
                 });
 
                 const stackSeries = [];
