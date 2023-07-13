@@ -32,8 +32,6 @@ const useStyles = makeStyles((theme) => ({
     },
     ScrollHeight: {
         height: 'calc(100vh - 88px)',
-        paddingLeft: '16px',
-        paddingRight: '16px',
         [theme.breakpoints.down('md')]: {
             height: 'calc(100vh - 56px)'
         }

@@ -12,7 +12,7 @@ import ClinicalData from './widgets/clinicalData';
 import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
-import { PRIMARY_SITES, COHORTS } from 'store/constant';
+import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 
@@ -22,8 +22,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'white',
         zIndex: 1100,
         top: 110,
-        borderRadius: 12,
-        height: 100
+        borderRadius: '12px 12px 0 0'
     },
     sidebarOffset: {
         width: 'calc(100% - 320px)',
@@ -34,15 +33,11 @@ const useStyles = makeStyles((theme) => ({
         left: 40
     },
     headerSpacing: {
-        height: 100
-    },
-    spaceBetween: {
-        height: 30
+        height: 50
     },
     anchor: {
         display: 'block',
         position: 'relative',
-        top: -82, // Height of the header
         visibility: 'hidden'
     },
     navigationLink: {
@@ -99,8 +94,8 @@ function ClinicalGenomicSearch() {
                     sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
                 }`}
             >
-                <Toolbar>
-                    <Typography variant="h5" sx={{ flexGrow: 1 }}>
+                <Toolbar sx={{ padding: '5px' }}>
+                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
                         Federated Search
                     </Typography>
                     {sections.map((section) => (
@@ -122,14 +117,10 @@ function ClinicalGenomicSearch() {
             <SearchHandler />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
                 <div className={classes.headerSpacing} />
-                <div>
-                    <Divider />
+                <div id="searchbar">
                     {/* Genomic Searchbar */}
-                    <div id="searchbar">
-                        <VariantsSearch />
-                    </div>
+                    <VariantsSearch />
                     {/* For now, until I figure out how to make it its own card */}
-                    <Divider />
                 </div>
                 {sections.map((section) => (
                     <div key={section.id}>

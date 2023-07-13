@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import PropTypes from 'prop-types';
-
 import {
     Checkbox,
     FormControl,
@@ -17,7 +15,7 @@ import {
 } from '@mui/material';
 import { TreeView } from '@mui/lab';
 import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 import { fetchFederation } from '../../../store/api';
@@ -42,13 +40,19 @@ const useStyles = makeStyles((theme) => ({
  * Helper function that styles a group
  */
 function SidebarGroup(props) {
+    const theme = useTheme();
     const { name, children } = props;
     const classes = useStyles();
 
+    console.log(children);
     return (
         <FormControl className={classes.form} component="fieldset" variant="standard">
-            <FormLabel>{name}</FormLabel>
-            <FormGroup>{children}</FormGroup>
+            <FormLabel
+                sx={{ color: theme.palette.primary.main, background: theme.palette.primary.light, fontWeight: 'bold', paddingLeft: '1em' }}
+            >
+                {name}
+            </FormLabel>
+            <FormGroup sx={{ paddingLeft: '1em', paddingRight: '1em', paddingTop: '0.5em', paddingBottom: '0.5em' }}>{children}</FormGroup>
         </FormControl>
     );
 }
@@ -148,9 +152,6 @@ function GenomicsGroup(props) {
         onWrite((old) => ({ ...old, genomic: { genome: selectedGenome } }));
     };
 
-    console.log(chromosomes);
-    console.log(genes);
-
     return (
         <>
             <SidebarGroup name="Reference Genome">
@@ -227,7 +228,7 @@ function Sidebar(props) {
         );
 
     return (
-        <>
+        <div style={{ padding: 0 }}>
             <Tabs value={selectedtab} onChange={setSelectedTab}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
@@ -279,7 +280,7 @@ function Sidebar(props) {
                     isDonorList
                 />
             </SidebarGroup>
-        </>
+        </div>
     );
 }
 
