@@ -144,7 +144,7 @@ function DataVisualization(props) {
     function AddChart(data, chartType) {
         setOpen(false);
         const newdataVisData = [...dataVisData, data];
-        const newDataVisChartType = [...dataVisChartType, chartType];
+        const newDataVisChartType = [...dataVisChartType, validStackedCharts.includes(data) ? 'bar' : chartType];
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
@@ -197,6 +197,7 @@ function DataVisualization(props) {
         );
     }
 
+    const completenessData = ['full_clinical_data', 'full_genomic_data'];
     function returndataVisData() {
         const data = dataVisData.map((item, index) => (
             <Grid item xs={12} sm={12} md={6} lg={3} key={item + index}>
@@ -210,6 +211,7 @@ function DataVisualization(props) {
                     dropDown
                     onRemoveChart={() => removeChart(index)}
                     edit={edit}
+                    grayscale={completenessData.includes(item)}
                 />
             </Grid>
         ));

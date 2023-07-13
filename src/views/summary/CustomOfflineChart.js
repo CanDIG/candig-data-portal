@@ -29,9 +29,7 @@ window.Highcharts = Highcharts;
  * @param {string} datasetName
  * @param {array} dataObject
  */
-
-function CustomOfflineChart(props) {
-    const { chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, loading, orderByFrequency, cutoff } = props;
+function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, grayscale, loading, orderByFrequency, cutoff }) {
     const theme = useTheme();
 
     // State management
@@ -95,6 +93,29 @@ function CustomOfflineChart(props) {
                 data?.forEach((value, key) => {
                     stackSeries.push({ name: key, data: value });
                 });
+                const stackedTheme = grayscale
+                    ? [
+                        theme.palette.grey[200],
+                        theme.palette.grey[300],
+                        theme.palette.grey[500],
+                        theme.palette.grey[600],
+                        theme.palette.grey[700],
+                        theme.palette.grey[900]
+                    ]
+                    : [
+                        theme.palette.secondary[200],
+                        theme.palette.tertiary[200],
+                        theme.palette.primary[200],
+                        theme.palette.secondary.main,
+                        theme.palette.tertiary.main,
+                        theme.palette.primary.main,
+                        theme.palette.secondary.dark,
+                        theme.palette.tertiary.dark,
+                        theme.palette.primary.dark,
+                        theme.palette.secondary[800],
+                        theme.palette.tertiary[800],
+                        theme.palette.primary[800]
+                    ];
 
                 setChartOptions({
                     credits: {
@@ -109,20 +130,7 @@ function CustomOfflineChart(props) {
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
-                    colors: [
-                        theme.palette.secondary[200],
-                        theme.palette.tertiary[200],
-                        theme.palette.primary[200],
-                        theme.palette.secondary.main,
-                        theme.palette.tertiary.main,
-                        theme.palette.primary.main,
-                        theme.palette.secondary.dark,
-                        theme.palette.tertiary.dark,
-                        theme.palette.primary.dark,
-                        theme.palette.secondary[800],
-                        theme.palette.tertiary[800],
-                        theme.palette.primary[800]
-                    ],
+                    colors: stackedTheme,
                     plotOptions: {
                         series: {
                             stacking: 'normal'
@@ -275,7 +283,7 @@ function CustomOfflineChart(props) {
                             <label htmlFor="types">
                                 Chart Types:
                                 <select
-                                    value={chart}
+                                    value="bar"
                                     name="types"
                                     id="types"
                                     onChange={(event) => {
@@ -302,7 +310,6 @@ function CustomOfflineChart(props) {
                                     <option value="line">Line</option>
                                     <option value="column">Column</option>
                                     <option value="scatter">Scatter</option>
-                                    <option value="pie">Pie</option>
                                 </select>
                             </label>
                         )}
@@ -338,6 +345,7 @@ CustomOfflineChart.propTypes = {
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
     onRemoveChart: PropTypes.func,
+    grayscale: PropTypes.bool,
     orderByFrequency: PropTypes.bool,
     cutoff: PropTypes.number
 };
