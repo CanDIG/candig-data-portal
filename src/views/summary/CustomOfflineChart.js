@@ -31,7 +31,21 @@ window.Highcharts = Highcharts;
  */
 
 function CustomOfflineChart(props) {
-    const { chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, loading, orderByFrequency, cutoff, grayscale } = props;
+    const {
+        chartType,
+        data,
+        index,
+        height,
+        dataVis,
+        dataObject,
+        dropDown,
+        onRemoveChart,
+        edit,
+        loading,
+        orderByFrequency,
+        cutoff,
+        grayscale
+    } = props;
     const theme = useTheme();
 
     // State management

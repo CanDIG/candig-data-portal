@@ -145,14 +145,17 @@ function GenomicsGroup(props) {
     const classes = useStyles();
     const referenceGenomes = ['hg38', 'hg36'];
     const [selectedGenome, setSelectedGenome] = useState('hg38');
-    const [selectedChromosomes, setSelectedChromosomes] = useState([]);
-    const [selectedGenes, setSelectedGenes] = useState([]);
+    const [selectedChromosomes, setSelectedChromosomes] = useState('');
+    const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(undefined);
     const [endPos, setEndPos] = useState(undefined);
 
     const HandleChange = (event, changer) => {
         changer(event.target.value);
-        onWrite((old) => ({ ...old, genomic: { genome: selectedGenome } }));
+        onWrite((old) => ({
+            ...old,
+            genomic: { assemblyId: selectedGenome, referenceName: selectedChromosomes, start: startPos, end: endPos }
+        }));
     };
 
     return (
@@ -224,6 +227,8 @@ function Sidebar(props) {
     }
     chromosomes.push('X');
     chromosomes.push('Y');
+    chromosomes.push('');
+    genes?.push('');
 
     const remap = (url, returnName) =>
         fetchFederation(url, 'katsu').then(
