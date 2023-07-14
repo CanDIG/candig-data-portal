@@ -271,8 +271,8 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    grayscale
                     loading={fullClinicalData === undefined}
+                    grayscale
                     orderByFrequency
                     cutoff={10}
                 />
@@ -285,8 +285,8 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    grayscale
                     loading={fullGenomicData === undefined}
+                    grayscale
                     orderByFrequency
                     cutoff={10}
                 />

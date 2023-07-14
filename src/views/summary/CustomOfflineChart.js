@@ -29,23 +29,10 @@ window.Highcharts = Highcharts;
  * @param {string} datasetName
  * @param {array} dataObject
  */
+
 function CustomOfflineChart(props) {
+    const { chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, loading, orderByFrequency, cutoff, grayscale } = props;
     const theme = useTheme();
-    const {
-        chartType,
-        data,
-        index,
-        height,
-        dataVis,
-        dataObject,
-        dropDown,
-        onRemoveChart,
-        edit,
-        grayscale,
-        loading,
-        orderByFrequency,
-        cutoff
-    } = props;
 
     // State management
     const events = useSelector((state) => state);
@@ -110,27 +97,27 @@ function CustomOfflineChart(props) {
                 });
                 const stackedTheme = grayscale
                     ? [
-                          theme.palette.grey[200],
-                          theme.palette.grey[300],
-                          theme.palette.grey[500],
-                          theme.palette.grey[600],
-                          theme.palette.grey[700],
-                          theme.palette.grey[900]
-                      ]
+                        theme.palette.grey[200],
+                        theme.palette.grey[300],
+                        theme.palette.grey[500],
+                        theme.palette.grey[600],
+                        theme.palette.grey[700],
+                        theme.palette.grey[900]
+                    ]
                     : [
-                          theme.palette.secondary[200],
-                          theme.palette.tertiary[200],
-                          theme.palette.primary[200],
-                          theme.palette.secondary.main,
-                          theme.palette.tertiary.main,
-                          theme.palette.primary.main,
-                          theme.palette.secondary.dark,
-                          theme.palette.tertiary.dark,
-                          theme.palette.primary.dark,
-                          theme.palette.secondary[800],
-                          theme.palette.tertiary[800],
-                          theme.palette.primary[800]
-                      ];
+                        theme.palette.secondary[200],
+                        theme.palette.tertiary[200],
+                        theme.palette.primary[200],
+                        theme.palette.secondary.main,
+                        theme.palette.tertiary.main,
+                        theme.palette.primary.main,
+                        theme.palette.secondary.dark,
+                        theme.palette.tertiary.dark,
+                        theme.palette.primary.dark,
+                        theme.palette.secondary[800],
+                        theme.palette.tertiary[800],
+                        theme.palette.primary[800]
+                    ];
 
                 setChartOptions({
                     credits: {

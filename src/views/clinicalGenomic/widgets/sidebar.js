@@ -20,6 +20,9 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 import { fetchFederation } from '../../../store/api';
 
+import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { fetchFederation } from '../../../store/api';
+
 const useStyles = makeStyles((theme) => ({
     tab: {
         minWidth: 40
@@ -228,7 +231,7 @@ function Sidebar(props) {
         );
 
     return (
-        <div style={{ padding: 0 }}>
+        <>
             <Tabs value={selectedtab} onChange={setSelectedTab}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
@@ -280,7 +283,7 @@ function Sidebar(props) {
                     isDonorList
                 />
             </SidebarGroup>
-        </div>
+        </>
     );
 }
 
