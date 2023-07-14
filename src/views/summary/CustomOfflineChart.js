@@ -109,29 +109,29 @@ function CustomOfflineChart(props) {
                 data?.forEach((value, key) => {
                     stackSeries.push({ name: key, data: value });
                 });
-                const stackedTheme = grayscale
-                    ? [
-                        theme.palette.grey[200],
-                        theme.palette.grey[300],
-                        theme.palette.grey[500],
-                        theme.palette.grey[600],
-                        theme.palette.grey[700],
-                        theme.palette.grey[900]
-                    ]
-                    : [
-                        theme.palette.secondary[200],
-                        theme.palette.tertiary[200],
-                        theme.palette.primary[200],
-                        theme.palette.secondary.main,
-                        theme.palette.tertiary.main,
-                        theme.palette.primary.main,
-                        theme.palette.secondary.dark,
-                        theme.palette.tertiary.dark,
-                        theme.palette.primary.dark,
-                        theme.palette.secondary[800],
-                        theme.palette.tertiary[800],
-                        theme.palette.primary[800]
-                    ];
+                const grayscaleTheme = [
+                    theme.palette.grey[200],
+                    theme.palette.grey[300],
+                    theme.palette.grey[500],
+                    theme.palette.grey[600],
+                    theme.palette.grey[700],
+                    theme.palette.grey[900]
+                ];
+                const colouredTheme = [
+                    theme.palette.secondary[200],
+                    theme.palette.tertiary[200],
+                    theme.palette.primary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.tertiary.main,
+                    theme.palette.primary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.tertiary.dark,
+                    theme.palette.primary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[800],
+                    theme.palette.primary[800]
+                ];
+                const stackedTheme = grayscale ? grayscaleTheme : colouredTheme;
 
                 setChartOptions({
                     credits: {

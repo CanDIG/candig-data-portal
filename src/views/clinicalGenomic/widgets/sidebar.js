@@ -20,9 +20,6 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 import { fetchFederation } from '../../../store/api';
 
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
-import { fetchFederation } from '../../../store/api';
-
 const useStyles = makeStyles((theme) => ({
     tab: {
         minWidth: 40
