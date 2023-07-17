@@ -13,8 +13,8 @@ import {
     Autocomplete,
     TextField
 } from '@mui/material';
-import { TreeView } from '@mui/lab';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { makeStyles, useTheme } from '@mui/styles';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
@@ -44,7 +44,6 @@ function SidebarGroup(props) {
     const { name, children } = props;
     const classes = useStyles();
 
-    console.log(children);
     return (
         <FormControl className={classes.form} component="fieldset" variant="standard">
             <FormLabel
@@ -140,6 +139,7 @@ function StyledCheckboxList(props) {
 function GenomicsGroup(props) {
     const { chromosomes, genes, onWrite } = props;
     const classes = useStyles();
+    // Genomic data
     const referenceGenomes = ['hg38', 'hg36'];
     const [selectedGenome, setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
@@ -172,6 +172,7 @@ function GenomicsGroup(props) {
             </SidebarGroup>
             <SidebarGroup name="Chromosome">
                 <Autocomplete
+                    size="small"
                     options={chromosomes || []}
                     onChange={(event) => HandleChange(event, setSelectedChromosomes)}
                     renderInput={(params) => <TextField {...params} />}
@@ -180,6 +181,7 @@ function GenomicsGroup(props) {
             </SidebarGroup>
             <SidebarGroup name="Gene Search">
                 <Autocomplete
+                    size="small"
                     options={genes || []}
                     onChange={(event) => HandleChange(event, setSelectedGenes)}
                     renderInput={(params) => <TextField {...params} />}
@@ -187,8 +189,8 @@ function GenomicsGroup(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
-                <TextField label="Start" type="number" />
-                <TextField label="End" type="number" />
+                <TextField sx={{ paddingBottom: '1em' }} size="small" label="Start" type="number" />
+                <TextField size="small" label="End" type="number" />
             </SidebarGroup>
         </>
     );
@@ -199,6 +201,32 @@ function Sidebar(props) {
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
     const classes = useStyles();
+
+    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+    const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+    // Clinical data
+    const [selectedCohorts, setSelectedCohorts] = useState([]);
+    const [selectedTumourPrimarySites, setSelectedTumourPrimarySites] = useState([]);
+    const [selectedTreatmentTypes, setSelectedTreatmentTypes] = useState([]);
+    const [selectedChemotherapyDrugNames, setSelectedChemotherapyDrugNames] = useState([]);
+    const [selectedImmunotherapyDrugNames, setSelectedImmunotherapyDrugNames] = useState([]);
+    const [selectedHormoneTherapyDrugNames, setSelectedHormoneTherapyDrugNames] = useState([]);
+
+    const HandleChange = (event, changer) => {
+        changer(event.target.value);
+        writerContext((old) => ({
+            ...old,
+            clinical: {
+                cohorts: selectedCohorts,
+                tumourPrimarySites: selectedTumourPrimarySites,
+                treatmentTypes: selectedTreatmentTypes,
+                chemotherapyDrugNames: selectedChemotherapyDrugNames,
+                immunotherapyDrugNames: selectedImmunotherapyDrugNames,
+                hormoneTherapyDrugNames: selectedHormoneTherapyDrugNames
+            }
+        }));
+    };
 
     // Fill up a list of options from the results of a Katsu query
     // This includes treatment types within the dataset, etc.
@@ -247,13 +275,37 @@ function Sidebar(props) {
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} />
             <SidebarGroup name="Treatment">
-                <StyledCheckboxList
+                <Autocomplete
+                    size="small"
+                    multiple
+                    id="checkboxes-tags-treatment"
+                    options={treatmentTypes || []}
+                    disableCloseOnSelect
+                    renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                            <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
+                            {option}
+                        </li>
+                    )}
+                    renderInput={(params) => <TextField {...params} label="Treatment Type" />}
+                    // set width to match parent
+                    sx={{ width: '100%' }}
+                    onChange={(event) => HandleChange(event, setSelectedTreatmentTypes)}
+                />
+                {/* <Autocomplete
+                    size="small"
+                    options={chromosomes || []}
+                    onChange={(event) => HandleChange(event, setSelectedChromosomes)}
+                    renderInput={(params) => <TextField {...params} />}
+                    value={selectedChromosomes}
+                /> */}
+                {/* <StyledCheckboxList
                     options={treatmentTypes}
                     onWrite={writerContext}
                     groupName="treatment"
                     remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
                     isDonorList
-                />
+                /> */}
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
                 <StyledCheckboxList options={tumourPrimarySites} onWrite={writerContext} groupName="primary_site" />

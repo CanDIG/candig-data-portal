@@ -86,7 +86,6 @@ function PatientCountSingle(props) {
 
             {expanded ? (
                 Object.keys(counts.totals).map((cohort) => {
-                    console.log(counts);
                     const locked = !counts.unlockedPrograms?.some((programID) => programID === cohort);
                     return (
                         <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort} className={classes.container}>
