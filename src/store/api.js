@@ -40,7 +40,7 @@ export function fetchFederationStat(endpoint) {
             if (response.ok) {
                 return response.json();
             }
-            return {};
+            return [];
         })
         .catch((error) => {
             console.log(`Error: ${error}`);
@@ -66,7 +66,7 @@ export function fetchFederation(path, service) {
             if (response.ok) {
                 return response.json();
             }
-            return {};
+            return [];
         })
         .catch((error) => {
             console.log(`Error: ${error}`);
@@ -122,22 +122,26 @@ Fetch variant for a specific Dataset Id; start; and reference name; and returns 
  * @param {number}... End
  * @param {string}... Reference name
 */
-export function searchVariant(chromosome, start, end) {
+export function searchVariant(chromosome, start, end, assemblyId = 'hg37') {
     const payload = {
-        regions: [
-            {
+        query: {
+            requestParameters: {
                 referenceName: chromosome,
-                start: parseInt(start, 10),
-                end: parseInt(end, 10)
+                assemblyId,
+                start: [parseInt(start, 10) || 0],
+                end: [parseInt(end, 10) || 100000]
             }
-        ]
+        },
+        meta: {
+            apiVersion: 'v2'
+        }
     };
     return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'POST',
-            path: 'htsget/v1/variants/search',
+            path: 'beacon/v2/g_variants',
             payload,
             service: 'htsget'
         })
@@ -146,7 +150,7 @@ export function searchVariant(chromosome, start, end) {
             if (response.ok) {
                 return response.json();
             }
-            return {};
+            return [];
         })
         .catch((error) => {
             console.log('Error:', error);

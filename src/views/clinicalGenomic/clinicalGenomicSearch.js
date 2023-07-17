@@ -90,8 +90,9 @@ function ClinicalGenomicSearch() {
             {/* Top bar */}
             <AppBar
                 component="nav"
-                className={`${classes.stickytop} ${classes.headerSpacing} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
-                    }`}
+                className={`${classes.stickytop} ${classes.headerSpacing} ${
+                    sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
+                }`}
             >
                 <Toolbar sx={{ padding: '5px' }}>
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>

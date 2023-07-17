@@ -99,7 +99,7 @@ function StyledCheckboxList(props) {
                 });
                 onWrite((old) => {
                     if (!isDonorList) {
-                        const retVal = old?.query.filter((name) => name !== groupName);
+                        const retVal = old?.query?.filter((name) => name !== groupName);
                         return { ...old, query: retVal };
                     }
 
@@ -144,8 +144,8 @@ function GenomicsGroup(props) {
     const [selectedGenome, setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
-    const [startPos, setStartPos] = useState(undefined);
-    const [endPos, setEndPos] = useState(undefined);
+    const [startPos, setStartPos] = useState(0);
+    const [endPos, setEndPos] = useState(0);
 
     const HandleChange = (event, changer) => {
         changer(event.target.value);
@@ -189,8 +189,15 @@ function GenomicsGroup(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
-                <TextField sx={{ paddingBottom: '1em' }} size="small" label="Start" type="number" />
-                <TextField size="small" label="End" type="number" />
+                <TextField
+                    sx={{ paddingBottom: '1em' }}
+                    size="small"
+                    label="Start"
+                    type="number"
+                    value={startPos}
+                    onChange={(event) => HandleChange(event, setStartPos)}
+                />
+                <TextField size="small" label="End" type="number" value={endPos} onChange={(event) => HandleChange(event, setEndPos)} />
             </SidebarGroup>
         </>
     );
@@ -247,6 +254,7 @@ function Sidebar(props) {
     const hormoneTherapyDrugNames = ExtractSidebarElements('hormone_therapy_drug_names');
     const chromosomes = [];
     const genes = readerContext?.genes;
+
     for (let i = 0; i < 23; i += 1) {
         chromosomes.push(i);
     }

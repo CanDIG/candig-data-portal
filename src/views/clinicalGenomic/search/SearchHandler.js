@@ -105,12 +105,42 @@ function SearchHandler() {
                     return data;
                 }),
                 'clinical'
-            ).then((data) => {
-                // Recursively query the genomics data until we have all the data we need
-                // NB: This needs to be moved to the backend somewhere. The UI should not be responsible for this.
-                const CLINICAL_PAGE_SIZE = 10;
-                searchVariant(reader.genome?.referenceName, reader.genome?.start, reader.genome?.end, reader.genome?.assemblyId);
-            });
+            )
+                .then(() =>
+                    // Grab the specimens from the backend
+                    fetchFederation('v2/authorized/specimens', 'katsu')
+                )
+                .then((data) => {
+                    // We may need to query the HTSGet portion in order to do genomics search.
+                    // It's important to note here that we're basically only using HTSGet to _filter_ the results from Katsu
+                    const needToCheckHTSGet = reader.genomic?.start || reader.genomic?.end || reader.genomic?.assemblyId;
+                    if (needToCheckHTSGet) {
+                        searchVariant(
+                            reader.genomic?.referenceName,
+                            reader.genomic?.start,
+                            reader.genomic?.end,
+                            reader.genomic?.assemblyId
+                        ).then((htsgetData) => {
+                            // Parse out the response from Beacon
+                            if (reader.query && Object.keys(reader.query).length > 0) {
+                                // If there is a clinical search going on, we need to cross-reference with the responses we got there
+                                if (finalList == null || finalList.length <= 0) {
+                                    // No data: don't go further
+                                    console.log('All data excluded');
+                                    return;
+                                }
+                            }
+
+                            // Just put this in front of the rest of the api and let them figure it out
+                            console.log(htsgetData);
+                            const htsgetIDs = htsgetData?.response?.map((caseData) => caseData.genomic_id) || [];
+                            data = data.filter((id) => htsgetIDs.includes(id));
+                            writer((old) => ({ ...old, genomic: data }));
+                        });
+                    } else {
+                        writer((old) => ({ ...old, genomic: data }));
+                    }
+                });
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
@@ -135,6 +165,7 @@ function SearchHandler() {
     }, [JSON.stringify(reader.donorID)]);
 
     // We don't really implement a graphical component
+    // NB: This might be a good reason to have this be a function call instead of what it currently is.
     return <></>;
 }
 
