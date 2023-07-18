@@ -288,11 +288,16 @@ function Sidebar(props) {
                     groupName="treatment"
                     remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
                     isDonorList
-                    useAutoComplete
+                    useAutoComplete={treatmentTypes.length >= 10}
                 />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
-                <StyledCheckboxList options={tumourPrimarySites} onWrite={writerContext} groupName="primary_site" />
+                <StyledCheckboxList
+                    options={tumourPrimarySites}
+                    onWrite={writerContext}
+                    groupName="primary_site"
+                    useAutoComplete={tumourPrimarySites.length >= 10}
+                />
             </SidebarGroup>
             <SidebarGroup name="Chemotherapy">
                 <StyledCheckboxList
@@ -301,6 +306,7 @@ function Sidebar(props) {
                     groupName="chemotherapy"
                     remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
+                    seAutoComplete={chemotherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
             <SidebarGroup name="Immunotherapy">
@@ -310,6 +316,7 @@ function Sidebar(props) {
                     groupName="immunotherapy"
                     remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
+                    seAutoComplete={immunotherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
             <SidebarGroup name="Hormone Therapy">
@@ -319,6 +326,7 @@ function Sidebar(props) {
                     groupName="hormone_therapy"
                     remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
+                    seAutoComplete={hormoneTherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
         </>
