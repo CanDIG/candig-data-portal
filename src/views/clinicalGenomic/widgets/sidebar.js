@@ -57,9 +57,12 @@ function SidebarGroup(props) {
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, remap, onWrite, options } = props;
+    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete } = props;
     const [checked, setChecked] = useState({});
     const classes = useStyles();
+
+    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+    const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
     const HandleChange = (option, isChecked) => {
         // If we need to call some mapping function, do so
@@ -103,11 +106,11 @@ function StyledCheckboxList(props) {
                         return { ...old, query: retVal };
                     }
 
-                    const retVal = Object.entries(old?.donorLists?.[groupName])?.filter(([key]) => key !== option);
+                    const retVal = Object.entries(old?.donorLists?.[groupName] || {})?.filter(([key]) => key !== option);
 
                     // Remove the list entirely if we are the last one
                     if (retVal.length <= 0) {
-                        const { [groupName]: _, ...rest } = old?.donorLists;
+                        const { [groupName]: _, ...rest } = old?.donorLists || {};
                         return { ...old, donorLists: rest };
                     }
 
@@ -118,20 +121,42 @@ function StyledCheckboxList(props) {
         });
     };
 
-    return options?.map((option) => (
-        <FormControlLabel
-            label={option}
-            control={
-                <Checkbox
-                    className={classes.checkbox}
-                    checked={option in checked}
-                    onChange={(event) => HandleChange(option, event.target.checked)}
-                />
-            }
-            key={option}
-            className={classes.checkboxLabel}
+    return useAutoComplete ? (
+        <Autocomplete
+            size="small"
+            multiple
+            id="checkboxes-tags-treatment"
+            options={options}
+            disableCloseOnSelect
+            renderOption={(props, option, { selected }) => (
+                <li {...props} value={option}>
+                    <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} value={option} />
+                    {option}
+                </li>
+            )}
+            renderInput={(params) => <TextField {...params} label={groupName} />}
+            // set width to match parent
+            sx={{ width: '100%' }}
+            onChange={(event, _, reason) => {
+                HandleChange(event.target.getAttribute('value'), reason === 'selectOption');
+            }}
         />
-    ));
+    ) : (
+        options?.map((option) => (
+            <FormControlLabel
+                label={option}
+                control={
+                    <Checkbox
+                        className={classes.checkbox}
+                        checked={option in checked}
+                        onChange={(event) => HandleChange(option, event.target.checked)}
+                    />
+                }
+                key={option}
+                className={classes.checkboxLabel}
+            />
+        ))
+    );
 }
 // A group of genomics data
 // Keeping this separate from the rest as it's all somewhat self-contained
@@ -140,7 +165,7 @@ function GenomicsGroup(props) {
     const { chromosomes, genes, onWrite } = props;
     const classes = useStyles();
     // Genomic data
-    const referenceGenomes = ['hg38', 'hg36'];
+    const referenceGenomes = ['hg38', 'hg37', 'hg36'];
     const [selectedGenome, setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
@@ -209,32 +234,6 @@ function Sidebar(props) {
     const writerContext = useSearchQueryWriterContext();
     const classes = useStyles();
 
-    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-    const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
-    // Clinical data
-    const [selectedCohorts, setSelectedCohorts] = useState([]);
-    const [selectedTumourPrimarySites, setSelectedTumourPrimarySites] = useState([]);
-    const [selectedTreatmentTypes, setSelectedTreatmentTypes] = useState([]);
-    const [selectedChemotherapyDrugNames, setSelectedChemotherapyDrugNames] = useState([]);
-    const [selectedImmunotherapyDrugNames, setSelectedImmunotherapyDrugNames] = useState([]);
-    const [selectedHormoneTherapyDrugNames, setSelectedHormoneTherapyDrugNames] = useState([]);
-
-    const HandleChange = (event, changer) => {
-        changer(event.target.value);
-        writerContext((old) => ({
-            ...old,
-            clinical: {
-                cohorts: selectedCohorts,
-                tumourPrimarySites: selectedTumourPrimarySites,
-                treatmentTypes: selectedTreatmentTypes,
-                chemotherapyDrugNames: selectedChemotherapyDrugNames,
-                immunotherapyDrugNames: selectedImmunotherapyDrugNames,
-                hormoneTherapyDrugNames: selectedHormoneTherapyDrugNames
-            }
-        }));
-    };
-
     // Fill up a list of options from the results of a Katsu query
     // This includes treatment types within the dataset, etc.
     const ExtractSidebarElements = (key) => {
@@ -283,37 +282,14 @@ function Sidebar(props) {
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} />
             <SidebarGroup name="Treatment">
-                <Autocomplete
-                    size="small"
-                    multiple
-                    id="checkboxes-tags-treatment"
-                    options={treatmentTypes || []}
-                    disableCloseOnSelect
-                    renderOption={(props, option, { selected }) => (
-                        <li {...props}>
-                            <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
-                            {option}
-                        </li>
-                    )}
-                    renderInput={(params) => <TextField {...params} label="Treatment Type" />}
-                    // set width to match parent
-                    sx={{ width: '100%' }}
-                    onChange={(event) => HandleChange(event, setSelectedTreatmentTypes)}
-                />
-                {/* <Autocomplete
-                    size="small"
-                    options={chromosomes || []}
-                    onChange={(event) => HandleChange(event, setSelectedChromosomes)}
-                    renderInput={(params) => <TextField {...params} />}
-                    value={selectedChromosomes}
-                /> */}
-                {/* <StyledCheckboxList
+                <StyledCheckboxList
                     options={treatmentTypes}
                     onWrite={writerContext}
                     groupName="treatment"
                     remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
                     isDonorList
-                /> */}
+                    useAutoComplete
+                />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
                 <StyledCheckboxList options={tumourPrimarySites} onWrite={writerContext} groupName="primary_site" />
