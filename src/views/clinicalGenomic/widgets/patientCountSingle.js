@@ -113,7 +113,7 @@ function PatientCountSingle(props) {
                             <Divider flexItem orientation="vertical" className={classes.divider} />
                             <Grid item xs={1} ml="auto" className={classes.button}>
                                 {locked ? (
-                                    <Button type="submit" variant="contained" sx={{ borderRadius: 1.8 }}>
+                                    <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>
                                         Request&nbsp;Access
                                     </Button>
                                 ) : (

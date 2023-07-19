@@ -66,6 +66,8 @@ function StyledCheckboxList(props) {
 
     const HandleChange = (option, isChecked) => {
         // If we need to call some mapping function, do so
+        console.log(option);
+        console.log(isChecked);
         let getID = new Promise((resolve) => resolve(option));
         if (remap) {
             getID = remap(option);
@@ -137,8 +139,8 @@ function StyledCheckboxList(props) {
             renderInput={(params) => <TextField {...params} label={groupName} />}
             // set width to match parent
             sx={{ width: '100%' }}
-            onChange={(event, _, reason) => {
-                HandleChange(event.target.getAttribute('value'), reason === 'selectOption');
+            onChange={(_, __, reason, details) => {
+                HandleChange(details.option, reason === 'selectOption');
             }}
         />
     ) : (

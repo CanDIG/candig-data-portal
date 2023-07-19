@@ -114,7 +114,7 @@ function GenomicData() {
     ];
 
     const queryParams = query?.gene || `${query?.chromosome}:${query?.start}-${query?.end}`;
-    const hasValidQuery = query?.referenceName && query?.start && query?.end || query?.gene;
+    const hasValidQuery = (query?.referenceName && query?.start && query?.end) || query?.gene;
 
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
