@@ -63,16 +63,18 @@ function GenomicData() {
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
+        console.log(searchResults);
         rows =
-            searchResults
-                ?.map((site) => site.results?.results)
-                ?.filter((entry) => entry !== undefined)
-                ?.flat(1)
-                ?.map((patient, index) => {
-                    // Make sure each row has an ID
-                    patient.id = index;
-                    return patient;
-                }) || [];
+            searchResults?.map((patient, index) => {
+                console.log(patient);
+                // Make sure each row has an ID
+                patient.id = index;
+                patient.genotypeLabel = patient.genotype.value;
+                patient.zygosityLabel = patient.genotype.zygosity?.label || "";
+                patient.location = patient.location.name;
+                return patient;
+            }) || [];
+        console.log(rows);
     }
 
     const jsonTheme = {
@@ -105,10 +107,11 @@ function GenomicData() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220 },
-        { field: 'submitter_specimen_id', headerName: 'Specimen ID', minWidth: 170 },
-        { field: 'tumour_grading_system', headerName: 'Tumour Grading System', minWidth: 170 },
-        { field: 'tumour_grade', headerName: 'Tumour Grade', minWidth: 200 }
+        { field: 'location', headerName: 'Location', minWidth: 200 },
+        { field: 'biosampleId', headerName: 'Specimen ID', minWidth: 220 },
+        { field: 'analysisId', headerName: 'Analysis ID', minWidth: 170 },
+        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 170 },
+        { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
     ];
 
     return (

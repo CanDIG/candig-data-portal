@@ -93,7 +93,7 @@ function StyledCheckboxList(props) {
                             }
                         };
                     }
-                    return { ...old, query: { groupName: ids } };
+                    return { ...old, query: { [groupName]: ids } };
                 });
             } else {
                 setChecked((old) => {
@@ -172,8 +172,8 @@ function GenomicsGroup(props) {
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
 
-    const HandleChange = (event, changer) => {
-        changer(event.target.value);
+    const HandleChange = (value, changer) => {
+        changer(value);
         onWrite((old) => ({
             ...old,
             genomic: { assemblyId: selectedGenome, referenceName: selectedChromosomes, start: startPos, end: endPos }
@@ -183,7 +183,7 @@ function GenomicsGroup(props) {
     return (
         <>
             <SidebarGroup name="Reference Genome">
-                <RadioGroup onChange={(event) => HandleChange(event, setSelectedGenome)} value={selectedGenome}>
+                <RadioGroup onChange={(event) => HandleChange(event.target.value, setSelectedGenome)} value={selectedGenome}>
                     {referenceGenomes.map((genome) => (
                         <FormControlLabel
                             label={genome}
@@ -199,7 +199,7 @@ function GenomicsGroup(props) {
                 <Autocomplete
                     size="small"
                     options={chromosomes || []}
-                    onChange={(event) => HandleChange(event, setSelectedChromosomes)}
+                    onChange={(_, value) => HandleChange(value, setSelectedChromosomes)}
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedChromosomes}
                 />
@@ -208,7 +208,7 @@ function GenomicsGroup(props) {
                 <Autocomplete
                     size="small"
                     options={genes || []}
-                    onChange={(event) => HandleChange(event, setSelectedGenes)}
+                    onChange={(_, value) => HandleChange(value, setSelectedGenes)}
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedGenes}
                 />
@@ -220,9 +220,15 @@ function GenomicsGroup(props) {
                     label="Start"
                     type="number"
                     value={startPos}
-                    onChange={(event) => HandleChange(event, setStartPos)}
+                    onChange={(event) => HandleChange(event.target.value, setStartPos)}
                 />
-                <TextField size="small" label="End" type="number" value={endPos} onChange={(event) => HandleChange(event, setEndPos)} />
+                <TextField
+                    size="small"
+                    label="End"
+                    type="number"
+                    value={endPos}
+                    onChange={(event) => HandleChange(event.target.value, setEndPos)}
+                />
             </SidebarGroup>
         </>
     );
@@ -255,7 +261,7 @@ function Sidebar(props) {
     const genes = readerContext?.genes;
 
     for (let i = 0; i < 23; i += 1) {
-        chromosomes.push(i);
+        chromosomes.push(`${i}`);
     }
     chromosomes.push('X');
     chromosomes.push('Y');

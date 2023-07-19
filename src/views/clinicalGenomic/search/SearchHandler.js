@@ -112,34 +112,41 @@ function SearchHandler() {
                 )
                 .then((data) => {
                     // We may need to query the HTSGet portion in order to do genomics search.
-                    // It's important to note here that we're basically only using HTSGet to _filter_ the results from Katsu
-                    const needToCheckHTSGet = reader.genomic?.start || reader.genomic?.end || reader.genomic?.assemblyId;
-                    if (needToCheckHTSGet) {
-                        searchVariant(
-                            reader.genomic?.referenceName,
-                            reader.genomic?.start,
-                            reader.genomic?.end,
-                            reader.genomic?.assemblyId
-                        ).then((htsgetData) => {
-                            // Parse out the response from Beacon
-                            if (reader.query && Object.keys(reader.query).length > 0) {
-                                // If there is a clinical search going on, we need to cross-reference with the responses we got there
-                                if (finalList == null || finalList.length <= 0) {
-                                    // No data: don't go further
-                                    console.log('All data excluded');
-                                    return;
-                                }
-                            }
+                    /* searchVariant(
+                        reader.genomic?.referenceName,
+                        reader.genomic?.start,
+                        reader.genomic?.end,
+                        reader.genomic?.assemblyId
+                    ).then((htsgetData) => { */
+                    searchVariant(
+                        "21",
+                        "5030000",
+                        "5030847",
+                        reader.genomic?.assemblyId
+                    ).then((htsgetData) => {
+                        // Parse out the response from Beacon
+                        const htsgetFilteredData = htsgetData
+                            .map((loc) => {
+                                const handovers = loc.results?.beaconHandovers;
+                                return loc.results.response.map((response, index) => {
+                                    return response.caseLevelData
+                                        .filter((caseData) => {
+                                            if (reader.query && Object.keys(reader.query).length > 0) {
+                                                return finalList !== null && finalList.contains(caseData.biosampleId);
+                                            }
+                                            return true;
+                                        })
+                                        .map((caseData) => {
+                                            caseData.beaconHandover = handovers[0];
+                                            caseData.location = loc.location;
+                                            return caseData;
+                                        });
+                                });
+                            })
+                            .flat(2);
 
-                            // Just put this in front of the rest of the api and let them figure it out
-                            console.log(htsgetData);
-                            const htsgetIDs = htsgetData?.response?.map((caseData) => caseData.genomic_id) || [];
-                            data = data.filter((id) => htsgetIDs.includes(id));
-                            writer((old) => ({ ...old, genomic: data }));
-                        });
-                    } else {
-                        writer((old) => ({ ...old, genomic: data }));
-                    }
+                        writer((old) => ({ ...old, genomic: htsgetFilteredData }));
+                    });
                 });
 
         if (lastPromise === null) {
