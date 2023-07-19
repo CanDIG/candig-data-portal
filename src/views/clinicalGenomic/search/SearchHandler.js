@@ -81,6 +81,7 @@ function SearchHandler() {
             });
         }
 
+        // From the donorLists, AND/OR them as needed until we have just one final list of acceptable donors
         let finalList = null;
         if (reader.donorLists && Object.keys(reader.donorLists).length > 0) {
             const allLists = Object.keys(reader.donorLists)?.map((key) =>
@@ -101,13 +102,113 @@ function SearchHandler() {
         const donorQueryPromise = () =>
             trackPromise(
                 fetchFederation(url, 'katsu').then((data) => {
-                    writer((old) => ({ ...old, clinical: data }));
-                    return data;
+                    // We need to do two things:
+                    // 1. Push the raw data into the context
+                    // 2. Go through the data and fill out our pseudo-discovery queries for data vis
+                    const discoveryCounts = {
+                        diagnosis_age_count: {},
+                        treatment_type_count: {},
+                        cancer_type_count: {},
+                        patients_per_cohort: {},
+
+                        // Below is test data
+                        full_clinical_data: {
+                            BCGSC: {
+                                POG: 30
+                            },
+                            UHN: {
+                                POG: 14,
+                                Inspire: 20,
+                                Biocan: 20,
+                                Biodiva: 10
+                            },
+                            C3G: {
+                                MOCK: 30
+                            }
+                        },
+                        full_genomic_data: {
+                            BCGSC: {
+                                POG: 10
+                            },
+                            UHN: {
+                                POG: 4,
+                                Inspire: 10,
+                                Biocan: 12,
+                                Biodiva: 12
+                            },
+                            C3G: {
+                                MOCK: 3
+                            }
+                        }
+                    };
+
+                    // Add to a dictionary, or increment its value if it already exists
+                    const addOrReplace = (dict, value) => {
+                        if (value in dict) {
+                            dict[value] += 1;
+                        } else {
+                            dict[value] = 1;
+                        }
+                    };
+
+                    // Go through the donors we have, fill out our data visualization counts
+                    const donorToDOB = {};
+                    data.forEach((loc) => {
+                        discoveryCounts.patients_per_cohort[loc.location.name] = {};
+                        loc?.results?.results?.forEach((donor) => {
+                            if (donor.date_of_birth) {
+                                donorToDOB[donor.submitter_donor_id] = donor.date_of_birth;
+                            }
+                            donor.primary_site.forEach((site) => addOrReplace(discoveryCounts.cancer_type_count, site));
+                            addOrReplace(discoveryCounts.patients_per_cohort[loc.location.name], donor.program_id);
+                        });
+                    });
+
+                    // Finally, to finish out our counts, we need to query the primary diagnoses
+                    return fetchFederation('v2/authorized/treatments', 'katsu')
+                        .then((treatments) => {
+                            treatments.forEach((loc) => {
+                                loc?.results?.results?.forEach((treatment) => {
+                                    if (treatment.submitter_donor_id in donorToDOB) {
+                                        treatment.treatment_type.forEach((treatmentType) => {
+                                            addOrReplace(discoveryCounts.treatment_type_count, treatmentType);
+                                        });
+                                    }
+                                });
+                            });
+                        })
+                        .then(() => fetchFederation('v2/authorized/primary_diagnoses', 'katsu'))
+                        .then((diagnoses) => {
+                            diagnoses.forEach((loc) => {
+                                loc?.results?.results?.forEach((diagnosis) => {
+                                    if (diagnosis.submitter_donor_id in donorToDOB && diagnosis.date_of_diagnosis) {
+                                        // Convert this to an age range
+                                        const diagDate = diagnosis.date_of_diagnosis.split('-');
+                                        const birthDate = donorToDOB[diagnosis.submitter_donor_id].split('-');
+                                        let ageAtDiagnosis = diagDate[0] - birthDate[0] + (diagDate[1] >= birthDate[1] ? 1 : 0);
+                                        ageAtDiagnosis -= ageAtDiagnosis % 10;
+
+                                        if (ageAtDiagnosis < 20) {
+                                            ageAtDiagnosis = '0-19 Years';
+                                        } else if (ageAtDiagnosis > 79) {
+                                            ageAtDiagnosis = '80+ Years';
+                                        } else {
+                                            ageAtDiagnosis = `${ageAtDiagnosis}-${ageAtDiagnosis + 9} Years`;
+                                        }
+                                        addOrReplace(discoveryCounts.diagnosis_age_count, ageAtDiagnosis);
+
+                                        delete donorToDOB[diagnosis.submitter_donor_id];
+                                    }
+                                });
+                            });
+                            writer((old) => ({ ...old, clinical: data, counts: discoveryCounts }));
+                        });
                 }),
                 'clinical'
             )
                 .then(() =>
                     // Grab the specimens from the backend
+                    // TODO: Make this use the specimens list from above, which I can do as soon as I get my changes into Katsu
                     fetchFederation('v2/authorized/specimens', 'katsu')
                 )
                 .then((data) => {

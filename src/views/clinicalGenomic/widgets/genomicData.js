@@ -63,7 +63,6 @@ function GenomicData() {
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
-        console.log(searchResults);
         rows =
             searchResults?.map((patient, index) => {
                 // Make sure each row has an ID

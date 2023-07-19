@@ -23,54 +23,14 @@ import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 
 function DataVisualization(props) {
     // Hooks
-    const resultsContext = useSearchResultsReaderContext();
+    const resultsContext = useSearchResultsReaderContext().counts;
     // Plan for context below see current dataVis for expected shape
-    // const dataVis = context?.dataVis;
+    // const dataVis = resultsContext || {};
     const dataVis = {
-        diagnosis_age_count: {
-            '0-19 Years': 10,
-            '20-29 Years': 20,
-            '30-39 Years': 40,
-            '40-49 Years': 60,
-            '50-59 Years': 50,
-            '60-69 Years': 55,
-            '70-79 Years': 20,
-            '80+ Years': 15
-        },
-        treatment_type_count: {
-            Palate: 1,
-            'Rectosigmoid junction': 1,
-            Tonsil: 3,
-            'Other and unspecified parts of mouth': 1,
-            Oropharynx: 1,
-            'Parotid gland': 2,
-            'Other and unspecified parts of tongue': 1,
-            'Other and unspecified parts of biliary tract': 1,
-            Gum: 3
-        },
-        cancer_type_count: {
-            'Breast C50.9': 50,
-            'Ovary C56.9': 5,
-            'Trachea C33': 30,
-            'Cardia C16.0': 20,
-            'Pancreas C25.9': 40,
-            'Colon C18': 60,
-            'Tonsil C09': 50
-        },
-        patients_per_cohort: {
-            BCGSC: {
-                POG: 50
-            },
-            UHN: {
-                POG: 67,
-                Inspire: 30,
-                Biocan: 50,
-                Biodiva: 30
-            },
-            C3G: {
-                MOCK: 50
-            }
-        },
+        diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
+        treatment_type_count: resultsContext?.treatment_type_count || {},
+        cancer_type_count: resultsContext?.cancer_type_count || {},
+        patients_per_cohort: resultsContext?.patients_per_cohort || {},
         full_clinical_data: {
             BCGSC: {
                 POG: 30
