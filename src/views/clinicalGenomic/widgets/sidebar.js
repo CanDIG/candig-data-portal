@@ -66,8 +66,6 @@ function StyledCheckboxList(props) {
 
     const HandleChange = (option, isChecked) => {
         // If we need to call some mapping function, do so
-        console.log(option);
-        console.log(isChecked);
         let getID = new Promise((resolve) => resolve(option));
         if (remap) {
             getID = remap(option);

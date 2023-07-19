@@ -83,8 +83,6 @@ function SearchHandler() {
 
         let finalList = null;
         if (reader.donorLists && Object.keys(reader.donorLists).length > 0) {
-            console.log('New query:');
-            console.log(reader.donorLists);
             const allLists = Object.keys(reader.donorLists)?.map((key) =>
                 // Lists from the same queries are OR'd together
                 [...new Set(Object.values(reader?.donorLists[key])?.flat(1))]
