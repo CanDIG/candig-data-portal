@@ -67,14 +67,15 @@ function GenomicData() {
         rows =
             searchResults?.map((patient, index) => {
                 // Make sure each row has an ID
-                patient.id = index;
-                patient.genotypeLabel = patient.genotype.value;
+                const retVal = { ...patient };
+                retVal.id = index;
+                retVal.genotypeLabel = patient.genotype.value;
                 if (patient.genotype.secondaryAlleleIds) {
-                    patient.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
+                    retVal.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
                 }
-                patient.zygosityLabel = patient.genotype.zygosity?.label || '';
-                patient.location = patient.location.name;
-                return patient;
+                retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
+                retVal.location = patient.location.name;
+                return retVal;
             }) || [];
     }
 
@@ -113,10 +114,11 @@ function GenomicData() {
     ];
 
     const queryParams = query?.gene || `${query?.chromosome}:${query?.start}-${query?.end}`;
+    const hasValidQuery = query?.referenceName && query?.start && query?.end || query?.gene;
 
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
-            <h2> {query ? `Genomic Data: ${queryParams}` : 'Genomic Data: Please query from the sidebar to populate.'} </h2>
+            <h2> {hasValidQuery ? `Genomic Data: ${queryParams}` : 'Genomic Data: Please query from the sidebar to populate.'} </h2>
             <div style={{ height: 510, width: '100%' }}>
                 <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>

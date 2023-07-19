@@ -118,12 +118,7 @@ function SearchHandler() {
                         reader.genomic?.end,
                         reader.genomic?.assemblyId
                     ).then((htsgetData) => { */
-                    searchVariant(
-                        "21",
-                        "5030000",
-                        "5030847",
-                        reader.genomic?.assemblyId
-                    ).then((htsgetData) => {
+                    searchVariant('21', '5030000', '5030847', reader.genomic?.assemblyId).then((htsgetData) => {
                         // Parse out the response from Beacon
                         const htsgetFilteredData = htsgetData
                             .map((loc) => {
@@ -139,6 +134,7 @@ function SearchHandler() {
                                         .map((caseData) => {
                                             caseData.beaconHandover = handovers[0];
                                             caseData.location = loc.location;
+                                            console.log(caseData.location);
                                             if (!loc.location) {
                                                 console.log(`Weird scenario with no location: ${loc}`);
                                             }

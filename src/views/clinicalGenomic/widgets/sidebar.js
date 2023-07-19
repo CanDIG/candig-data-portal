@@ -176,7 +176,14 @@ function GenomicsGroup(props) {
         changer(value);
         onWrite((old) => ({
             ...old,
-            genomic: { assemblyId: selectedGenome, referenceName: selectedChromosomes, start: startPos, end: endPos, gene: selectedGenes, [toChange]: value }
+            genomic: {
+                assemblyId: selectedGenome,
+                referenceName: selectedChromosomes,
+                start: startPos,
+                end: endPos,
+                gene: selectedGenes,
+                [toChange]: value
+            }
         }));
     };
 
@@ -298,7 +305,12 @@ function Sidebar(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
-                <StyledCheckboxList options={tumourPrimarySites} onWrite={writerContext} groupName="primary_site" />
+                <StyledCheckboxList
+                    options={tumourPrimarySites}
+                    onWrite={writerContext}
+                    groupName="primary_site"
+                    useAutoComplete={tumourPrimarySites.length >= 10}
+                />
             </SidebarGroup>
             <SidebarGroup name="Chemotherapy">
                 <StyledCheckboxList
