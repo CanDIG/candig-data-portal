@@ -165,24 +165,24 @@ function GenomicsGroup(props) {
     const { chromosomes, genes, onWrite } = props;
     const classes = useStyles();
     // Genomic data
-    const referenceGenomes = ['hg38', 'hg37', 'hg36'];
+    const referenceGenomes = ['hg38'];
     const [selectedGenome, setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
 
-    const HandleChange = (value, changer) => {
+    const HandleChange = (value, changer, toChange) => {
         changer(value);
         onWrite((old) => ({
             ...old,
-            genomic: { assemblyId: selectedGenome, referenceName: selectedChromosomes, start: startPos, end: endPos }
+            genomic: { assemblyId: selectedGenome, referenceName: selectedChromosomes, start: startPos, end: endPos, gene: selectedGenes, [toChange]: value }
         }));
     };
 
     return (
         <>
-            <SidebarGroup name="Reference Genome">
+            {/* <SidebarGroup name="Reference Genome">
                 <RadioGroup onChange={(event) => HandleChange(event.target.value, setSelectedGenome)} value={selectedGenome}>
                     {referenceGenomes.map((genome) => (
                         <FormControlLabel
@@ -194,23 +194,23 @@ function GenomicsGroup(props) {
                         />
                     ))}
                 </RadioGroup>
+            </SidebarGroup> */}
+            <SidebarGroup name="Gene Search">
+                <Autocomplete
+                    size="small"
+                    options={genes || []}
+                    onChange={(_, value) => HandleChange(value, setSelectedGenes, 'gene')}
+                    renderInput={(params) => <TextField {...params} />}
+                    value={selectedGenes}
+                />
             </SidebarGroup>
             <SidebarGroup name="Chromosome">
                 <Autocomplete
                     size="small"
                     options={chromosomes || []}
-                    onChange={(_, value) => HandleChange(value, setSelectedChromosomes)}
+                    onChange={(_, value) => HandleChange(value, setSelectedChromosomes, 'referenceName')}
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedChromosomes}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Gene Search">
-                <Autocomplete
-                    size="small"
-                    options={genes || []}
-                    onChange={(_, value) => HandleChange(value, setSelectedGenes)}
-                    renderInput={(params) => <TextField {...params} />}
-                    value={selectedGenes}
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
@@ -220,14 +220,14 @@ function GenomicsGroup(props) {
                     label="Start"
                     type="number"
                     value={startPos}
-                    onChange={(event) => HandleChange(event.target.value, setStartPos)}
+                    onChange={(event) => HandleChange(event.target.value, setStartPos, 'start')}
                 />
                 <TextField
                     size="small"
                     label="End"
                     type="number"
                     value={endPos}
-                    onChange={(event) => HandleChange(event.target.value, setEndPos)}
+                    onChange={(event) => HandleChange(event.target.value, setEndPos, 'end')}
                 />
             </SidebarGroup>
         </>
@@ -298,12 +298,7 @@ function Sidebar(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site">
-                <StyledCheckboxList
-                    options={tumourPrimarySites}
-                    onWrite={writerContext}
-                    groupName="primary_site"
-                    useAutoComplete={tumourPrimarySites.length >= 10}
-                />
+                <StyledCheckboxList options={tumourPrimarySites} onWrite={writerContext} groupName="primary_site" />
             </SidebarGroup>
             <SidebarGroup name="Chemotherapy">
                 <StyledCheckboxList
@@ -312,7 +307,7 @@ function Sidebar(props) {
                     groupName="chemotherapy"
                     remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
-                    seAutoComplete={chemotherapyDrugNames.length >= 10}
+                    useAutoComplete={chemotherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
             <SidebarGroup name="Immunotherapy">
@@ -322,7 +317,7 @@ function Sidebar(props) {
                     groupName="immunotherapy"
                     remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
-                    seAutoComplete={immunotherapyDrugNames.length >= 10}
+                    useAutoComplete={immunotherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
             <SidebarGroup name="Hormone Therapy">
@@ -332,7 +327,7 @@ function Sidebar(props) {
                     groupName="hormone_therapy"
                     remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
-                    seAutoComplete={hormoneTherapyDrugNames.length >= 10}
+                    useAutoComplete={hormoneTherapyDrugNames.length >= 10}
                 />
             </SidebarGroup>
         </>

@@ -128,8 +128,8 @@ function SearchHandler() {
                         const htsgetFilteredData = htsgetData
                             .map((loc) => {
                                 const handovers = loc.results?.beaconHandovers;
-                                return loc.results.response.map((response, index) => {
-                                    return response.caseLevelData
+                                return loc.results.response.map((response, index) =>
+                                    response.caseLevelData
                                         .filter((caseData) => {
                                             if (reader.query && Object.keys(reader.query).length > 0) {
                                                 return finalList !== null && finalList.contains(caseData.biosampleId);
@@ -139,9 +139,13 @@ function SearchHandler() {
                                         .map((caseData) => {
                                             caseData.beaconHandover = handovers[0];
                                             caseData.location = loc.location;
+                                            if (!loc.location) {
+                                                console.log(`Weird scenario with no location: ${loc}`);
+                                            }
+                                            caseData.position = response.variation.location.interval.start.value;
                                             return caseData;
-                                        });
-                                });
+                                        })
+                                );
                             })
                             .flat(2);
 

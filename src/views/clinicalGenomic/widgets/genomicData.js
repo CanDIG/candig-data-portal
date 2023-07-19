@@ -14,7 +14,7 @@ import { Box } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useSearchQueryReaderContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Styles
 const useStyles = makeStyles({
@@ -58,7 +58,7 @@ function GenomicData() {
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResults = useSearchResultsReaderContext().genomic;
-    const writerContext = useSearchQueryWriterContext();
+    const query = useSearchQueryReaderContext().genomic;
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
@@ -66,15 +66,16 @@ function GenomicData() {
         console.log(searchResults);
         rows =
             searchResults?.map((patient, index) => {
-                console.log(patient);
                 // Make sure each row has an ID
                 patient.id = index;
                 patient.genotypeLabel = patient.genotype.value;
-                patient.zygosityLabel = patient.genotype.zygosity?.label || "";
+                if (patient.genotype.secondaryAlleleIds) {
+                    patient.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
+                }
+                patient.zygosityLabel = patient.genotype.zygosity?.label || '';
                 patient.location = patient.location.name;
                 return patient;
             }) || [];
-        console.log(rows);
     }
 
     const jsonTheme = {
@@ -96,10 +97,6 @@ function GenomicData() {
         base0F: '#00418A'
     };
 
-    const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
-    };
-
     // Tracks Screensize
     React.useEffect(() => {
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
@@ -107,24 +104,21 @@ function GenomicData() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'location', headerName: 'Location', minWidth: 200 },
-        { field: 'biosampleId', headerName: 'Specimen ID', minWidth: 220 },
-        { field: 'analysisId', headerName: 'Analysis ID', minWidth: 170 },
-        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 170 },
+        { field: 'location', headerName: 'Node', minWidth: 200 },
+        { field: 'position', headerName: 'Position', minWidth: 200 },
+        { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 220 },
+        { field: 'biosampleId', headerName: 'Tumour Specimen ID', minWidth: 220 },
+        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
     ];
 
+    const queryParams = query?.gene || `${query?.chromosome}:${query?.start}-${query?.end}`;
+
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+            <h2> {query ? `Genomic Data: ${queryParams}` : 'Genomic Data: Please query from the sidebar to populate.'} </h2>
             <div style={{ height: 510, width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[10]}
-                    onRowClick={(rowData) => handleRowClick(rowData.row)}
-                    hideFooterSelectedRowCount
-                />
+                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>
         </Box>
     );
