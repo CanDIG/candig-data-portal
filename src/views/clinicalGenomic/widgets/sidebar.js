@@ -61,7 +61,11 @@ function SidebarGroup(props) {
                     {name}
                 </FormLabel>
             )}
-            <FormGroup sx={{ paddingLeft: '1em', paddingRight: '1em', paddingTop: '0.5em', paddingBottom: '0.5em' }}>{children}</FormGroup>
+            <FormGroup
+                sx={{ paddingLeft: '1em', paddingRight: '1em', ...(name === 'Position' && { paddingTop: '1em', paddingBottom: '0.5em' }) }}
+            >
+                {children}
+            </FormGroup>
         </FormControl>
     );
 }
@@ -150,7 +154,7 @@ function StyledCheckboxList(props) {
             )}
             renderInput={(params) => <TextField {...params} label={groupName} />}
             // set width to match parent
-            sx={{ width: '100%' }}
+            sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, __, reason, details) => {
                 HandleChange(details.option, reason === 'selectOption');
             }}
@@ -227,6 +231,7 @@ function GenomicsGroup(props) {
                     onChange={(_, value) => HandleChange(value, setSelectedGenes, 'gene')}
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedGenes}
+                    style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
                 />
             </SidebarGroup>
             <SidebarGroup name="Chromosome">
@@ -236,6 +241,7 @@ function GenomicsGroup(props) {
                     onChange={(_, value) => HandleChange(value, setSelectedChromosomes, 'referenceName')}
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedChromosomes}
+                    style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
@@ -246,6 +252,7 @@ function GenomicsGroup(props) {
                     type="number"
                     value={startPos}
                     onChange={(event) => HandleChange(event.target.value, setStartPos, 'start')}
+                    style={{ paddingTop: '0.5em', paddingBottom: '1em' }}
                 />
                 <TextField
                     size="small"
@@ -253,6 +260,7 @@ function GenomicsGroup(props) {
                     type="number"
                     value={endPos}
                     onChange={(event) => HandleChange(event.target.value, setEndPos, 'end')}
+                    style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
                 />
             </SidebarGroup>
         </>
