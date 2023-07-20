@@ -65,6 +65,9 @@ function GenomicData() {
                 }
                 retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
                 retVal.location = patient.location.name;
+
+                // TODO: Fix the below with the actual normal ID
+                retVal.normalId = patient.biosampleId;
                 return retVal;
             }) || [];
     }
@@ -79,7 +82,7 @@ function GenomicData() {
         { field: 'location', headerName: 'Node', minWidth: 200 },
         { field: 'position', headerName: 'Position', minWidth: 200 },
         { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 220 },
-        { field: 'biosampleId', headerName: 'Tumour Specimen ID', minWidth: 220 },
+        { field: 'normalId', headerName: 'Tumour Specimen ID', minWidth: 220 },
         { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
     ];
