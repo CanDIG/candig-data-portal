@@ -102,7 +102,7 @@ function StyledCheckboxList(props) {
                 });
                 onWrite((old) => {
                     if (!isDonorList) {
-                        const retVal = old?.query?.filter((name) => name !== groupName);
+                        const retVal = Object.fromEntries(Object.entries(old?.query)?.filter(([name, _]) => name !== groupName));
                         return { ...old, query: retVal };
                     }
 
