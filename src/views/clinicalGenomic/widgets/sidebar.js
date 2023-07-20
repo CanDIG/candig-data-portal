@@ -74,7 +74,7 @@ function SidebarGroup(props) {
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete, hide, defaultChecked } = props;
+    const { groupName, isDonorList, isFilterList, remap, onWrite, options, useAutoComplete, hide, defaultChecked } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
@@ -91,15 +91,6 @@ function StyledCheckboxList(props) {
         });
         setInitialized(true);
         setChecked(optionsObject);
-        /* onWrite((old) => {
-            const retVal = { ...old };
-            if (isDonorList) {
-                retVal.donorLists[groupName] = options;
-            } else {
-                retVal.filters[groupName] = options;
-            }
-            return retVal;
-        }); */
     }
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -120,21 +111,23 @@ function StyledCheckboxList(props) {
 
             if (isChecked) {
                 setChecked((old) => ({ ...old, [option]: true }));
-                // This appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
                 onWrite((old) => {
+                    const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
+
+                    // The following appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
                     if (isDonorList) {
-                        return {
-                            ...old,
-                            donorLists: {
-                                ...old.donorLists,
-                                [groupName]: {
-                                    ...old.donorLists?.[groupName],
-                                    [option]: ids
-                                }
-                            }
-                        };
+                        if (!(groupName in retVal.donorLists)) {
+                            retVal.donorLists[groupName] = { [option]: ids };
+                        } else {
+                            retVal.donorLists[groupName][option] = ids;
+                        }
+                    } else if (isFilterList) {
+                        retVal.filter[groupName] = ids;
+                    } else {
+                        retVal.query[groupName] = ids;
                     }
-                    return { ...old, query: { [groupName]: ids } };
+
+                    return retVal;
                 });
             } else {
                 setChecked((old) => {
@@ -142,21 +135,25 @@ function StyledCheckboxList(props) {
                     return rest;
                 });
                 onWrite((old) => {
+                    const retVal = { ...old };
                     if (!isDonorList) {
-                        const retVal = Object.fromEntries(Object.entries(old?.query)?.filter(([name, _]) => name !== groupName));
-                        return { ...old, query: retVal };
+                        const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
+                        retVal.query = newList;
+                        return retVal;
                     }
 
-                    const retVal = Object.entries(old?.donorLists?.[groupName] || {})?.filter(([key]) => key !== option);
+                    const newList = Object.entries(old.donorLists[groupName] || {}).filter(([key]) => key !== option);
 
                     // Remove the list entirely if we are the last one
-                    if (retVal.length <= 0) {
-                        const { [groupName]: _, ...rest } = old?.donorLists || {};
-                        return { ...old, donorLists: rest };
+                    if (newList.length <= 0) {
+                        const { [groupName]: _, ...rest } = old.donorLists || {};
+                        retVal.donorLists = rest;
+                        return retVal;
                     }
 
                     // Otherwise remove just our entry from the list
-                    return { ...old, donorLists: { [groupName]: Object.fromEntries(retVal) } };
+                    retVal.donorLists[groupName] = Object.fromEntries(newList);
+                    return retVal;
                 });
             }
         });
