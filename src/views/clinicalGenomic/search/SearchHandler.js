@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, searchVariant } from 'store/api';
+import { fetchFederationStat, fetchFederation, searchVariant, searchVariantByGene } from 'store/api';
 
 // This will grab all of the results from a query, but continue to consume all "next" from the pagination until we are complete
 // This defeats the purpose of pagination, and is frowned upon, but... deadlines
@@ -206,44 +206,67 @@ function SearchHandler() {
                 }),
                 'clinical'
             )
-                .then(() =>
+                .then(
                     // Grab the specimens from the backend
-                    // TODO: Make this use the specimens list from above, which I can do as soon as I get my changes into Katsu
-                    fetchFederation('v2/authorized/specimens', 'katsu')
+                    () => fetchFederation('v2/authorized/specimens', 'katsu')
                 )
                 .then((data) => {
-                    // We may need to query the HTSGet portion in order to do genomics search.
-                    /* searchVariant(
-                        reader.genomic?.referenceName,
-                        reader.genomic?.start,
-                        reader.genomic?.end,
-                        reader.genomic?.assemblyId
-                    ).then((htsgetData) => { */
-                    searchVariant('21', '5030000', '5030847', reader.genomic?.assemblyId).then((htsgetData) => {
-                        // Parse out the response from Beacon
-                        const htsgetFilteredData = htsgetData
-                            .map((loc) => {
-                                const handovers = loc.results?.beaconHandovers;
-                                return loc.results.response.map((response, index) =>
-                                    response.caseLevelData
-                                        .filter((caseData) => {
-                                            if (reader.query && Object.keys(reader.query).length > 0) {
-                                                return finalList !== null && finalList.includes(caseData.biosampleId);
-                                            }
-                                            return true;
-                                        })
-                                        .map((caseData) => {
-                                            caseData.beaconHandover = handovers[0];
-                                            caseData.location = loc.location;
-                                            caseData.position = response.variation.location.interval.start.value;
-                                            return caseData;
-                                        })
-                                );
-                            })
-                            .flat(2);
+                    // First, we need to parse out all of the specimens that exist inside of our finalList (if any)
+                    const allowedSpecimens = [];
+                    if (finalList) {
+                        data.forEach((loc) => {
+                            loc.results?.results?.forEach((specimen) => {
+                                if (finalList.includes(specimen.submitter_donor_id)) {
+                                    allowedSpecimens.push(specimen.submitter_specimen_id);
+                                }
+                            });
+                        });
+                    }
+                    console.log(allowedSpecimens);
 
-                        writer((old) => ({ ...old, genomic: htsgetFilteredData }));
-                    });
+                    // We may need to query the HTSGet portion in order to do genomics search.
+                    let htsgetPromise = null;
+                    if (reader.genomic?.gene) {
+                        htsgetPromise = searchVariantByGene(reader.genomic.gene);
+                    } else if (reader.genomic?.referenceName) {
+                        htsgetPromise = searchVariant(
+                            reader.genomic?.referenceName,
+                            reader.genomic?.start,
+                            reader.genomic?.end,
+                            reader.genomic?.assemblyId
+                        );
+                    }
+
+                    // htsgetPromise = searchVariant('21', '5030000', '5030847', reader.genomic?.assemblyId);
+                    if (htsgetPromise) {
+                        htsgetPromise.then((htsgetData) => {
+                            // Parse out the response from Beacon
+                            const htsgetFilteredData = htsgetData
+                                .map((loc) => {
+                                    const handovers = loc.results?.beaconHandovers;
+                                    return (
+                                        loc.results.response?.map((response) =>
+                                            response.caseLevelData
+                                                .filter((caseData) => {
+                                                    if (reader.query && Object.keys(reader.query).length > 0) {
+                                                        return allowedSpecimens.includes(caseData.biosampleId);
+                                                    }
+                                                    return true;
+                                                })
+                                                .map((caseData) => {
+                                                    caseData.beaconHandover = handovers[0];
+                                                    caseData.location = loc.location;
+                                                    caseData.position = response.variation.location.interval.start.value;
+                                                    return caseData;
+                                                })
+                                        ) || []
+                                    );
+                                })
+                                .flat(2);
+
+                            writer((old) => ({ ...old, genomic: htsgetFilteredData }));
+                        });
+                    }
                 });
 
         if (lastPromise === null) {

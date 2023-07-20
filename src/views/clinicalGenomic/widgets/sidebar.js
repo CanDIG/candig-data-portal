@@ -1,18 +1,6 @@
 import { useState } from 'react';
 
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    FormGroup,
-    RadioGroup,
-    Radio,
-    Tab,
-    Tabs,
-    Autocomplete,
-    TextField
-} from '@mui/material';
+import { Checkbox, FormControl, FormControlLabel, FormLabel, FormGroup, Tab, Tabs, Autocomplete, TextField } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { makeStyles, useTheme } from '@mui/styles';
@@ -232,6 +220,7 @@ function GenomicsGroup(props) {
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedGenes}
                     style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+                    disabled={!!selectedChromosomes}
                 />
             </SidebarGroup>
             <SidebarGroup name="Chromosome">
@@ -242,6 +231,7 @@ function GenomicsGroup(props) {
                     renderInput={(params) => <TextField {...params} />}
                     value={selectedChromosomes}
                     style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+                    disabled={!!selectedGenes}
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
@@ -253,6 +243,7 @@ function GenomicsGroup(props) {
                     value={startPos}
                     onChange={(event) => HandleChange(event.target.value, setStartPos, 'start')}
                     style={{ paddingTop: '0.5em', paddingBottom: '1em' }}
+                    disabled={!!selectedGenes}
                 />
                 <TextField
                     size="small"
@@ -261,6 +252,7 @@ function GenomicsGroup(props) {
                     value={endPos}
                     onChange={(event) => HandleChange(event.target.value, setEndPos, 'end')}
                     style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+                    disabled={!!selectedGenes}
                 />
             </SidebarGroup>
         </>

@@ -157,3 +157,40 @@ export function searchVariant(chromosome, start, end, assemblyId = 'hg37') {
             return 'error';
         });
 }
+
+/*
+Fetch variant for a gene name; and returns a promise that contains the results from HTSGet through Federation
+ * @param {string}... Name of a gene
+*/
+export function searchVariantByGene(geneName) {
+    const payload = {
+        query: {
+            requestParameters: {
+                gene_id: geneName
+            }
+        },
+        meta: {
+            apiVersion: 'v2'
+        }
+    };
+    return fetch(`${federation}/fanout`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'POST',
+            path: 'beacon/v2/g_variants',
+            payload,
+            service: 'htsget'
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return [];
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
+}

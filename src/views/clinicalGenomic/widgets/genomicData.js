@@ -90,7 +90,7 @@ function GenomicData() {
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
-                {hasValidQuery ? `Genomic Data: ${queryParams}` : 'Genomic Data: Please query from the sidebar to populate'}
+                {hasValidQuery ? `Genomic Variants: ${queryParams}` : 'Genomic Variants: Please query from the sidebar to populate'}
             </Typography>
             <div style={{ height: 510, width: '100%' }}>
                 <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
