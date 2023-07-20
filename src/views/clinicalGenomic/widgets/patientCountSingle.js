@@ -49,7 +49,7 @@ function PatientCountSingle(props) {
         : {}; */
 
     return (
-        <Box mr={2} ml={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
+        <Box pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
                 <Grid item xs={2}>
                     <CardHeader avatar={<Avatar>{site.slice(0, 1).toUpperCase()}</Avatar>} title={<b>{site}</b>} />
@@ -73,9 +73,9 @@ function PatientCountSingle(props) {
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
-                <Grid item xs={1} ml="auto" className={classes.button}>
+                <Grid item className={classes.button} pr={-2}>
                     {numCohorts > 1 ? (
-                        <Button onClick={(_) => setExpanded((old) => !old)} variant="contained" sx={{ borderRadius: 1.8 }}>
+                        <Button onClick={(_) => setExpanded((old) => !old)} variant="contained" sx={{ borderRadius: 100, border: 'solid 1px' + theme.palette.primary.main, backgroundColor: 'white', color: theme.palette.primary.main }}>
                             {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
                         </Button>
                     ) : (
@@ -110,8 +110,7 @@ function PatientCountSingle(props) {
                             <Grid item xs={2}>
                                 {/* Num cohorts doesn't make any sense here */}
                             </Grid>
-                            <Divider flexItem orientation="vertical" className={classes.divider} />
-                            <Grid item xs={1} ml="auto" className={classes.button}>
+                            <Grid item ml="auto" className={classes.button}>
                                 {locked ? (
                                     <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>
                                         Request&nbsp;Access
