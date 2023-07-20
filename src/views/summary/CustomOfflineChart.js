@@ -160,11 +160,21 @@ function CustomOfflineChart(props) {
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                const data = [];
-                const categories = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => {
+                let data = [];
+                let categories = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => {
                     data.push(dataObject === '' ? dataVis[chartData][key] : dataObject[key]);
                     return key;
                 });
+
+                // Order & truncate the categories by the data
+                if (orderByFrequency) {
+                    categories = categories.slice().sort((a, b) => data[categories.indexOf(b)] - data[categories.indexOf(a)]);
+                    data = data.sort((a, b) => b - a);
+                }
+                if (cutoff) {
+                    categories = categories.slice(0, cutoff);
+                    data = data.slice(0, cutoff);
+                }
 
                 setChartOptions({
                     credits: {
