@@ -128,12 +128,12 @@ export const DataVisualizationChartInfo = {
     treatment_type_count: {
         title: 'Treatment Type Distribution',
         xAxis: 'Treatment Type',
-        yAxis: 'Number of Patients'
+        yAxis: 'Number of Treatments'
     },
     cancer_type_count: {
         title: 'Cancer Type Distribution',
         xAxis: 'Cancer Type',
-        yAxis: 'Number of Patients'
+        yAxis: 'Number of Primary Sites'
     },
     patients_per_cohort: {
         title: 'Distribution of Cohort by Node',
