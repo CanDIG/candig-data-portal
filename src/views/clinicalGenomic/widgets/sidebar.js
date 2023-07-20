@@ -61,7 +61,7 @@ function SidebarGroup(props) {
                 </FormLabel>
             )}
             <FormGroup
-                sx={{ paddingLeft: '1em', paddingRight: '1em', ...(name === 'Position' && { paddingTop: '1em', paddingBottom: '0.5em' }) }}
+                sx={{ paddingLeft: '1em', paddingRight: '1em', ...(name === 'Position' && { paddingTop: '0.5em', paddingBottom: '0.5em' }) }}
             >
                 {children}
             </FormGroup>
@@ -224,7 +224,7 @@ function GenomicsGroup(props) {
                 </RadioGroup>
             </SidebarGroup> */}
             <SidebarGroup name="Gene Search">
-                {selectedChromosomes && <Typography sx={{ paddingTop: '1em' }}>(Disabled during position search)</Typography>}
+                {selectedChromosomes && <Typography sx={{ paddingTop: '0.5em' }}>(Disabled during position search)</Typography>}
                 <Autocomplete
                     size="small"
                     options={genes || []}
@@ -236,7 +236,7 @@ function GenomicsGroup(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
-                {selectedGenes && <Typography>(Disabled during gene search)</Typography>}
+                {selectedGenes && <Typography sx={{ paddingTop: '0.5em' }}>(Disabled during gene search)</Typography>}
                 <Autocomplete
                     size="small"
                     options={chromosomes || []}
