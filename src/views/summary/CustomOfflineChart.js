@@ -43,6 +43,7 @@ function CustomOfflineChart(props) {
         edit,
         loading,
         orderByFrequency,
+        orderAlphabetically,
         cutoff,
         grayscale
     } = props;
@@ -160,21 +161,24 @@ function CustomOfflineChart(props) {
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                let data = [];
-                let categories = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => {
-                    data.push(dataObject === '' ? dataVis[chartData][key] : dataObject[key]);
-                    return key;
-                });
+                let entries = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => [
+                    key,
+                    dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                ]);
 
                 // Order & truncate the categories by the data
                 if (orderByFrequency) {
-                    categories = categories.slice().sort((a, b) => data[categories.indexOf(b)] - data[categories.indexOf(a)]);
-                    data = data.sort((a, b) => b - a);
+                    entries = entries.sort((a, b) => b[1] - a[1]);
+                }
+                if (orderAlphabetically) {
+                    entries = entries.sort((a, b) => (a[0] > b[0] ? 1 : -1));
                 }
                 if (cutoff) {
-                    categories = categories.slice(0, cutoff);
-                    data = data.slice(0, cutoff);
+                    entries = entries.slice(0, cutoff);
                 }
+
+                const categories = entries.map(([key, _]) => key);
+                const data = entries.map(([_, val]) => val);
 
                 setChartOptions({
                     credits: {
@@ -372,6 +376,7 @@ CustomOfflineChart.propTypes = {
     onRemoveChart: PropTypes.func,
     grayscale: PropTypes.bool,
     orderByFrequency: PropTypes.bool,
+    orderAlphabetically: PropTypes.bool,
     cutoff: PropTypes.number
 };
 
