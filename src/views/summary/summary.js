@@ -67,7 +67,7 @@ function Summary() {
 
                 switch (endpoint) {
                     case '/individual_count':
-                        setIndividualCount(aggregateObj(stat.results, individualCount));
+                        setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
                             candigDataSouceCollection[stat.location['province-code']] = stat.results.individual_count;
 
@@ -107,7 +107,7 @@ function Summary() {
 
         // Set Site Count/Provinces
         if (data) {
-            setProvinceCount(data?.length);
+            setProvinceCount(new Set(data.map((loc) => loc.location.province))?.length);
         }
 
         // Count Node Status
