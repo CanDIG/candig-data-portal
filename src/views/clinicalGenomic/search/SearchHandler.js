@@ -228,7 +228,7 @@ function SearchHandler() {
                                     response.caseLevelData
                                         .filter((caseData) => {
                                             if (reader.query && Object.keys(reader.query).length > 0) {
-                                                return finalList !== null && finalList.includes(caseData.biosampleId);
+                                                return finalList !== null && finalList.contains(caseData.biosampleId);
                                             }
                                             return true;
                                         })

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/styles';
 
 // MUI
-import { Box, Grid, IconButton } from '@mui/material';
+import { Box, Grid, IconButton, Typography } from '@mui/material';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -212,8 +212,13 @@ function DataVisualization(props) {
             >
                 {!edit ? <IconEdit /> : <IconX />}
             </IconButton>
-            <Grid container spacing={1} alignItems="center" justifyContent="center">
-                {returndataVisData()}
+            <Grid container spacing={1} direction="column">
+                <Typography pb={1} variant="h4">
+                    Data Visualization
+                </Typography>
+                <Grid container spacing={1} alignItems="center" justifyContent="center">
+                    {returndataVisData()}
+                </Grid>
             </Grid>
             {edit && (
                 <IconButton

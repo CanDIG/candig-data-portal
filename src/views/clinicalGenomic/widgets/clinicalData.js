@@ -1,19 +1,13 @@
 import * as React from 'react';
 
-// npm installs
-import ReactJson from 'react-json-view';
-import cancerTypeCSV from '../../../assets/data_files/cancer_histological_codes_labels.csv';
-import papa from 'papaparse';
-
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Typography } from '@mui/material';
 
 // REDUX
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Styles
@@ -50,9 +44,6 @@ const useStyles = makeStyles({
 
 function ClinicalView() {
     const theme = useTheme();
-    const classes = useStyles();
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [pageNum, setPageNum] = React.useState(true);
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
@@ -77,25 +68,6 @@ function ClinicalView() {
                 }) || [];
     }
 
-    const jsonTheme = {
-        base00: 'white',
-        base01: '#ddd',
-        base02: '#ddd',
-        base03: 'black',
-        base04: '#0E3E17',
-        base05: 'black',
-        base06: 'black',
-        base07: '#252525',
-        base08: '#252525',
-        base09: '#00418A',
-        base0A: '#00418A',
-        base0B: '#00418A',
-        base0C: '#00418A',
-        base0D: '#00418A',
-        base0E: '#00418A',
-        base0F: '#00418A'
-    };
-
     const handleRowClick = (row) => {
         writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
     };
@@ -115,7 +87,10 @@ function ClinicalView() {
     ];
 
     return (
-        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+            <Typography pb={1} variant="h4">
+                Clinical Data
+            </Typography>
             <div style={{ height: 510, width: '100%' }}>
                 <DataGrid
                     rows={rows}

@@ -7,9 +7,6 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
 
 const useStyles = makeStyles((theme) => ({
-    header: {
-        // Unknown what we want in here
-    },
     divider: {
         borderColor: theme.palette.primary.main,
         marginTop: 20,
@@ -66,9 +63,7 @@ function PatientCounts(props) {
             <Box mr={2} ml={1} pr={5} sx={{ border: 1, borderRadius: 2, borderColor: 'white' }}>
                 <Grid container justifyContent="center" alignItems="center" spacing={2}>
                     <Grid item xs={2}>
-                        <Typography variant="h4" className={classes.header}>
-                            Patient Data
-                        </Typography>
+                        <Typography variant="h4">Patient Data</Typography>
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" align="center" className={classes.header}>

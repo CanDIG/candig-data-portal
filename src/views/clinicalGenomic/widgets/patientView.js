@@ -219,7 +219,7 @@ function PatientView(props) {
     return (
         <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-                <Typography variant="h2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+                <Typography variant="h4" sx={{ flexGrow: 1 }}>
                     Patient Info
                 </Typography>
                 <TextField
