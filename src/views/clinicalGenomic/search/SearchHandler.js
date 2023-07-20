@@ -7,30 +7,34 @@ import { fetchFederationStat, fetchFederation, searchVariant, searchVariantByGen
 
 // This will grab all of the results from a query, but continue to consume all "next" from the pagination until we are complete
 // This defeats the purpose of pagination, and is frowned upon, but... deadlines
-function ConsumeAllDonors(url, service = 'katsu') {
-    let donors = [];
-    const RecursiveQuery = (data) => {
+function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
+    const parsedData = {};
+    const RecursiveQuery = (data, idx) => {
         let nextQuery = null;
 
         // Collect all donor IDs
         data.forEach((loc) => {
-            if (loc.next) {
-                nextQuery = loc.next;
+            if (!(loc.location.name in parsedData)) {
+                parsedData[loc.location.name] = [];
             }
 
-            if (loc.results) {
-                donors = donors.concat(loc.results.map((donor) => donor.submitter_donor_id));
+            if (loc.results.next) {
+                nextQuery = `${url}${url.includes('?') ? '&' : '?'}page=${idx + 1}`;
+            }
+
+            if (loc.results.results) {
+                parsedData[loc.location.name] = parsedData[loc.location.name].concat(loc.results.results.map(resultConsumer));
             }
         });
 
         if (nextQuery) {
-            return fetchFederation(nextQuery, service).then(RecursiveQuery);
+            return fetchFederation(nextQuery, service).then((newData) => RecursiveQuery(newData, idx + 1));
         }
 
-        return new Promise((resolve) => resolve(donors));
+        return new Promise((resolve) => resolve(parsedData));
     };
 
-    return fetchFederation(url, service).then(RecursiveQuery);
+    return fetchFederation(url, service).then((data) => RecursiveQuery(data, 1));
 }
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
@@ -97,11 +101,12 @@ function SearchHandler() {
             searchParams.append('donors', finalList.join(','));
         }
 
+        searchParams.append('page_size', 100);
         const url = `v2/authorized/donors?${searchParams}`;
 
         const donorQueryPromise = () =>
             trackPromise(
-                fetchFederation(url, 'katsu').then((data) => {
+                ConsumeAllPages(url, (donor) => donor, 'katsu').then((data) => {
                     // We need to do two things:
                     // 1. Push the raw data into the context
                     // 2. Go through the data and fill out our pseudo-discovery queries for data vis
@@ -153,39 +158,49 @@ function SearchHandler() {
 
                     // Go through the donors we have, fill out our data visualization counts
                     const donorToDOB = {};
-                    data.forEach((loc) => {
-                        discoveryCounts.patients_per_cohort[loc.location.name] = {};
-                        donorToDOB[loc.location.name] = {};
-                        loc?.results?.results?.forEach((donor) => {
+                    Object.keys(data).forEach((locName) => {
+                        discoveryCounts.patients_per_cohort[locName] = {};
+                        donorToDOB[locName] = {};
+                        data[locName].forEach((donor) => {
                             if (donor.date_of_birth) {
-                                donorToDOB[loc.location.name][donor.submitter_donor_id] = donor.date_of_birth;
+                                donorToDOB[locName][donor.submitter_donor_id] = donor.date_of_birth;
                             }
                             donor.primary_site.forEach((site) => addOrReplace(discoveryCounts.cancer_type_count, site));
-                            addOrReplace(discoveryCounts.patients_per_cohort[loc.location.name], donor.program_id);
+                            addOrReplace(discoveryCounts.patients_per_cohort[locName], donor.program_id);
                         });
                     });
 
                     // Finally, to finish out our counts, we need to query the primary diagnoses
-                    return fetchFederation('v2/authorized/treatments', 'katsu')
+                    return ConsumeAllPages(
+                        'v2/authorized/treatments/?page_size=100',
+                        (treatment) => [treatment.submitter_donor_id, treatment.treatment_type],
+                        'katsu'
+                    )
                         .then((treatments) => {
-                            treatments.forEach((loc) => {
-                                loc?.results?.results?.forEach((treatment) => {
-                                    if (treatment.submitter_donor_id in donorToDOB[loc.location.name]) {
-                                        treatment.treatment_type.forEach((treatmentType) => {
+                            Object.keys(treatments).forEach((locName) => {
+                                treatments[locName]?.forEach(([donorID, treatmentTypes]) => {
+                                    if (donorID in donorToDOB[locName]) {
+                                        treatmentTypes.forEach((treatmentType) => {
                                             addOrReplace(discoveryCounts.treatment_type_count, treatmentType);
                                         });
                                     }
                                 });
                             });
                         })
-                        .then(() => fetchFederation('v2/authorized/primary_diagnoses', 'katsu'))
+                        .then(() =>
+                            ConsumeAllPages(
+                                'v2/authorized/primary_diagnoses/?page_size=100',
+                                (diagnosis) => [diagnosis.submitter_donor_id, diagnosis.date_of_diagnosis],
+                                'katsu'
+                            )
+                        )
                         .then((diagnoses) => {
-                            diagnoses.forEach((loc) => {
-                                loc?.results?.results?.forEach((diagnosis) => {
-                                    if (diagnosis.submitter_donor_id in donorToDOB[loc.location.name] && diagnosis.date_of_diagnosis) {
+                            Object.keys(diagnoses).forEach((locName) => {
+                                diagnoses[locName]?.forEach(([donorID, dateOfDiagnosis]) => {
+                                    if (donorID in donorToDOB[locName] && dateOfDiagnosis) {
                                         // Convert this to an age range
-                                        const diagDate = diagnosis.date_of_diagnosis.split('-');
-                                        const birthDate = donorToDOB[loc.location.name][diagnosis.submitter_donor_id].split('-');
+                                        const diagDate = dateOfDiagnosis.split('-');
+                                        const birthDate = donorToDOB[locName][donorID].split('-');
                                         let ageAtDiagnosis = diagDate[0] - birthDate[0] + (diagDate[1] >= birthDate[1] ? 1 : 0);
                                         ageAtDiagnosis -= ageAtDiagnosis % 10;
 
@@ -198,7 +213,7 @@ function SearchHandler() {
                                         }
                                         addOrReplace(discoveryCounts.diagnosis_age_count, ageAtDiagnosis);
 
-                                        delete donorToDOB[loc.location.name][diagnosis.submitter_donor_id];
+                                        delete donorToDOB[locName][donorID];
                                     }
                                 });
                             });
@@ -209,21 +224,24 @@ function SearchHandler() {
             )
                 .then(
                     // Grab the specimens from the backend
-                    () => fetchFederation('v2/authorized/specimens', 'katsu')
+                    () =>
+                        ConsumeAllPages(
+                            'v2/authorized/specimens/?page_size=100',
+                            (specimen) => [specimen.submitter_specimen_id, specimen.submitter_donor_id],
+                            'katsu'
+                        )
                 )
                 .then((data) => {
                     // First, we need to parse out all of the specimens that exist inside of our finalList (if any)
-                    const allowedSpecimens = [];
-                    if (finalList) {
-                        data.forEach((loc) => {
-                            loc.results?.results?.forEach((specimen) => {
-                                if (finalList.includes(specimen.submitter_donor_id)) {
-                                    allowedSpecimens.push(specimen.submitter_specimen_id);
-                                }
-                            });
+                    const specimenToDonor = {};
+                    Object.keys(data).forEach((locName) => {
+                        specimenToDonor[locName] = {};
+                        data[locName]?.forEach(([specimenID, donorID]) => {
+                            if (!finalList || finalList.includes(donorID)) {
+                                specimenToDonor[locName][specimenID] = donorID;
+                            }
                         });
-                    }
-                    console.log(allowedSpecimens);
+                    });
 
                     // We may need to query the HTSGet portion in order to do genomics search.
                     let htsgetPromise = null;
@@ -250,7 +268,7 @@ function SearchHandler() {
                                             response.caseLevelData
                                                 .filter((caseData) => {
                                                     if (reader.query && Object.keys(reader.query).length > 0) {
-                                                        return allowedSpecimens.includes(caseData.biosampleId);
+                                                        return caseData.biosampleId in specimenToDonor[loc.location.name];
                                                     }
                                                     return true;
                                                 })
@@ -258,6 +276,7 @@ function SearchHandler() {
                                                     caseData.beaconHandover = handovers[0];
                                                     caseData.location = loc.location;
                                                     caseData.position = response.variation.location.interval.start.value;
+                                                    caseData.donorID = specimenToDonor[loc.location.name][caseData.biosampleId];
                                                     return caseData;
                                                 })
                                         ) || []

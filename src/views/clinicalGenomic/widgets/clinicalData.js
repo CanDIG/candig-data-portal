@@ -55,9 +55,7 @@ function ClinicalView() {
     let rows = [];
     if (searchResults) {
         rows =
-            searchResults
-                ?.map((site) => site.results?.results)
-                ?.filter((entry) => entry !== undefined)
+            Object.values(searchResults)
                 ?.flat(1)
                 ?.map((patient, index) => {
                     // Make sure each row has an ID and a deceased status

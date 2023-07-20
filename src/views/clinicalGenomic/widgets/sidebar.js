@@ -74,12 +74,32 @@ function SidebarGroup(props) {
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete, hide } = props;
+    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete, hide, defaultChecked } = props;
     const [checked, setChecked] = useState({});
+    const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
 
     if (hide) {
         return <></>;
+    }
+
+    // Check all of our options by default
+    if (!initialized && defaultChecked && options.length) {
+        const optionsObject = {};
+        options.forEach((option) => {
+            optionsObject[option] = true;
+        });
+        setInitialized(true);
+        setChecked(optionsObject);
+        /* onWrite((old) => {
+            const retVal = { ...old };
+            if (isDonorList) {
+                retVal.donorLists[groupName] = options;
+            } else {
+                retVal.filters[groupName] = options;
+            }
+            return retVal;
+        }); */
     }
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -324,10 +344,10 @@ function Sidebar(props) {
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
             </Tabs>
             <SidebarGroup name="Node">
-                <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" />
+                <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" defaultChecked />
             </SidebarGroup>
             <SidebarGroup name="Cohort">
-                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" />
+                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" defaultChecked />
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
             <SidebarGroup name="Treatment" hide={hideClinical}>

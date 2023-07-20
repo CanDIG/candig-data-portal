@@ -28,10 +28,10 @@ function PatientCounts(props) {
         siteData = sites.map((entry) => {
             // Find this site within our search results
             const counts = {};
-            if (Array.isArray(searchResults)) {
-                const match = searchResults.find((search) => entry.location.name === search.location.name);
+            if (searchResults && entry.location.name in searchResults) {
+                const match = searchResults[entry.location.name];
                 // Iterate through each donor in this site
-                match?.results?.results?.forEach((donor) => {
+                match.forEach((donor) => {
                     if (donor.program_id in counts) {
                         counts[donor.program_id] += 1;
                     } else {

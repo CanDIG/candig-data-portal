@@ -79,10 +79,11 @@ function GenomicData() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'location', headerName: 'Node', minWidth: 200 },
+        { field: 'location', headerName: 'Node', minWidth: 150 },
+        { field: 'donorID', headerName: 'Donor ID', minWidth: 150 },
         { field: 'position', headerName: 'Position', minWidth: 200 },
-        { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 220 },
-        { field: 'normalId', headerName: 'Tumour Specimen ID', minWidth: 220 },
+        { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 200 },
+        { field: 'normalId', headerName: 'Tumour Specimen ID', minWidth: 200 },
         { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
     ];
