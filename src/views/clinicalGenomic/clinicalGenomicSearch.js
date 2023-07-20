@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
 import VariantsSearch from '../genomicsData/VariantsSearch';
 import PatientCounts from './widgets/patientCounts';
@@ -80,6 +80,7 @@ function ClinicalGenomicSearch() {
     const classes = useStyles();
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = useSelector((state) => state.customization.opened);
+    const theme = useTheme();
 
     // When we load, set the sidebar component
     useEffect(() => {
@@ -113,6 +114,17 @@ function ClinicalGenomicSearch() {
                         </Button>
                     ))}
                 </Toolbar>
+                <div
+                    style={{
+                        backgroundColor: theme.palette.primary.light,
+                        position: 'absolute',
+                        top: -28,
+                        left: -20,
+                        width: '102.5%',
+                        height: '28px',
+                        borderRadius: 12
+                    }}
+                />
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
             <SearchHandler />

@@ -131,8 +131,8 @@ export const DataVisualizationChartInfo = {
         yAxis: 'Number of Treatments'
     },
     cancer_type_count: {
-        title: 'Cancer Type Distribution',
-        xAxis: 'Cancer Type',
+        title: 'Tumour Primary Site Distribution',
+        xAxis: 'Primary Site',
         yAxis: 'Number of Primary Sites'
     },
     patients_per_cohort: {
