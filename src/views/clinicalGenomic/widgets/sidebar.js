@@ -33,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     },
     checkboxLabel: {
         textTransform: 'capitalize'
+    },
+    hidden: {
+        height: 0
     }
 }));
 
@@ -41,25 +44,36 @@ const useStyles = makeStyles((theme) => ({
  */
 function SidebarGroup(props) {
     const theme = useTheme();
-    const { name, children } = props;
+    const { name, children, hide } = props;
     const classes = useStyles();
 
     return (
-        <FormControl className={classes.form} component="fieldset" variant="standard">
-            <FormLabel
-                sx={{ color: theme.palette.primary.main, background: theme.palette.primary.light, fontWeight: 'bold', paddingLeft: '1em' }}
-            >
-                {name}
-            </FormLabel>
+        <FormControl className={`${classes.form} ${hide ? classes.hidden : ''}`} component="fieldset" variant="standard">
+            {hide || (
+                <FormLabel
+                    sx={{
+                        color: theme.palette.primary.main,
+                        background: theme.palette.primary.light,
+                        fontWeight: 'bold',
+                        paddingLeft: '1em'
+                    }}
+                >
+                    {name}
+                </FormLabel>
+            )}
             <FormGroup sx={{ paddingLeft: '1em', paddingRight: '1em', paddingTop: '0.5em', paddingBottom: '0.5em' }}>{children}</FormGroup>
         </FormControl>
     );
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete } = props;
+    const { groupName, isDonorList, remap, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const classes = useStyles();
+
+    if (hide) {
+        return <></>;
+    }
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -162,7 +176,7 @@ function StyledCheckboxList(props) {
 // Keeping this separate from the rest as it's all somewhat self-contained
 // NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
-    const { chromosomes, genes, onWrite } = props;
+    const { chromosomes, genes, onWrite, hide } = props;
     const classes = useStyles();
     // Genomic data
     const referenceGenomes = ['hg38'];
@@ -171,6 +185,10 @@ function GenomicsGroup(props) {
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
+
+    if (hide) {
+        return <></>;
+    }
 
     const HandleChange = (value, changer, toChange) => {
         changer(value);
@@ -275,6 +293,9 @@ function Sidebar(props) {
     chromosomes.push('');
     genes?.push('');
 
+    const hideGenomic = selectedtab !== 'All' && selectedtab !== 'Genomic';
+    const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
+
     const remap = (url, returnName) =>
         fetchFederation(url, 'katsu').then(
             (data) => data?.map((loc) => loc?.results?.results?.map((result) => result[returnName]) || []) || []
@@ -282,7 +303,7 @@ function Sidebar(props) {
 
     return (
         <>
-            <Tabs value={selectedtab} onChange={setSelectedTab}>
+            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
@@ -293,8 +314,8 @@ function Sidebar(props) {
             <SidebarGroup name="Cohort">
                 <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" />
             </SidebarGroup>
-            <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} />
-            <SidebarGroup name="Treatment">
+            <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
+            <SidebarGroup name="Treatment" hide={hideClinical}>
                 <StyledCheckboxList
                     options={treatmentTypes}
                     onWrite={writerContext}
@@ -302,17 +323,19 @@ function Sidebar(props) {
                     remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
                     isDonorList
                     useAutoComplete={treatmentTypes.length >= 10}
+                    hide={hideClinical}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Site">
+            <SidebarGroup name="Tumour Primary Site" hide={hideClinical}>
                 <StyledCheckboxList
                     options={tumourPrimarySites}
                     onWrite={writerContext}
                     groupName="primary_site"
                     useAutoComplete={tumourPrimarySites.length >= 10}
+                    hide={hideClinical}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Chemotherapy">
+            <SidebarGroup name="Chemotherapy" hide={hideClinical}>
                 <StyledCheckboxList
                     options={chemotherapyDrugNames}
                     onWrite={writerContext}
@@ -320,9 +343,10 @@ function Sidebar(props) {
                     remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
                     useAutoComplete={chemotherapyDrugNames.length >= 10}
+                    hide={hideClinical}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Immunotherapy">
+            <SidebarGroup name="Immunotherapy" hide={hideClinical}>
                 <StyledCheckboxList
                     options={immunotherapyDrugNames}
                     onWrite={writerContext}
@@ -330,9 +354,10 @@ function Sidebar(props) {
                     remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
                     useAutoComplete={immunotherapyDrugNames.length >= 10}
+                    hide={hideClinical}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Hormone Therapy">
+            <SidebarGroup name="Hormone Therapy" hide={hideClinical}>
                 <StyledCheckboxList
                     options={hormoneTherapyDrugNames}
                     onWrite={writerContext}
@@ -340,6 +365,7 @@ function Sidebar(props) {
                     remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_donor_id')}
                     isDonorList
                     useAutoComplete={hormoneTherapyDrugNames.length >= 10}
+                    hide={hideClinical}
                 />
             </SidebarGroup>
         </>
