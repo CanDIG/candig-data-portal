@@ -172,6 +172,8 @@ function DataVisualization(props) {
                     onRemoveChart={() => removeChart(index)}
                     edit={edit}
                     grayscale={completenessData.includes(item)}
+                    orderByFrequency={item !== 'diagnosis_age_count'}
+                    orderAlphabetically={item === 'diagnosis_age_count'}
                 />
             </Grid>
         ));
