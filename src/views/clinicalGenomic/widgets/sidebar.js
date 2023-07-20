@@ -1,6 +1,17 @@
 import { useState } from 'react';
 
-import { Checkbox, FormControl, FormControlLabel, FormLabel, FormGroup, Tab, Tabs, Autocomplete, TextField } from '@mui/material';
+import {
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    FormGroup,
+    Tab,
+    Tabs,
+    Autocomplete,
+    TextField,
+    Typography
+} from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { makeStyles, useTheme } from '@mui/styles';
@@ -213,6 +224,7 @@ function GenomicsGroup(props) {
                 </RadioGroup>
             </SidebarGroup> */}
             <SidebarGroup name="Gene Search">
+                {selectedChromosomes && <Typography>Gene search is disabled while you are searching by position.</Typography>}
                 <Autocomplete
                     size="small"
                     options={genes || []}
@@ -223,18 +235,17 @@ function GenomicsGroup(props) {
                     disabled={!!selectedChromosomes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Chromosome">
+            <SidebarGroup name="Position">
+                {selectedGenes && <Typography>Searching by position is disabled while you are searching by gene.</Typography>}
                 <Autocomplete
                     size="small"
                     options={chromosomes || []}
                     onChange={(_, value) => HandleChange(value, setSelectedChromosomes, 'referenceName')}
-                    renderInput={(params) => <TextField {...params} />}
+                    renderInput={(params) => <TextField label="Chromosome" {...params} />}
                     value={selectedChromosomes}
-                    style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+                    style={{ paddingTop: '0.5em', paddingBottom: '1em' }}
                     disabled={!!selectedGenes}
                 />
-            </SidebarGroup>
-            <SidebarGroup name="Position">
                 <TextField
                     sx={{ paddingBottom: '1em' }}
                     size="small"
