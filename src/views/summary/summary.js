@@ -107,7 +107,7 @@ function Summary() {
 
         // Set Site Count/Provinces
         if (data) {
-            setProvinceCount(new Set(data.map((loc) => loc.location.province))?.length);
+            setProvinceCount(new Set(data.map((loc) => loc.location.province)).size);
         }
 
         // Count Node Status
