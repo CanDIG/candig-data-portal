@@ -209,7 +209,7 @@ function PatientView(props) {
     }, [JSON.stringify(patient)]);
 
     const noResultsMessage = !patient ? (
-        'Please select a patient to see results'
+        'Please select a patient from the above table'
     ) : (
         <>
             No results for <span>{search}</span> were found in this patient.
@@ -231,8 +231,11 @@ function PatientView(props) {
                     onChange={(event) => {
                         handleSearch(event.target.value);
                     }}
+                    disabled={!patient}
                 />
-                <Button onClick={handleExpandAll}>{expanded.length <= 1 ? 'Expand all' : 'Collapse all'}</Button>
+                <Button disabled={!patient} onClick={handleExpandAll}>
+                    {expanded.length <= 1 ? 'Expand all' : 'Collapse all'}
+                </Button>
             </Box>
             {prunedPatient ? (
                 <TreeView

@@ -38,7 +38,8 @@ const useStyles = makeStyles((theme) => ({
     anchor: {
         display: 'block',
         position: 'relative',
-        visibility: 'hidden'
+        visibility: 'hidden',
+        top: -150
     },
     navigationLink: {
         float: 'right',
