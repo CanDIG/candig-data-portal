@@ -224,7 +224,7 @@ function GenomicsGroup(props) {
                 </RadioGroup>
             </SidebarGroup> */}
             <SidebarGroup name="Gene Search">
-                {selectedChromosomes && <Typography>Gene search is disabled while you are searching by position.</Typography>}
+                {selectedChromosomes && <Typography sx={{ paddingTop: '1em' }}>(Disabled during position search)</Typography>}
                 <Autocomplete
                     size="small"
                     options={genes || []}
@@ -236,7 +236,7 @@ function GenomicsGroup(props) {
                 />
             </SidebarGroup>
             <SidebarGroup name="Position">
-                {selectedGenes && <Typography>Searching by position is disabled while you are searching by gene.</Typography>}
+                {selectedGenes && <Typography>(Disabled during gene search)</Typography>}
                 <Autocomplete
                     size="small"
                     options={chromosomes || []}
