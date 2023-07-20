@@ -60,6 +60,11 @@ function Summary() {
             data?.forEach((stat) => {
                 // Federation aggregate count of stats
                 count += 1;
+                if (!stat.results) {
+                    // Something went wrong
+                    return;
+                }
+
                 switch (endpoint) {
                     case '/individual_count':
                         setIndividualCount(aggregateObj(stat.results, individualCount));
