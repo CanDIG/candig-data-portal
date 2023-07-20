@@ -61,7 +61,11 @@ function SidebarGroup(props) {
                 </FormLabel>
             )}
             <FormGroup
-                sx={{ paddingLeft: '1em', paddingRight: '1em', ...(name === 'Position' && { paddingTop: '0.5em', paddingBottom: '0.5em' }) }}
+                sx={{
+                    paddingLeft: '1em',
+                    paddingRight: '1em',
+                    ...(name === 'Position' && { paddingTop: '0.5em', paddingBottom: '0.5em' })
+                }}
             >
                 {children}
             </FormGroup>
