@@ -155,9 +155,10 @@ function SearchHandler() {
                     const donorToDOB = {};
                     data.forEach((loc) => {
                         discoveryCounts.patients_per_cohort[loc.location.name] = {};
+                        donorToDOB[loc.location.name] = {};
                         loc?.results?.results?.forEach((donor) => {
                             if (donor.date_of_birth) {
-                                donorToDOB[donor.submitter_donor_id] = donor.date_of_birth;
+                                donorToDOB[loc.location.name][donor.submitter_donor_id] = donor.date_of_birth;
                             }
                             donor.primary_site.forEach((site) => addOrReplace(discoveryCounts.cancer_type_count, site));
                             addOrReplace(discoveryCounts.patients_per_cohort[loc.location.name], donor.program_id);
@@ -169,7 +170,7 @@ function SearchHandler() {
                         .then((treatments) => {
                             treatments.forEach((loc) => {
                                 loc?.results?.results?.forEach((treatment) => {
-                                    if (treatment.submitter_donor_id in donorToDOB) {
+                                    if (treatment.submitter_donor_id in donorToDOB[loc.location.name]) {
                                         treatment.treatment_type.forEach((treatmentType) => {
                                             addOrReplace(discoveryCounts.treatment_type_count, treatmentType);
                                         });
@@ -181,10 +182,10 @@ function SearchHandler() {
                         .then((diagnoses) => {
                             diagnoses.forEach((loc) => {
                                 loc?.results?.results?.forEach((diagnosis) => {
-                                    if (diagnosis.submitter_donor_id in donorToDOB && diagnosis.date_of_diagnosis) {
+                                    if (diagnosis.submitter_donor_id in donorToDOB[loc.location.name] && diagnosis.date_of_diagnosis) {
                                         // Convert this to an age range
                                         const diagDate = diagnosis.date_of_diagnosis.split('-');
-                                        const birthDate = donorToDOB[diagnosis.submitter_donor_id].split('-');
+                                        const birthDate = donorToDOB[loc.location.name][diagnosis.submitter_donor_id].split('-');
                                         let ageAtDiagnosis = diagDate[0] - birthDate[0] + (diagDate[1] >= birthDate[1] ? 1 : 0);
                                         ageAtDiagnosis -= ageAtDiagnosis % 10;
 
@@ -197,7 +198,7 @@ function SearchHandler() {
                                         }
                                         addOrReplace(discoveryCounts.diagnosis_age_count, ageAtDiagnosis);
 
-                                        delete donorToDOB[diagnosis.submitter_donor_id];
+                                        delete donorToDOB[loc.location.name][diagnosis.submitter_donor_id];
                                     }
                                 });
                             });
