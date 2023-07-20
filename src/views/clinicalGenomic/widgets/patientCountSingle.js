@@ -75,7 +75,16 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item className={classes.button} pr={-2}>
                     {numCohorts > 1 ? (
-                        <Button onClick={(_) => setExpanded((old) => !old)} variant="contained" sx={{ borderRadius: 100, border: 'solid 1px' + theme.palette.primary.main, backgroundColor: 'white', color: theme.palette.primary.main }}>
+                        <Button
+                            onClick={(_) => setExpanded((old) => !old)}
+                            variant="contained"
+                            sx={{
+                                borderRadius: 100,
+                                border: `solid 1px ${theme.palette.primary.main}`,
+                                backgroundColor: 'white',
+                                color: theme.palette.primary.main
+                            }}
+                        >
                             {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
                         </Button>
                     ) : (
