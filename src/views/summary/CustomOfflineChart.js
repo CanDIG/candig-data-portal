@@ -394,7 +394,7 @@ function CustomOfflineChart(props) {
 }
 
 CustomOfflineChart.propTypes = {
-    dropDown: PropTypes.bool.isRequired,
+    dropDown: PropTypes.bool,
     height: PropTypes.string,
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
