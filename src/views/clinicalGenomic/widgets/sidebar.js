@@ -74,7 +74,7 @@ function SidebarGroup(props) {
 }
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, isFilterList, remap, onWrite, options, useAutoComplete, hide, defaultChecked } = props;
+    const { groupName, isDonorList, isFilterList, remap, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
@@ -84,7 +84,7 @@ function StyledCheckboxList(props) {
     }
 
     // Check all of our options by default
-    if (!initialized && defaultChecked && options.length) {
+    if (!initialized && isFilterList && options.length) {
         const optionsObject = {};
         options.forEach((option) => {
             optionsObject[option] = true;
@@ -122,7 +122,8 @@ function StyledCheckboxList(props) {
                             retVal.donorLists[groupName][option] = ids;
                         }
                     } else if (isFilterList) {
-                        retVal.filter[groupName] = ids;
+                        // Filter lists operate differently: you _remove_ the option when you check it
+                        retVal.filter[groupName].splice(retVal.filter[groupName].indexOf(option));
                     } else {
                         retVal.query[groupName] = ids;
                     }
@@ -135,7 +136,15 @@ function StyledCheckboxList(props) {
                     return rest;
                 });
                 onWrite((old) => {
-                    const retVal = { ...old };
+                    const retVal = { filter: {}, ...old };
+                    if (isFilterList) {
+                        if (groupName in retVal.filter) {
+                            retVal.filter[groupName].push(ids);
+                        } else {
+                            retVal.filter[groupName] = [ids];
+                        }
+                        return retVal;
+                    }
                     if (!isDonorList) {
                         const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
                         retVal.query = newList;
@@ -341,10 +350,10 @@ function Sidebar(props) {
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
             </Tabs>
             <SidebarGroup name="Node">
-                <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" defaultChecked />
+                <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" isFilterList />
             </SidebarGroup>
             <SidebarGroup name="Cohort">
-                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" defaultChecked />
+                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" isFilterList />
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
             <SidebarGroup name="Treatment" hide={hideClinical}>

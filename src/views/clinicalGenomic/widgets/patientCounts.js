@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 
 import { Box, Grid, Typography } from '@mui/material';
 
-import { useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
 
 const useStyles = makeStyles((theme) => ({
@@ -19,6 +19,7 @@ function PatientCounts(props) {
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
     const searchResults = context?.clinical;
+    const filters = useSearchQueryReaderContext()?.filter;
     const programs = context?.programs;
 
     // Generate the map of site->cohort->numbers
@@ -29,15 +30,24 @@ function PatientCounts(props) {
             // Find this site within our search results
             const counts = {};
             if (searchResults && entry.location.name in searchResults) {
-                const match = searchResults[entry.location.name];
-                // Iterate through each donor in this site
-                match.forEach((donor) => {
-                    if (donor.program_id in counts) {
-                        counts[donor.program_id] += 1;
-                    } else {
-                        counts[donor.program_id] = 1;
-                    }
-                });
+                // Has this node been excluded from the results?
+                console.log(filters);
+                if (!(filters && filters?.node?.includes(entry.location.name))) {
+                    const match = searchResults[entry.location.name];
+                    // Iterate through each donor in this site
+                    match.forEach((donor) => {
+                        if (filters && filters?.program_id?.includes(donor.program_id)) {
+                            // Exclude based on cohort
+                            return;
+                        }
+
+                        if (donor.program_id in counts) {
+                            counts[donor.program_id] += 1;
+                        } else {
+                            counts[donor.program_id] = 1;
+                        }
+                    });
+                }
             }
 
             let unlockedPrograms = [];

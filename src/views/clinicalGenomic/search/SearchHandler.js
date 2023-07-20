@@ -159,9 +159,19 @@ function SearchHandler() {
                     // Go through the donors we have, fill out our data visualization counts
                     const donorToDOB = {};
                     Object.keys(data).forEach((locName) => {
+                        if (reader.filter?.node?.includes(locName)) {
+                            // Don't process filtered-out nodes
+                            return;
+                        }
+
                         discoveryCounts.patients_per_cohort[locName] = {};
                         donorToDOB[locName] = {};
                         data[locName].forEach((donor) => {
+                            if (reader.filter?.program_id?.includes(donor.program_id)) {
+                                // Don't process filtered-out programs
+                                return;
+                            }
+
                             if (donor.date_of_birth) {
                                 donorToDOB[locName][donor.submitter_donor_id] = donor.date_of_birth;
                             }
@@ -178,6 +188,11 @@ function SearchHandler() {
                     )
                         .then((treatments) => {
                             Object.keys(treatments).forEach((locName) => {
+                                if (reader.filter?.node?.includes(locName)) {
+                                    // Don't process filtered-out nodes
+                                    return;
+                                }
+
                                 treatments[locName]?.forEach(([donorID, treatmentTypes]) => {
                                     if (donorID in donorToDOB[locName]) {
                                         treatmentTypes.forEach((treatmentType) => {
@@ -190,13 +205,23 @@ function SearchHandler() {
                         .then(() =>
                             ConsumeAllPages(
                                 'v2/authorized/primary_diagnoses/?page_size=100',
-                                (diagnosis) => [diagnosis.submitter_donor_id, diagnosis.date_of_diagnosis],
+                                (diagnosis) => [diagnosis.submitter_donor_id, diagnosis.date_of_diagnosis, diagnosis.program_id],
                                 'katsu'
                             )
                         )
                         .then((diagnoses) => {
                             Object.keys(diagnoses).forEach((locName) => {
-                                diagnoses[locName]?.forEach(([donorID, dateOfDiagnosis]) => {
+                                if (reader.filter?.node?.includes(locName)) {
+                                    // Don't process filtered-out nodes
+                                    return;
+                                }
+
+                                diagnoses[locName]?.forEach(([donorID, dateOfDiagnosis, programID]) => {
+                                    if (reader.filter?.program_id?.includes(programID)) {
+                                        // Don't process filtered-out programs
+                                        return;
+                                    }
+
                                     if (donorID in donorToDOB[locName] && dateOfDiagnosis) {
                                         // Convert this to an age range
                                         const diagDate = dateOfDiagnosis.split('-');
@@ -235,6 +260,11 @@ function SearchHandler() {
                     // First, we need to parse out all of the specimens that exist inside of our finalList (if any)
                     const specimenToDonor = {};
                     Object.keys(data).forEach((locName) => {
+                        if (reader.filter?.node?.includes(locName)) {
+                            // Don't process filtered-out nodes
+                            return;
+                        }
+
                         specimenToDonor[locName] = {};
                         data[locName]?.forEach(([specimenID, donorID]) => {
                             if (!finalList || finalList.includes(donorID)) {
@@ -294,7 +324,7 @@ function SearchHandler() {
         } else {
             lastPromise.then(donorQueryPromise);
         }
-    }, [JSON.stringify(reader.query), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic)]);
+    }, [JSON.stringify(reader.query), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic), JSON.stringify(reader.filter)]);
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
