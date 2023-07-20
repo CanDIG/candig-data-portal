@@ -27,10 +27,10 @@ function DataVisualization(props) {
     // Plan for context below see current dataVis for expected shape
     // const dataVis = resultsContext || {};
     const dataVis = {
+        patients_per_cohort: resultsContext?.patients_per_cohort || {},
         diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
         treatment_type_count: resultsContext?.treatment_type_count || {},
         cancer_type_count: resultsContext?.cancer_type_count || {},
-        patients_per_cohort: resultsContext?.patients_per_cohort || {},
         full_clinical_data: {
             BCGSC: {
                 POG: 30
@@ -78,6 +78,9 @@ function DataVisualization(props) {
     const [dataVisChartType, setDataVisChartType] = useState(
         Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
     );
+    const [dataVisTrim, setDataVisTrim] = useState(
+        Cookies.get('dataVisTrim') ? JSON.parse(Cookies.get('dataVisTrim')) : [false, false, false, false]
+    );
 
     // Intial cookie setting if there are none
     useEffect(() => {
@@ -85,6 +88,7 @@ function DataVisualization(props) {
             const charts = topKeys.map(() => 'bar');
             Cookies.set('dataVisChartType', JSON.stringify(charts), { expires: 365 });
             Cookies.set('dataVisData', JSON.stringify(topKeys), { expires: 365 });
+            Cookies.set('dataVisTrim', JSON.stringify([false, false, false, false]), { expires: 365 });
         }
     }, []);
 
@@ -95,20 +99,26 @@ function DataVisualization(props) {
     function removeChart(index) {
         const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
         const newdataVisData = dataVisData.slice(0, index).concat(dataVisData.slice(index + 1));
+        const newDataVisTrim = dataVisTrim.slice(0, index).concat(dataVisTrim.slice(index + 1));
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
+        setDataVisTrim(newDataVisTrim);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
         Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
     }
 
     function AddChart(data, chartType) {
         setOpen(false);
         const newdataVisData = [...dataVisData, data];
         const newDataVisChartType = [...dataVisChartType, validStackedCharts.includes(data) ? 'bar' : chartType];
+        const newDataVisTrim = [...dataVisTrim, false];
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
+        setDataVisTrim(newDataVisTrim);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
         Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
     }
     /* eslint-disable jsx-a11y/no-onchange */
     function returnChartDialog() {
@@ -174,6 +184,7 @@ function DataVisualization(props) {
                     grayscale={completenessData.includes(item)}
                     orderByFrequency={item !== 'diagnosis_age_count'}
                     orderAlphabetically={item === 'diagnosis_age_count'}
+                    trimByDefault={dataVisTrim[index]}
                 />
             </Grid>
         ));

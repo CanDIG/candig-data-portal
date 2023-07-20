@@ -45,7 +45,8 @@ function CustomOfflineChart(props) {
         orderByFrequency,
         orderAlphabetically,
         cutoff,
-        grayscale
+        grayscale,
+        trimByDefault
     } = props;
     const theme = useTheme();
 
@@ -53,6 +54,7 @@ function CustomOfflineChart(props) {
     const events = useSelector((state) => state);
     const [chart, setChart] = useState(chartType);
     const [chartData, setChartData] = useState(data);
+    const [trim, setTrim] = useState(trimByDefault || false);
     const chartRef = createRef();
 
     NoDataToDisplay(Highcharts);
@@ -101,8 +103,8 @@ function CustomOfflineChart(props) {
                     if (orderByFrequency) {
                         categories.sort((a, b) => thisData[b] - thisData[a]);
                     }
-                    if (cutoff) {
-                        categories = categories.slice(0, cutoff);
+                    if (cutoff || trim) {
+                        categories = categories.slice(0, cutoff || 15);
                     }
                 });
 
@@ -161,7 +163,7 @@ function CustomOfflineChart(props) {
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                let entries = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => [
+                let entries = Object.keys((dataObject === '' ? dataVis[chartData] : dataObject) || []).map((key) => [
                     key,
                     dataObject === '' ? dataVis[chartData][key] : dataObject[key]
                 ]);
@@ -173,8 +175,8 @@ function CustomOfflineChart(props) {
                 if (orderAlphabetically) {
                     entries = entries.sort((a, b) => (a[0] > b[0] ? 1 : -1));
                 }
-                if (cutoff) {
-                    entries = entries.slice(0, cutoff);
+                if (cutoff || trim) {
+                    entries = entries.slice(0, cutoff || 15);
                 }
 
                 const categories = entries.map(([key, _]) => key);
@@ -188,10 +190,10 @@ function CustomOfflineChart(props) {
                         type: chart
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title
+                        text: DataVisualizationChartInfo[chartData]?.title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis } },
                     colors: [theme.palette.primary.dark],
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
@@ -253,7 +255,7 @@ function CustomOfflineChart(props) {
         }
 
         createChart();
-    }, [dataVis, chart, chartData, JSON.stringify(dataObject)]);
+    }, [dataVis, chart, chartData, JSON.stringify(dataObject), trim]);
 
     function setCookieDataVisChart(event) {
         // Set cookie for Data Visualization Chart Type
@@ -269,6 +271,13 @@ function CustomOfflineChart(props) {
         Cookies.set('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
     }
 
+    function setCookieDataVisTrim(value) {
+        // Set Cookie for Data Visualization Trim status
+        const dataVisTrim = JSON.parse(Cookies.get('dataVisTrim'));
+        dataVisTrim[index] = value;
+        Cookies.set('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
+    }
+
     /* eslint-disable jsx-a11y/no-onchange */
 
     // Control whether or not this element is currently loading
@@ -281,6 +290,8 @@ function CustomOfflineChart(props) {
             chartObj?.hideLoading();
         }
     }, [loading]);
+
+    const showTrim = (dataObject || dataVis[chartData]) && Object.entries(dataObject === '' ? dataVis[chartData] : dataObject).length > 15;
 
     return (
         <Box sx={{ position: 'relative' }}>
@@ -343,6 +354,20 @@ function CustomOfflineChart(props) {
                                 </select>
                             </label>
                         )}
+                        {showTrim && (
+                            <label htmlFor="trim">
+                                Trim:
+                                <input
+                                    type="checkbox"
+                                    id="trim"
+                                    onChange={() => {
+                                        setCookieDataVisTrim(!trim);
+                                        setTrim((old) => !old);
+                                    }}
+                                    checked={trim}
+                                />
+                            </label>
+                        )}
                         <label htmlFor="types">
                             Data:
                             <select
@@ -377,7 +402,8 @@ CustomOfflineChart.propTypes = {
     grayscale: PropTypes.bool,
     orderByFrequency: PropTypes.bool,
     orderAlphabetically: PropTypes.bool,
-    cutoff: PropTypes.number
+    cutoff: PropTypes.number,
+    trimByDefault: PropTypes.bool
 };
 
 CustomOfflineChart.defaultProps = {
