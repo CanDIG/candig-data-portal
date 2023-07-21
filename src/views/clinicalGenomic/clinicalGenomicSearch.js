@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
         position: 'fixed',
         backgroundColor: 'white',
         zIndex: 1100,
-        top: 110,
-        borderRadius: '12px 12px 0 0'
+        top: 95,
+        borderRadius: '1px 1px 0 0',
+        outline: '20px solid #e3f2fd'
     },
     sidebarOffset: {
         width: 'calc(100% - 320px)',
@@ -114,22 +115,12 @@ function ClinicalGenomicSearch() {
                         </Button>
                     ))}
                 </Toolbar>
-                <div
-                    style={{
-                        backgroundColor: theme.palette.primary.light,
-                        position: 'absolute',
-                        top: -28,
-                        left: -20,
-                        width: '102.5%',
-                        height: '28px',
-                        borderRadius: 12
-                    }}
-                />
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
             <SearchHandler />
-            <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
-                <div className={classes.headerSpacing} />
+            <MainCard
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
+            >
                 <div id="searchbar">
                     {/* Genomic Searchbar */}
                     <VariantsSearch />
