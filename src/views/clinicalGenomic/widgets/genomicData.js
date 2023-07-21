@@ -83,12 +83,12 @@ function GenomicData() {
         { field: 'donorID', headerName: 'Donor ID', minWidth: 150 },
         { field: 'position', headerName: 'Position', minWidth: 200 },
         { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 200 },
-        { field: 'normalId', headerName: 'Tumour Specimen ID', minWidth: 200 },
+        { field: 'submitter_specimen_id', headerName: 'Tumour Specimen ID', minWidth: 200 },
         { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
     ];
 
-    const queryParams = query?.gene || `${query?.chromosome}:${query?.start}-${query?.end}`;
+    const queryParams = query?.gene || `${query?.referenceName}:${query?.start}-${query?.end}`;
     const hasValidQuery = (query?.referenceName && query?.start && query?.end) || query?.gene;
 
     return (
