@@ -319,73 +319,77 @@ function CustomOfflineChart(props) {
             <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
                 <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
                 {dropDown && (
-                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                        {validStackedCharts.includes(chartData) ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <Box sx={{ paddingBottom: '0.5em' }}>
                             <label htmlFor="types">
-                                Chart Types:
+                                Data:
                                 <select
-                                    value="bar"
+                                    value={chartData}
                                     name="types"
                                     id="types"
                                     onChange={(event) => {
-                                        setChart(event.target.value);
-                                        setCookieDataVisChart(event);
+                                        setChartData(event.target.value);
+                                        setCookieDataVisData(event);
                                     }}
                                 >
-                                    <option value="bar">Stacked Bar</option>
+                                    {Object.keys(dataVis).map((key) => (
+                                        <option key={key} value={key}>
+                                            {DataVisualizationChartInfo[key].title}
+                                        </option>
+                                    ))}
                                 </select>
                             </label>
-                        ) : (
-                            <label htmlFor="types">
-                                Chart Types:
-                                <select
-                                    value={chart}
-                                    name="types"
-                                    id="types"
-                                    onChange={(event) => {
-                                        setChart(event.target.value);
-                                        setCookieDataVisChart(event);
-                                    }}
-                                >
-                                    <option value="bar">Bar</option>
-                                    <option value="line">Line</option>
-                                    <option value="column">Column</option>
-                                    <option value="scatter">Scatter</option>
-                                </select>
-                            </label>
-                        )}
-                        {showTrim && (
-                            <label htmlFor="trim">
-                                Trim:
-                                <input
-                                    type="checkbox"
-                                    id="trim"
-                                    onChange={() => {
-                                        setCookieDataVisTrim(!trim);
-                                        setTrim((old) => !old);
-                                    }}
-                                    checked={trim}
-                                />
-                            </label>
-                        )}
-                        <label htmlFor="types">
-                            Data:
-                            <select
-                                value={chartData}
-                                name="types"
-                                id="types"
-                                onChange={(event) => {
-                                    setChartData(event.target.value);
-                                    setCookieDataVisData(event);
-                                }}
-                            >
-                                {Object.keys(dataVis).map((key) => (
-                                    <option key={key} value={key}>
-                                        {DataVisualizationChartInfo[key].title}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
+                        </Box>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            {validStackedCharts.includes(chartData) ? (
+                                <label htmlFor="types">
+                                    Chart Types:
+                                    <select
+                                        value="bar"
+                                        name="types"
+                                        id="types"
+                                        onChange={(event) => {
+                                            setChart(event.target.value);
+                                            setCookieDataVisChart(event);
+                                        }}
+                                    >
+                                        <option value="bar">Stacked Bar</option>
+                                    </select>
+                                </label>
+                            ) : (
+                                <label htmlFor="types">
+                                    Chart Types:
+                                    <select
+                                        value={chart}
+                                        name="types"
+                                        id="types"
+                                        onChange={(event) => {
+                                            setChart(event.target.value);
+                                            setCookieDataVisChart(event);
+                                        }}
+                                    >
+                                        <option value="bar">Bar</option>
+                                        <option value="line">Line</option>
+                                        <option value="column">Column</option>
+                                        <option value="scatter">Scatter</option>
+                                    </select>
+                                </label>
+                            )}
+                            {showTrim && (
+                                <label htmlFor="trim">
+                                    Trim:
+                                    <input
+                                        type="checkbox"
+                                        id="trim"
+                                        onChange={() => {
+                                            setCookieDataVisTrim(!trim);
+                                            setTrim((old) => !old);
+                                        }}
+                                        checked={trim}
+                                    />
+                                </label>
+                            )}
+                        </Box>
                     </Box>
                 )}
             </MainCard>
