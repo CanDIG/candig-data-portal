@@ -76,17 +76,17 @@ function PatientCounts(props) {
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" align="center" className={classes.header}>
+                            Total Cohorts
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Typography variant="h5" align="center" className={classes.header}>
                             Total Patients
                         </Typography>
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" align="center" className={classes.header}>
                             Patients In Search
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={2}>
-                        <Typography variant="h5" align="center" className={classes.header}>
-                            Cohorts
                         </Typography>
                     </Grid>
                     <Grid item xs={1} ml="auto" className={classes.button}>

@@ -57,6 +57,12 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
+                        {numCohorts}
+                    </Typography>
+                </Grid>
+                <Divider flexItem orientation="vertical" className={classes.divider} />
+                <Grid item xs={2}>
+                    <Typography align="center" className={classes.patientEntry}>
                         {totalPatients}
                     </Typography>
                 </Grid>
@@ -64,12 +70,6 @@ function PatientCountSingle(props) {
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
                         {patientsInSearch}
-                    </Typography>
-                </Grid>
-                <Divider flexItem orientation="vertical" className={classes.divider} />
-                <Grid item xs={2}>
-                    <Typography align="center" className={classes.patientEntry}>
-                        {numCohorts}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
