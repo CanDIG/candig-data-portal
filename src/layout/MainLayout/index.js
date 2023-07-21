@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
     },
     appBarWidth: {
         transition: theme.transitions.create('width'),
-        backgroundColor: theme.palette.background.default
+        backgroundColor: theme.palette.background.default,
+        height: 100
     },
     content: {
         ...theme.typography.mainContent,
