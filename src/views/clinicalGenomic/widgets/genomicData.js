@@ -82,7 +82,7 @@ function GenomicData() {
         { field: 'location', headerName: 'Node', minWidth: 150 },
         { field: 'donorID', headerName: 'Donor ID', minWidth: 150 },
         { field: 'position', headerName: 'Position', minWidth: 200 },
-        { field: 'biosampleId', headerName: 'Normal Specimen ID', minWidth: 200 },
+        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200 },
         { field: 'submitter_specimen_id', headerName: 'Tumour Specimen ID', minWidth: 200 },
         { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }

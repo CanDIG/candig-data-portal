@@ -252,14 +252,15 @@ function SearchHandler() {
                     // Grab the specimens from the backend
                     () =>
                         ConsumeAllPages(
-                            'v2/authorized/specimens/?page_size=100',
-                            (specimen) => [specimen.submitter_specimen_id, specimen.submitter_donor_id],
+                            'v2/authorized/sample_registrations/?page_size=100',
+                            (sample) => [sample.submitter_sample_id, sample.submitter_donor_id, sample.tumour_normal_designation],
                             'katsu'
                         )
                 )
                 .then((data) => {
-                    // First, we need to parse out all of the specimens that exist inside of our finalList (if any)
+                    // First, we need to parse out all of the samples that exist inside of our finalList (if any)
                     const specimenToDonor = {};
+                    const specimenType = {};
                     Object.keys(data).forEach((locName) => {
                         if (reader.filter?.node?.includes(locName)) {
                             // Don't process filtered-out nodes
@@ -267,10 +268,10 @@ function SearchHandler() {
                         }
 
                         specimenToDonor[locName] = {};
-                        data[locName]?.forEach(([specimenID, donorID]) => {
-                            if (!finalList || finalList.includes(donorID)) {
-                                specimenToDonor[locName][specimenID] = donorID;
-                            }
+                        specimenType[locName] = {};
+                        data[locName]?.forEach(([sampleID, donorID, tumourNormalDesignation]) => {
+                            specimenToDonor[locName][sampleID] = donorID;
+                            specimenType[locName][sampleID] = tumourNormalDesignation;
                         });
                     });
 
@@ -300,19 +301,26 @@ function SearchHandler() {
                                                 .map((caseData) => {
                                                     // We need to map before filtering because we need to parse out the program & donor ID
                                                     const id = caseData.biosampleId.split('~');
-                                                    caseData.program_id = id[0];
-                                                    caseData.submitter_specimen_id = id[1];
+                                                    if (id.length > 1) {
+                                                        caseData.program_id = id[0];
+                                                        caseData.submitter_specimen_id = id[1];
+                                                        caseData.donorID =
+                                                            specimenToDonor[loc.location.name]?.[caseData.submitter_specimen_id];
+                                                        caseData.tumour_normal_designation =
+                                                            specimenType[loc.location.name]?.[caseData.submitter_specimen_id];
+                                                    } else {
+                                                        caseData.submitter_specimen_id = caseData.biosampleId;
+                                                    }
 
                                                     caseData.beaconHandover = handovers[0];
                                                     caseData.location = loc.location;
                                                     caseData.position = response.variation.location.interval.start.value;
-                                                    caseData.donorID = specimenToDonor[loc.location.name]?.[caseData.submitter_specimen_id];
                                                     console.log(caseData);
                                                     return caseData;
                                                 })
                                                 .filter((caseData) => {
-                                                    if (reader.query && Object.keys(reader.query).length > 0) {
-                                                        return caseData.submitter_specimen_id in specimenToDonor[loc.location.name];
+                                                    if (reader.query && Object.keys(reader.query).length > 0 && caseData.donorID) {
+                                                        return finalList.includes(caseData.donorID);
                                                     }
                                                     return true;
                                                 })
