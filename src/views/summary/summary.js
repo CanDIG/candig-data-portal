@@ -69,7 +69,10 @@ function Summary() {
                     case '/individual_count':
                         setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
-                            candigDataSouceCollection[stat.location['province-code']] = stat.results.individual_count;
+                            if (!(stat.location['province-code'] in candigDataSouceCollection)) {
+                                candigDataSouceCollection[stat.location['province-code']] = 0;
+                            }
+                            candigDataSouceCollection[stat.location['province-code']] += stat.results.individual_count;
 
                             if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
