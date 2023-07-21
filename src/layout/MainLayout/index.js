@@ -43,18 +43,15 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen
         }),
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: -(drawerWidth - 20),
         [theme.breakpoints.up('md')]: {
-            marginLeft: -(drawerWidth - 20),
-            width: `calc(100% - ${drawerWidth}px)`
         },
         [theme.breakpoints.down('lg')]: {
-            marginLeft: '20px',
-            width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px'
         },
         [theme.breakpoints.down('md')]: {
             marginLeft: '10px',
-            width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px',
             marginRight: '10px'
         }
@@ -95,6 +92,8 @@ const MainLayout = () => {
         dispatch({ type: SET_MENU, opened: !matchDownMd });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd]);
+
+    console.log(leftDrawerOpened);
 
     return (
         <div className={classes.root}>
