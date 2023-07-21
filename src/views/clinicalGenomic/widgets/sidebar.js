@@ -213,7 +213,7 @@ function GenomicsGroup(props) {
     const classes = useStyles();
     // Genomic data
     const referenceGenomes = ['hg38'];
-    const [selectedGenome, setSelectedGenome] = useState('hg37');
+    const [selectedGenome, setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
