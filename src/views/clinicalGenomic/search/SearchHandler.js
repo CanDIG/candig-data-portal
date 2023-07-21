@@ -70,7 +70,6 @@ function SearchHandler() {
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
         const searchParams = new URLSearchParams();
-        console.log(reader.genomic);
         /*
         // Parse out search parameters according to what they are:
         if (reader.query) {
@@ -288,7 +287,6 @@ function SearchHandler() {
                         );
                     }
 
-                    htsgetPromise = searchVariant('21', '5030000', '5030847', reader.genomic?.assemblyId);
                     if (htsgetPromise) {
                         htsgetPromise.then((htsgetData) => {
                             // Parse out the response from Beacon
@@ -315,7 +313,6 @@ function SearchHandler() {
                                                     caseData.beaconHandover = handovers[0];
                                                     caseData.location = loc.location;
                                                     caseData.position = response.variation.location.interval.start.value;
-                                                    console.log(caseData);
                                                     return caseData;
                                                 })
                                                 .filter((caseData) => {
