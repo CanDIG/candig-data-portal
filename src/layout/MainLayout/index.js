@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
     },
     appBarWidth: {
         transition: theme.transitions.create('width'),
-        backgroundColor: theme.palette.background.default
+        backgroundColor: theme.palette.background.default,
+        height: 100
     },
     content: {
         ...theme.typography.mainContent,
@@ -42,18 +43,13 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen
         }),
-        [theme.breakpoints.up('md')]: {
-            marginLeft: -(drawerWidth - 20),
-            width: `calc(100% - ${drawerWidth}px)`
-        },
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: -(drawerWidth - 20),
         [theme.breakpoints.down('lg')]: {
-            marginLeft: '20px',
-            width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px'
         },
         [theme.breakpoints.down('md')]: {
             marginLeft: '10px',
-            width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px',
             marginRight: '10px'
         }
@@ -83,20 +79,23 @@ const MainLayout = () => {
     const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 
     // Handle left drawer
-    const leftDrawerOpened = useSelector((state) => state.customization.opened);
+    const [sidebarContent, setSidebarContent] = useState(false);
+    const leftDrawerOpened = useSelector((state) => state.customization.opened) && !!sidebarContent;
     const dispatch = useDispatch();
     const handleLeftDrawerToggle = () => {
         dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         dispatch({ type: SET_MENU, opened: !matchDownMd });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd]);
 
+    console.log(leftDrawerOpened);
+
     return (
         <div className={classes.root}>
-            <SidebarProvider>
+            <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
                 <AppBar
@@ -112,9 +111,7 @@ const MainLayout = () => {
                 </AppBar>
 
                 {/* drawer */}
-                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle}>
-                    <div>Test</div>
-                </Sidebar>
+                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
                 {/* main content */}
                 <main

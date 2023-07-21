@@ -1,20 +1,14 @@
 import * as React from 'react';
 
-// npm installs
-import ReactJson from 'react-json-view';
-import cancerTypeCSV from '../../../assets/data_files/cancer_histological_codes_labels.csv';
-import papa from 'papaparse';
-
 // mui
 import { useTheme, makeStyles } from '@mui/styles';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Typography } from '@mui/material';
 
 // REDUX
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
-import { useSearchResultsReaderContext, useSearchResultsWriterContext } from '../SearchResultsContext';
+import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Styles
 const useStyles = makeStyles({
@@ -50,53 +44,30 @@ const useStyles = makeStyles({
 
 function ClinicalView() {
     const theme = useTheme();
-    const classes = useStyles();
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [pageNum, setPageNum] = React.useState(true);
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResults = useSearchResultsReaderContext().clinical;
-    const writerContext = useSearchResultsWriterContext();
+    const writerContext = useSearchQueryWriterContext();
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
     if (searchResults) {
-        rows = searchResults
-            .map((site) => site.results?.results)
-            .filter((entry) => entry !== undefined)
-            .flat(1)
-            .map((patient, index) => {
-                // Make sure each row has an ID and a deceased status
-                patient.id = index;
-                patient.deceased = !!patient.date_of_death;
+        rows =
+            Object.values(searchResults)
+                ?.flat(1)
+                ?.map((patient, index) => {
+                    // Make sure each row has an ID and a deceased status
+                    patient.id = index;
+                    patient.deceased = !!patient.date_of_death;
 
-                return patient;
-            });
+                    return patient;
+                }) || [];
     }
 
-    const jsonTheme = {
-        base00: 'white',
-        base01: '#ddd',
-        base02: '#ddd',
-        base03: 'black',
-        base04: '#0E3E17',
-        base05: 'black',
-        base06: 'black',
-        base07: '#252525',
-        base08: '#252525',
-        base09: '#00418A',
-        base0A: '#00418A',
-        base0B: '#00418A',
-        base0C: '#00418A',
-        base0D: '#00418A',
-        base0E: '#00418A',
-        base0F: '#00418A'
-    };
-
     const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, selectedPatient: row }));
+        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
     };
 
     // Tracks Screensize
@@ -106,25 +77,29 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', width: 110 },
-        { field: 'sex_at_birth', headerName: 'Sex At Birth', width: 85 },
-        { field: 'deceased', headerName: 'Deceased', width: 85 },
-        { field: 'date_of_birth', headerName: 'Date of Birth', width: 100 },
-        { field: 'date_of_death', headerName: 'Date of Death', width: 110 }
+        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220 },
+        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170 },
+        { field: 'deceased', headerName: 'Deceased', minWidth: 170 },
+        { field: 'date_of_birth', headerName: 'Date of Birth', minWidth: 200 },
+        { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220 }
     ];
 
     return (
-        <MainCard title="mCode Data">
-            <div style={{ height: 300, width: '100%' }}>
+        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+            <Typography pb={1} variant="h4">
+                Clinical Data
+            </Typography>
+            <div style={{ height: 510, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pageSize={7}
-                    rowsPerPageOptions={[7]}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
+                    hideFooterSelectedRowCount
                 />
             </div>
-        </MainCard>
+        </Box>
     );
 }
 

@@ -25,12 +25,12 @@ function Summary() {
     const [isLoading, setLoading] = useState(true);
 
     const [provinceCounter, setProvinceCount] = useState(0);
-    const [individualCount, setIndividualCount] = useState({});
-    const [cancerTypeCount, setCancerTypeCount] = useState({});
-    const [treatmentTypeCount, setTreatmentTypeCount] = useState({});
-    const [cohortCount, setCohortCount] = useState({});
-    const [patientsPerCohort, setPatientsPerCohort] = useState({});
-    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState({});
+    const [individualCount, setIndividualCount] = useState(undefined);
+    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
+    const [cohortCount, setCohortCount] = useState(undefined);
+    const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
+    const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
     // const [fullClinicalData, setFullClinicalData] = useState({});
     // const [fullGenomicData, setFullGenomicData] = useState({});
     const [connectionError, setConnectionError] = useState(0);
@@ -43,26 +43,31 @@ function Summary() {
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
     useEffect(() => {
-        sidebarWriter(<></>);
+        sidebarWriter(null);
     }, []);
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
         const candigDataSouceCollection = {};
 
-        if (data) {
+        if (data && Array.isArray(data)) {
             // Fake Server with same URL
             // data[0].location[0] = 'UHN';
             // data[0].location[1] = 'Ontario';
             // data[0].location[2] = 'ca-on';
 
             let count = 0;
-            data.forEach((stat) => {
+            data?.forEach((stat) => {
                 // Federation aggregate count of stats
                 count += 1;
+                if (!stat.results) {
+                    // Something went wrong
+                    return;
+                }
+
                 switch (endpoint) {
                     case '/individual_count':
-                        setIndividualCount(aggregateObj(stat.results, individualCount));
+                        setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
                             candigDataSouceCollection[stat.location['province-code']] = stat.results.individual_count;
 
@@ -73,19 +78,21 @@ function Summary() {
 
                         break;
                     case '/cohort_count':
-                        setCohortCount(aggregateObj(stat.results, cohortCount));
+                        setCohortCount((oldCohortCount) => aggregateObj(stat.results, oldCohortCount));
                         break;
                     case '/patients_per_cohort':
-                        setPatientsPerCohort(aggregateObjStack(stat, patientsPerCohort));
+                        setPatientsPerCohort((oldPatientsPerCohort) =>
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                        );
                         break;
                     case '/cancer_type_count':
-                        setCancerTypeCount(aggregateObj(stat.results, cancerTypeCount));
+                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount(aggregateObj(stat.results, treatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount(aggregateObj(stat.results, diagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);
@@ -100,7 +107,7 @@ function Summary() {
 
         // Set Site Count/Provinces
         if (data) {
-            setProvinceCount(data?.length);
+            setProvinceCount(new Set(data.map((loc) => loc.location.province)).size);
         }
 
         // Count Node Status
@@ -127,7 +134,7 @@ function Summary() {
 
     useEffect(() => {
         function fetchData(endpoint) {
-            fetchFederationStat(endpoint)
+            return fetchFederationStat(endpoint)
                 .then((data) => {
                     federationStatCount(data, endpoint);
                     if (endpoint === '/individual_count') {
@@ -137,28 +144,16 @@ function Summary() {
                 .catch((error) => {
                     // pass
                     console.log('Error fetching data : ', error);
-
-                    setLoading(false);
-                })
-                .finally(() => setLoading(false));
+                });
         }
 
-        fetchData('/individual_count');
-        setTimeout(() => {
-            fetchData('/cancer_type_count');
-        }, 250);
-        setTimeout(() => {
-            fetchData('/cohort_count');
-        }, 3000);
-        setTimeout(() => {
-            fetchData('/patients_per_cohort');
-        }, 3750);
-        setTimeout(() => {
-            fetchData('/treatment_type_count');
-        }, 6500);
-        setTimeout(() => {
-            fetchData('/diagnosis_age_count');
-        }, 9250);
+        fetchData('/individual_count')
+            .then(() => fetchData('/cancer_type_count'))
+            .then(() => fetchData('/cohort_count'))
+            .then(() => fetchData('/patients_per_cohort'))
+            .then(() => fetchData('/treatment_type_count'))
+            .then(() => fetchData('/diagnosis_age_count'))
+            .finally(() => setLoading(false));
     }, []);
 
     return (
@@ -198,7 +193,7 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Number of Patients"
-                    count={individualCount.individual_count}
+                    count={individualCount?.individual_count || 0}
                     primary
                     icon={<Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
@@ -207,7 +202,7 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     title="Cohorts"
-                    count={cohortCount.cohort_count}
+                    count={cohortCount?.cohort_count || 0}
                     icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
@@ -216,90 +211,91 @@ function Summary() {
                 <SmallCountCard
                     isLoading={isLoading}
                     title="Provinces"
-                    count={provinceCounter}
+                    count={provinceCounter || 0}
                     icon={<Public fontSize="inherit" />}
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
-            {Object.keys(canDigDataSource).length !== 0 && cohortCount && (
-                <Grid item xs={12} sm={12} md={12} lg={6}>
-                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
-                </Grid>
-            )}
-            {Object.keys(diagnosisAgeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={diagnosisAgeCount}
-                        data="diagnosis_age_count"
-                        dataVis=""
-                        height="400px; auto"
-                        chartType="bar"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(treatmentTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={treatmentTypeCount}
-                        data="treatment_type_count"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(cancerTypeCount).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={cancerTypeCount}
-                        data="cancer_type_count"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(patientsPerCohort).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={patientsPerCohort}
-                        data="patients_per_cohort"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullClinicalData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={fullClinicalData}
-                        data="full_clinical_data"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                        grayscale
-                    />
-                </Grid>
-            )}
-            {Object.keys(fullGenomicData).length !== 0 && (
-                <Grid item xs={12} sm={12} md={6} lg={3}>
-                    <CustomOfflineChart
-                        dataObject={fullGenomicData}
-                        data="full_genomic_data"
-                        dataVis=""
-                        chartType="bar"
-                        height="400px; auto"
-                        dropDown={false}
-                        grayscale
-                    />
-                </Grid>
-            )}
+            <Grid item xs={12} sm={12} md={12} lg={6}>
+                <TreatingCentreMap datasetName="" data={canDigDataSource} />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    data="diagnosis_age_count"
+                    dataObject={diagnosisAgeCount || {}}
+                    dataVis=""
+                    height="400px; auto"
+                    loading={diagnosisAgeCount === undefined}
+                    chartType="bar"
+                    dropDown={false}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={treatmentTypeCount || {}}
+                    data="treatment_type_count"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    loading={treatmentTypeCount === undefined}
+                    orderByFrequency
+                    cutoff={10}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={cancerTypeCount || {}}
+                    data="cancer_type_count"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={cancerTypeCount === undefined}
+                    orderByFrequency
+                    cutoff={10}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={patientsPerCohort || {}}
+                    data="patients_per_cohort"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={patientsPerCohort === undefined}
+                    orderByFrequency
+                    cutoff={10}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={fullClinicalData || {}}
+                    data="full_clinical_data"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={fullClinicalData === undefined}
+                    grayscale
+                    orderByFrequency
+                    cutoff={10}
+                />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <CustomOfflineChart
+                    dataObject={fullGenomicData || {}}
+                    data="full_genomic_data"
+                    dataVis=""
+                    chartType="bar"
+                    height="400px; auto"
+                    dropDown={false}
+                    loading={fullGenomicData === undefined}
+                    grayscale
+                    orderByFrequency
+                    cutoff={10}
+                />
+            </Grid>
         </Grid>
     );
 }

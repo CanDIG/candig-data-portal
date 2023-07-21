@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
 import VariantsSearch from '../genomicsData/VariantsSearch';
 import PatientCounts from './widgets/patientCounts';
@@ -12,27 +12,35 @@ import ClinicalData from './widgets/clinicalData';
 import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
-import { PRIMARY_SITES, COHORTS } from 'store/constant';
+import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {
-        position: 'static',
+        position: 'fixed',
         backgroundColor: 'white',
-        width: '100%',
         zIndex: 1100,
-        top: 110,
-        borderRadius: 12
+        top: 95,
+        borderRadius: '1px 1px 0 0',
+        outline: '20px solid #e3f2fd'
     },
-    spaceBetween: {
-        height: 30
+    sidebarOffset: {
+        width: 'calc(100% - 320px)',
+        left: 280
+    },
+    noSidebarOffset: {
+        width: 'calc(100% - 80px)',
+        left: 40
+    },
+    headerSpacing: {
+        height: 50
     },
     anchor: {
         display: 'block',
         position: 'relative',
-        top: -82, // Height of the header
-        visibility: 'hidden'
+        visibility: 'hidden',
+        top: -150
     },
     navigationLink: {
         float: 'right',
@@ -72,6 +80,8 @@ function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
     const classes = useStyles();
     const sidebarWriter = useSidebarWriterContext();
+    const sidebarOpened = useSelector((state) => state.customization.opened);
+    const theme = useTheme();
 
     // When we load, set the sidebar component
     useEffect(() => {
@@ -81,9 +91,14 @@ function ClinicalGenomicSearch() {
     return (
         <>
             {/* Top bar */}
-            <AppBar component="nav" className={classes.stickytop}>
-                <Toolbar>
-                    <Typography variant="h5" sx={{ flexGrow: 1 }}>
+            <AppBar
+                component="nav"
+                className={`${classes.stickytop} ${classes.headerSpacing} ${
+                    sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
+                }`}
+            >
+                <Toolbar sx={{ padding: '5px' }}>
+                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
                         Federated Search
                     </Typography>
                     {sections.map((section) => (
@@ -101,23 +116,21 @@ function ClinicalGenomicSearch() {
                     ))}
                 </Toolbar>
             </AppBar>
+            {/* Empty div to make sure the header takes up space */}
             <SearchHandler />
-            <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25 }}>
-                <div>
-                    <Divider />
+            <MainCard
+                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
+            >
+                <div id="searchbar">
                     {/* Genomic Searchbar */}
-                    <div id="searchbar">
-                        <VariantsSearch />
-                    </div>
+                    <VariantsSearch />
                     {/* For now, until I figure out how to make it its own card */}
-                    <Divider />
                 </div>
                 {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
                             &nbsp;
                         </a>
-                        <h3>{section.header}</h3>
                         {section.component}
                         <div className={classes.spaceBetween} />
                     </div>

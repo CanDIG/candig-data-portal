@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { createRef, useCallback, useState, useEffect } from 'react';
 
 // MUI
+import PropTypes from 'prop-types';
 import { useTheme } from '@mui/styles';
 import { Box, IconButton } from '@mui/material';
 
@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import Cookies from 'js-cookie';
 import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import { IconTrash } from '@tabler/icons';
 
 // Custon Components and constants
@@ -29,13 +30,34 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObject, dropDown, onRemoveChart, edit, grayscale }) {
+function CustomOfflineChart(props) {
+    const {
+        chartType,
+        data,
+        index,
+        height,
+        dataVis,
+        dataObject,
+        dropDown,
+        onRemoveChart,
+        edit,
+        loading,
+        orderByFrequency,
+        orderAlphabetically,
+        cutoff,
+        grayscale,
+        trimByDefault
+    } = props;
     const theme = useTheme();
 
     // State management
     const events = useSelector((state) => state);
     const [chart, setChart] = useState(chartType);
     const [chartData, setChartData] = useState(data);
+    const [trim, setTrim] = useState(trimByDefault || false);
+    const chartRef = createRef();
+
+    NoDataToDisplay(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -65,46 +87,54 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
             if (validStackedCharts.includes(chartData)) {
                 // Stacked Bar Chart
                 const data = new Map();
-                const categories = [];
-                dataObject = dataObject === '' ? dataVis[chartData] : dataObject;
+                let categories = [];
+                const thisData = dataObject === '' ? dataVis[chartData] : dataObject;
 
-                Object.keys(dataObject).forEach((key, i) => {
+                Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
-                    Object.keys(dataObject[key]).forEach((cohort) => {
+                    Object.keys(thisData[key]).forEach((cohort) => {
                         if (!data.has(cohort)) {
-                            data.set(cohort, new Array(Object.keys(dataObject).length).fill(0));
+                            data.set(cohort, new Array(Object.keys(thisData).length).fill(0));
                         }
-                        data.get(cohort).splice(i, 1, dataObject[key][cohort]);
+                        data.get(cohort).splice(i, 1, thisData[key][cohort]);
                     });
+
+                    // Order & truncate the categories by the data
+                    if (orderByFrequency) {
+                        categories.sort((a, b) => thisData[b] - thisData[a]);
+                    }
+                    if (cutoff || trim) {
+                        categories = categories.slice(0, cutoff || 15);
+                    }
                 });
 
                 const stackSeries = [];
-                data.forEach((value, key) => {
+                data?.forEach((value, key) => {
                     stackSeries.push({ name: key, data: value });
                 });
-                const stackedTheme = grayscale
-                    ? [
-                          theme.palette.grey[200],
-                          theme.palette.grey[300],
-                          theme.palette.grey[500],
-                          theme.palette.grey[600],
-                          theme.palette.grey[700],
-                          theme.palette.grey[900]
-                      ]
-                    : [
-                          theme.palette.secondary[200],
-                          theme.palette.tertiary[200],
-                          theme.palette.primary[200],
-                          theme.palette.secondary.main,
-                          theme.palette.tertiary.main,
-                          theme.palette.primary.main,
-                          theme.palette.secondary.dark,
-                          theme.palette.tertiary.dark,
-                          theme.palette.primary.dark,
-                          theme.palette.secondary[800],
-                          theme.palette.tertiary[800],
-                          theme.palette.primary[800]
-                      ];
+                const grayscaleTheme = [
+                    theme.palette.grey[200],
+                    theme.palette.grey[300],
+                    theme.palette.grey[500],
+                    theme.palette.grey[600],
+                    theme.palette.grey[700],
+                    theme.palette.grey[900]
+                ];
+                const colouredTheme = [
+                    theme.palette.secondary[200],
+                    theme.palette.tertiary[200],
+                    theme.palette.primary[200],
+                    theme.palette.secondary.main,
+                    theme.palette.tertiary.main,
+                    theme.palette.primary.main,
+                    theme.palette.secondary.dark,
+                    theme.palette.tertiary.dark,
+                    theme.palette.primary.dark,
+                    theme.palette.secondary[800],
+                    theme.palette.tertiary[800],
+                    theme.palette.primary[800]
+                ];
+                const stackedTheme = grayscale ? grayscaleTheme : colouredTheme;
 
                 setChartOptions({
                     credits: {
@@ -133,11 +163,24 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                const data = [];
-                const categories = Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => {
-                    data.push(dataObject === '' ? dataVis[chartData][key] : dataObject[key]);
-                    return key;
-                });
+                let entries = Object.keys((dataObject === '' ? dataVis[chartData] : dataObject) || []).map((key) => [
+                    key,
+                    dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                ]);
+
+                // Order & truncate the categories by the data
+                if (orderByFrequency) {
+                    entries = entries.sort((a, b) => b[1] - a[1]);
+                }
+                if (orderAlphabetically) {
+                    entries = entries.sort((a, b) => (a[0] > b[0] ? 1 : -1));
+                }
+                if (cutoff || trim) {
+                    entries = entries.slice(0, cutoff || 15);
+                }
+
+                const categories = entries.map(([key, _]) => key);
+                const data = entries.map(([_, val]) => val);
 
                 setChartOptions({
                     credits: {
@@ -147,10 +190,10 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                         type: chart
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title
+                        text: DataVisualizationChartInfo[chartData]?.title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis } },
                     colors: [theme.palette.primary.dark],
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
@@ -161,7 +204,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                                 dataSum += point.y;
                             });
                             const pcnt = (this.y / dataSum) * 100;
-                            return `<b> ${this.point.category}</b><br> - ${this.y} <br> - ${Highcharts.numberFormat(pcnt)}%`;
+                            return `<b> ${this.point.category}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
                         }
                     }
                 });
@@ -212,7 +255,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
         }
 
         createChart();
-    }, [dataVis, chart, chartData]);
+    }, [dataVis, chart, chartData, JSON.stringify(dataObject), trim]);
 
     function setCookieDataVisChart(event) {
         // Set cookie for Data Visualization Chart Type
@@ -228,7 +271,27 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
         Cookies.set('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
     }
 
+    function setCookieDataVisTrim(value) {
+        // Set Cookie for Data Visualization Trim status
+        const dataVisTrim = JSON.parse(Cookies.get('dataVisTrim'));
+        dataVisTrim[index] = value;
+        Cookies.set('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
+    }
+
     /* eslint-disable jsx-a11y/no-onchange */
+
+    // Control whether or not this element is currently loading
+    useEffect(() => {
+        const chartObj = chartRef?.current?.chart;
+
+        if (loading) {
+            chartObj?.showLoading();
+        } else {
+            chartObj?.hideLoading();
+        }
+    }, [loading]);
+
+    const showTrim = (dataObject || dataVis[chartData]) && Object.entries(dataObject === '' ? dataVis[chartData] : dataObject).length > 15;
 
     return (
         <Box sx={{ position: 'relative' }}>
@@ -254,7 +317,7 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                 </IconButton>
             )}
             <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
-                <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+                <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
                 {dropDown && (
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         {validStackedCharts.includes(chartData) ? (
@@ -291,6 +354,20 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
                                 </select>
                             </label>
                         )}
+                        {showTrim && (
+                            <label htmlFor="trim">
+                                Trim:
+                                <input
+                                    type="checkbox"
+                                    id="trim"
+                                    onChange={() => {
+                                        setCookieDataVisTrim(!trim);
+                                        setTrim((old) => !old);
+                                    }}
+                                    checked={trim}
+                                />
+                            </label>
+                        )}
                         <label htmlFor="types">
                             Data:
                             <select
@@ -317,12 +394,16 @@ function CustomOfflineChart({ chartType, data, index, height, dataVis, dataObjec
 }
 
 CustomOfflineChart.propTypes = {
-    dropDown: PropTypes.bool.isRequired,
+    dropDown: PropTypes.bool,
     height: PropTypes.string,
     dataVis: PropTypes.any,
     dataObject: PropTypes.any,
     onRemoveChart: PropTypes.func,
-    grayscale: PropTypes.bool
+    grayscale: PropTypes.bool,
+    orderByFrequency: PropTypes.bool,
+    orderAlphabetically: PropTypes.bool,
+    cutoff: PropTypes.number,
+    trimByDefault: PropTypes.bool
 };
 
 CustomOfflineChart.defaultProps = {

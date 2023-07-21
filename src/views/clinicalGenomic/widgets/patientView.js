@@ -49,13 +49,12 @@ const JSONTree = (props) => {
     // Determine how we're going to display what's inside of the TreeItem:
     let innerItem;
     if (Array.isArray(json)) {
-        // Displaying an array: return recursive JSONTrees, prefixed by their index
-        innerItem =
-            json.length > 0 ? (
-                json.map((value, i) => <JSONTree id={`${id}/${i}`} label={i} json={value} key={i} searchExp={searchExp} />)
-            ) : (
-                <JSONTree id={`${id}/empty`} label="empty" json="" key="empty" searchExp={searchExp} />
-            );
+        if (json.length > 0) {
+            // Displaying an array: return recursive JSONTrees, prefixed by their index
+            innerItem = json.map((value, i) => <JSONTree id={`${id}/${i}`} label={i} json={value} key={i} searchExp={searchExp} />);
+        } else {
+            value = '[empty]';
+        }
     } else if (isObject(json)) {
         // Displaying an object: return recursive JSONTrees, prefixed by their key
         innerItem = Object.keys(json)
@@ -99,7 +98,7 @@ const JSONTree = (props) => {
 
 function PatientView(props) {
     const resultsContext = useSearchResultsReaderContext();
-    const patient = resultsContext.selectedPatient;
+    const patient = resultsContext.donor?.[0]?.results?.results?.[0];
     const [expanded, setExpanded] = useState(['.']);
 
     // When searching: search, then prune the results
@@ -210,7 +209,7 @@ function PatientView(props) {
     }, [JSON.stringify(patient)]);
 
     const noResultsMessage = !patient ? (
-        'Please select a patient to see results'
+        'Please select a patient from the above table'
     ) : (
         <>
             No results for <span>{search}</span> were found in this patient.
@@ -218,9 +217,9 @@ function PatientView(props) {
     );
 
     return (
-        <Box mr={2} ml={1} p={1} pr={5} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-                <Typography variant="h2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+                <Typography variant="h4" sx={{ flexGrow: 1 }}>
                     Patient Info
                 </Typography>
                 <TextField
@@ -232,8 +231,11 @@ function PatientView(props) {
                     onChange={(event) => {
                         handleSearch(event.target.value);
                     }}
+                    disabled={!patient}
                 />
-                <Button onClick={handleExpandAll}>{expanded.length <= 1 ? 'Expand all' : 'Collapse all'}</Button>
+                <Button disabled={!patient} onClick={handleExpandAll}>
+                    {expanded.length <= 1 ? 'Expand all' : 'Collapse all'}
+                </Button>
             </Box>
             {prunedPatient ? (
                 <TreeView

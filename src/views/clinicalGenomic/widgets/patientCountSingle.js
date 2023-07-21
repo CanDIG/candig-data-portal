@@ -40,26 +40,19 @@ function PatientCountSingle(props) {
     const totalPatients = Object.values(counts.totals)?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
     const patientsInSearch = Object.values(counts.counts)?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
     const numCohorts = Object.values(counts.totals)?.length || 0;
-    const locked = false; // searchResults.locked;
 
-    const avatarProps = locked
+    /* const avatarProps = locked
         ? {
               // If we're locked out, gray out the avatar
               sx: { bgcolor: theme.palette.action.disabled }
           }
-        : {};
+        : {}; */
 
     return (
-        <Box
-            mr={2}
-            ml={1}
-            pr={5}
-            sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}
-            className={locked ? classes.locked : ''}
-        >
+        <Box pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
                 <Grid item xs={2}>
-                    <CardHeader avatar={<Avatar {...avatarProps}>{site.slice(0, 1).toUpperCase()}</Avatar>} title={<b>{site}</b>} />
+                    <CardHeader avatar={<Avatar>{site.slice(0, 1).toUpperCase()}</Avatar>} title={<b>{site}</b>} />
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
@@ -80,9 +73,18 @@ function PatientCountSingle(props) {
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
-                <Grid item xs={1} ml="auto" className={classes.button}>
+                <Grid item className={classes.button} pr={-2}>
                     {numCohorts > 1 ? (
-                        <Button onClick={(_) => setExpanded((old) => !old)} variant="contained" sx={{ borderRadius: 1.8 }}>
+                        <Button
+                            onClick={(_) => setExpanded((old) => !old)}
+                            variant="contained"
+                            sx={{
+                                borderRadius: 100,
+                                border: `solid 1px ${theme.palette.primary.main}`,
+                                backgroundColor: 'white',
+                                color: theme.palette.primary.main
+                            }}
+                        >
                             {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
                         </Button>
                     ) : (
@@ -92,41 +94,43 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded ? (
-                Object.keys(counts.totals).map((cohort) => (
-                    <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort} className={classes.container}>
-                        <Grid item xs={2}>
-                            <Typography variant="h5" align="center" className={classes.patientEntry}>
-                                <b>{cohort}</b>
-                            </Typography>
+                Object.keys(counts.totals).map((cohort) => {
+                    const locked = !counts.unlockedPrograms?.some((programID) => programID === cohort);
+                    return (
+                        <Grid container justifyContent="center" alignItems="center" spacing={2} key={cohort} className={classes.container}>
+                            <Grid item xs={2}>
+                                <Typography variant="h5" align="center" className={classes.patientEntry}>
+                                    <b>{cohort}</b>
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item xs={2}>
+                                <Typography align="center" className={classes.patientEntry}>
+                                    {counts.totals[cohort]}
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item xs={2}>
+                                <Typography align="center" className={classes.patientEntry}>
+                                    {counts.counts?.[cohort] || 0}
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item xs={2}>
+                                {/* Num cohorts doesn't make any sense here */}
+                            </Grid>
+                            <Grid item ml="auto" className={classes.button}>
+                                {locked ? (
+                                    <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>
+                                        Request&nbsp;Access
+                                    </Button>
+                                ) : (
+                                    <></>
+                                )}
+                            </Grid>
                         </Grid>
-                        <Divider flexItem orientation="vertical" className={classes.divider} />
-                        <Grid item xs={2}>
-                            <Typography align="center" className={classes.patientEntry}>
-                                {counts.totals[cohort]}
-                            </Typography>
-                        </Grid>
-                        <Divider flexItem orientation="vertical" className={classes.divider} />
-                        <Grid item xs={2}>
-                            <Typography align="center" className={classes.patientEntry}>
-                                {counts.counts?.[cohort] || 0}
-                            </Typography>
-                        </Grid>
-                        <Divider flexItem orientation="vertical" className={classes.divider} />
-                        <Grid item xs={2}>
-                            {/* Num cohorts doesn't make any sense here */}
-                        </Grid>
-                        <Divider flexItem orientation="vertical" className={classes.divider} />
-                        <Grid item xs={1} ml="auto" className={classes.button}>
-                            {locked ? (
-                                <Button type="submit" variant="contained" sx={{ borderRadius: 1.8 }}>
-                                    Request&nbsp;Access
-                                </Button>
-                            ) : (
-                                <></>
-                            )}
-                        </Grid>
-                    </Grid>
-                ))
+                    );
+                })
             ) : (
                 <></>
             )}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/styles';
 
 // MUI
-import { Box, Grid, IconButton } from '@mui/material';
+import { Box, Grid, IconButton, Typography } from '@mui/material';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -23,54 +23,14 @@ import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 
 function DataVisualization(props) {
     // Hooks
-    const resultsContext = useSearchResultsReaderContext();
+    const resultsContext = useSearchResultsReaderContext().counts;
     // Plan for context below see current dataVis for expected shape
-    // const dataVis = context?.dataVis;
+    // const dataVis = resultsContext || {};
     const dataVis = {
-        diagnosis_age_count: {
-            '0-19 Years': 10,
-            '20-29 Years': 20,
-            '30-39 Years': 40,
-            '40-49 Years': 60,
-            '50-59 Years': 50,
-            '60-69 Years': 55,
-            '70-79 Years': 20,
-            '80+ Years': 15
-        },
-        treatment_type_count: {
-            Palate: 1,
-            'Rectosigmoid junction': 1,
-            Tonsil: 3,
-            'Other and unspecified parts of mouth': 1,
-            Oropharynx: 1,
-            'Parotid gland': 2,
-            'Other and unspecified parts of tongue': 1,
-            'Other and unspecified parts of biliary tract': 1,
-            Gum: 3
-        },
-        cancer_type_count: {
-            'Breast C50.9': 50,
-            'Ovary C56.9': 5,
-            'Trachea C33': 30,
-            'Cardia C16.0': 20,
-            'Pancreas C25.9': 40,
-            'Colon C18': 60,
-            'Tonsil C09': 50
-        },
-        patients_per_cohort: {
-            BCGSC: {
-                POG: 50
-            },
-            UHN: {
-                POG: 67,
-                Inspire: 30,
-                Biocan: 50,
-                Biodiva: 30
-            },
-            C3G: {
-                MOCK: 50
-            }
-        },
+        patients_per_cohort: resultsContext?.patients_per_cohort || {},
+        diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
+        treatment_type_count: resultsContext?.treatment_type_count || {},
+        cancer_type_count: resultsContext?.cancer_type_count || {},
         full_clinical_data: {
             BCGSC: {
                 POG: 30
@@ -118,6 +78,9 @@ function DataVisualization(props) {
     const [dataVisChartType, setDataVisChartType] = useState(
         Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
     );
+    const [dataVisTrim, setDataVisTrim] = useState(
+        Cookies.get('dataVisTrim') ? JSON.parse(Cookies.get('dataVisTrim')) : [false, false, false, false]
+    );
 
     // Intial cookie setting if there are none
     useEffect(() => {
@@ -125,6 +88,7 @@ function DataVisualization(props) {
             const charts = topKeys.map(() => 'bar');
             Cookies.set('dataVisChartType', JSON.stringify(charts), { expires: 365 });
             Cookies.set('dataVisData', JSON.stringify(topKeys), { expires: 365 });
+            Cookies.set('dataVisTrim', JSON.stringify([false, false, false, false]), { expires: 365 });
         }
     }, []);
 
@@ -135,20 +99,26 @@ function DataVisualization(props) {
     function removeChart(index) {
         const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
         const newdataVisData = dataVisData.slice(0, index).concat(dataVisData.slice(index + 1));
+        const newDataVisTrim = dataVisTrim.slice(0, index).concat(dataVisTrim.slice(index + 1));
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
+        setDataVisTrim(newDataVisTrim);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
         Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
     }
 
     function AddChart(data, chartType) {
         setOpen(false);
         const newdataVisData = [...dataVisData, data];
         const newDataVisChartType = [...dataVisChartType, validStackedCharts.includes(data) ? 'bar' : chartType];
+        const newDataVisTrim = [...dataVisTrim, false];
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
+        setDataVisTrim(newDataVisTrim);
         Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
         Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
     }
     /* eslint-disable jsx-a11y/no-onchange */
     function returnChartDialog() {
@@ -212,6 +182,9 @@ function DataVisualization(props) {
                     onRemoveChart={() => removeChart(index)}
                     edit={edit}
                     grayscale={completenessData.includes(item)}
+                    orderByFrequency={item !== 'diagnosis_age_count'}
+                    orderAlphabetically={item === 'diagnosis_age_count'}
+                    trimByDefault={dataVisTrim[index]}
                 />
             </Grid>
         ));
@@ -252,8 +225,13 @@ function DataVisualization(props) {
             >
                 {!edit ? <IconEdit /> : <IconX />}
             </IconButton>
-            <Grid container spacing={1} alignItems="center" justifyContent="center">
-                {returndataVisData()}
+            <Grid container spacing={1} direction="column">
+                <Typography pb={1} variant="h4">
+                    Data Visualization
+                </Typography>
+                <Grid container spacing={1} alignItems="center" justifyContent="center">
+                    {returndataVisData()}
+                </Grid>
             </Grid>
             {edit && (
                 <IconButton
