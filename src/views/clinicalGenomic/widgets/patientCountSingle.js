@@ -57,7 +57,7 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {numCohorts}
+                        {patientsInSearch}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
@@ -69,7 +69,7 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {patientsInSearch}
+                        {numCohorts}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
@@ -106,13 +106,13 @@ function PatientCountSingle(props) {
                             <Divider flexItem orientation="vertical" className={classes.divider} />
                             <Grid item xs={2}>
                                 <Typography align="center" className={classes.patientEntry}>
-                                    {counts.totals[cohort]}
+                                    {counts.counts?.[cohort] || 0}
                                 </Typography>
                             </Grid>
                             <Divider flexItem orientation="vertical" className={classes.divider} />
                             <Grid item xs={2}>
                                 <Typography align="center" className={classes.patientEntry}>
-                                    {counts.counts?.[cohort] || 0}
+                                    {counts.totals[cohort]}
                                 </Typography>
                             </Grid>
                             <Divider flexItem orientation="vertical" className={classes.divider} />
