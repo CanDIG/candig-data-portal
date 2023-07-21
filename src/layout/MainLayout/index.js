@@ -45,8 +45,6 @@ const useStyles = makeStyles((theme) => ({
         }),
         width: `calc(100% - ${drawerWidth}px)`,
         marginLeft: -(drawerWidth - 20),
-        [theme.breakpoints.up('md')]: {
-        },
         [theme.breakpoints.down('lg')]: {
             padding: '16px'
         },
