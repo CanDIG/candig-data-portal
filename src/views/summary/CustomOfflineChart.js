@@ -9,7 +9,6 @@ import { Box, IconButton } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 // Third-party libraries
-import Cookies from 'js-cookie';
 import Highcharts, { map } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
@@ -259,23 +258,23 @@ function CustomOfflineChart(props) {
 
     function setCookieDataVisChart(event) {
         // Set cookie for Data Visualization Chart Type
-        const dataVisChart = JSON.parse(Cookies.get('dataVisChartType'));
+        const dataVisChart = JSON.parse(localStorage.getItem('dataVisChartType'));
         dataVisChart[index] = event.target.value;
-        Cookies.set('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
+        localStorage.setItem('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
     }
 
     function setCookieDataVisData(event) {
         // Set Cookie for Data Visualization Data
-        const dataVisData = JSON.parse(Cookies.get('dataVisData'));
+        const dataVisData = JSON.parse(localStorage.getItem('dataVisData'));
         dataVisData[index] = event.target.value;
-        Cookies.set('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
+        localStorage.setItem('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
     }
 
     function setCookieDataVisTrim(value) {
         // Set Cookie for Data Visualization Trim status
-        const dataVisTrim = JSON.parse(Cookies.get('dataVisTrim'));
+        const dataVisTrim = JSON.parse(localStorage.getItem('dataVisTrim'));
         dataVisTrim[index] = value;
-        Cookies.set('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
+        localStorage.setItem('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
     }
 
     /* eslint-disable jsx-a11y/no-onchange */
