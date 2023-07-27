@@ -18,11 +18,11 @@ function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
                 parsedData[loc.location.name] = [];
             }
 
-            if (loc.results.next) {
+            if (loc.results?.next) {
                 nextQuery = `${url}${url.includes('?') ? '&' : '?'}page=${idx + 1}`;
             }
 
-            if (loc.results.results) {
+            if (loc.results?.results) {
                 parsedData[loc.location.name] = parsedData[loc.location.name].concat(loc.results.results.map(resultConsumer));
             }
         });
@@ -102,7 +102,7 @@ function SearchHandler() {
         }
 
         searchParams.append('page_size', 100);
-        const url = `v2/authorized/donors?${searchParams}`;
+        const url = `v2/authorized/donors/?${searchParams}`;
 
         const donorQueryPromise = () =>
             trackPromise(
