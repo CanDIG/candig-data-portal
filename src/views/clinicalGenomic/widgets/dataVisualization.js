@@ -85,7 +85,7 @@ function DataVisualization(props) {
         localStorage.getItem('dataVisTrim') ? JSON.parse(localStorage.getItem('dataVisTrim')) : [false, false, false, false]
     );
 
-    // Intial cookie setting if there are none
+    // Intial localStorage setting if there are none
     useEffect(() => {
         if (!localStorage.getItem('dataVisData') && !localStorage.getItem('dataVisChartType')) {
             const charts = topKeys.map(() => 'bar');

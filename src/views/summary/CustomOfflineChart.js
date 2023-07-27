@@ -256,22 +256,22 @@ function CustomOfflineChart(props) {
         createChart();
     }, [dataVis, chart, chartData, JSON.stringify(dataObject), trim]);
 
-    function setCookieDataVisChart(event) {
-        // Set cookie for Data Visualization Chart Type
+    function setLocalStorageDataVisChart(event) {
+        // Set LocalStorage for Data Visualization Chart Type
         const dataVisChart = JSON.parse(localStorage.getItem('dataVisChartType'));
         dataVisChart[index] = event.target.value;
         localStorage.setItem('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
     }
 
-    function setCookieDataVisData(event) {
-        // Set Cookie for Data Visualization Data
+    function setLocalStorageDataVisData(event) {
+        // Set LocalStorage for Data Visualization Data
         const dataVisData = JSON.parse(localStorage.getItem('dataVisData'));
         dataVisData[index] = event.target.value;
         localStorage.setItem('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
     }
 
-    function setCookieDataVisTrim(value) {
-        // Set Cookie for Data Visualization Trim status
+    function setLocalStorageDataVisTrim(value) {
+        // Set LocalStorage for Data Visualization Trim status
         const dataVisTrim = JSON.parse(localStorage.getItem('dataVisTrim'));
         dataVisTrim[index] = value;
         localStorage.setItem('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
@@ -328,7 +328,7 @@ function CustomOfflineChart(props) {
                                     id="types"
                                     onChange={(event) => {
                                         setChartData(event.target.value);
-                                        setCookieDataVisData(event);
+                                        setLocalStorageDataVisData(event);
                                     }}
                                 >
                                     {Object.keys(dataVis).map((key) => (
@@ -349,7 +349,7 @@ function CustomOfflineChart(props) {
                                         id="types"
                                         onChange={(event) => {
                                             setChart(event.target.value);
-                                            setCookieDataVisChart(event);
+                                            setLocalStorageDataVisChart(event);
                                         }}
                                     >
                                         <option value="bar">Stacked Bar</option>
@@ -364,7 +364,7 @@ function CustomOfflineChart(props) {
                                         id="types"
                                         onChange={(event) => {
                                             setChart(event.target.value);
-                                            setCookieDataVisChart(event);
+                                            setLocalStorageDataVisChart(event);
                                         }}
                                     >
                                         <option value="bar">Bar</option>
@@ -381,7 +381,7 @@ function CustomOfflineChart(props) {
                                         type="checkbox"
                                         id="trim"
                                         onChange={() => {
-                                            setCookieDataVisTrim(!trim);
+                                            setLocalStorageDataVisTrim(!trim);
                                             setTrim((old) => !old);
                                         }}
                                         checked={trim}
