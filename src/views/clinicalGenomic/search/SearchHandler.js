@@ -316,7 +316,11 @@ function SearchHandler() {
                                                     return caseData;
                                                 })
                                                 .filter((caseData) => {
-                                                    if (reader.donorLists && Object.keys(reader.donorLists).length > 0 && caseData.donorID) {
+                                                    if (
+                                                        reader.donorLists &&
+                                                        Object.keys(reader.donorLists).length > 0 &&
+                                                        caseData.donorID
+                                                    ) {
                                                         return finalList.includes(caseData.donorID);
                                                     }
                                                     return true;

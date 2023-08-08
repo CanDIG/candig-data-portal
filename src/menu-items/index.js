@@ -1,5 +1,6 @@
 import clinicalGenomicSearch from './clinicalGenomicSearch';
 import summary from './summary';
+import ingest from './ingest';
 
 // import pages from './pages';
 // import utilities from './utilities';
@@ -8,7 +9,7 @@ import summary from './summary';
 // ===========================|| MENU ITEMS ||=========================== //
 
 const menuItems = {
-    items: [summary, clinicalGenomicSearch /* pages, utilities, other */]
+    items: [summary, clinicalGenomicSearch, ingest /* pages, utilities, other */]
 };
 
 export default menuItems;
