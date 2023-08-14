@@ -1,4 +1,4 @@
-import IngestMenu from 'ui-component/ingest/IngestTab';
+import IngestMenu from 'ui-component/ingest/IngestMenu';
 import { Grid } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 
@@ -6,6 +6,8 @@ function IngestPage() {
     const useStyles = makeStyles({
         container: {
             color: 'white',
+            background: 'white',
+            height: '100%',
             width: '100%',
             paddingTop: '0.8em',
             borderRadius: '1em',
@@ -28,8 +30,8 @@ function IngestPage() {
     });
     const classes = useStyles();
     return (
-        <Grid container sx={{ height: '100%', width: '100%' }}>
-            <Grid item sx={{ background: 'white' }} className={classes.container}>
+        <Grid container className={classes.container}>
+            <Grid item sx={{ height: '100%', width: '100%' }}>
                 <div className={classes.label}>Ingest Data</div>
                 <IngestMenu />
             </Grid>

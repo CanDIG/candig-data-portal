@@ -1,4 +1,4 @@
-import { styled } from '@mui/styles';
+import { makeStyles, styled } from '@mui/styles';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 
@@ -28,11 +28,26 @@ const IngestTab = styled(Tab)({
     verticalAlign: 'center'
 });
 
-export default function IngestMenu() {
+function IngestMenu() {
     const [value, setValue] = useState(0);
     const setTab = (event, val) => {
         setValue(val);
     };
+
+    const useStyles = makeStyles({
+        tabActive: {
+            border: '0.15vw #2196F3 solid',
+            borderBottom: 'none',
+            background: '#FFFFFF'
+        },
+        tabInactive: {
+            border: '0.1vw #2196F3 solid',
+            borderBottom: '0.15vw #2196F3 solid',
+            background: '#F4FAFF'
+        }
+    });
+
+    const classes = useStyles();
 
     function getPage(val) {
         if (val === 1) return <ClinicalIngestPage />;
@@ -54,18 +69,12 @@ export default function IngestMenu() {
                 centered
             >
                 {tabs.map((name, idx) => (
-                    <IngestTab
-                        label={name}
-                        key={name}
-                        sx={{
-                            border: idx === value ? '0.15vw #2196F3 solid' : '0.1vw #2196F3 solid',
-                            borderBottom: idx === value ? 'none' : '0.15vw #2196F3 solid',
-                            background: idx === value ? '#FFFFFF' : '#F4FAFF'
-                        }}
-                    />
+                    <IngestTab label={name} key={name} className={idx === value ? classes.tabActive : classes.tabInactive} />
                 ))}
             </Tabs>
             {getPage(value)}
         </Box>
     );
 }
+
+export default IngestMenu;
