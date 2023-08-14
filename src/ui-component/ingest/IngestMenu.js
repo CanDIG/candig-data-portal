@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import ClinicalIngestPage from 'ui-component/ingest/ClinicalIngest';
 
-const tabs = ['Permissions', 'Clinical Ingest', 'Genomic Ingest'];
+const tabs = ['Clinical Ingest', 'Genomic Ingest'];
 
 const IngestTab = styled(Tab)({
     height: '2.75em',
@@ -52,7 +52,6 @@ function IngestMenu() {
     function getPage(val) {
         if (val === 1) return <ClinicalIngestPage />;
         if (val === 2) return <ClinicalIngestPage />;
-        if (val === 3) return <ClinicalIngestPage />;
         return <ClinicalIngestPage />;
     }
 
