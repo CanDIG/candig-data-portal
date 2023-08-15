@@ -2,7 +2,8 @@ import { makeStyles, styled } from '@mui/styles';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 
-import ClinicalIngestPage from 'ui-component/ingest/ClinicalIngest';
+import IngestTabPage from 'ui-component/ingest/IngestTabPage';
+import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
 
 const tabs = ['Clinical Ingest', 'Genomic Ingest'];
 
@@ -50,9 +51,8 @@ function IngestMenu() {
     const classes = useStyles();
 
     function getPage(val) {
-        if (val === 1) return <ClinicalIngestPage />;
-        if (val === 2) return <ClinicalIngestPage />;
-        return <ClinicalIngestPage />;
+        if (val === 0) return <ClinicalIngest setTab={() => setValue(1)} />;
+        return <ClinicalIngest setTab={() => {}} />;
     }
 
     return (
@@ -71,7 +71,7 @@ function IngestMenu() {
                     <IngestTab label={name} key={name} className={idx === value ? classes.tabActive : classes.tabInactive} />
                 ))}
             </Tabs>
-            {getPage(value)}
+            <IngestTabPage> {getPage(value)} </IngestTabPage>
         </Box>
     );
 }
