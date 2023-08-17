@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import IngestTabPage from 'ui-component/ingest/IngestTabPage';
 import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
+import GenomicIngest from 'ui-component/ingest/GenomicIngest';
 
 const tabs = ['Clinical Ingest', 'Genomic Ingest'];
 
@@ -52,7 +53,7 @@ function IngestMenu() {
 
     function getPage(val) {
         if (val === 0) return <ClinicalIngest setTab={() => setValue(1)} />;
-        return <ClinicalIngest setTab={() => {}} />;
+        return <GenomicIngest beginIngest={() => {}} />;
     }
 
     return (
