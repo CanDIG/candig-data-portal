@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
     label: {
         marginTop: '-3.5em',
-        paddingBottom: '1.75em',
+        paddingBottom: '2em',
         color: 'black'
     }
 }));
