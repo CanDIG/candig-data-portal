@@ -33,7 +33,6 @@ const GenomicIngest = ({ beginIngest }) => {
     const classes = useStyles();
 
     return (
-        // setTab should be a function that sets the tab to the genomic ingest page
         <>
             <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
                 <Grid item>
@@ -53,7 +52,13 @@ const GenomicIngest = ({ beginIngest }) => {
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <TextField sx={{ width: '100%' }} id="clinical-file" variant="outlined" type="file" />
+                            <TextField
+                                sx={{ width: '100%' }}
+                                id="genomic-file"
+                                variant="outlined"
+                                type="file"
+                                inputProps={{ accept: 'application/json' }}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
