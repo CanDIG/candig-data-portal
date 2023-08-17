@@ -1,16 +1,9 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import DataRow from 'ui-component/DataRow';
+import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
 
-function makeField(lab, val) {
-    return {
-        label: lab,
-        value: val
-    };
-}
-
-const GenomicIngest = ({ beginIngest }) => {
+const GenomicIngest = ({ beginIngest, fileUpload }) => {
     const cohort = [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')];
 
     const useStyles = makeStyles({
@@ -52,13 +45,7 @@ const GenomicIngest = ({ beginIngest }) => {
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <TextField
-                                sx={{ width: '100%' }}
-                                id="genomic-file"
-                                variant="outlined"
-                                type="file"
-                                inputProps={{ accept: 'application/json' }}
-                            />
+                            {fileUpload}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -73,7 +60,8 @@ const GenomicIngest = ({ beginIngest }) => {
 };
 
 GenomicIngest.propTypes = {
-    beginIngest: PropTypes.func.isRequired
+    beginIngest: PropTypes.func.isRequired,
+    fileUpload: PropTypes.element
 };
 
 export default GenomicIngest;

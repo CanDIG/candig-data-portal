@@ -5,6 +5,7 @@ import { useState } from 'react';
 import IngestTabPage from 'ui-component/ingest/IngestTabPage';
 import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
 import GenomicIngest from 'ui-component/ingest/GenomicIngest';
+import PersistentFile from 'ui-component/PersistentFile';
 
 const tabs = ['Clinical Ingest', 'Genomic Ingest'];
 
@@ -32,6 +33,8 @@ const IngestTab = styled(Tab)({
 
 function IngestMenu() {
     const [value, setValue] = useState(0);
+    const [clinicalFile, setClinicalFile] = useState(undefined);
+    const [genomicFile, setGenomicFile] = useState(undefined);
     const setTab = (event, val) => {
         setValue(val);
     };
@@ -52,8 +55,11 @@ function IngestMenu() {
     const classes = useStyles();
 
     function getPage(val) {
-        if (val === 0) return <ClinicalIngest setTab={() => setValue(1)} />;
-        return <GenomicIngest beginIngest={() => {}} />;
+        if (val === 0)
+            return (
+                <ClinicalIngest setTab={() => setValue(1)} fileUpload={<PersistentFile file={clinicalFile} setFile={setClinicalFile} />} />
+            );
+        return <GenomicIngest beginIngest={() => {}} fileUpload={<PersistentFile file={genomicFile} setFile={setGenomicFile} />} />;
     }
 
     return (

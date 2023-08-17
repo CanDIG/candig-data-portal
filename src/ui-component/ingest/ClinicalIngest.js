@@ -1,16 +1,10 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import DataRow from 'ui-component/DataRow';
+import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
 
-function makeField(lab, val) {
-    return {
-        label: lab,
-        value: val
-    };
-}
-
-const ClinicalIngest = ({ setTab }) => {
+const ClinicalIngest = ({ setTab, fileUpload }) => {
+    // setTab should be a function that sets the tab to the genomic ingest page
     const dataRowFields = [
         [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')],
         [makeField('Cohort', 'MOCK COHORT 2'), makeField('Clinical Patients', '325'), makeField('Read Access', '1')],
@@ -32,7 +26,6 @@ const ClinicalIngest = ({ setTab }) => {
     const classes = useStyles();
 
     return (
-        // setTab should be a function that sets the tab to the genomic ingest page
         <>
             <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
                 <Grid item>
@@ -58,13 +51,7 @@ const ClinicalIngest = ({ setTab }) => {
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <TextField
-                                sx={{ width: '100%' }}
-                                id="clinical-file"
-                                variant="outlined"
-                                type="file"
-                                inputProps={{ accept: 'application/json' }}
-                            />
+                            {fileUpload}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -93,7 +80,8 @@ const ClinicalIngest = ({ setTab }) => {
 };
 
 ClinicalIngest.propTypes = {
-    setTab: PropTypes.func.isRequired
+    setTab: PropTypes.func.isRequired,
+    fileUpload: PropTypes.element
 };
 
 export default ClinicalIngest;
