@@ -58,7 +58,13 @@ const ClinicalIngest = ({ setTab }) => {
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <TextField sx={{ width: '100%' }} id="clinical-file" variant="outlined" type="file" />
+                            <TextField
+                                sx={{ width: '100%' }}
+                                id="clinical-file"
+                                variant="outlined"
+                                type="file"
+                                inputProps={{ accept: 'application/json' }}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
