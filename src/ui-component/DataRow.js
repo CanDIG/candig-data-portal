@@ -4,6 +4,13 @@ import PropTypes from 'prop-types';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import { useTheme, makeStyles } from '@mui/styles';
 
+function makeField(lab, val) {
+    return {
+        label: lab,
+        value: val
+    };
+}
+
 const useStyles = makeStyles((theme) => ({
     rowText: {
         color: 'black'
@@ -109,4 +116,4 @@ DataRow.propTypes = {
     rowWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
-export default DataRow;
+export { makeField, DataRow };
