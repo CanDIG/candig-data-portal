@@ -34,6 +34,7 @@ const IngestTab = styled(Tab)({
 function IngestMenu() {
     const [value, setValue] = useState(0);
     const [clinicalFile, setClinicalFile] = useState(undefined);
+    const [clinicalData, setClinicalData] = useState(undefined);
     const [genomicFile, setGenomicFile] = useState(undefined);
     const setTab = (event, val) => {
         setValue(val);
@@ -54,10 +55,22 @@ function IngestMenu() {
 
     const classes = useStyles();
 
+    function loadClinicalFile(file, data) {
+        if (!('donors' in data && Array.isArray(data.donors))) {
+            throw Error('Donors key not found in clinical file');
+        }
+        setClinicalData(data);
+        setClinicalFile(file);
+    }
+
     function getPage(val) {
         if (val === 0)
             return (
-                <ClinicalIngest setTab={() => setValue(1)} fileUpload={<PersistentFile file={clinicalFile} setFile={setClinicalFile} />} />
+                <ClinicalIngest
+                    setTab={() => setValue(1)}
+                    fileUpload={<PersistentFile file={clinicalFile} fileLoader={(file, data) => loadClinicalFile(file, data)} />}
+                    clinicalData={clinicalData}
+                />
             );
         return <GenomicIngest beginIngest={() => {}} fileUpload={<PersistentFile file={genomicFile} setFile={setGenomicFile} />} />;
     }
