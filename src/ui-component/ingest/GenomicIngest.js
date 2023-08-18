@@ -34,7 +34,7 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
                     </Typography>
                     <DataRow rowWidth="100%" itemSize="0.9em" fields={cohort} />
                 </Grid>
-                <Grid item>
+                <Grid item width="100%">
                     <Typography align="left" className={classes.titleText}>
                         <b>Upload genomic sample info</b>
                     </Typography>
@@ -44,9 +44,7 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
                                 <b>Genomic data:</b>
                             </Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            {fileUpload}
-                        </Grid>
+                        <Grid item>{fileUpload}</Grid>
                     </Grid>
                 </Grid>
                 <Grid item align="center">

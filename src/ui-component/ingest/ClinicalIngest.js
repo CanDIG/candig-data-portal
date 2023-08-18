@@ -40,7 +40,7 @@ const ClinicalIngest = ({ setTab, fileUpload }) => {
                         ))}
                     </Grid>
                 </Grid>
-                <Grid item xs={2} md={2} sm={2}>
+                <Grid item sx={{ width: '100%' }}>
                     <div>
                         <Typography align="left" className={classes.titleText}>
                             <b>Choose a cohort for validation</b>
