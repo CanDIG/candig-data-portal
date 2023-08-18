@@ -27,7 +27,7 @@ const ClinicalIngest = ({ setTab, fileUpload }) => {
 
     return (
         <>
-            <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
+            <Grid container direction="column" spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
                         <b>Active cohorts</b>
@@ -40,20 +40,22 @@ const ClinicalIngest = ({ setTab, fileUpload }) => {
                         ))}
                     </Grid>
                 </Grid>
-                <Grid item>
-                    <Typography align="left" className={classes.titleText}>
-                        <b>Choose a cohort for validation</b>
-                    </Typography>
-                    <Grid container sx={{ marginTop: '0.5em', marginLeft: '1em' }} direction="row" alignItems="center" spacing={2}>
-                        <Grid item>
-                            <Typography align="left" className={classes.bodyText}>
-                                <b>Clinical data:</b>
-                            </Typography>
+                <Grid item xs={2} md={2} sm={2}>
+                    <div>
+                        <Typography align="left" className={classes.titleText}>
+                            <b>Choose a cohort for validation</b>
+                        </Typography>
+                        <Grid container sx={{ marginTop: '0.5em', marginLeft: '1em' }} direction="row" alignItems="center" spacing={2}>
+                            <Grid item>
+                                <Typography align="left" className={classes.bodyText}>
+                                    <b>Clinical data:</b>
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                                {fileUpload}
+                            </Grid>
                         </Grid>
-                        <Grid item xs={4}>
-                            {fileUpload}
-                        </Grid>
-                    </Grid>
+                    </div>
                 </Grid>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>

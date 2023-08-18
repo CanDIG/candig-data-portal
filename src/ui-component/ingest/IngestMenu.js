@@ -41,7 +41,7 @@ function IngestMenu() {
 
     const useStyles = makeStyles({
         tabActive: {
-            border: '0.15vw #2196F3 solid',
+            border: '0.125vw #2196F3 solid',
             borderBottom: 'none',
             background: '#FFFFFF'
         },
