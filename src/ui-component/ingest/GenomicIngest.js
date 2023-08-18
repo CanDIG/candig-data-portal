@@ -3,8 +3,12 @@ import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
 
-const GenomicIngest = ({ beginIngest, fileUpload }) => {
-    const cohort = [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')];
+const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) => {
+    const cohort = [
+        makeField('Cohort', clinicalData.donors[0].program_id),
+        makeField('Clinical Patients', clinicalData.donors.length),
+        makeField('Read Access', '1')
+    ];
 
     const useStyles = makeStyles({
         titleText: {
@@ -21,6 +25,12 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
             backgroundColor: '#37CA50',
             width: '7em',
             height: '3em'
+        },
+        ingestButtonDisabled: {
+            backgroundColor: 'grey',
+            '&:hover': {
+                backgroundColor: 'grey'
+            }
         }
     });
     const classes = useStyles();
@@ -48,7 +58,11 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
                     </Grid>
                 </Grid>
                 <Grid item align="center">
-                    <Button className={classes.ingestButton} onClick={beginIngest} variant="contained">
+                    <Button
+                        className={classes.ingestButton + (genomicData === undefined ? ` ${classes.ingestButtonDisabled}` : '')}
+                        onClick={beginIngest}
+                        variant="contained"
+                    >
                         Ingest
                     </Button>
                 </Grid>
@@ -59,7 +73,9 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
 
 GenomicIngest.propTypes = {
     beginIngest: PropTypes.func.isRequired,
-    fileUpload: PropTypes.element
+    fileUpload: PropTypes.element,
+    clinicalData: PropTypes.object,
+    genomicData: PropTypes.object
 };
 
 export default GenomicIngest;
