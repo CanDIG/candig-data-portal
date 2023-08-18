@@ -12,7 +12,7 @@ const IngestTabPage = ({ children }) => {
             borderBottomLeftRadius: '0.75em',
             borderBottomRightRadius: '0.75em',
             marginTop: 0,
-            border: '0.15vw #2196F3 solid',
+            border: '0.125vw #2196F3 solid',
             borderTop: 'none',
             padding: '1em'
         }
