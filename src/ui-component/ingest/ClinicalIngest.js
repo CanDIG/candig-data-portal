@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
 
-const ClinicalIngest = ({ setTab, fileUpload }) => {
+const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
     // setTab should be a function that sets the tab to the genomic ingest page
     const dataRowFields = [
         [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')],
@@ -61,16 +61,28 @@ const ClinicalIngest = ({ setTab, fileUpload }) => {
                     <Typography align="left" className={classes.titleText}>
                         <b>Live Preview Summary</b>
                     </Typography>
-                    <Typography sx={{ color: 'grey' }} align="left" className={classes.bodyText}>
-                        Waiting for upload...
-                    </Typography>
+                    {clinicalData === undefined ? (
+                        <Typography sx={{ color: 'grey' }} align="left" className={classes.bodyText}>
+                            Waiting for upload...
+                        </Typography>
+                    ) : (
+                        <DataRow
+                            rowWidth="100%"
+                            itemSize="0.9em"
+                            fields={[
+                                makeField('Cohort', clinicalData.donors[0].program_id),
+                                makeField('Clinical Patients', clinicalData.donors.length),
+                                makeField('Read Access', '1')
+                            ]}
+                        />
+                    )}
                 </Grid>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
                         <b>Validation</b>
                     </Typography>
                     <Typography sx={{ color: 'grey' }} align="left" className={classes.bodyText}>
-                        Waiting for upload...
+                        Waiting for validation...
                     </Typography>
                 </Grid>
             </Grid>
@@ -83,7 +95,8 @@ const ClinicalIngest = ({ setTab, fileUpload }) => {
 
 ClinicalIngest.propTypes = {
     setTab: PropTypes.func.isRequired,
-    fileUpload: PropTypes.element
+    fileUpload: PropTypes.element,
+    clinicalData: PropTypes.object
 };
 
 export default ClinicalIngest;
