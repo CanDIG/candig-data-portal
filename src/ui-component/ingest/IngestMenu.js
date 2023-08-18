@@ -7,8 +7,6 @@ import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
 import GenomicIngest from 'ui-component/ingest/GenomicIngest';
 import PersistentFile from 'ui-component/PersistentFile';
 
-const tabs = ['Clinical Ingest', 'Genomic Ingest'];
-
 const IngestTab = styled(Tab)({
     height: '2.75em',
     paddingLeft: '0.77em',
@@ -72,7 +70,7 @@ function IngestMenu() {
                     clinicalData={clinicalData}
                 />
             );
-        return <GenomicIngest beginIngest={() => {}} fileUpload={<PersistentFile file={genomicFile} setFile={setGenomicFile} />} />;
+        return <GenomicIngest beginIngest={() => {}} fileUpload={<PersistentFile file={genomicFile} fileLoader={setGenomicFile} />} />;
     }
 
     return (
@@ -87,9 +85,13 @@ function IngestMenu() {
                 }}
                 centered
             >
-                {tabs.map((name, idx) => (
-                    <IngestTab label={name} key={name} className={idx === value ? classes.tabActive : classes.tabInactive} />
-                ))}
+                <IngestTab label="Clinical Ingest" key={0} className={value === 0 ? classes.tabActive : classes.tabInactive} />
+                <IngestTab
+                    label="Genomic Ingest"
+                    key={0}
+                    className={value === 1 ? classes.tabActive : classes.tabInactive}
+                    disabled={clinicalData === undefined}
+                />
             </Tabs>
             <IngestTabPage> {getPage(value)} </IngestTabPage>
         </Box>

@@ -21,6 +21,20 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
             color: 'black',
             fontSize: '1em',
             fontFamily: 'Catamaran'
+        },
+        buttonEnabled: {
+            position: 'absolute',
+            right: '0.2em',
+            bottom: '0.2em'
+        },
+        buttonDisabled: {
+            position: 'absolute',
+            right: '0.2em',
+            bottom: '0.2em',
+            backgroundColor: 'grey',
+            '&:hover': {
+                backgroundColor: 'grey'
+            }
         }
     });
     const classes = useStyles();
@@ -86,9 +100,15 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
                     </Typography>
                 </Grid>
             </Grid>
-            <Button sx={{ position: 'absolute', right: '0.2em', bottom: '0.2em' }} onClick={setTab} variant="contained">
-                Next
-            </Button>
+            {clinicalData === undefined ? (
+                <Button className={classes.buttonDisabled} variant="contained">
+                    Next
+                </Button>
+            ) : (
+                <Button className={classes.buttonEnabled} onClick={setTab} variant="contained">
+                    Next
+                </Button>
+            )}
         </>
     );
 };
