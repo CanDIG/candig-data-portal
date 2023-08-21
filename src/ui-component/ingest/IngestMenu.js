@@ -62,9 +62,6 @@ function IngestMenu() {
         setClinicalFile(file);
     }
     function loadGenomicFile(file, data) {
-        if (!('donors' in data && Array.isArray(data.donors))) {
-            throw Error('Donors key not found in clinical file');
-        }
         setGenomicData(data);
         setGenomicFile(file);
     }
