@@ -45,7 +45,7 @@ const MainRoutes = {
             element: <ClinicalGenomicSearch />
         },
         {
-            path: `${basename}/ingest`,
+            path: `${basename}/ingest-data`,
             element: <IngestPortal />
         },
         {
