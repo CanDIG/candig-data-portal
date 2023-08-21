@@ -2,14 +2,36 @@ import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
+import { useEffect, useState } from 'react';
+import { fetchFederation } from 'store/api';
 
 const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
     // setTab should be a function that sets the tab to the genomic ingest page
-    const dataRowFields = [
-        [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')],
-        [makeField('Cohort', 'MOCK COHORT 2'), makeField('Clinical Patients', '325'), makeField('Read Access', '1')],
-        [makeField('Cohort', 'MOCK COHORT 2'), makeField('Clinical Patients', '78'), makeField('Read Access', '2')]
-    ];
+
+    const [authorizedCohorts, setAuthorizedCohorts] = useState([]);
+
+    useEffect(() => {
+        function fetchPrograms() {
+            return fetchFederation('v2/discovery/donors/', 'katsu')
+                .then((result) => {
+                    result.forEach((site) => {
+                        const programs = site.results.discovery_donor;
+                        const fields = [];
+                        Object.keys(programs).forEach((program) => {
+                            const field = [
+                                makeField('Cohort', program),
+                                makeField('Clinical Patients', programs[program].toString()),
+                                makeField('Read Access', 'Unknown')
+                            ];
+                            fields.push(field);
+                        });
+                        setAuthorizedCohorts(fields);
+                    });
+                })
+                .catch((error) => console.log(error));
+        }
+        fetchPrograms();
+    });
 
     const useStyles = makeStyles({
         titleText: {
@@ -37,6 +59,7 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
             }
         }
     });
+
     const classes = useStyles();
 
     return (
@@ -44,15 +67,21 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
             <Grid container direction="column" spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
-                        <b>Active cohorts</b>
+                        <b>Your authorized cohorts</b>
                     </Typography>
-                    <Grid direction="row" spacing={3} container>
-                        {dataRowFields.map((fields, index) => (
-                            <Grid item xs={5} key={index}>
-                                <DataRow rowWidth="100%" itemSize="0.9em" fields={fields} />
-                            </Grid>
-                        ))}
-                    </Grid>
+                    {authorizedCohorts.length > 0 ? (
+                        <Grid direction="row" spacing={3} container>
+                            {authorizedCohorts.map((fields, index) => (
+                                <Grid item xs={5} key={index}>
+                                    <DataRow rowWidth="100%" itemSize="0.9em" fields={fields} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <Typography align="left" className={classes.bodyText}>
+                            No cohorts found.
+                        </Typography>
+                    )}
                 </Grid>
                 <Grid item sx={{ width: '100%' }}>
                     <div>
