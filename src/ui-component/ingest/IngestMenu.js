@@ -1,5 +1,5 @@
 import { makeStyles, styled } from '@mui/styles';
-import { Alert, Box, Tab, Tabs } from '@mui/material';
+import { Alert, Box, CircularProgress, Grid, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import IngestTabPage from 'ui-component/ingest/IngestTabPage';
@@ -65,15 +65,28 @@ function IngestMenu() {
     const classes = useStyles();
 
     function getIngestStatusComponent(status) {
+        function progressRow(component) {
+            return (
+                <Grid container direction="row">
+                    <Grid item>
+                        <CircularProgress sx={{ padding: '0.35em' }} />
+                    </Grid>
+                    <Grid item xs>
+                        {component}
+                    </Grid>
+                </Grid>
+            );
+        }
+
         switch (status) {
             case IngestStates.STARTED_CLINICAL:
-                return <Alert severity="info">Ingesting clinical data...</Alert>;
+                return progressRow(<Alert severity="info">Ingesting clinical data...</Alert>);
             case IngestStates.SUCCESS:
                 return <Alert severity="success">Ingest complete!</Alert>;
             case IngestStates.ERROR:
                 return <Alert severity="error">Ingest encountered the following error: {ingestError}</Alert>;
             case IngestStates.STARTED_GENOMIC:
-                return <Alert severity="info">Clinical ingest complete. Beginning genomic ingest...</Alert>;
+                return progressRow(<Alert severity="info">Clinical ingest complete. Beginning genomic ingest...</Alert>);
             default:
                 return <Alert severity="info">Nothing to show. (You probably should not be seeing this...)</Alert>;
         }
