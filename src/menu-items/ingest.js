@@ -22,7 +22,7 @@ const ingest = {
             id: 'Data Ingest',
             title: 'Data Ingest',
             type: 'item',
-            url: `${basename}/ingest-data`,
+            url: `${basename}/data-ingest`,
             icon: icons.IconUpload,
             breadcrumbs: false
         }
