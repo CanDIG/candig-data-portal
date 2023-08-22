@@ -31,7 +31,7 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
                 .catch((error) => console.log(error));
         }
         fetchPrograms();
-    });
+    }, []);
 
     const useStyles = makeStyles({
         titleText: {
@@ -130,7 +130,7 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
                 </Grid>
             </Grid>
             {clinicalData === undefined ? (
-                <Button className={classes.buttonDisabled} variant="contained">
+                <Button className={classes.buttonDisabled} variant="contained" disabled>
                     Next
                 </Button>
             ) : (
