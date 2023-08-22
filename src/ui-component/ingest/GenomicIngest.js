@@ -2,8 +2,11 @@ import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
+import { useEffect, useState } from 'react';
 
 const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) => {
+    const [ingestButtonEnabled, setIngestButtonEnabled] = useState(false);
+
     const cohort = [
         makeField('Cohort', clinicalData.donors[0].program_id),
         makeField('Clinical Patients', clinicalData.donors.length),
@@ -35,6 +38,8 @@ const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) =
     });
     const classes = useStyles();
 
+    useEffect(() => genomicData !== undefined && genomicData !== null && setIngestButtonEnabled(true), [genomicData]);
+
     return (
         <>
             <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
@@ -59,9 +64,15 @@ const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) =
                 </Grid>
                 <Grid item align="center">
                     <Button
-                        className={classes.ingestButton + (genomicData === undefined ? ` ${classes.ingestButtonDisabled}` : '')}
-                        onClick={beginIngest}
+                        className={classes.ingestButton + (ingestButtonEnabled ? '' : ` ${classes.ingestButtonDisabled}`)}
+                        onClick={() => {
+                            if (ingestButtonEnabled) {
+                                setIngestButtonEnabled(false);
+                                beginIngest();
+                            }
+                        }}
                         variant="contained"
+                        disabled={!ingestButtonEnabled}
                     >
                         Ingest
                     </Button>

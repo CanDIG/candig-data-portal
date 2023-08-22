@@ -1,11 +1,12 @@
 import { makeStyles, styled } from '@mui/styles';
-import { Box, Tab, Tabs } from '@mui/material';
-import { useState } from 'react';
+import { Alert, Box, Tab, Tabs } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import IngestTabPage from 'ui-component/ingest/IngestTabPage';
 import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
 import GenomicIngest from 'ui-component/ingest/GenomicIngest';
 import PersistentFile from 'ui-component/PersistentFile';
+import { ingestClinicalData, ingestGenomicData } from 'store/api';
 
 const IngestTab = styled(Tab)({
     height: '2.75em',
@@ -30,11 +31,20 @@ const IngestTab = styled(Tab)({
 });
 
 function IngestMenu() {
+    const IngestStates = {
+        PENDING: 0,
+        STARTED_CLINICAL: 1,
+        STARTED_GENOMIC: 2,
+        ERROR: 3,
+        SUCCESS: 4
+    };
     const [value, setValue] = useState(0);
     const [clinicalFile, setClinicalFile] = useState(undefined);
     const [clinicalData, setClinicalData] = useState(undefined);
     const [genomicData, setGenomicData] = useState(undefined);
     const [genomicFile, setGenomicFile] = useState(undefined);
+    const [ingestState, setIngestState] = useState(IngestStates.PENDING);
+    const [ingestError, setIngestError] = useState('');
     const setTab = (event, val) => {
         setValue(val);
     };
@@ -54,6 +64,21 @@ function IngestMenu() {
 
     const classes = useStyles();
 
+    function getIngestStatusComponent(status) {
+        switch (status) {
+            case IngestStates.STARTED_CLINICAL:
+                return <Alert severity="info">Ingesting clinical data...</Alert>;
+            case IngestStates.SUCCESS:
+                return <Alert severity="success">Ingest complete!</Alert>;
+            case IngestStates.ERROR:
+                return <Alert severity="error">Ingest encountered the following error: {ingestError}</Alert>;
+            case IngestStates.STARTED_GENOMIC:
+                return <Alert severity="info">Clinical ingest complete. Beginning genomic ingest...</Alert>;
+            default:
+                return <Alert severity="info">Nothing to show. (You probably should not be seeing this...)</Alert>;
+        }
+    }
+
     function loadClinicalFile(file, data) {
         if (!('donors' in data && Array.isArray(data.donors))) {
             throw Error('Donors key not found in clinical file');
@@ -66,6 +91,27 @@ function IngestMenu() {
         setGenomicFile(file);
     }
 
+    function beginIngest() {
+        console.log('Beginning ingest...');
+        setIngestState(IngestStates.STARTED_CLINICAL);
+        ingestClinicalData(JSON.stringify(clinicalData)).then((result) => {
+            if (result.response_code === 0) {
+                setIngestState(IngestStates.STARTED_GENOMIC);
+                ingestGenomicData(JSON.stringify(genomicData), clinicalData.donors[0].program_id).then((response) => {
+                    if (response.status === 200) {
+                        setIngestState(IngestStates.SUCCESS);
+                    } else {
+                        setIngestError(result.json.result);
+                    }
+                });
+            } else {
+                setIngestError(result.result);
+            }
+        });
+    }
+
+    useEffect(() => ingestError && setIngestState(IngestStates.ERROR), [ingestError]);
+
     function getPage(val) {
         if (val === 0)
             return (
@@ -77,7 +123,7 @@ function IngestMenu() {
             );
         return (
             <GenomicIngest
-                beginIngest={() => {}}
+                beginIngest={() => beginIngest()}
                 fileUpload={<PersistentFile file={genomicFile} fileLoader={(file, data) => loadGenomicFile(file, data)} />}
                 clinicalData={clinicalData}
                 genomicData={genomicData}
@@ -106,6 +152,7 @@ function IngestMenu() {
                 />
             </Tabs>
             <IngestTabPage> {getPage(value)} </IngestTabPage>
+            {ingestState !== IngestStates.PENDING && getIngestStatusComponent(ingestState)}
         </Box>
     );
 }
