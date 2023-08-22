@@ -5,6 +5,7 @@ export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
 export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const TYK_URL = process.env.REACT_APP_TYK_SERVER;
+export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
 
 // API Calls
 /* 
@@ -220,5 +221,34 @@ export function query(parameters, abort) {
         .catch((error) => {
             console.log('Error:', error);
             return 'error';
+        });
+
+/*
+Post a clinical data JSON to Katsu
+ * @param {string}... Name of a gene
+*/
+export function ingestClinicalData(data) {
+    return fetch(`${INGEST_URL}/ingest/clinical_donors`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: data
+    })
+        .then((response) => response.json())
+        .catch((error) => {
+            console.log('Error:', error);
+            return error;
+        });
+}
+
+export function ingestGenomicData(data, program_id) {
+    return fetch(`${INGEST_URL}/ingest/moh_variants/${program_id}`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: data
+    })
+        .then((response) => response)
+        .catch((error) => {
+            console.log('Error:', error);
+            return error;
         });
 }
