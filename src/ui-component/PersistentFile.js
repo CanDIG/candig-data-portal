@@ -37,7 +37,7 @@ const PersistentFile = ({ file, setFile, validate = true }) => {
     });
 
     return (
-        <div>
+        <>
             <TextField
                 sx={{ width: '100%' }}
                 variant="outlined"
@@ -50,7 +50,7 @@ const PersistentFile = ({ file, setFile, validate = true }) => {
                     {error}
                 </Alert>
             )}
-        </div>
+        </>
     );
 };
 
