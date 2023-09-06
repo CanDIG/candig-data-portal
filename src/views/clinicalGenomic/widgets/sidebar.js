@@ -81,7 +81,7 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { groupName, isDonorList, isFilterList, remap, onWrite, options, useAutoComplete, hide } = props;
+    const { groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
@@ -103,76 +103,48 @@ function StyledCheckboxList(props) {
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-    const HandleChange = (option, isChecked) => {
-        // If we need to call some mapping function, do so
-        let getID = new Promise((resolve) => resolve(option));
-        if (remap) {
-            getID = remap(option);
+    const HandleChange = (ids, isChecked) => {
+        // Remove duplicates
+        if (Array.isArray(ids)) {
+            ids = Array.from(new Set(ids?.flat(1)));
         }
 
-        getID.then((ids) => {
-            // Remove duplicates
-            if (Array.isArray(ids)) {
-                ids = Array.from(new Set(ids?.flat(1)));
-            }
+        if (isChecked) {
+            setChecked((old) => ({ ...old, [ids]: true }));
+            onWrite((old) => {
+                const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
 
-            if (isChecked) {
-                setChecked((old) => ({ ...old, [option]: true }));
-                onWrite((old) => {
-                    const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
+                // The following appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
+                if (isFilterList) {
+                    // Filter lists operate differently: you _remove_ the option when you check it
+                    retVal.filter[groupName].splice(retVal.filter[groupName].indexOf(ids));
+                } else {
+                    retVal.query[groupName] = ids;
+                }
 
-                    // The following appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
-                    if (isDonorList) {
-                        if (!(groupName in retVal.donorLists)) {
-                            retVal.donorLists[groupName] = { [option]: ids };
-                        } else {
-                            retVal.donorLists[groupName][option] = ids;
-                        }
-                    } else if (isFilterList) {
-                        // Filter lists operate differently: you _remove_ the option when you check it
-                        retVal.filter[groupName].splice(retVal.filter[groupName].indexOf(option));
+                return retVal;
+            });
+        } else {
+            setChecked((old) => {
+                const { [ids]: _, ...rest } = old;
+                return rest;
+            });
+            onWrite((old) => {
+                const retVal = { filter: {}, ...old };
+                if (isFilterList) {
+                    if (groupName in retVal.filter) {
+                        retVal.filter[groupName].push(ids);
                     } else {
-                        retVal.query[groupName] = ids;
+                        retVal.filter[groupName] = [ids];
                     }
-
                     return retVal;
-                });
-            } else {
-                setChecked((old) => {
-                    const { [option]: _, ...rest } = old;
-                    return rest;
-                });
-                onWrite((old) => {
-                    const retVal = { filter: {}, ...old };
-                    if (isFilterList) {
-                        if (groupName in retVal.filter) {
-                            retVal.filter[groupName].push(ids);
-                        } else {
-                            retVal.filter[groupName] = [ids];
-                        }
-                        return retVal;
-                    }
-                    if (!isDonorList) {
-                        const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
-                        retVal.query = newList;
-                        return retVal;
-                    }
+                }
 
-                    const newList = Object.entries(old.donorLists[groupName] || {}).filter(([key]) => key !== option);
-
-                    // Remove the list entirely if we are the last one
-                    if (newList.length <= 0) {
-                        const { [groupName]: _, ...rest } = old.donorLists || {};
-                        retVal.donorLists = rest;
-                        return retVal;
-                    }
-
-                    // Otherwise remove just our entry from the list
-                    retVal.donorLists[groupName] = Object.fromEntries(newList);
-                    return retVal;
-                });
-            }
-        });
+                const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
+                retVal.query = newList;
+                return retVal;
+            });
+        }
     };
 
     return useAutoComplete ? (
@@ -362,11 +334,6 @@ function Sidebar() {
     const hideGenomic = selectedtab !== 'All' && selectedtab !== 'Genomic';
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
-    const remap = (url, returnName) =>
-        fetchFederation(url, 'katsu').then(
-            (data) => data?.map((loc) => loc?.results?.results?.map((result) => result[returnName]) || []) || []
-        );
-
     return (
         <>
             <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
@@ -386,8 +353,6 @@ function Sidebar() {
                     options={treatmentTypes}
                     onWrite={writerContext}
                     groupName="treatment"
-                    remap={(id) => remap(`v2/authorized/treatments?treatment_type=${id}`, 'submitter_donor_id')}
-                    isDonorList
                     useAutoComplete={treatmentTypes.length >= 10}
                     hide={hideClinical}
                 />
@@ -406,8 +371,6 @@ function Sidebar() {
                     options={chemotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="chemotherapy"
-                    remap={(id) => remap(`v2/authorized/chemotherapies?drug_name=${id}`, 'submitter_donor_id')}
-                    isDonorList
                     useAutoComplete={chemotherapyDrugNames.length >= 10}
                     hide={hideClinical}
                 />
@@ -417,8 +380,6 @@ function Sidebar() {
                     options={immunotherapyDrugNames}
                     onWrite={writerContext}
                     groupName="immunotherapy"
-                    remap={(id) => remap(`v2/authorized/immunotherapies?drug_name=${id}`, 'submitter_donor_id')}
-                    isDonorList
                     useAutoComplete={immunotherapyDrugNames.length >= 10}
                     hide={hideClinical}
                 />
@@ -428,8 +389,6 @@ function Sidebar() {
                     options={hormoneTherapyDrugNames}
                     onWrite={writerContext}
                     groupName="hormone_therapy"
-                    remap={(id) => remap(`v2/authorized/hormone_therapies?drug_name=${id}`, 'submitter_donor_id')}
-                    isDonorList
                     useAutoComplete={hormoneTherapyDrugNames.length >= 10}
                     hide={hideClinical}
                 />
