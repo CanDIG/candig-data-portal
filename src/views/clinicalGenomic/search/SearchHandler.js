@@ -70,12 +70,10 @@ function SearchHandler() {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
-        const searchParams = new URLSearchParams();
-
-        console.log(reader.query);
-
         // First, we abort any currently-running search promises
         // controller.abort();
+        console.log('Query re-initiated');
+        console.log(reader.query);
 
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
@@ -99,7 +97,6 @@ function SearchHandler() {
         const donorQueryPromise = () =>
             query(reader.query, controller.signal).then((data) => {
                 // We need to collate the discovery statistics from each site
-                console.log(data);
                 const discoveryCounts = {
                     diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
                     treatment_type_count: CollateSummary(data, 'treatment_type_count'),
@@ -137,14 +134,23 @@ function SearchHandler() {
                     }
                 };
 
-                // Reorder the data, and fill outu the patients per cohort
+                // Reorder the data, and fill out the patients per cohort
                 const clinicalData = {};
                 data.forEach((site) => {
                     discoveryCounts.patients_per_cohort[site.location.name] = site.results?.summary?.patients_per_cohort;
                     clinicalData[site.location.name] = site?.results?.results;
                 });
 
-                writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts }));
+                const genomicData = data
+                    .map((site) =>
+                        site.results.genomic?.map((caseData) => {
+                            caseData.location = site.location;
+                            return caseData;
+                        })
+                    )
+                    .flat(1);
+
+                writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData }));
             });
 
         if (lastPromise === null) {

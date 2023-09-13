@@ -77,11 +77,11 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220 },
-        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170 },
-        { field: 'deceased', headerName: 'Deceased', minWidth: 170 },
-        { field: 'date_of_birth', headerName: 'Date of Birth', minWidth: 200 },
-        { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220 }
+        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
+        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
+        { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
+        { field: 'date_of_birth', headerName: 'Date of Birth', minWidth: 200, sortable: false },
+        { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
     ];
 
     return (

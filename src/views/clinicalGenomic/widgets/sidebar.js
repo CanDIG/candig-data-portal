@@ -190,24 +190,40 @@ function GenomicsGroup(props) {
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
+    const [timeout, setNewTimeout] = useState(null);
 
     if (hide) {
         return <></>;
     }
 
     const HandleChange = (value, changer, toChange) => {
-        changer(value);
-        onWrite((old) => ({
-            ...old,
-            genomic: {
-                assemblyId: selectedGenome,
-                referenceName: selectedChromosomes,
-                start: startPos,
-                end: endPos,
-                gene: selectedGenes,
-                [toChange]: value
+        setNewTimeout((oldTimeout) => {
+            if (oldTimeout != null) {
+                clearTimeout(oldTimeout);
             }
-        }));
+
+            return setTimeout(() => {
+                const newQuery = {
+                    referenceName: selectedChromosomes,
+                    gene: selectedGenes,
+                    start: startPos,
+                    end: endPos,
+                    assembly: selectedGenome,
+                    [toChange]: value
+                };
+
+                onWrite((old) => ({
+                    ...old,
+                    query: {
+                        ...old.query,
+                        chrom: newQuery.referenceName ? `chr${newQuery.referenceName}:${newQuery.start}-${newQuery.end}` : undefined,
+                        gene: newQuery.gene || undefined,
+                        assembly: newQuery.assembly
+                    }
+                }));
+            }, 1000);
+        });
+        changer(value);
     };
 
     return (
