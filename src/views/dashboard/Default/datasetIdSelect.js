@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { fetchDatasets } from '../../../store/api';
+// import { fetchDatasets } from '../../../store/api';
 import AlertComponent from 'ui-component/AlertComponent';
 
 // REDUX
@@ -15,15 +15,16 @@ export default function DatasetIdSelect() {
 
     // STATES
     const [selectedDataset, setSelectedDataset] = useState(events.customization.selectedDataset);
-    const [datasets, setDatasets] = useState(events.customization.datasets);
+    const [datasets, _setDatasets] = useState(events.customization.datasets);
     const [open, setOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertSeverity, setAlertSeverity] = useState('');
+    const [alertMessage, _setAlertMessage] = useState('');
+    const [alertSeverity, _setAlertSeverity] = useState('');
 
     function updateParentState(datasetName, datasetId) {
         dispatch({ type: 'SET_UPDATE_STATE', payload: { datasetName, datasetId } });
     }
 
+    /* 
     function setFirstDataset(datasetsList) {
         const firstDataset = datasetsList[Object.keys(datasetsList)[0]];
         setSelectedDataset(firstDataset.name);
@@ -57,6 +58,7 @@ export default function DatasetIdSelect() {
                 });
         }
     });
+    */
 
     const handleChange = (id, name) => {
         setSelectedDataset(name);

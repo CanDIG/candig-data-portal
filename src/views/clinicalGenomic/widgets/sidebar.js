@@ -15,11 +15,12 @@ import {
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { makeStyles, useTheme } from '@mui/styles';
+import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 import { fetchFederation } from '../../../store/api';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_) => ({
     tab: {
         minWidth: 40
     },
@@ -72,6 +73,12 @@ function SidebarGroup(props) {
         </FormControl>
     );
 }
+
+SidebarGroup.propTypes = {
+    name: PropTypes.string,
+    children: PropTypes.node,
+    hide: PropTypes.bool
+};
 
 function StyledCheckboxList(props) {
     const { groupName, isDonorList, isFilterList, remap, onWrite, options, useAutoComplete, hide } = props;
@@ -205,15 +212,26 @@ function StyledCheckboxList(props) {
         ))
     );
 }
+
+StyledCheckboxList.propTypes = {
+    groupName: PropTypes.string,
+    hide: PropTypes.bool,
+    isDonorList: PropTypes.bool,
+    isFilterList: PropTypes.bool,
+    remap: PropTypes.func,
+    onWrite: PropTypes.func,
+    options: PropTypes.array,
+    useAutoComplete: PropTypes.bool
+};
+
 // A group of genomics data
 // Keeping this separate from the rest as it's all somewhat self-contained
 // NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
     const { chromosomes, genes, onWrite, hide } = props;
-    const classes = useStyles();
     // Genomic data
-    const referenceGenomes = ['hg38'];
-    const [selectedGenome, setSelectedGenome] = useState('hg38');
+    // const referenceGenomes = ['hg38'];
+    const [selectedGenome, _setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
@@ -300,7 +318,14 @@ function GenomicsGroup(props) {
     );
 }
 
-function Sidebar(props) {
+GenomicsGroup.propTypes = {
+    chromosomes: PropTypes.array,
+    genes: PropTypes.array,
+    hide: PropTypes.bool,
+    onWrite: PropTypes.func
+};
+
+function Sidebar() {
     const [selectedtab, setSelectedTab] = useState('All');
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();

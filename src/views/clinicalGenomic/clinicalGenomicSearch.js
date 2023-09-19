@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
 import VariantsSearch from '../genomicsData/VariantsSearch';
 import PatientCounts from './widgets/patientCounts';
@@ -16,7 +16,7 @@ import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_) => ({
     stickytop: {
         position: 'fixed',
         backgroundColor: 'white',
@@ -81,12 +81,11 @@ function ClinicalGenomicSearch() {
     const classes = useStyles();
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = useSelector((state) => state.customization.opened);
-    const theme = useTheme();
 
     // When we load, set the sidebar component
     useEffect(() => {
         sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
-    }, []);
+    }, [sidebarWriter]);
 
     return (
         <>

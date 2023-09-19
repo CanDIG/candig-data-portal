@@ -1,4 +1,4 @@
-import { createRef, useCallback, useState, useEffect } from 'react';
+import { createRef, useState, useEffect } from 'react';
 
 // MUI
 import PropTypes from 'prop-types';
@@ -9,7 +9,7 @@ import { Box, IconButton } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 // Third-party libraries
-import Highcharts, { map } from 'highcharts';
+import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import { IconTrash } from '@tabler/icons';
@@ -197,7 +197,7 @@ function CustomOfflineChart(props) {
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
                         useHTML: true,
-                        formatter: function () {
+                        formatter: () => {
                             let dataSum = 0;
                             this.series.points.forEach((point) => {
                                 dataSum += point.y;
@@ -254,7 +254,22 @@ function CustomOfflineChart(props) {
         }
 
         createChart();
-    }, [dataVis, chart, chartData, JSON.stringify(dataObject), trim]);
+    }, [
+        dataVis,
+        chart,
+        chartData,
+        trim,
+        cutoff,
+        dataObject,
+        grayscale,
+        height,
+        orderAlphabetically,
+        orderByFrequency,
+        theme.palette.grey,
+        theme.palette.primary,
+        theme.palette.secondary,
+        theme.palette.tertiary
+    ]);
 
     function setLocalStorageDataVisChart(event) {
         // Set LocalStorage for Data Visualization Chart Type
@@ -288,7 +303,7 @@ function CustomOfflineChart(props) {
         } else {
             chartObj?.hideLoading();
         }
-    }, [loading]);
+    }, [chartRef, loading]);
 
     const showTrim = (dataObject || dataVis[chartData]) && Object.entries(dataObject === '' ? dataVis[chartData] : dataObject).length > 15;
 
@@ -397,15 +412,20 @@ function CustomOfflineChart(props) {
 }
 
 CustomOfflineChart.propTypes = {
-    dropDown: PropTypes.bool,
-    height: PropTypes.string,
-    dataVis: PropTypes.any,
+    chartType: PropTypes.string,
+    cutoff: PropTypes.number,
+    data: PropTypes.string,
     dataObject: PropTypes.any,
-    onRemoveChart: PropTypes.func,
+    dataVis: PropTypes.any,
+    dropDown: PropTypes.bool,
+    edit: PropTypes.bool,
     grayscale: PropTypes.bool,
+    height: PropTypes.string,
+    index: PropTypes.number,
+    loading: PropTypes.bool,
+    onRemoveChart: PropTypes.func,
     orderByFrequency: PropTypes.bool,
     orderAlphabetically: PropTypes.bool,
-    cutoff: PropTypes.number,
     trimByDefault: PropTypes.bool
 };
 

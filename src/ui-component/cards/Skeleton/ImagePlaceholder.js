@@ -1,5 +1,3 @@
-import React from 'react';
-
 // mui
 import Skeleton from '@mui/material/Skeleton';
 

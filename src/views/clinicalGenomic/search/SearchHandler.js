@@ -37,6 +37,10 @@ function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
     return fetchFederation(url, service).then((data) => RecursiveQuery(data, 1));
 }
 
+// NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
+// However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
+/* eslint-disable react-hooks/exhaustive-deps */
+
 // This handles transforming queries in the SearchResultsContext to actual search queries
 function SearchHandler() {
     const reader = useSearchQueryReaderContext();
@@ -316,7 +320,11 @@ function SearchHandler() {
                                                     return caseData;
                                                 })
                                                 .filter((caseData) => {
-                                                    if (reader.donorLists && Object.keys(reader.donorLists).length > 0 && caseData.donorID) {
+                                                    if (
+                                                        reader.donorLists &&
+                                                        Object.keys(reader.donorLists).length > 0 &&
+                                                        caseData.donorID
+                                                    ) {
                                                         return finalList.includes(caseData.donorID);
                                                     }
                                                     return true;
@@ -357,5 +365,6 @@ function SearchHandler() {
     // NB: This might be a good reason to have this be a function call instead of what it currently is.
     return <></>;
 }
+/* eslint-enable react-hooks/exhaustive-deps */
 
 export default SearchHandler;

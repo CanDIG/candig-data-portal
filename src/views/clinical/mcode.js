@@ -66,6 +66,8 @@ const useStyles = makeStyles({
     }
 });
 
+// NB: This function isn't really used anywhere and it's messing with the linter
+/* eslint-disable react-hooks/exhaustive-deps */
 function MCodeView() {
     const theme = useTheme();
     const classes = useStyles();
@@ -635,5 +637,6 @@ function MCodeView() {
         </MainCard>
     );
 }
+/* eslint-enable react-hooks/exhaustive-deps */
 
 export default MCodeView;

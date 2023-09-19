@@ -7,11 +7,11 @@ import VariantsTable from 'ui-component/Tables/VariantsTable';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import AlertComponent from 'ui-component/AlertComponent';
 import { ListOfReferenceNames } from 'store/constant';
-import { trackPromise, usePromiseTracker } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import { trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import 'assets/css/VariantsSearch.css';
 import { searchVariant, fetchFederationClinicalData, htsget } from 'store/api';
 import IGViewer from './IGViewer';
-import DropDown from '../../ui-component/DropDown';
+// import DropDown from '../../ui-component/DropDown';
 import {
     processMCodeMainData,
     processMedicationListData,
@@ -26,6 +26,10 @@ import { useTheme } from '@mui/styles';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 
+// NB: This VariantsSearch is currently unused, but is throwing linter errors
+// Disabling it for now
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 function VariantsSearch() {
     const [isLoading, setLoading] = useState(true);
     const theme = useTheme();
@@ -34,12 +38,12 @@ function VariantsSearch() {
 
     const [rowData, setRowData] = useState([]);
     const [displayVariantsTable, setDisplayVariantsTable] = useState(false);
-    const { promiseInProgress } = usePromiseTracker();
+    // const { promiseInProgress } = usePromiseTracker();
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('warning');
     const [isIGVWindowOpen, setIsIGVWindowOpen] = useState(false);
-    const [showIGVButton, setShowIGVButton] = useState(false);
+    const [_showIGVButton, setShowIGVButton] = useState(false);
     const [IGVOptions, setIGVOptions] = useState({});
     const [variantSearchOptions, setVariantSearchOptions] = useState({});
     const [patientList, setPatientList] = useState([]);
@@ -48,7 +52,7 @@ function VariantsSearch() {
     // Clinical Search Filter
     const clinicalSearchPatients = useSelector((state) => state.customization.clinicalSearchResultPatients);
     const clinicalSearch = useSelector((state) => state.customization.clinicalSearch);
-    const [cancerType, setCancerType] = React.useState([]);
+    const [cancerType, _setCancerType] = React.useState([]);
 
     // Dropdown patient table open/closed
     const [isListOpenMedications, setListOpenMedications] = React.useState(false);
@@ -567,5 +571,7 @@ function VariantsSearch() {
         </>
     );
 }
+/* eslint-enable no-unused-vars */
+/* eslint-enable react-hooks/exhaustive-deps */
 
 export default VariantsSearch;
