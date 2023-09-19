@@ -5,7 +5,6 @@ import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import VariantsSearch from '../genomicsData/VariantsSearch';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
@@ -120,11 +119,6 @@ function ClinicalGenomicSearch() {
             <MainCard
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
             >
-                <div id="searchbar">
-                    {/* Genomic Searchbar */}
-                    <VariantsSearch />
-                    {/* For now, until I figure out how to make it its own card */}
-                </div>
                 {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
