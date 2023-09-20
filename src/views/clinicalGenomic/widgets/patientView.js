@@ -5,10 +5,11 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { TreeView, TreeItem } from '@mui/lab';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PropTypes from 'prop-types';
 
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
     label: {
         textTransform: 'capitalize',
         display: 'inline-flex'
@@ -96,7 +97,49 @@ const JSONTree = (props) => {
     );
 };
 
-function PatientView(props) {
+JSONTree.propTypes = {
+    id: PropTypes.string,
+    label: PropTypes.string,
+    json: PropTypes.object,
+    searchExp: PropTypes.string
+};
+
+// Prune the patient entry according to search
+const recursivePrune = (json, searchTerm) => {
+    if (Array.isArray(json)) {
+        // Create a new array with pruned children
+        const retVal = json.map((child) => recursivePrune(child, searchTerm)).filter((child) => child !== undefined);
+        return retVal.length <= 0 ? undefined : retVal;
+    }
+
+    if (isObject(json)) {
+        // Find any key that matches the search
+        const retVal = {};
+        Object.keys(json).forEach((key) => {
+            if (key.toLowerCase().indexOf(searchTerm) >= 0) {
+                // include all children of a matching parent
+                retVal[key] = json[key];
+                return;
+            }
+
+            // For all non-valid keys, there might be a valid child -- recurse downwards and prune
+            const childObj = recursivePrune(json[key], searchTerm);
+            if (childObj !== undefined) {
+                retVal[key] = childObj;
+            }
+        });
+        return Object.keys(retVal).length > 0 ? retVal : undefined;
+    }
+
+    if (typeof json === 'string' && json.toLowerCase().indexOf(searchTerm) >= 0) {
+        // Check if we're a match of the search
+        return json;
+    }
+
+    return undefined;
+};
+
+function PatientView() {
     const resultsContext = useSearchResultsReaderContext();
     const patient = resultsContext.donor?.map((loc) => loc?.results?.results?.[0])?.filter((donor) => donor)?.[0];
     const [expanded, setExpanded] = useState(['.']);
@@ -114,41 +157,6 @@ function PatientView(props) {
             return [prefix].concat(Object.keys(json).map((key) => getAllChildIDs(json[key], `${prefix}/${key}`, includeValues))).flat(1);
         }
         return includeValues ? [`${prefix}:${typeof json === 'string' ? json.toLowerCase() : json}`] : [];
-    };
-
-    // Prune the patient entry according to search
-    const recursivePrune = (json, searchTerm) => {
-        if (Array.isArray(json)) {
-            // Create a new array with pruned children
-            const retVal = json.map((child) => recursivePrune(child, searchTerm)).filter((child) => child !== undefined);
-            return retVal.length <= 0 ? undefined : retVal;
-        }
-
-        if (isObject(json)) {
-            // Find any key that matches the search
-            const retVal = {};
-            Object.keys(json).forEach((key) => {
-                if (key.toLowerCase().indexOf(searchTerm) >= 0) {
-                    // include all children of a matching parent
-                    retVal[key] = json[key];
-                    return;
-                }
-
-                // For all non-valid keys, there might be a valid child -- recurse downwards and prune
-                const childObj = recursivePrune(json[key], searchTerm);
-                if (childObj !== undefined) {
-                    retVal[key] = childObj;
-                }
-            });
-            return Object.keys(retVal).length > 0 ? retVal : undefined;
-        }
-
-        if (typeof json === 'string' && json.toLowerCase().indexOf(searchTerm) >= 0) {
-            // Check if we're a match of the search
-            return json;
-        }
-
-        return undefined;
     };
 
     const handleExpandAll = () => {
@@ -199,6 +207,7 @@ function PatientView(props) {
     };
 
     // When the patient changes, we need to update the pruned view according to search
+    const patientString = JSON.stringify(patient);
     useEffect(() => {
         if (search !== '') {
             setPrunedPatient(recursivePrune(patient, search));
@@ -206,7 +215,7 @@ function PatientView(props) {
             // Otherwise, just reset the prunedPatient view to the patient view
             setPrunedPatient(patient);
         }
-    }, [JSON.stringify(patient)]);
+    }, [patientString]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const noResultsMessage = !patient ? (
         'Please select a patient from the above table'

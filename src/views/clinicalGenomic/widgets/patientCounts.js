@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function PatientCounts(props) {
+function PatientCounts() {
     const classes = useStyles();
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
