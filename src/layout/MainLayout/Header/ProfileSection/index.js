@@ -109,6 +109,9 @@ const useStyles = makeStyles((theme) => ({
     badgeWarning: {
         backgroundColor: theme.palette.warning.dark,
         color: '#fff'
+    },
+    usernamePadding: {
+        paddingBottom: '1em'
     }
 }));
 
@@ -210,7 +213,7 @@ const ProfileSection = () => {
                                                     First Name Last Name
                                                 </Typography> */}
                                             </Grid>
-                                            <Grid item>
+                                            <Grid item className={classes.usernamePadding}>
                                                 <Typography variant="subtitle2">{SITE}</Typography>
                                             </Grid>
                                         </Grid>
