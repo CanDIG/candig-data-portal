@@ -77,6 +77,9 @@ const useStyles = makeStyles((theme) => ({
     cardContent: {
         padding: '16px !important'
     },
+    showOnTop: {
+        zIndex: 11001
+    },
     card: {
         backgroundColor: theme.palette.primary.light,
         marginBottom: '16px',
@@ -118,7 +121,6 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [value, setValue] = React.useState('');
     const [selectedIndex] = React.useState(1);
 
     const [open, setOpen] = React.useState(false);
@@ -185,7 +187,7 @@ const ProfileSection = () => {
                 anchorEl={anchorRef.current}
                 role={undefined}
                 transition
-                disablePortal
+                className={classes.showOnTop}
                 popperOptions={{
                     modifiers: [
                         {
@@ -214,22 +216,6 @@ const ProfileSection = () => {
                                                 <Typography variant="subtitle2">{SITE}</Typography>
                                             </Grid>
                                         </Grid>
-                                        <OutlinedInput
-                                            className={classes.searchControl}
-                                            id="input-search-profile"
-                                            value={value}
-                                            onChange={(e) => setValue(e.target.value)}
-                                            placeholder="Search profile options"
-                                            startAdornment={
-                                                <InputAdornment position="start">
-                                                    <IconSearch stroke={1.5} size="1.3rem" className={classes.startAdornment} />
-                                                </InputAdornment>
-                                            }
-                                            aria-describedby="search-helper-text"
-                                            inputProps={{
-                                                'aria-label': 'weight'
-                                            }}
-                                        />
                                         <Divider />
                                         <PerfectScrollbar className={classes.ScrollHeight}>
                                             <Divider />
