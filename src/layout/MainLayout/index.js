@@ -91,8 +91,6 @@ const MainLayout = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd]);
 
-    console.log(leftDrawerOpened);
-
     return (
         <div className={classes.root}>
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
