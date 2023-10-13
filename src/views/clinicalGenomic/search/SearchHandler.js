@@ -100,6 +100,10 @@ function SearchHandler() {
 
         const donorQueryPromise = () =>
             query(reader.query, controller.signal).then((data) => {
+                if (reader.filter?.node) {
+                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                }
+
                 // We need to collate the discovery statistics from each site
                 const discoveryCounts = {
                     diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),

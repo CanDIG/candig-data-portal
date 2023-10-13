@@ -18,7 +18,6 @@ import { makeStyles, useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
-import { fetchFederation } from '../../../store/api';
 
 const useStyles = makeStyles((_) => ({
     tab: {
@@ -81,7 +80,7 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
+    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
@@ -109,7 +108,7 @@ function StyledCheckboxList(props) {
             ids = Array.from(new Set(ids?.flat(1)));
         }
 
-        if (isChecked) {
+        if (isExclusion ? !isChecked : isChecked) {
             setChecked((old) => ({ ...old, [ids]: true }));
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
@@ -122,6 +121,7 @@ function StyledCheckboxList(props) {
                     retVal.query[groupName] = ids;
                 }
 
+                console.log(retVal);
                 return retVal;
             });
         } else {
@@ -137,11 +137,13 @@ function StyledCheckboxList(props) {
                     } else {
                         retVal.filter[groupName] = [ids];
                     }
+                    console.log(retVal);
                     return retVal;
                 }
 
                 const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
                 retVal.query = newList;
+                console.log(retVal);
                 return retVal;
             });
         }
@@ -156,7 +158,13 @@ function StyledCheckboxList(props) {
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
                 <li {...props} value={option}>
-                    <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} value={option} />
+                    <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={isExclusion ? !selected : selected}
+                        value={option}
+                    />
                     {option}
                 </li>
             )}
@@ -174,7 +182,7 @@ function StyledCheckboxList(props) {
                 control={
                     <Checkbox
                         className={classes.checkbox}
-                        checked={option in checked}
+                        checked={isExclusion ? !(option in checked) : option in checked}
                         onChange={(event) => HandleChange(option, event.target.checked)}
                     />
                 }
@@ -186,6 +194,7 @@ function StyledCheckboxList(props) {
 }
 
 StyledCheckboxList.propTypes = {
+    isExclusion: PropTypes.bool,
     groupName: PropTypes.string,
     hide: PropTypes.bool,
     isDonorList: PropTypes.bool,
@@ -361,7 +370,7 @@ function Sidebar() {
                 <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" isFilterList />
             </SidebarGroup>
             <SidebarGroup name="Cohort">
-                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" isFilterList />
+                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="exclude_cohorts" isExclusion />
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
             <SidebarGroup name="Treatment" hide={hideClinical}>
