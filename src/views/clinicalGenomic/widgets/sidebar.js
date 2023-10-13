@@ -121,7 +121,6 @@ function StyledCheckboxList(props) {
                     retVal.query[groupName] = ids;
                 }
 
-                console.log(retVal);
                 return retVal;
             });
         } else {
@@ -137,13 +136,11 @@ function StyledCheckboxList(props) {
                     } else {
                         retVal.filter[groupName] = [ids];
                     }
-                    console.log(retVal);
                     return retVal;
                 }
 
                 const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
                 retVal.query = newList;
-                console.log(retVal);
                 return retVal;
             });
         }
