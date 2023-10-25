@@ -222,6 +222,7 @@ export function query(parameters, abort) {
             console.log('Error:', error);
             return 'error';
         });
+}
 
 /*
 Post a clinical data JSON to Katsu
