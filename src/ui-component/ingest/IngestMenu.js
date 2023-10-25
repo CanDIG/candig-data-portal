@@ -45,9 +45,6 @@ function IngestMenu() {
     const [genomicFile, setGenomicFile] = useState(undefined);
     const [ingestState, setIngestState] = useState(IngestStates.PENDING);
     const [ingestError, setIngestError] = useState('');
-    const setTab = (event, val) => {
-        setValue(val);
-    };
 
     const useStyles = makeStyles({
         tabActive: {
@@ -148,7 +145,7 @@ function IngestMenu() {
         <Box sx={{ width: '100%' }}>
             <Tabs
                 value={value}
-                onChange={setTab}
+                onChange={(_, value) => setValue(value)}
                 variant="fullWidth"
                 sx={{ width: '100%' }}
                 TabIndicatorProps={{
