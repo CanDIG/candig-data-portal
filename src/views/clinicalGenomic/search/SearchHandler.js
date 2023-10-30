@@ -75,7 +75,6 @@ function SearchHandler() {
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
         // First, we abort any currently-running search promises
-        // controller.abort();
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
@@ -155,7 +154,7 @@ function SearchHandler() {
                     )
                     .flat(1);
 
-                writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData }));
+                writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData, loading: false }));
             });
 
         if (lastPromise === null) {
