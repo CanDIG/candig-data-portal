@@ -12,7 +12,7 @@
         "@mui/base": "^5.0.0-alpha.82",
         "@mui/icons-material": "^5.8.0",
         "@mui/lab": "^5.0.0-alpha.49",
-        "@mui/material": "^5.8.1",
+        "@mui/material": "^5.14.13",
         "@mui/styled-engine": "^5.8.0",
         "@mui/styles": "^5.8.0",
         "@mui/system": "^5.8.1",
