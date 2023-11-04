@@ -17,7 +17,7 @@
         "@mui/styles": "^5.8.0",
         "@mui/system": "^5.8.1",
         "@mui/x-data-grid": "^4.0.2",
-        "@tabler/icons": "^1.39.1",
+        "@tabler/icons": "^1.119.0",
         "@testing-library/jest-dom": "^5.11.10",
         "@testing-library/react": "^11.2.6",
         "@testing-library/user-event": "^12.8.3",
