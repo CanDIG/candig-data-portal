@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, searchVariant, searchVariantByGene, query } from 'store/api';
+import { fetchFederationStat, fetchFederation, query } from 'store/api';
 
 // This will grab all of the results from a query, but continue to consume all "next" from the pagination until we are complete
 // This defeats the purpose of pagination, and is frowned upon, but... deadlines
-function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
+/* function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
     const parsedData = {};
     const RecursiveQuery = (data, idx) => {
         let nextQuery = null;
@@ -35,7 +35,7 @@ function ConsumeAllPages(url, resultConsumer, service = 'katsu') {
     };
 
     return fetchFederation(url, service).then((data) => RecursiveQuery(data, 1));
-}
+} */
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?

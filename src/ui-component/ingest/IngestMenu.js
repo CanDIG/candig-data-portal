@@ -120,7 +120,7 @@ function IngestMenu() {
         });
     }
 
-    useEffect(() => ingestError && setIngestState(IngestStates.ERROR), [ingestError]);
+    useEffect(() => ingestError && setIngestState(IngestStates.ERROR), [ingestError, IngestStates.ERROR]);
 
     function getPage(val) {
         if (val === 0)

@@ -157,7 +157,7 @@ function CustomOfflineChart(props) {
                     legend: { enabled: false },
                     series: stackSeries,
                     tooltip: {
-                        pointFormat: '<b>{point.name}:</b> {point.y}'
+                        pointFormat: '<b>{series.name}:</b> {point.y}'
                     }
                 });
             } else if (validCharts.includes(chart)) {
@@ -197,14 +197,17 @@ function CustomOfflineChart(props) {
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
                         useHTML: true,
-                        formatter: () => {
+                        // Anonymous functions don't appear to work with highcharts for some reason?
+                        /* eslint-disable func-names */
+                        formatter: function () {
                             let dataSum = 0;
                             this.series.points.forEach((point) => {
                                 dataSum += point.y;
                             });
                             const pcnt = (this.y / dataSum) * 100;
-                            return `<b> ${this.point.category}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
+                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
                         }
+                        /* eslint-enable func-names */
                     }
                 });
             } else {
