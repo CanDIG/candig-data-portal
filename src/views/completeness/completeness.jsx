@@ -9,19 +9,18 @@ import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 
 // project imports
 import { fetchFederation } from 'store/api';
-import { aggregateObj, aggregateObjStack } from 'utils/utils';
 
 // assets
-import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
+import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
 
 // Test data
-import { fullClinicalData, fullGenomicData } from '../../store/constant';
-
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
+import MainCard from 'ui-component/cards/MainCard';
+import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
 
 function Completeness() {
     const theme = useTheme();
-    const [clinicalComplete, setClinicalComplete] = useState({});
+    const [clinicalComplete, setClinicalComplete] = useState([]);
     const [numNodes, setNumNodes] = useState(0);
     const [numErrorNodes, setNumErrorNodes] = useState(0);
     const [numDonors, setNumDonors] = useState(0);
@@ -185,7 +184,7 @@ function Completeness() {
                     dataObject={numClinicalComplete || {}}
                     data="full_clinical_data"
                     dataVis=""
-                    chartType="bar"
+                    chartType="column"
                     height="400px; auto"
                     dropDown={false}
                     loading={undefined}
@@ -198,13 +197,19 @@ function Completeness() {
                     dataObject={numGenomicComplete || {}}
                     data="full_genomic_data"
                     dataVis=""
-                    chartType="bar"
+                    chartType="column"
                     height="400px; auto"
                     dropDown={false}
                     loading={undefined}
                     orderByFrequency
                     cutoff={10}
                 />
+            </Grid>
+            {/* <Grid item xs={12} sm={12} md={6} lg={6}>
+                <MainCard>(Percentage complete graph)</MainCard>
+            </Grid> */}
+            <Grid item xs={12} sm={12} md={6} lg={6}>
+                <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} />
             </Grid>
         </Grid>
     );
