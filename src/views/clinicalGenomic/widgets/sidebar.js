@@ -214,7 +214,7 @@ function GenomicsGroup(props) {
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
-    const [timeout, setNewTimeout] = useState(null);
+    const [_timeout, setNewTimeout] = useState(null);
 
     if (hide) {
         return <></>;
