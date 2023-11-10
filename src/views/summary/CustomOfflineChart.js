@@ -1,4 +1,4 @@
-import { createRef, useCallback, useState, useEffect } from 'react';
+import { createRef, useState, useEffect } from 'react';
 
 // MUI
 import PropTypes from 'prop-types';
@@ -9,8 +9,7 @@ import { Box, IconButton } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 // Third-party libraries
-import Cookies from 'js-cookie';
-import Highcharts, { map } from 'highcharts';
+import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import { IconTrash } from '@tabler/icons';
@@ -158,7 +157,7 @@ function CustomOfflineChart(props) {
                     legend: { enabled: false },
                     series: stackSeries,
                     tooltip: {
-                        pointFormat: '<b>{point.name}:</b> {point.y}'
+                        pointFormat: '<b>{series.name}:</b> {point.y}'
                     }
                 });
             } else if (validCharts.includes(chart)) {
@@ -198,14 +197,17 @@ function CustomOfflineChart(props) {
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
                         useHTML: true,
+                        // Anonymous functions don't appear to work with highcharts for some reason?
+                        /* eslint-disable func-names */
                         formatter: function () {
                             let dataSum = 0;
                             this.series.points.forEach((point) => {
                                 dataSum += point.y;
                             });
                             const pcnt = (this.y / dataSum) * 100;
-                            return `<b> ${this.point.category}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
+                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
                         }
+                        /* eslint-enable func-names */
                     }
                 });
             } else {
@@ -255,27 +257,42 @@ function CustomOfflineChart(props) {
         }
 
         createChart();
-    }, [dataVis, chart, chartData, JSON.stringify(dataObject), trim]);
+    }, [
+        dataVis,
+        chart,
+        chartData,
+        trim,
+        cutoff,
+        dataObject,
+        grayscale,
+        height,
+        orderAlphabetically,
+        orderByFrequency,
+        theme.palette.grey,
+        theme.palette.primary,
+        theme.palette.secondary,
+        theme.palette.tertiary
+    ]);
 
-    function setCookieDataVisChart(event) {
-        // Set cookie for Data Visualization Chart Type
-        const dataVisChart = JSON.parse(Cookies.get('dataVisChartType'));
+    function setLocalStorageDataVisChart(event) {
+        // Set LocalStorage for Data Visualization Chart Type
+        const dataVisChart = JSON.parse(localStorage.getItem('dataVisChartType'));
         dataVisChart[index] = event.target.value;
-        Cookies.set('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
+        localStorage.setItem('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
     }
 
-    function setCookieDataVisData(event) {
-        // Set Cookie for Data Visualization Data
-        const dataVisData = JSON.parse(Cookies.get('dataVisData'));
+    function setLocalStorageDataVisData(event) {
+        // Set LocalStorage for Data Visualization Data
+        const dataVisData = JSON.parse(localStorage.getItem('dataVisData'));
         dataVisData[index] = event.target.value;
-        Cookies.set('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
+        localStorage.setItem('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
     }
 
-    function setCookieDataVisTrim(value) {
-        // Set Cookie for Data Visualization Trim status
-        const dataVisTrim = JSON.parse(Cookies.get('dataVisTrim'));
+    function setLocalStorageDataVisTrim(value) {
+        // Set LocalStorage for Data Visualization Trim status
+        const dataVisTrim = JSON.parse(localStorage.getItem('dataVisTrim'));
         dataVisTrim[index] = value;
-        Cookies.set('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
+        localStorage.setItem('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
     }
 
     /* eslint-disable jsx-a11y/no-onchange */
@@ -289,7 +306,7 @@ function CustomOfflineChart(props) {
         } else {
             chartObj?.hideLoading();
         }
-    }, [loading]);
+    }, [chartRef, loading]);
 
     const showTrim = (dataObject || dataVis[chartData]) && Object.entries(dataObject === '' ? dataVis[chartData] : dataObject).length > 15;
 
@@ -329,7 +346,7 @@ function CustomOfflineChart(props) {
                                     id="types"
                                     onChange={(event) => {
                                         setChartData(event.target.value);
-                                        setCookieDataVisData(event);
+                                        setLocalStorageDataVisData(event);
                                     }}
                                 >
                                     {Object.keys(dataVis).map((key) => (
@@ -350,7 +367,7 @@ function CustomOfflineChart(props) {
                                         id="types"
                                         onChange={(event) => {
                                             setChart(event.target.value);
-                                            setCookieDataVisChart(event);
+                                            setLocalStorageDataVisChart(event);
                                         }}
                                     >
                                         <option value="bar">Stacked Bar</option>
@@ -365,7 +382,7 @@ function CustomOfflineChart(props) {
                                         id="types"
                                         onChange={(event) => {
                                             setChart(event.target.value);
-                                            setCookieDataVisChart(event);
+                                            setLocalStorageDataVisChart(event);
                                         }}
                                     >
                                         <option value="bar">Bar</option>
@@ -382,7 +399,7 @@ function CustomOfflineChart(props) {
                                         type="checkbox"
                                         id="trim"
                                         onChange={() => {
-                                            setCookieDataVisTrim(!trim);
+                                            setLocalStorageDataVisTrim(!trim);
                                             setTrim((old) => !old);
                                         }}
                                         checked={trim}
@@ -398,15 +415,20 @@ function CustomOfflineChart(props) {
 }
 
 CustomOfflineChart.propTypes = {
-    dropDown: PropTypes.bool,
-    height: PropTypes.string,
-    dataVis: PropTypes.any,
+    chartType: PropTypes.string,
+    cutoff: PropTypes.number,
+    data: PropTypes.string,
     dataObject: PropTypes.any,
-    onRemoveChart: PropTypes.func,
+    dataVis: PropTypes.any,
+    dropDown: PropTypes.bool,
+    edit: PropTypes.bool,
     grayscale: PropTypes.bool,
+    height: PropTypes.string,
+    index: PropTypes.number,
+    loading: PropTypes.bool,
+    onRemoveChart: PropTypes.func,
     orderByFrequency: PropTypes.bool,
     orderAlphabetically: PropTypes.bool,
-    cutoff: PropTypes.number,
     trimByDefault: PropTypes.bool
 };
 

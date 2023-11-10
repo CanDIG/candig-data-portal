@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Typography } from '@mui/material';
 import { useTheme, makeStyles } from '@mui/styles';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
     patientEntry: {
@@ -137,5 +138,10 @@ function PatientCountSingle(props) {
         </Box>
     );
 }
+
+PatientCountSingle.propTypes = {
+    site: PropTypes.string,
+    counts: PropTypes.object
+};
 
 export default PatientCountSingle;

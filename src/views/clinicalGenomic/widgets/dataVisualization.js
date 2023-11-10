@@ -11,7 +11,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 
 // Third-party libraries
-import Cookies from 'js-cookie';
 import { IconEdit, IconX, IconPlus } from '@tabler/icons';
 
 // Custom Components and context
@@ -21,7 +20,7 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 
-function DataVisualization(props) {
+function DataVisualization() {
     // Hooks
     const resultsContext = useSearchResultsReaderContext().counts;
     // Plan for context below see current dataVis for expected shape
@@ -69,28 +68,32 @@ function DataVisualization(props) {
     // Top 4 keys from dataVis
     const topKeys = Object.keys(dataVis).slice(0, 4);
 
-    // Cookies
+    // LocalStorage
     const [dataValue, setDataValue] = useState(
-        Cookies.get('dataVisData') ? JSON.parse(Cookies.get('dataVisData'))[0] : 'patients_per_cohort'
+        localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData'))[0] : 'patients_per_cohort'
     );
-    const [chartType, setChartType] = useState(Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType'))[0] : 'bar');
-    const [dataVisData, setdataVisData] = useState(Cookies.get('dataVisData') ? JSON.parse(Cookies.get('dataVisData')) : topKeys);
+    const [chartType, setChartType] = useState(
+        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType'))[0] : 'bar'
+    );
+    const [dataVisData, setdataVisData] = useState(
+        localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData')) : topKeys
+    );
     const [dataVisChartType, setDataVisChartType] = useState(
-        Cookies.get('dataVisChartType') ? JSON.parse(Cookies.get('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
+        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
     );
     const [dataVisTrim, setDataVisTrim] = useState(
-        Cookies.get('dataVisTrim') ? JSON.parse(Cookies.get('dataVisTrim')) : [false, false, false, false]
+        localStorage.getItem('dataVisTrim') ? JSON.parse(localStorage.getItem('dataVisTrim')) : [false, false, false, false]
     );
 
-    // Intial cookie setting if there are none
+    // Intial localStorage setting if there are none
     useEffect(() => {
-        if (!Cookies.get('dataVisData') && !Cookies.get('dataVisChartType')) {
+        if (!localStorage.getItem('dataVisData') && !localStorage.getItem('dataVisChartType')) {
             const charts = topKeys.map(() => 'bar');
-            Cookies.set('dataVisChartType', JSON.stringify(charts), { expires: 365 });
-            Cookies.set('dataVisData', JSON.stringify(topKeys), { expires: 365 });
-            Cookies.set('dataVisTrim', JSON.stringify([false, false, false, false]), { expires: 365 });
+            localStorage.setItem('dataVisChartType', JSON.stringify(charts), { expires: 365 });
+            localStorage.setItem('dataVisData', JSON.stringify(topKeys), { expires: 365 });
+            localStorage.setItem('dataVisTrim', JSON.stringify([false, false, false, false]), { expires: 365 });
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleToggleDialog = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -103,9 +106,9 @@ function DataVisualization(props) {
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         setDataVisTrim(newDataVisTrim);
-        Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
-        Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
-        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
+        localStorage.setItem('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
+        localStorage.setItem('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        localStorage.setItem('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
     }
 
     function AddChart(data, chartType) {
@@ -116,9 +119,9 @@ function DataVisualization(props) {
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         setDataVisTrim(newDataVisTrim);
-        Cookies.set('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
-        Cookies.set('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
-        Cookies.set('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
+        localStorage.setItem('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+        localStorage.setItem('dataVisTrim', JSON.stringify(newDataVisTrim), { expires: 365 });
+        localStorage.setItem('dataVisData', JSON.stringify(newdataVisData), { expires: 365 });
     }
     /* eslint-disable jsx-a11y/no-onchange */
     function returnChartDialog() {

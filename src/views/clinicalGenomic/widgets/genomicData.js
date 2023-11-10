@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme } from '@mui/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 
@@ -10,38 +10,6 @@ import { Box, Typography } from '@mui/material';
 // project imports
 import { useSearchQueryReaderContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
-// Styles
-const useStyles = makeStyles({
-    dropdownItem: {
-        background: 'white',
-        paddingRight: '1.25em',
-        paddingLeft: '1.25em',
-        border: 'none',
-        width: 'fit-content(5em)',
-        '&:hover': {
-            background: '#2196f3',
-            color: 'white'
-        }
-    },
-    mobileRow: {
-        width: '800px'
-    },
-    scrollbar: {
-        scrollbarWidth: 'thin',
-        '&::-webkit-scrollbar': {
-            height: '0.4em',
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)'
-        }
-    }
-});
-
 function GenomicData() {
     const theme = useTheme();
 
@@ -49,7 +17,7 @@ function GenomicData() {
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResults = useSearchResultsReaderContext().genomic;
-    const query = useSearchQueryReaderContext().genomic;
+    const query = useSearchQueryReaderContext().query;
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
@@ -79,17 +47,17 @@ function GenomicData() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'location', headerName: 'Node', minWidth: 150 },
-        { field: 'donorID', headerName: 'Donor ID', minWidth: 150 },
-        { field: 'position', headerName: 'Position', minWidth: 200 },
-        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200 },
-        { field: 'submitter_specimen_id', headerName: 'Tumour Specimen ID', minWidth: 200 },
-        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300 },
-        { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200 }
+        { field: 'location', headerName: 'Node', minWidth: 120, sortable: false },
+        { field: 'donor_id', headerName: 'Donor ID', minWidth: 150, sortable: false },
+        { field: 'position', headerName: 'Position', minWidth: 150, sortable: false },
+        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200, sortable: false },
+        { field: 'submitter_specimen_id', headerName: 'Tumour Specimen ID', minWidth: 300, sortable: false },
+        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300, sortable: false },
+        { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200, sortable: false }
     ];
 
-    const queryParams = query?.gene || `${query?.referenceName}:${query?.start}-${query?.end}`;
-    const hasValidQuery = (query?.referenceName && query?.start && query?.end) || query?.gene;
+    const queryParams = query?.gene || query?.chrom;
+    const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene;
 
     return (
         <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
