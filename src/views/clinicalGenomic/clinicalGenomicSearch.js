@@ -65,11 +65,6 @@ const sections = [
         component: <ClinicalData />
     },
     {
-        id: 'patient',
-        header: 'Patient View',
-        component: <PatientView />
-    },
-    {
         id: 'genomic',
         header: 'Genomic Data',
         component: <GenomicData />
