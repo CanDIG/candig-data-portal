@@ -107,7 +107,7 @@ function Completeness() {
         fetchFederation('genomic-completeness', 'query').then((data) => {
             const numCompleteGenomic = {};
             data.filter((site) => site.status === 200).forEach((site) => {
-                numCompleteGenomic[site.location.name] = site.results;
+                numCompleteGenomic[site.location.name] = site.results.all;
             });
             setNumGenomicComplete(numCompleteGenomic);
         });
