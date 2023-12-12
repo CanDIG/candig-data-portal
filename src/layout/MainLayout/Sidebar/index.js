@@ -65,7 +65,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                 </PerfectScrollbar>
             </BrowserView>
             <MobileView>
-                <Box sx={{ px: 2 }} />
+                <Box sx={{ px: 2 }}>{sidebarContext || <></>}</Box>
             </MobileView>
         </>
     );
