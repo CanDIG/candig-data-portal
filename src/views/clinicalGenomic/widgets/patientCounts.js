@@ -32,6 +32,8 @@ function PatientCounts() {
             if (searchResults && entry.location.name in searchResults) {
                 // Has this node been excluded from the results?
                 if (!(filters && filters?.node?.includes(entry.location.name))) {
+                    console.log(entry);
+                    console.log(searchResults);
                     const match = searchResults[entry.location.name];
                     // Iterate through each donor in this site
                     match.forEach((donor) => {
