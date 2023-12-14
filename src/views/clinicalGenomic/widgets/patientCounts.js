@@ -33,7 +33,14 @@ function PatientCounts() {
                 // Has this node been excluded from the results?
                 if (!(filters && filters?.node?.includes(entry.location.name))) {
                     const match = searchResults[entry.location.name];
-                    // Iterate through each donor in this site
+                    Object.keys(match.summary.patients_per_cohort).forEach((cohort) => {
+                        if (cohort in counts) {
+                            counts[cohort] += match.summary.patients_per_cohort[cohort];
+                        } else {
+                            counts[cohort] = match.summary.patients_per_cohort[cohort];
+                        }
+                    });
+                    /* // Iterate through each donor in this site
                     match.forEach((donor) => {
                         if (filters && filters?.program_id?.includes(donor.program_id)) {
                             // Exclude based on cohort
@@ -45,7 +52,7 @@ function PatientCounts() {
                         } else {
                             counts[donor.program_id] = 1;
                         }
-                    });
+                    }); */
                 }
             }
 
