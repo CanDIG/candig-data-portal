@@ -10,12 +10,17 @@ ENV TYK_KATSU_API_TARGET=$katsu_api_target_url
 
 RUN apk update && apk add gettext
 
-WORKDIR /app/candig-data-portal
-ENV PATH /app/candig-data-portal/node_modules/.bin:$PATH
-
 RUN apk add --no-cache git curl vim bash
 
-COPY . /app/candig-data-portal
+RUN addgroup -S candig && adduser -S candig -G candig
+
+COPY --chown=candig:candig . /app/candig-data-portal
+
+USER candig
+
+WORKDIR /app/candig-data-portal
+
+ENV PATH /app/candig-data-portal/node_modules/.bin:$PATH
 
 RUN npm install
 
