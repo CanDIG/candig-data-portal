@@ -12,6 +12,10 @@ import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../S
 
 function ClinicalView() {
     const theme = useTheme();
+    const [paginationModel, setPaginationModel] = React.useState({
+        pageSize: 25,
+        page: 0
+    });
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
@@ -24,6 +28,7 @@ function ClinicalView() {
     if (searchResults) {
         rows =
             Object.values(searchResults)
+                ?.map((results) => results.results)
                 ?.flat(1)
                 ?.map((patient, index) => {
                     // Make sure each row has an ID and a deceased status
@@ -52,6 +57,22 @@ function ClinicalView() {
         { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
     ];
 
+    const HandlePageChange = (newPage) => {
+        if (newPage !== paginationModel.page) {
+            writerContext((old) => ({ ...old, query: { ...old.query, page: newPage } }));
+        }
+        setPaginationModel({
+            pageSize: 10,
+            page: newPage
+        });
+    };
+
+    const totalRows = searchResults
+        ? Object.values(searchResults)
+              ?.map((site) => site.count)
+              .reduce((partial, a) => partial + a, 0)
+        : 0;
+
     return (
         <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
@@ -62,8 +83,12 @@ function ClinicalView() {
                     rows={rows}
                     columns={columns}
                     pageSize={10}
+                    rowCount={totalRows}
                     rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
+                    paginationModel={paginationModel}
+                    onPageChange={HandlePageChange}
+                    paginationMode="server"
                     hideFooterSelectedRowCount
                 />
             </div>
