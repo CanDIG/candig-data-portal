@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import {
     Box,
     Button,

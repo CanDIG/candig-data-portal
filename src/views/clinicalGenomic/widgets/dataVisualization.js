@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 
 // MUI
 import { Box, Grid, IconButton, Typography } from '@mui/material';

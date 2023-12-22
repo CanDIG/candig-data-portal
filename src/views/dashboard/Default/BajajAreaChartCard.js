@@ -1,7 +1,7 @@
 import React from 'react';
 
 // mui
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/system';
 import { Card, CardContent, Grid, Typography } from '@mui/material';
 
 // third-party

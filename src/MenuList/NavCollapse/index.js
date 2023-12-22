@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Collapse, List, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 

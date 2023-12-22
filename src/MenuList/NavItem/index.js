@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, Chip, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 

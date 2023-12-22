@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/system';
 import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';

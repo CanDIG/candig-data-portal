@@ -1,4 +1,4 @@
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Button, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
 // project imports

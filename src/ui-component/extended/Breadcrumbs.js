@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Card, CardContent, Divider, Grid, Typography } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 

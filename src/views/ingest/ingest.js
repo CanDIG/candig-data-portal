@@ -1,6 +1,6 @@
 import IngestMenu from 'ui-component/ingest/IngestMenu';
 import { Grid } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 
 function IngestPage() {
     const useStyles = makeStyles({

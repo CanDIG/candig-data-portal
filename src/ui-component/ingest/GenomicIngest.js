@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { useEffect, useState } from 'react';
 
 const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) => {

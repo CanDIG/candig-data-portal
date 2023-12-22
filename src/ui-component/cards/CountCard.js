@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // REDUX

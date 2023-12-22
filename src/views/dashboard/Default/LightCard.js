@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 // REDUX

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/system';
 import {
     Avatar,
     CardContent,

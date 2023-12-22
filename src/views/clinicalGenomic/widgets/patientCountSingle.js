@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Typography } from '@mui/material';
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme, makeStyles } from '@mui/system';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import PropTypes from 'prop-types';

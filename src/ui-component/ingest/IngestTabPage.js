@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import PropTypes from 'prop-types';
 
 const IngestTabPage = ({ children }) => {

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 
 // mui
-// import { useTheme, makeStyles } from '@mui/styles';
+// import { useTheme, makeStyles } from '@mui/system';
 import Grid from '@mui/material/Grid';
-import useTheme from '@mui/styles/useTheme';
+import useTheme from '@mui/system/useTheme';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';

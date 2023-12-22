@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // material-ui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, Box, ButtonBase, Card, CardContent, Grid, InputAdornment, OutlinedInput, Popper } from '@mui/material';
 
 // third-party

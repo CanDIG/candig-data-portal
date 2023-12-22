@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
 
 // ===========================|| CUSTOM SUB CARD ||=========================== //

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 
 // project import
 import MainCard from 'ui-component/cards/MainCard';

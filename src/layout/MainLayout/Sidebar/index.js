@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/system';
 import { Box, Drawer, useMediaQuery } from '@mui/material';
 
 // third-party

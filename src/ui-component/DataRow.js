@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Box, Divider, Grid, Typography } from '@mui/material';
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme, makeStyles } from '@mui/system';
 
 function makeField(lab, val) {
     return {

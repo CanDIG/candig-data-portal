@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme, makeStyles } from '@mui/system';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';

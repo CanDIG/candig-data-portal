@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Divider, List, Typography } from '@mui/material';
 
 // project imports

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // project imports

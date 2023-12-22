@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';

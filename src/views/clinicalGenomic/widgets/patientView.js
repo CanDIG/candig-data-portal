@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/system';
 import { TreeView, TreeItem } from '@mui/lab';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

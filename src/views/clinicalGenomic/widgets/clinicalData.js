@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 

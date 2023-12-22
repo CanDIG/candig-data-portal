@@ -1,4 +1,4 @@
-import { makeStyles, styled } from '@mui/styles';
+import { makeStyles, styled } from '@mui/system';
 import { Alert, Box, CircularProgress, Grid, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
 

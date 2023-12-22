@@ -1,5 +1,5 @@
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Card } from '@mui/material';
 
 // project imports

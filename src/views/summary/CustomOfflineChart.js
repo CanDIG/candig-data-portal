@@ -2,7 +2,7 @@ import { createRef, useState, useEffect } from 'react';
 
 // MUI
 import PropTypes from 'prop-types';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { Box, IconButton } from '@mui/material';
 
 // REDUX

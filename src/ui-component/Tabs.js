@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Grid, Box } from '@mui/material';
 
 const useStyles = makeStyles({

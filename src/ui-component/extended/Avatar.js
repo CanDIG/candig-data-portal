@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import MuiAvatar from '@mui/material/Avatar';
 
 // style constant

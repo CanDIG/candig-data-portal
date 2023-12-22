@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@mui/system';
 import { Avatar, Button, Grid, Typography } from '@mui/material';
 
 // third-party
