@@ -2,30 +2,28 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 
-const PersistentFile = ({ file, setFile, validate = true }) => {
+const PersistentFile = ({ file, fileLoader }) => {
     // A JSON file input dialog which can maintain its state after unmounting. Optionally validates before upload.
+    // Calls "fileLoader" with the file object as argument #1 and the JSON data as argument #2.
     const [error, setError] = useState(null);
     const fileRef = useRef(null);
 
     async function loadFile(file) {
         try {
-            if (validate) {
-                const result = await file.text().then((data) => JSON.parse(data) && data !== null && data !== undefined);
-                if (!result) {
-                    console.log(`Error parsing uploaded JSON file ${file.name}`);
-                    setError(`Error parsing uploaded JSON "${file.name}`);
-                    return;
-                }
+            const data = await file.text().then((data) => JSON.parse(data));
+            if (!(data || data !== undefined)) {
+                console.log(`Error parsing uploaded JSON file ${file.name}`);
+                setError(`Error parsing uploaded JSON "${file.name}`);
+                return;
             }
+            fileLoader(file, data);
+            setError(null);
         } catch (error) {
             console.log(`Error parsing JSON ${file.name}`);
             console.log(error);
             setError(`Error parsing JSON "${file.name}": ${error.message}`);
             fileRef.current.value = '';
-            return;
         }
-        setFile(file);
-        setError(null);
     }
 
     useEffect(() => {
@@ -55,9 +53,8 @@ const PersistentFile = ({ file, setFile, validate = true }) => {
 };
 
 PersistentFile.propTypes = {
-    setFile: PropTypes.func.isRequired,
-    file: PropTypes.instanceOf(File),
-    validate: PropTypes.bool
+    fileLoader: PropTypes.func.isRequired,
+    file: PropTypes.instanceOf(File)
 };
 
 export default PersistentFile;

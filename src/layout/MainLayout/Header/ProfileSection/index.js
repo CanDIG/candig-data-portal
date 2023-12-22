@@ -9,11 +9,9 @@ import {
     ClickAwayListener,
     Divider,
     Grid,
-    InputAdornment,
     List,
     ListItemIcon,
     ListItemText,
-    OutlinedInput,
     Paper,
     Popper,
     Typography
@@ -29,7 +27,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import { SITE } from 'store/constant';
 
 // assets
-import { IconLogout, IconSearch, IconSettings } from '@tabler/icons';
+import { IconLogout, IconSettings } from '@tabler/icons';
 import User1 from 'assets/images/users/user-round.svg';
 import BCGSC from 'assets/images/users/bcgsc.svg';
 import UHN from 'assets/images/users/UHN.svg';
@@ -77,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
     cardContent: {
         padding: '16px !important'
     },
+    showOnTop: {
+        zIndex: 11001
+    },
     card: {
         backgroundColor: theme.palette.primary.light,
         marginBottom: '16px',
@@ -108,6 +109,9 @@ const useStyles = makeStyles((theme) => ({
     badgeWarning: {
         backgroundColor: theme.palette.warning.dark,
         color: '#fff'
+    },
+    usernamePadding: {
+        paddingBottom: '1em'
     }
 }));
 
@@ -118,7 +122,6 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [value, setValue] = React.useState('');
     const [selectedIndex] = React.useState(1);
 
     const [open, setOpen] = React.useState(false);
@@ -185,7 +188,7 @@ const ProfileSection = () => {
                 anchorEl={anchorRef.current}
                 role={undefined}
                 transition
-                disablePortal
+                className={classes.showOnTop}
                 popperOptions={{
                     modifiers: [
                         {
@@ -210,26 +213,10 @@ const ProfileSection = () => {
                                                     First Name Last Name
                                                 </Typography> */}
                                             </Grid>
-                                            <Grid item>
+                                            <Grid item className={classes.usernamePadding}>
                                                 <Typography variant="subtitle2">{SITE}</Typography>
                                             </Grid>
                                         </Grid>
-                                        <OutlinedInput
-                                            className={classes.searchControl}
-                                            id="input-search-profile"
-                                            value={value}
-                                            onChange={(e) => setValue(e.target.value)}
-                                            placeholder="Search profile options"
-                                            startAdornment={
-                                                <InputAdornment position="start">
-                                                    <IconSearch stroke={1.5} size="1.3rem" className={classes.startAdornment} />
-                                                </InputAdornment>
-                                            }
-                                            aria-describedby="search-helper-text"
-                                            inputProps={{
-                                                'aria-label': 'weight'
-                                            }}
-                                        />
                                         <Divider />
                                         <PerfectScrollbar className={classes.ScrollHeight}>
                                             <Divider />

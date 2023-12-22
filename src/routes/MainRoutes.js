@@ -20,6 +20,9 @@ const ClinicalPatientView = Loadable(lazy(() => import('views/clinicalGenomic/cl
 // Ingest Portal
 const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
 
+// Ingest Portal
+// const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
+
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
 
@@ -45,6 +48,10 @@ const MainRoutes = {
             path: `${basename}/clinicalGenomicSearch`,
             element: <ClinicalGenomicSearch />
         },
+        /* {
+            path: `${basename}/data-ingest`,
+            element: <IngestPortal />
+        }, */
         {
             path: `${basename}/patientView`,
             element: <ClinicalPatientView />

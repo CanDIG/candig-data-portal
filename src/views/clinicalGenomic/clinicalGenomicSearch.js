@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Divider, Toolbar, Typography, Box } from '@mui/material';
+import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import VariantsSearch from '../genomicsData/VariantsSearch';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
@@ -17,7 +16,7 @@ import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 import { DataGrid } from '@mui/x-data-grid';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_) => ({
     stickytop: {
         position: 'fixed',
         backgroundColor: 'white',
@@ -77,21 +76,19 @@ function ClinicalGenomicSearch() {
     const classes = useStyles();
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = useSelector((state) => state.customization.opened);
-    const theme = useTheme();
 
     // When we load, set the sidebar component
     useEffect(() => {
         sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
-    }, []);
+    }, [sidebarWriter]);
 
     return (
         <>
             {/* Top bar */}
             <AppBar
                 component="nav"
-                className={`${classes.stickytop} ${classes.headerSpacing} ${
-                    sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
-                }`}
+                className={`${classes.stickytop} ${classes.headerSpacing} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset
+                    }`}
             >
                 <Toolbar sx={{ padding: '5px' }}>
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>
@@ -117,11 +114,6 @@ function ClinicalGenomicSearch() {
             <MainCard
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
             >
-                <div id="searchbar">
-                    {/* Genomic Searchbar */}
-                    <VariantsSearch />
-                    {/* For now, until I figure out how to make it its own card */}
-                </div>
                 {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor} aria-hidden="true">

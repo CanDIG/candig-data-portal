@@ -28,8 +28,8 @@ function HtsgetBrowser() {
     const [open, setOpen] = useState(false);
     const [selectedBamIds, setSelectedBamIds] = useState([]);
     const [selectedVcfIds, setSelectedVcfIds] = useState([]);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertSeverity, setAlertSeverity] = useState('');
+    const [alertMessage, _setAlertMessage] = useState('');
+    const [alertSeverity, _setAlertSeverity] = useState('');
 
     useEffect(() => {
         setSelected([]);
@@ -41,7 +41,7 @@ function HtsgetBrowser() {
         // Get a list of genomics files available
         trackPromise(
             fetchKatsu('/api/genomicsreports')
-                .then((data) => {
+                .then((_data) => {
                     // TODO: get a list of ids of genomics files from API above
                     // Or any other APIs that can provide a list of IDs
                     // Note: if only VCF files are served, then the following TODOs concerning BAM files

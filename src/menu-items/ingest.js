@@ -14,7 +14,7 @@ const icons = {
 // ===========================|| Ingest MENU ITEMS ||=========================== //
 
 const ingest = {
-    id: 'frontendIngest',
+    id: 'ingest',
     title: 'Data Ingest',
     type: 'group',
     children: [
@@ -22,7 +22,7 @@ const ingest = {
             id: 'Data Ingest',
             title: 'Data Ingest',
             type: 'item',
-            url: `${basename}/frontendIngest`,
+            url: `${basename}/data-ingest`,
             icon: icons.IconUpload,
             breadcrumbs: false
         }

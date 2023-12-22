@@ -15,11 +15,11 @@ import {
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { makeStyles, useTheme } from '@mui/styles';
+import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
-import { fetchFederation } from '../../../store/api';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_) => ({
     tab: {
         minWidth: 40
     },
@@ -73,8 +73,14 @@ function SidebarGroup(props) {
     );
 }
 
+SidebarGroup.propTypes = {
+    name: PropTypes.string,
+    children: PropTypes.node,
+    hide: PropTypes.bool
+};
+
 function StyledCheckboxList(props) {
-    const { groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
+    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
     const classes = useStyles();
@@ -102,7 +108,7 @@ function StyledCheckboxList(props) {
             ids = Array.from(new Set(ids?.flat(1)));
         }
 
-        if (isChecked) {
+        if (isExclusion ? !isChecked : isChecked) {
             setChecked((old) => ({ ...old, [ids]: true }));
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
@@ -149,7 +155,13 @@ function StyledCheckboxList(props) {
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
                 <li {...props} value={option}>
-                    <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} value={option} />
+                    <Checkbox
+                        icon={icon}
+                        checkedIcon={checkedIcon}
+                        style={{ marginRight: 8 }}
+                        checked={isExclusion ? !selected : selected}
+                        value={option}
+                    />
                     {option}
                 </li>
             )}
@@ -167,7 +179,7 @@ function StyledCheckboxList(props) {
                 control={
                     <Checkbox
                         className={classes.checkbox}
-                        checked={option in checked}
+                        checked={isExclusion ? !(option in checked) : option in checked}
                         onChange={(event) => HandleChange(option, event.target.checked)}
                     />
                 }
@@ -177,20 +189,32 @@ function StyledCheckboxList(props) {
         ))
     );
 }
+
+StyledCheckboxList.propTypes = {
+    isExclusion: PropTypes.bool,
+    groupName: PropTypes.string,
+    hide: PropTypes.bool,
+    isDonorList: PropTypes.bool,
+    isFilterList: PropTypes.bool,
+    remap: PropTypes.func,
+    onWrite: PropTypes.func,
+    options: PropTypes.array,
+    useAutoComplete: PropTypes.bool
+};
+
 // A group of genomics data
 // Keeping this separate from the rest as it's all somewhat self-contained
 // NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
     const { chromosomes, genes, onWrite, hide } = props;
-    const classes = useStyles();
     // Genomic data
-    const referenceGenomes = ['hg38'];
-    const [selectedGenome, setSelectedGenome] = useState('hg38');
+    // const referenceGenomes = ['hg38'];
+    const [selectedGenome, _setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
-    const [timeout, setNewTimeout] = useState(null);
+    const [_timeout, setNewTimeout] = useState(null);
 
     if (hide) {
         return <></>;
@@ -288,7 +312,14 @@ function GenomicsGroup(props) {
     );
 }
 
-function Sidebar(props) {
+GenomicsGroup.propTypes = {
+    chromosomes: PropTypes.array,
+    genes: PropTypes.array,
+    hide: PropTypes.bool,
+    onWrite: PropTypes.func
+};
+
+function Sidebar() {
     const [selectedtab, setSelectedTab] = useState('All');
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
@@ -305,7 +336,7 @@ function Sidebar(props) {
 
     // Parse out what we need:
     const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    const cohorts = readerContext?.programs?.map((loc) => loc.results.results.map((cohort) => cohort.program_id)).flat(1) || [];
+    const cohorts = readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');
@@ -336,7 +367,7 @@ function Sidebar(props) {
                 <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" isFilterList />
             </SidebarGroup>
             <SidebarGroup name="Cohort">
-                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="program_id" isFilterList />
+                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="exclude_cohorts" isExclusion />
             </SidebarGroup>
             <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
             <SidebarGroup name="Treatment" hide={hideClinical}>

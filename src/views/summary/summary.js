@@ -44,7 +44,7 @@ function Summary() {
     const sidebarWriter = useSidebarWriterContext();
     useEffect(() => {
         sidebarWriter(null);
-    }, []);
+    }, [sidebarWriter]);
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {

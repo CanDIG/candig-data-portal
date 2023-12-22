@@ -44,6 +44,9 @@
         "no-unused-vars": [
             1,
             {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_",
                 "ignoreRestSiblings": false
             }
         ],
