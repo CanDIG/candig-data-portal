@@ -27,7 +27,15 @@ function isObject(obj) {
 function applyHighlight(term, searchExp, highlightClass) {
     if (searchExp && typeof term === 'string') {
         const splitText = term.split(searchExp);
-        return splitText.map((text) => (searchExp.test(text) ? <span className={highlightClass}>{text}</span> : text));
+        return splitText.map((text) =>
+            searchExp.test(text) ? (
+                <span className={highlightClass} key={text}>
+                    {text}
+                </span>
+            ) : (
+                text
+            )
+        );
     }
     return term;
 }
