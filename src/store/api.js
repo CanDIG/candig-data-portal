@@ -25,6 +25,32 @@ export function fetchKatsu(URL) {
         });
 }
 
+/*
+Fetch htsget calls
+*/
+export function fetchHtsget() {
+    return fetch(`${federation}/fanout`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'GET',
+            path: `ga4gh/drs/v1/objects`,
+            payload: {},
+            service: 'htsget'
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return [];
+        })
+        .catch((error) => {
+            console.log(`Error: ${error}`);
+            return 'error';
+        });
+}
+
 export function fetchFederationStat(endpoint) {
     return fetch(`${federation}/fanout`, {
         method: 'post',

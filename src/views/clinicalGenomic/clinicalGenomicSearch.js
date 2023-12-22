@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Divider, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Divider, Toolbar, Typography, Box } from '@mui/material';
 
 import { makeStyles, useTheme } from '@mui/styles';
 import MainCard from 'ui-component/cards/MainCard';
@@ -15,6 +15,7 @@ import Sidebar from './widgets/sidebar';
 import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
+import { DataGrid } from '@mui/x-data-grid';
 
 const useStyles = makeStyles((theme) => ({
     stickytop: {

@@ -1,18 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    FormGroup,
-    Tab,
-    Tabs,
-    Autocomplete,
-    TextField,
-    Typography,
-    Button
-} from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { makeStyles, useTheme } from '@mui/styles';
@@ -25,39 +13,28 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
 
 const useStyles = makeStyles((theme) => ({
-    tab: {
-        minWidth: 40
-    },
-    checkbox: {
-        paddingTop: 0,
-        paddingBottom: 0
-    },
-    form: {
-        width: '100%'
-    },
-    checkboxLabel: {
-        textTransform: 'capitalize'
-    },
-    hidden: {
-        height: 0
-    },
     header: {
+        display: 'flex',
+        flexDirection: 'row',
         margin: 0,
         borderLeft: `solid 0.5em ${theme.palette.primary.main}`,
         borderRadius: 0,
         backgroundColor: theme.palette.primary.light,
         color: theme.palette.primary.main,
-        width: '100%'
+        width: '100%',
+        textAlign: 'left'
     },
     subHeader: {
-        paddingLeft: '1.5em',
-        paddingRight: '1.5em'
-    },
-    subHeaderColor: {
-        color: theme.palette.primary.main,
+        borderRadius: 0,
+        margin: 0,
         fontWeight: 'bold',
         display: 'flex',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        width: '100%'
+    },
+    subHeaderColor: {
+        color: theme.palette.primary.main
     },
     centeredIconText: {
         display: 'flex',
@@ -81,38 +58,43 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function PatientSidebar({ sidebar, setColumns, setRows, setTitle }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     const classes = useStyles();
     const theme = useTheme();
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
-
-    function formatKey(key) {
-        // Replace underscores with spaces and capitalize each word
-        return key
+    // Function to format keys for display removing _ and casing
+    const formatKey = (key) =>
+        key
             .split('_')
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
-    }
 
-    function handleToggleSection(key) {
+    // Function to toggle expanded sections in the sidebar
+    const toggleSection = (key) => {
         setExpandedSections((prevExpanded) => ({
             ...prevExpanded,
             [key]: !prevExpanded[key]
         }));
-    }
+    };
 
-    function handleTableSet(title, array) {
+    // Function to handle setting data for the table
+    function handleTableSet(title, array, idKey) {
         const uniqueKeysSet = new Set();
+
+        console.log('Array', array);
 
         // Iterate through each object in the array
         array.forEach((obj) => {
-            // Get the keys of the current object
-            const keys = Object.keys(obj);
+            // Get the keys and values of the current object
+            const entries = Object.entries(obj);
 
-            // Add the keys to the Set to ensure uniqueness
-            keys.forEach((key) => {
+            // Filter out keys with no data or empty string in any row
+            const validEntries = entries.filter(([key, value]) => value !== null && value !== undefined && value !== '');
+
+            // Add the valid keys to the Set to ensure uniqueness
+            validEntries.forEach(([key]) => {
                 uniqueKeysSet.add(key);
             });
         });
@@ -120,31 +102,49 @@ function PatientSidebar({ sidebar, setColumns, setRows, setTitle }) {
         // Convert the Set back to an array
         const uniqueKeys = Array.from(uniqueKeysSet);
 
-        const columns = uniqueKeys.map((key) => ({
-            field: key,
-            headerName: formatKey(key),
-            minWidth: 250
-        }));
+        // Filter columns to include only those with non-empty values in any row
+        const columns = uniqueKeys.map((key) => {
+            const hasNonEmptyValue = array.some(
+                (obj) =>
+                    obj[key] !== null &&
+                    obj[key] !== undefined &&
+                    obj[key] !== '' &&
+                    !(typeof obj[key] === 'object') &&
+                    (!(typeof obj[key] === 'object') || Object.keys(obj[key]).length > 0)
+            );
+            return hasNonEmptyValue
+                ? {
+                      field: key,
+                      headerName: formatKey(key),
+                      flex: 1,
+                      minWidth: 250
+                  }
+                : null;
+        });
 
-        const reorderedColumns = [...columns].sort((a, b) => {
-            // Move columns with headerName ending in "ID" to the front
+        // Remove null values from the columns array
+        const filteredColumns = columns.filter((column) => column !== null);
+
+        const reorderedColumns = [...filteredColumns].sort((a, b) => {
             const aEndsWithID = a.headerName.endsWith('Id');
             const bEndsWithID = b.headerName.endsWith('Id');
 
             if (aEndsWithID && !bEndsWithID) {
                 return -1;
-            } else if (!aEndsWithID && bEndsWithID) {
-                return 1;
-            } else {
-                return 0;
             }
+            if (!aEndsWithID && bEndsWithID) {
+                return 1;
+            }
+
+            // eslint-disable-next-line no-else-return
+            return 0;
         });
 
         const rows = array.map((obj, index) => {
             const row = { id: index };
 
-            uniqueKeys.forEach((key) => {
-                row[key] = obj[key];
+            filteredColumns.forEach((column) => {
+                row[column.field] = obj[column.field];
             });
 
             return row;
@@ -155,91 +155,179 @@ function PatientSidebar({ sidebar, setColumns, setRows, setTitle }) {
         setRows(rows);
     }
 
-    function createSubSidebarHeaders(array, depth) {
-        let sidebarTitles = [];
-        let subTableMap = {};
+    function findIdKey(obj) {
+        const idKeys = obj.map((item) => {
+            const keyArray = Object.keys(item);
+            return keyArray.find((key) => Object.prototype.hasOwnProperty.call(item, key) && key.toLowerCase().endsWith('_id'));
+        });
+
+        console.log('find id keys', idKeys);
+        return idKeys.filter((idKey) => idKey !== undefined && idKey !== null);
+    }
+
+    // Function to handle click events in the header
+    const handleHeaderClick = (key, obj, parentID) => {
+        const idKey = findIdKey(obj[key]);
+        handleTableSet(key, obj[key], parentID, idKey);
+        setSelected(key);
+    };
+
+    useEffect(() => {
+        if (initialHeader) {
+            // Find the first header key
+            let firstHeaderKey = null;
+            Object.keys(sidebar).some((key) => {
+                const value = sidebar[key];
+                if (Array.isArray(value) && value.length > 0 && value.every((item) => typeof item === 'object')) {
+                    firstHeaderKey = key;
+                    return true; // Exit the loop once the first header key is found
+                }
+                return false;
+            });
+
+            // Set the initial selected key if found and trigger the click event
+            if (firstHeaderKey) {
+                setInitialHeader(false);
+                setSelected(firstHeaderKey);
+                handleHeaderClick(firstHeaderKey, sidebar, null);
+            }
+        }
+    }, [initialHeader, sidebar]);
+
+    // Function to create subheaders in the sidebar
+    function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
+        const sidebarTitles = [];
+        const subTableMap = {};
+
         if (Array.isArray(array)) {
             array.forEach((obj, index) => {
-                // array = array of primary diagnosis obj
-                // obj = primary Diagnosis
-                // key = specimen title
-                // obj[key] = specimen array of obj
-                // Primary Diagnosis is [{specimen: [{}]},{specimen: [{}]}]
-                for (const key in obj) {
+                // PD
+                const subTablePart = {};
+                let idKey = '';
+                let id = '';
+                Object.keys(obj).forEach((key) => {
+                    // spec, treat
                     if (Array.isArray(obj[key]) && typeof obj[key][0] === 'object' && obj[key].length > 0) {
-                        // Map all keys that have array obj and merge into key value set then loop
-                        if (subTableMap.hasOwnProperty(key)) {
-                            // Merge into value second array of objects
-                            subTableMap[key] = subTableMap[key].concat(obj[key]);
-                        } else {
-                            subTableMap = {
-                                ...subTableMap,
-                                [key]: obj[key]
-                            };
-                        }
+                        subTablePart[key] = obj[key].slice(); // Initialize as a copy of the array
+                    } else if (key.toLowerCase().endsWith('_id')) {
+                        idKey = key;
+                        id = obj[key];
                     }
-                }
+                });
+                Object.keys(subTablePart).forEach((key) => {
+                    // For each array in current PD
+                    subTablePart[key].forEach((row) => {
+                        // For each row in array
+                        row[idKey] = id;
+                    });
+                    if (subTableMap[key]) {
+                        // Add to matching table
+                        subTableMap[key] = subTableMap[key].concat(subTablePart[key]);
+                    } else {
+                        subTableMap[key] = subTablePart[key].slice(); // Initialize as a copy of the array
+                    }
+                });
             });
         }
-        for (const key in subTableMap) {
-            const isExpanded = expandedSections[key] ? expandedSections[key] : false;
+        Object.keys(subTableMap).forEach((key) => {
+            const isExpanded = expandedSections[key] || false;
+            const folderDepth = hasChildren ? 0 : 1.5;
+            const paddingValue = `${folderDepth + depth * 1}em`;
+
             sidebarTitles.push(
                 <div key={`${key}-${depth}`}>
                     <Button
-                        className={
-                            (isExpanded || depth <= 1 ? classes.subHeaderExpanded : classes.subHeaderCollapsed) +
-                            (selected === key ? ` ${classes.selected}` : '')
-                        }
+                        style={{ textAlign: 'left', alignItems: 'flex-start' }}
+                        className={`${isExpanded || depth <= 1 ? classes.subHeaderExpanded : classes.subHeaderCollapsed} 
+                            ${classes.subHeader} 
+                            ${selected === key ? classes.selected : ''}`}
                         onClick={() => {
-                            handleToggleSection(key);
-                            handleTableSet(key, subTableMap[key]);
+                            toggleSection(key);
+                            const idKey = findIdKey(subTableMap[key]);
+                            handleTableSet(key, subTableMap[key], idKey);
                             setSelected(key);
                         }}
                     >
-                        <p className={selected === key ? `${classes.selected} ${classes.subHeaderColor}` : classes.subHeaderColor}>
-                            {isExpanded ? <FolderOpenIcon className={classes.iconMargin} /> : <FolderIcon className={classes.iconMargin} />}
+                        <Typography
+                            variant="body1"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-end',
+                                textAlign: 'left',
+                                width: '100%',
+                                paddingLeft: paddingValue
+                            }}
+                            className={`${selected === key ? classes.selected : ''} ${classes.subHeaderColor}`}
+                        >
+                            {hasChildren && isExpanded && <FolderOpenIcon className={classes.iconMargin} />}
+                            {hasChildren && !isExpanded && <FolderIcon className={classes.iconMargin} />}
                             {formatKey(key)}
-                        </p>
+                        </Typography>
                     </Button>
-                    {isExpanded && createSubSidebarHeaders(subTableMap[key], depth + 1)}
+                    {isExpanded &&
+                        createSubSidebarHeaders(
+                            subTableMap[key],
+                            depth + 1,
+                            subTableMap[key], // Pass the ID key to the next level
+                            Array.isArray(subTableMap[key]) &&
+                                subTableMap[key].some(
+                                    (obj) =>
+                                        Array.isArray(obj) &&
+                                        obj.length > 0 &&
+                                        Object.values(obj).some((value) => Array.isArray(value) && value.length > 0)
+                                )
+                        )}
                 </div>
             );
-        }
+        });
+
         return sidebarTitles;
     }
 
-    function createSidebarHeaders(obj) {
+    // Function to create main headers in the sidebar
+    function createMainSidebarHeaders(obj = {}, parentID = null, isFirstPass = true) {
         let sidebarTitles = [];
-        for (const key in obj) {
+        Object.keys(obj).forEach((key) => {
+            const isExpanded = expandedSections[key] ? expandedSections[key] : false;
             const value = obj[key];
+
             if (Array.isArray(obj[key]) && value.length > 0 && value.every((item) => typeof item === 'object')) {
                 sidebarTitles.push(
                     <Button
+                        style={{ textAlign: 'left' }}
                         className={selected === key ? `${classes.header} ${classes.selected}` : classes.header}
                         key={key}
                         onClick={() => {
-                            handleTableSet(key, obj[key]);
+                            const idKey = findIdKey(obj[key]);
+                            handleTableSet(key, obj[key], parentID, idKey);
                             setSelected(key);
                         }}
                     >
-                        <h3 style={{ margin: 0 }}>{formatKey(key)}</h3>
+                        <Typography
+                            variant="h4"
+                            style={{ display: 'flex', alignItems: 'flex-end', margin: 0, width: '100%', textAlign: 'left' }}
+                            className={`${selected === key ? `${classes.subHeaderColor} ${classes.selected}` : classes.subHeaderColor}`}
+                        >
+                            <FolderOpenIcon className={classes.iconMargin} />
+                            {formatKey(key)}
+                        </Typography>
                     </Button>
                 );
-                sidebarTitles = [...sidebarTitles, ...createSubSidebarHeaders(obj[key], 0)];
+                sidebarTitles = [...sidebarTitles, ...createSubSidebarHeaders(obj[key], 0, true)]; // Pass the ID key
             }
-        }
+        });
         return sidebarTitles;
     }
 
     return (
         <>
-            <div>{createSidebarHeaders(sidebar)}</div>
+            <div>{createMainSidebarHeaders(sidebar)}</div>
         </>
     );
 }
 
 PatientSidebar.propTypes = {
-    sidebar: PropTypes.any,
+    sidebar: PropTypes.object,
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
     setTitle: PropTypes.func.isRequired
