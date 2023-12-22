@@ -83,8 +83,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     function handleTableSet(title, array, idKey) {
         const uniqueKeysSet = new Set();
 
-        console.log('Array', array);
-
         // Iterate through each object in the array
         array.forEach((obj) => {
             // Get the keys and values of the current object
@@ -160,8 +158,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
             const keyArray = Object.keys(item);
             return keyArray.find((key) => Object.prototype.hasOwnProperty.call(item, key) && key.toLowerCase().endsWith('_id'));
         });
-
-        console.log('find id keys', idKeys);
         return idKeys.filter((idKey) => idKey !== undefined && idKey !== null);
     }
 
@@ -192,33 +188,32 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
-    }, [initialHeader, sidebar]);
+    }, [initialHeader]);
 
     // Function to create subheaders in the sidebar
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
         const sidebarTitles = [];
         const subTableMap = {};
-
         if (Array.isArray(array)) {
             array.forEach((obj, index) => {
                 // PD
                 const subTablePart = {};
-                let idKey = '';
-                let id = '';
+                const idMap = {};
                 Object.keys(obj).forEach((key) => {
                     // spec, treat
                     if (Array.isArray(obj[key]) && typeof obj[key][0] === 'object' && obj[key].length > 0) {
                         subTablePart[key] = obj[key].slice(); // Initialize as a copy of the array
                     } else if (key.toLowerCase().endsWith('_id')) {
-                        idKey = key;
-                        id = obj[key];
+                        idMap[key] = obj[key];
                     }
                 });
                 Object.keys(subTablePart).forEach((key) => {
                     // For each array in current PD
                     subTablePart[key].forEach((row) => {
                         // For each row in array
-                        row[idKey] = id;
+                        Object.keys(idMap).forEach((key) => {
+                            row[key] = idMap[key];
+                        });
                     });
                     if (subTableMap[key]) {
                         // Add to matching table
@@ -268,7 +263,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                         createSubSidebarHeaders(
                             subTableMap[key],
                             depth + 1,
-                            subTableMap[key], // Pass the ID key to the next level
                             Array.isArray(subTableMap[key]) &&
                                 subTableMap[key].some(
                                     (obj) =>

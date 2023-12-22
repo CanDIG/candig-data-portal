@@ -30,7 +30,6 @@ function useClinicalPatientData(patientId) {
                 const filteredData = Object.fromEntries(
                     Object.entries(patientData).filter(([key, value]) => !Array.isArray(value) && typeof value !== 'object' && value !== '')
                 );
-                console.log(filteredData);
                 setTopLevel(filteredData);
                 setData(patientData);
             } catch (error) {
