@@ -16,7 +16,7 @@
         "@mui/styled-engine": "^5.8.0",
         "@mui/styles": "^5.8.0",
         "@mui/system": "^5.14.13",
-        "@mui/x-data-grid": "^4.0.2",
+        "@mui/x-data-grid": "^6.18.5",
         "@tabler/icons": "^1.119.0",
         "@testing-library/jest-dom": "^5.11.10",
         "@testing-library/react": "^11.2.6",
