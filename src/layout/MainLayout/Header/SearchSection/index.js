@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // material-ui
 import { makeStyles } from '@mui/styles';

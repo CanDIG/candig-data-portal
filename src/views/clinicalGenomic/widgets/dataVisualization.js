@@ -20,7 +20,7 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 
-function DataVisualization(props) {
+function DataVisualization() {
     // Hooks
     const resultsContext = useSearchResultsReaderContext().counts;
     // Plan for context below see current dataVis for expected shape
@@ -93,7 +93,7 @@ function DataVisualization(props) {
             localStorage.setItem('dataVisData', JSON.stringify(topKeys), { expires: 365 });
             localStorage.setItem('dataVisTrim', JSON.stringify([false, false, false, false]), { expires: 365 });
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleToggleDialog = () => {
         setOpen((prevOpen) => !prevOpen);

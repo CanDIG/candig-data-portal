@@ -2,9 +2,16 @@ import { Button, Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
 import { makeStyles } from '@mui/styles';
+import { useEffect, useState } from 'react';
 
-const GenomicIngest = ({ beginIngest, fileUpload }) => {
-    const cohort = [makeField('Cohort', 'MOCK COHORT'), makeField('Clinical Patients', '850'), makeField('Read Access', '3')];
+const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) => {
+    const [ingestButtonEnabled, setIngestButtonEnabled] = useState(false);
+
+    const cohort = [
+        makeField('Cohort', clinicalData.donors[0].program_id),
+        makeField('Clinical Patients', clinicalData.donors.length),
+        makeField('Read Access', '1')
+    ];
 
     const useStyles = makeStyles({
         titleText: {
@@ -21,9 +28,17 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
             backgroundColor: '#37CA50',
             width: '7em',
             height: '3em'
+        },
+        ingestButtonDisabled: {
+            backgroundColor: 'grey',
+            '&:hover': {
+                backgroundColor: 'grey'
+            }
         }
     });
     const classes = useStyles();
+
+    useEffect(() => genomicData !== undefined && genomicData !== null && setIngestButtonEnabled(true), [genomicData]);
 
     return (
         <>
@@ -34,7 +49,7 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
                     </Typography>
                     <DataRow rowWidth="100%" itemSize="0.9em" fields={cohort} />
                 </Grid>
-                <Grid item>
+                <Grid item width="100%">
                     <Typography align="left" className={classes.titleText}>
                         <b>Upload genomic sample info</b>
                     </Typography>
@@ -44,13 +59,21 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
                                 <b>Genomic data:</b>
                             </Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            {fileUpload}
-                        </Grid>
+                        <Grid item>{fileUpload}</Grid>
                     </Grid>
                 </Grid>
                 <Grid item align="center">
-                    <Button className={classes.ingestButton} onClick={beginIngest} variant="contained">
+                    <Button
+                        className={classes.ingestButton + (ingestButtonEnabled ? '' : ` ${classes.ingestButtonDisabled}`)}
+                        onClick={() => {
+                            if (ingestButtonEnabled) {
+                                setIngestButtonEnabled(false);
+                                beginIngest();
+                            }
+                        }}
+                        variant="contained"
+                        disabled={!ingestButtonEnabled}
+                    >
                         Ingest
                     </Button>
                 </Grid>
@@ -61,7 +84,9 @@ const GenomicIngest = ({ beginIngest, fileUpload }) => {
 
 GenomicIngest.propTypes = {
     beginIngest: PropTypes.func.isRequired,
-    fileUpload: PropTypes.element
+    fileUpload: PropTypes.element,
+    clinicalData: PropTypes.object,
+    genomicData: PropTypes.object
 };
 
 export default GenomicIngest;

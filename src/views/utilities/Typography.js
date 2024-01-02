@@ -1,4 +1,3 @@
-import React from 'react';
 // mui
 import { Grid, Link } from '@mui/material';
 import MuiTypography from '@mui/material/Typography';

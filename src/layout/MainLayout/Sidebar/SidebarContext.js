@@ -1,5 +1,7 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
+
 const DEFAULT_STATE = false;
 
 const SidebarReaderContext = React.createContext(DEFAULT_STATE);
@@ -19,6 +21,11 @@ export function SidebarProvider(props) {
         </SidebarReaderContext.Provider>
     );
 }
+
+SidebarProvider.propTypes = {
+    data: PropTypes.object,
+    setData: PropTypes.func
+};
 
 /**
  * Obtain the context reader of the federation sites query.

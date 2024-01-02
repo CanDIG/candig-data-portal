@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme } from '@mui/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 
@@ -10,40 +10,12 @@ import { Box, Typography } from '@mui/material';
 // project imports
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
-// Styles
-const useStyles = makeStyles({
-    dropdownItem: {
-        background: 'white',
-        paddingRight: '1.25em',
-        paddingLeft: '1.25em',
-        border: 'none',
-        width: 'fit-content(5em)',
-        '&:hover': {
-            background: '#2196f3',
-            color: 'white'
-        }
-    },
-    mobileRow: {
-        width: '800px'
-    },
-    scrollbar: {
-        scrollbarWidth: 'thin',
-        '&::-webkit-scrollbar': {
-            height: '0.4em',
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 4px rgba(0,0,0,0.00)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)'
-        }
-    }
-});
-
 function ClinicalView() {
     const theme = useTheme();
+    const [paginationModel, setPaginationModel] = React.useState({
+        pageSize: 25,
+        page: 0
+    });
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
@@ -57,6 +29,7 @@ function ClinicalView() {
     if (searchResults) {
         rows =
             Object.values(searchResults)
+                ?.map((results) => results.results)
                 ?.flat(1)
                 ?.map((patient, index) => {
                     // Make sure each row has an ID and a deceased status
@@ -86,6 +59,22 @@ function ClinicalView() {
         { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
     ];
 
+    const HandlePageChange = (newPage) => {
+        if (newPage !== paginationModel.page) {
+            writerContext((old) => ({ ...old, query: { ...old.query, page: newPage } }));
+        }
+        setPaginationModel({
+            pageSize: 10,
+            page: newPage
+        });
+    };
+
+    const totalRows = searchResults
+        ? Object.values(searchResults)
+              ?.map((site) => site.count)
+              .reduce((partial, a) => partial + a, 0)
+        : 0;
+
     return (
         <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
@@ -96,8 +85,12 @@ function ClinicalView() {
                     rows={rows}
                     columns={columns}
                     pageSize={10}
+                    rowCount={totalRows}
                     rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
+                    paginationModel={paginationModel}
+                    onPageChange={HandlePageChange}
+                    paginationMode="server"
                     hideFooterSelectedRowCount
                 />
             </div>
