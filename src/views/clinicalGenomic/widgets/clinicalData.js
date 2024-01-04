@@ -41,7 +41,8 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        const url = `/patientView?patientId=${row.submitter_donor_id}`;
+        console.log(row);
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
         window.open(url, '_blank');
     };
 

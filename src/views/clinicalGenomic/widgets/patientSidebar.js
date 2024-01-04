@@ -298,7 +298,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                         }}
                     >
                         <Typography
-                            variant="h4"
+                            variant="h6"
                             style={{ display: 'flex', alignItems: 'flex-end', margin: 0, width: '100%', textAlign: 'left' }}
                             className={`${selected === key ? `${classes.subHeaderColor} ${classes.selected}` : classes.subHeaderColor}`}
                         >

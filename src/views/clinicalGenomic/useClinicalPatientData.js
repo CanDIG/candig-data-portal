@@ -3,7 +3,7 @@ import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/Sidebar
 import { fetchFederation } from '../../store/api';
 import PatientSidebar from './widgets/patientSidebar';
 
-function useClinicalPatientData(patientId) {
+function useClinicalPatientData(patientId, programId) {
     const sidebarWriter = useSidebarWriterContext();
     const [data, setData] = useState({});
     const [rows, setRows] = useState([]);
@@ -21,9 +21,11 @@ function useClinicalPatientData(patientId) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = `v2/authorized/donor_with_clinical_data/?submitter_donor_id=${patientId}`;
+                // const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
+                const url = `v2/authorized/donor_with_clinical_data/program/SYNTHETIC-2/donor/DONOR_2`;
                 const result = await fetchFederation(url, 'katsu');
-                const patientData = result[0]?.results?.results[0] || {};
+                console.log('RESULTS', result);
+                const patientData = result[0].results || {};
 
                 sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
 
@@ -38,7 +40,7 @@ function useClinicalPatientData(patientId) {
         };
 
         fetchData();
-    }, [patientId, sidebarWriter]);
+    }, [patientId, programId, sidebarWriter]);
 
     return { data, rows, columns, title, topLevel, formatKey };
 }

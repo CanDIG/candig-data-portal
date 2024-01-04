@@ -37,23 +37,26 @@ function ClinicalPatientView() {
     const { opened: sidebarOpened } = customization;
 
     const [patientId, setPatientId] = useState('');
-    const { data, rows, columns, title, topLevel, formatKey } = useClinicalPatientData(patientId);
+    const [programId, setProgramId] = useState('');
+    const { data, rows, columns, title, topLevel, formatKey } = useClinicalPatientData(patientId, programId);
 
     useEffect(() => {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
+        const intitalProgramId = urlParams.get('programId');
 
         setPatientId(initialPatientId || '');
+        setProgramId(intitalProgramId || '');
     }, []);
 
     return (
         <>
             <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
-                <Typography pb={1} variant="h3">
+                <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
                     {title}
                 </Typography>
-                <Typography pb={1} variant="h4">
+                <Typography pb={1} variant="h6">
                     {patientId}
                 </Typography>
                 <div style={{ width: '100%', height: '68vh' }}>

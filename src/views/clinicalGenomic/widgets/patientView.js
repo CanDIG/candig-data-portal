@@ -27,7 +27,15 @@ function isObject(obj) {
 function applyHighlight(term, searchExp, highlightClass) {
     if (searchExp && typeof term === 'string') {
         const splitText = term.split(searchExp);
-        return splitText.map((text) => (searchExp.test(text) ? <span className={highlightClass}>{text}</span> : text));
+        return splitText.map((text, index) =>
+            searchExp.test(text) ? (
+                <span key={`${text}-${index}`} className={highlightClass}>
+                    {text}
+                </span>
+            ) : (
+                text
+            )
+        );
     }
     return term;
 }
@@ -226,7 +234,7 @@ function PatientView() {
     );
 
     return (
-        <Box mr={2} ml={1} p={1}>
+        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
                 <Typography variant="h4" sx={{ flexGrow: 1 }}>
                     Patient Info
