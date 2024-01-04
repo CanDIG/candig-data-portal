@@ -11,7 +11,7 @@ import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import Transitions from 'ui-component/extended/Transitions';
 
 // assets
-import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons';
+import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons-react';
 
 // style constant
 const useStyles = makeStyles((theme) => ({

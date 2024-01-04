@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
 // material
-import { makeStyles, useTheme } from '@mui/system';
 import { AppBar, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
+import { styled } from '@mui/system';
 
 // third-party
 import clsx from 'clsx';
@@ -20,22 +20,30 @@ import { SET_MENU } from 'store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';
 
 // assets
-import { IconChevronRight } from '@tabler/icons';
+import { IconChevronRight } from '@tabler/icons-react';
 
 // style constant
-const useStyles = makeStyles((theme) => ({
-    root: {
+const PREFIX = 'MainLayout';
+const classes = {
+    root: `${PREFIX}-root`,
+    appBar: `${PREFIX}-appBar`,
+    appBarWidth: `${PREFIX}-appBarWidth`,
+    content: `${PREFIX}-content`,
+    contentShift: `${PREFIX}-contentShift`
+};
+const Root = styled('flex')(({ theme }) => ({
+    [`&.${classes.root}`]: {
         display: 'flex'
     },
-    appBar: {
+    [`&.${classes.appBar}`]: {
         backgroundColor: theme.palette.background.default
     },
-    appBarWidth: {
+    [`&.${classes.appBarWidth}`]: {
         transition: theme.transitions.create('width'),
         backgroundColor: theme.palette.background.default,
         height: 100
     },
-    content: {
+    [`&.${classes.content}`]: {
         ...theme.typography.mainContent,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
@@ -54,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
             marginRight: '10px'
         }
     },
-    contentShift: {
+    [`&.${classes.contentShift}`]: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen
@@ -73,8 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| MAIN LAYOUT ||=========================== //
 
-const MainLayout = () => {
-    const classes = useStyles();
+function MainLayout() {
     const theme = useTheme();
     const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -92,7 +99,7 @@ const MainLayout = () => {
     }, [matchDownMd]);
 
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
@@ -126,7 +133,7 @@ const MainLayout = () => {
                 </main>
                 <Customization />
             </SidebarProvider>
-        </div>
+        </Root>
     );
 };
 

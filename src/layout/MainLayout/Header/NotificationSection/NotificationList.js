@@ -1,4 +1,4 @@
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/system';
 import {
     Avatar,
     Button,
@@ -17,12 +17,31 @@ import {
 } from '@mui/material';
 
 // assets
-import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@tabler/icons';
+import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@tabler/icons-react';
 import User1 from 'assets/images/users/user-round.svg';
 
 // style constant
-const useStyles = makeStyles((theme) => ({
-    navContainer: {
+const PREFIX = 'MainLayoutHeader';
+const classes = {
+    grow: `${PREFIX}-grow`,
+    navContainer: `${PREFIX}-navContainer`,
+    listAction: `${PREFIX}-listAction`,
+    actionColor: `${PREFIX}-actionColor`,
+    listItem: `${PREFIX}-listItem`,
+    sendIcon: `${PREFIX}-sendIcon`,
+    listDivider: `${PREFIX}-listDivider`,
+    listChipError: `${PREFIX}-listChipError`,
+    listChipWarning: `${PREFIX}-listChipWarning`,
+    listChipSuccess: `${PREFIX}-listChipSuccess`,
+    listAvatarSuccess: `${PREFIX}-listAvatarSuccess`,
+    listAvatarPrimary: `${PREFIX}-listAvatarPrimary`,
+    listContainer: `${PREFIX}-listContainer`,
+    uploadCard: `${PREFIX}-uploadCard`,
+    paddingBottom: `${PREFIX}-paddingBottom`,
+    itemAction: `${PREFIX}-itemActionw`
+};
+const StyledList = styled(List)(({ theme }) => ({
+    [`&.${classes.navContainer}`]: {
         width: '100%',
         maxWidth: '330px',
         paddingTop: 0,
@@ -32,65 +51,64 @@ const useStyles = makeStyles((theme) => ({
             maxWidth: '300px'
         }
     },
-    listAction: {
+    [`&.${classes.listAction}`]: {
         top: '22px'
     },
-    actionColor: {
+    [`&.${classes.actionColor}`]: {
         color: theme.palette.grey[500]
     },
-
-    listItem: {
+    [`&.${classes.listItem}`]: {
         padding: 0
     },
-    sendIcon: {
+    [`&.${classes.sendIcon}`]: {
         marginLeft: '8px',
         marginTop: '-3px'
     },
-    listDivider: {
+    [`&.${classes.listDivider}`]: {
         marginTop: 0,
         marginBottom: 0
     },
-    listChipError: {
+    [`&.${classes.listChipError}`]: {
         color: theme.palette.orange.dark,
         backgroundColor: theme.palette.orange.light,
         height: '24px',
         padding: '0 6px',
         marginRight: '5px'
     },
-    listChipWarning: {
+    [`&.${classes.listChipWarning}`]: {
         color: theme.palette.warning.dark,
         backgroundColor: theme.palette.warning.light,
         height: '24px',
         padding: '0 6px'
     },
-    listChipSuccess: {
+    [`&.${classes.listChipSuccess}`]: {
         color: theme.palette.success.dark,
         backgroundColor: theme.palette.success.light,
         height: '24px',
         padding: '0 6px'
     },
-    listAvatarSuccess: {
+    [`&.${classes.listAvatarSuccess}`]: {
         color: theme.palette.success.dark,
         backgroundColor: theme.palette.success.light,
         border: 'none',
         borderColor: theme.palette.success.main
     },
-    listAvatarPrimary: {
+    [`&.${classes.listAvatarPrimary}`]: {
         color: theme.palette.primary.dark,
         backgroundColor: theme.palette.primary.light,
         border: 'none',
         borderColor: theme.palette.primary.main
     },
-    listContainer: {
+    [`&.${classes.listContainer}`]: {
         paddingLeft: '56px'
     },
-    uploadCard: {
+    [`&.${classes.uploadCard}`]: {
         backgroundColor: theme.palette.secondary.light
     },
-    paddingBottom: {
+    [`&.${classes.paddingBottom}`]: {
         paddingBottom: '16px'
     },
-    itemAction: {
+    [`&.${classes.itemAction}`]: {
         cursor: 'pointer',
         padding: '16px',
         '&:hover': {
@@ -101,11 +119,9 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| NOTIFICATION LIST ITEM ||=========================== //
 
-const NotificationList = () => {
-    const classes = useStyles();
-
+function NotificationList() {
     return (
-        <List className={classes.navContainer}>
+        <StyledList className={classes.navContainer}>
             <div className={classes.itemAction}>
                 <ListItem alignItems="center" className={classes.listItem}>
                     <ListItemAvatar>

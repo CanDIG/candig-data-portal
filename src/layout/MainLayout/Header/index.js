@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/system';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // project imports
@@ -10,15 +10,21 @@ import ProfileSection from './ProfileSection';
 import MenuList from '../../../MenuList';
 
 // assets
-import { IconMenu2 } from '@tabler/icons';
+import { IconMenu2 } from '@tabler/icons-react';
 import { useSidebarReaderContext } from '../Sidebar/SidebarContext';
 
 // style constant
-const useStyles = makeStyles((theme) => ({
-    grow: {
+const PREFIX = 'MainLayoutHeader';
+const classes = {
+    grow: `${PREFIX}-grow`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    boxContainer: `${PREFIX}-boxContainer`
+};
+const Root = styled('flex')(({ theme }) => ({
+    [`&.${classes.grow}`]: {
         flexGrow: 1
     },
-    headerAvatar: {
+    [`&.${classes.headerAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         transition: 'all .2s ease-in-out',
@@ -29,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.light
         }
     },
-    boxContainer: {
+    [`&.${classes.boxContainer}`]: {
         width: '228px',
         display: 'flex',
         [theme.breakpoints.down('lg')]: {
@@ -40,12 +46,11 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| MAIN NAVBAR / HEADER ||=========================== //
 
-const Header = ({ handleLeftDrawerToggle }) => {
-    const classes = useStyles();
+function Header({ handleLeftDrawerToggle }) {
     const sidebar = useSidebarReaderContext();
 
     return (
-        <>
+        <Root>
             {/* logo & toggler button */}
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <div className={classes.boxContainer}>
@@ -74,7 +79,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             {/* notification & profile */}
             {/* <NotificationSection /> */}
             <ProfileSection />
-        </>
+        </Root>
     );
 };
 

@@ -1,5 +1,5 @@
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/system';
 import { Card } from '@mui/material';
 
 // project imports
@@ -7,6 +7,13 @@ import MainCard from 'ui-component/cards/MainCard';
 import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
 
 // style constant
+const PREFIX = 'MainLayoutHeader';
+const classes = {
+    grow: `${PREFIX}-grow`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    boxContainer: `${PREFIX}-boxContainer`
+};
+const Root = styled('flex')(({ theme }) => ({
 const useStyles = makeStyles((theme) => ({
     frame: {
         height: 'calc(100vh - 210px)',

@@ -27,7 +27,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import { SITE } from 'store/constant';
 
 // assets
-import { IconLogout, IconSettings } from '@tabler/icons';
+import { IconLogout, IconSettings } from '@tabler/icons-react';
 import User1 from 'assets/images/users/user-round.svg';
 import BCGSC from 'assets/images/users/bcgsc.svg';
 import UHN from 'assets/images/users/UHN.svg';

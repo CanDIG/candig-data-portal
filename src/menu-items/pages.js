@@ -1,5 +1,5 @@
 // assets
-import { IconKey, IconReceipt2, IconBug, IconBellRinging, IconPhoneCall } from '@tabler/icons';
+import { IconKey, IconReceipt2, IconBug, IconBellRinging, IconPhoneCall } from '@tabler/icons-react';
 
 // constant
 const icons = {

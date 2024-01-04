@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
-import { IconTrash } from '@tabler/icons';
+import { IconTrash } from '@tabler/icons-react';
 
 // Custon Components and constants
 import MainCard from 'ui-component/cards/MainCard';

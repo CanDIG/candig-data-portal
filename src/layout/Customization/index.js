@@ -27,7 +27,7 @@ import { SET_BORDER_RADIUS, SET_FONT_FAMILY } from 'store/actions'; // THEME_RTL
 import { gridSpacing } from 'store/constant';
 
 // assets
-import { IconSettings } from '@tabler/icons';
+import { IconSettings } from '@tabler/icons-react';
 
 // concat 'px'
 function valueText(value) {
