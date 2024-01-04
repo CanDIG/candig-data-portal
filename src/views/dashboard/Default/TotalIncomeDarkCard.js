@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 // project imports
@@ -11,9 +11,20 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 // assets
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'TotalIncomeDarkCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    avatar: `${PREFIX}-avatar`,
+    primary: `${PREFIX}-primary`,
+    secondary: `${PREFIX}-secondary`,
+    padding: `${PREFIX}-padding`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.card}`]: {
         backgroundColor: theme.palette.primary.dark,
         color: theme.palette.primary.light,
         overflow: 'hidden',
@@ -39,23 +50,28 @@ const useStyles = makeStyles((theme) => ({
             right: '-130px'
         }
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: '16px !important'
     },
-    avatar: {
+
+    [`& .${classes.avatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: theme.palette.primary[800],
         color: '#fff'
     },
-    primary: {
+
+    [`& .${classes.primary}`]: {
         color: '#fff'
     },
-    secondary: {
+
+    [`& .${classes.secondary}`]: {
         color: theme.palette.primary.light,
         marginTop: '5px'
     },
-    padding: {
+
+    [`& .${classes.padding}`]: {
         paddingTop: 0,
         paddingBottom: 0
     }
@@ -63,11 +79,9 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| DASHBOARD - TOTAL INCOME DARK CARD ||=========================== //
 
-const TotalIncomeDarkCard = ({ isLoading }) => {
-    const classes = useStyles();
-
+function TotalIncomeDarkCard({ isLoading }) {
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
@@ -100,9 +114,9 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                     </List>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 TotalIncomeDarkCard.propTypes = {
     isLoading: PropTypes.bool

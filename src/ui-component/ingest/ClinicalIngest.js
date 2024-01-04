@@ -1,11 +1,48 @@
 import { Button, Grid, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
-import { makeStyles } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { fetchFederation } from 'store/api';
 
-const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
+const PREFIX = 'ClinicalIngest';
+
+const classes = {
+    titleText: `${PREFIX}-titleText`,
+    bodyText: `${PREFIX}-bodyText`,
+    buttonEnabled: `${PREFIX}-buttonEnabled`,
+    buttonDisabled: `${PREFIX}-buttonDisabled`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')({
+    [`& .${classes.titleText}`]: {
+        color: 'black',
+        fontSize: '1.5em',
+        fontFamily: 'Roboto'
+    },
+    [`& .${classes.bodyText}`]: {
+        color: 'black',
+        fontSize: '1em',
+        fontFamily: 'Catamaran'
+    },
+    [`& .${classes.buttonEnabled}`]: {
+        position: 'absolute',
+        right: '0.2em',
+        bottom: '0.2em'
+    },
+    [`& .${classes.buttonDisabled}`]: {
+        position: 'absolute',
+        right: '0.2em',
+        bottom: '0.2em',
+        backgroundColor: 'grey',
+        '&:hover': {
+            backgroundColor: 'grey'
+        }
+    }
+});
+
+function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
     // setTab should be a function that sets the tab to the genomic ingest page
 
     const [authorizedCohorts, setAuthorizedCohorts] = useState([]);
@@ -33,37 +70,8 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
         fetchPrograms();
     }, []);
 
-    const useStyles = makeStyles({
-        titleText: {
-            color: 'black',
-            fontSize: '1.5em',
-            fontFamily: 'Roboto'
-        },
-        bodyText: {
-            color: 'black',
-            fontSize: '1em',
-            fontFamily: 'Catamaran'
-        },
-        buttonEnabled: {
-            position: 'absolute',
-            right: '0.2em',
-            bottom: '0.2em'
-        },
-        buttonDisabled: {
-            position: 'absolute',
-            right: '0.2em',
-            bottom: '0.2em',
-            backgroundColor: 'grey',
-            '&:hover': {
-                backgroundColor: 'grey'
-            }
-        }
-    });
-
-    const classes = useStyles();
-
     return (
-        <>
+        <Root>
             <Grid container direction="column" spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
@@ -138,9 +146,9 @@ const ClinicalIngest = ({ setTab, fileUpload, clinicalData }) => {
                     Next
                 </Button>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 ClinicalIngest.propTypes = {
     setTab: PropTypes.func.isRequired,

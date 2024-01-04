@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import {
     Box,
     Button,
@@ -35,9 +35,19 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import Google from 'assets/images/icons/social-google.svg';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    redButton: {
+const PREFIX = 'FirebaseLogin';
+
+const classes = {
+    redButton: `${PREFIX}-redButton`,
+    signDivider: `${PREFIX}-signDivider`,
+    signText: `${PREFIX}-signText`,
+    loginIcon: `${PREFIX}-loginIcon`,
+    loginInput: `${PREFIX}-loginInput`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.redButton}`]: {
         fontSize: '1rem',
         fontWeight: 500,
         backgroundColor: theme.palette.grey[50],
@@ -52,10 +62,12 @@ const useStyles = makeStyles((theme) => ({
             fontSize: '0.875rem'
         }
     },
-    signDivider: {
+
+    [`& .${classes.signDivider}`]: {
         flexGrow: 1
     },
-    signText: {
+
+    [`& .${classes.signText}`]: {
         cursor: 'unset',
         margin: theme.spacing(2),
         padding: '5px 56px',
@@ -63,22 +75,22 @@ const useStyles = makeStyles((theme) => ({
         color: `${theme.palette.grey[900]}!important`,
         fontWeight: 500
     },
-    loginIcon: {
+
+    [`& .${classes.loginIcon}`]: {
         marginRight: '16px',
         [theme.breakpoints.down('md')]: {
             marginRight: '8px'
         }
     },
-    loginInput: {
+
+    [`& .${classes.loginInput}`]: {
         ...theme.typography.customInput
     }
 }));
 
 //= ===========================|| FIREBASE - LOGIN ||============================//
 
-const FirebaseLogin = (props, { ...others }) => {
-    const classes = useStyles();
-
+function FirebaseLogin(props, { ...others }) {
     const customization = useSelector((state) => state.customization);
     const scriptedRef = useScriptRef();
     const [checked, setChecked] = React.useState(true);
@@ -97,7 +109,7 @@ const FirebaseLogin = (props, { ...others }) => {
     };
 
     return (
-        <>
+        <Root>
             <Grid container direction="column" justifyContent="center" spacing={2}>
                 <Grid item xs={12}>
                     <AnimateButton>
@@ -145,7 +157,6 @@ const FirebaseLogin = (props, { ...others }) => {
                     </Box>
                 </Grid>
             </Grid>
-
             <Formik
                 initialValues={{
                     email: 'info@codedthemes.com',
@@ -288,8 +299,8 @@ const FirebaseLogin = (props, { ...others }) => {
                     </form>
                 )}
             </Formik>
-        </>
+        </Root>
     );
-};
+}
 
 export default FirebaseLogin;

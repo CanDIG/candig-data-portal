@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 
-const PersistentFile = ({ file, fileLoader }) => {
+function PersistentFile({ file, fileLoader }) {
     // A JSON file input dialog which can maintain its state after unmounting. Optionally validates before upload.
     // Calls "fileLoader" with the file object as argument #1 and the JSON data as argument #2.
     const [error, setError] = useState(null);
@@ -50,7 +50,7 @@ const PersistentFile = ({ file, fileLoader }) => {
             )}
         </>
     );
-};
+}
 
 PersistentFile.propTypes = {
     fileLoader: PropTypes.func.isRequired,

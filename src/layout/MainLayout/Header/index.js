@@ -57,14 +57,12 @@ function Header({ handleLeftDrawerToggle }) {
                     <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
                         <LogoSection />
                     </Box>
-                    {sidebar ? (
+                    {sidebar && (
                         <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
                             <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
                                 <IconMenu2 stroke={1.5} size="1.3rem" />
                             </Avatar>
                         </ButtonBase>
-                    ) : (
-                        <></>
                     )}
                 </div>
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -81,7 +79,7 @@ function Header({ handleLeftDrawerToggle }) {
             <ProfileSection />
         </Root>
     );
-};
+}
 
 Header.propTypes = {
     handleLeftDrawerToggle: PropTypes.func

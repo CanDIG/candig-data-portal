@@ -35,11 +35,7 @@ function BamInstance({ tracks, genome, chromosome }) {
         }
     }, [tracks, genome, chromosome]);
 
-    return (
-        <>
-            <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />
-        </>
-    );
+    return <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />;
 }
 
 BamInstance.propTypes = {

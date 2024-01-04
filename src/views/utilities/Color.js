@@ -12,7 +12,7 @@ import { gridSpacing } from 'store/constant';
 
 //= ==============================|| COLOR BOX ||===============================//
 
-const ColorBox = ({ bgcolor, title, data, dark }) => {
+function ColorBox({ bgcolor, title, data, dark }) {
     const theme = useTheme();
     return (
         <>
@@ -49,7 +49,7 @@ const ColorBox = ({ bgcolor, title, data, dark }) => {
             )}
         </>
     );
-};
+}
 
 ColorBox.propTypes = {
     bgcolor: PropTypes.string,
@@ -60,7 +60,7 @@ ColorBox.propTypes = {
 
 //= ==============================|| UI COLOR ||===============================//
 
-const UIColor = () => {
+function UIColor() {
     const theme = useTheme();
 
     return (
@@ -387,6 +387,6 @@ const UIColor = () => {
             </Grid>
         </MainCard>
     );
-};
+}
 
 export default UIColor;

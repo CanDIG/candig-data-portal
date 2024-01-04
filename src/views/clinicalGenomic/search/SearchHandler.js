@@ -182,7 +182,7 @@ function SearchHandler() {
 
     // We don't really implement a graphical component
     // NB: This might be a good reason to have this be a function call instead of what it currently is.
-    return <></>;
+    return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
 

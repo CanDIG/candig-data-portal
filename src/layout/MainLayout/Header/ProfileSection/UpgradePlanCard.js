@@ -1,12 +1,19 @@
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Button, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'UpgradePlanCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    tagLine: `${PREFIX}-tagLine`,
+    button: `${PREFIX}-button`
+};
+
+const StyledCard = styled(Card)(({ theme }) => ({
+    [`&.${classes.card}`]: {
         background: theme.palette.warning.light,
         marginTop: '16px',
         marginBottom: '16px',
@@ -35,11 +42,13 @@ const useStyles = makeStyles((theme) => ({
             right: '-70px'
         }
     },
-    tagLine: {
+
+    [`& .${classes.tagLine}`]: {
         color: theme.palette.grey[900],
         opacity: 0.6
     },
-    button: {
+
+    [`& .${classes.button}`]: {
         color: theme.palette.grey[800],
         backgroundColor: theme.palette.warning.main,
         textTransform: 'capitalize',
@@ -52,11 +61,9 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| PROFILE MENU - UPGRADE PLAN CARD ||=========================== //
 
-const UpgradePlanCard = () => {
-    const classes = useStyles();
-
+function UpgradePlanCard() {
     return (
-        <Card className={classes.card}>
+        <StyledCard className={classes.card}>
             <CardContent>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
@@ -79,8 +86,8 @@ const UpgradePlanCard = () => {
                     </Grid>
                 </Grid>
             </CardContent>
-        </Card>
+        </StyledCard>
     );
-};
+}
 
 export default UpgradePlanCard;

@@ -15,7 +15,7 @@ import AuthFooter from 'ui-component/cards/AuthFooter';
 
 //= ===============================|| AUTH3 - LOGIN ||================================//
 
-const Login = () => {
+function Login() {
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -84,6 +84,6 @@ const Login = () => {
             </Grid>
         </AuthWrapper1>
     );
-};
+}
 
 export default Login;

@@ -1,10 +1,15 @@
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Card, CardContent, Grid, Skeleton } from '@mui/material';
 
-// style constant
-const useStyles = makeStyles({
-    cardHeading: {
+const PREFIX = 'EarningCard';
+
+const classes = {
+    cardHeading: `${PREFIX}-cardHeading`
+};
+
+const StyledCard = styled(Card)({
+    [`& .${classes.cardHeading}`]: {
         marginRight: '8px',
         marginTop: '18px',
         marginBottom: '14px'
@@ -13,10 +18,9 @@ const useStyles = makeStyles({
 
 // ===========================|| SKELETON EARNING CARD ||=========================== //
 
-const EarningCard = () => {
-    const classes = useStyles();
+function EarningCard() {
     return (
-        <Card>
+        <StyledCard>
             <CardContent>
                 <Grid container direction="column">
                     <Grid item>
@@ -37,8 +41,8 @@ const EarningCard = () => {
                     </Grid>
                 </Grid>
             </CardContent>
-        </Card>
+        </StyledCard>
     );
-};
+}
 
 export default EarningCard;

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 
 // REDUX
@@ -10,12 +10,23 @@ import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
+const PREFIX = 'LightCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    avatar: `${PREFIX}-avatar`,
+    primary: `${PREFIX}-primary`,
+    secondary: `${PREFIX}-secondary`,
+    padding: `${PREFIX}-padding`
+};
+
 // ===========================|| DASHBOARD - TOTAL INCOME LIGHT CARD ||=========================== //
 
-const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
-    const events = useSelector((state) => state);
-    const useStyles = makeStyles((theme) => ({
-        card: {
+function LightCard({ isLoading, header, value, icon, color = 'grey' }) {
+    // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+    const Root = styled('div')(({ theme }) => ({
+        [`& .${classes.card}`]: {
             backgroundColor: '#fff',
             color: theme.palette[color].light,
             overflow: 'hidden',
@@ -41,32 +52,36 @@ const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
                 right: '-130px'
             }
         },
-        content: {
+
+        [`& .${classes.content}`]: {
             padding: '16px !important'
         },
-        avatar: {
+
+        [`& .${classes.avatar}`]: {
             ...theme.typography.commonAvatar,
             ...theme.typography.largeAvatar,
             backgroundColor: theme.palette[color].dark,
             color: '#fff'
         },
-        primary: {
+
+        [`& .${classes.primary}`]: {
             color: '#fff'
         },
-        secondary: {
+
+        [`& .${classes.secondary}`]: {
             color: 'black',
             marginTop: '5px'
         },
-        padding: {
+
+        [`& .${classes.padding}`]: {
             paddingTop: 0,
             paddingBottom: 0
         }
     }));
-
-    const classes = useStyles();
+    const events = useSelector((state) => state);
 
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
@@ -99,9 +114,9 @@ const LightCard = ({ isLoading, header, value, icon, color = 'grey' }) => {
                     </List>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 LightCard.propTypes = {
     isLoading: PropTypes.bool,

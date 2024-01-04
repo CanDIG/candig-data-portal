@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
+import { styled } from '@mui/material/styles';
+
 // material-ui
-import { makeStyles } from '@mui/system';
 import { Avatar, Box, ButtonBase, Card, CardContent, Grid, InputAdornment, OutlinedInput, Popper } from '@mui/material';
 
 // third-party
@@ -13,9 +14,21 @@ import Transitions from 'ui-component/extended/Transitions';
 // assets
 import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons-react';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    searchControl: {
+const PREFIX = 'SearchSection';
+
+const classes = {
+    searchControl: `${PREFIX}-searchControl`,
+    startAdornment: `${PREFIX}-startAdornment`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    closeAvatar: `${PREFIX}-closeAvatar`,
+    popperContainer: `${PREFIX}-popperContainer`,
+    cardContent: `${PREFIX}-cardContent`,
+    card: `${PREFIX}-card`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.searchControl}`]: {
         width: '434px',
         marginLeft: '16px',
         paddingRight: '16px',
@@ -33,11 +46,13 @@ const useStyles = makeStyles((theme) => ({
             background: '#fff'
         }
     },
-    startAdornment: {
+
+    [`& .${classes.startAdornment}`]: {
         fontSize: '1rem',
         color: theme.palette.grey[500]
     },
-    headerAvatar: {
+
+    [`& .${classes.headerAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         background: theme.palette.primary.light,
@@ -47,7 +62,8 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.light
         }
     },
-    closeAvatar: {
+
+    [`& .${classes.closeAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         background: theme.palette.orange.light,
@@ -57,7 +73,8 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.orange.light
         }
     },
-    popperContainer: {
+
+    [`& .${classes.popperContainer}`]: {
         zIndex: 1100,
         width: '99%',
         top: '-55px !important',
@@ -66,10 +83,12 @@ const useStyles = makeStyles((theme) => ({
             padding: '0 10px'
         }
     },
-    cardContent: {
+
+    [`& .${classes.cardContent}`]: {
         padding: '12px !important'
     },
-    card: {
+
+    [`& .${classes.card}`]: {
         background: '#fff',
         [theme.breakpoints.down('md')]: {
             border: 0,
@@ -80,12 +99,11 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| SEARCH INPUT ||=========================== //
 
-const SearchSection = () => {
-    const classes = useStyles();
+function SearchSection() {
     const [value, setValue] = useState('');
 
     return (
-        <>
+        <Root>
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                 <PopupState variant="popper" popupId="demo-popup-popper">
                     {(popupState) => (
@@ -181,8 +199,8 @@ const SearchSection = () => {
                     }}
                 />
             </Box>
-        </>
+        </Root>
     );
-};
+}
 
 export default SearchSection;

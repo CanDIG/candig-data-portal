@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme, makeStyles } from '@mui/system';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
@@ -11,8 +12,16 @@ import Table from '@mui/material/Table';
 // Project imports
 import DropDown from './DropDown';
 
-const useStyles = makeStyles({
-    dropdownItem: {
+const PREFIX = 'SingleRowTable';
+
+const classes = {
+    dropdownItem: `${PREFIX}-dropdownItem`,
+    mobileRow: `${PREFIX}-mobileRow`,
+    scrollbar: `${PREFIX}-scrollbar`
+};
+
+const StyledTableContainer = styled(TableContainer)({
+    [`& .${classes.dropdownItem}`]: {
         background: 'white',
         paddingRight: '1.25em',
         paddingLeft: '1.25em',
@@ -23,10 +32,10 @@ const useStyles = makeStyles({
             color: 'white'
         }
     },
-    mobileRow: {
+    [`& .${classes.mobileRow}`]: {
         width: '700px'
     },
-    scrollbar: {
+    [`& .${classes.scrollbar}`]: {
         scrollbarWidth: 'thin',
         '&::-webkit-scrollbar': {
             height: '0.4em',
@@ -55,10 +64,9 @@ function SingleRowTable({
     dropDownGroup
 }) {
     const theme = useTheme();
-    const classes = useStyles();
 
     return (
-        <TableContainer className={[classes.mobileRow, classes.scrollbar]}>
+        <StyledTableContainer className={[classes.mobileRow, classes.scrollbar]}>
             <Table>
                 <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
                     <DropDown
@@ -85,7 +93,7 @@ function SingleRowTable({
                     ))}
                 </Stack>
             </Table>
-        </TableContainer>
+        </StyledTableContainer>
     );
 }
 

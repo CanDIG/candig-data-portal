@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/materia
 
 // ===========================|| CUSTOM SUB CARD ||=========================== //
 
-const SubCard = ({ children, content, contentClass, darkTitle, secondary, sx = {}, title, ...others }) => {
+function SubCard({ children, content, contentClass, darkTitle, secondary, sx = {}, title, ...others }) {
     const theme = useTheme();
 
     return (
@@ -44,7 +44,7 @@ const SubCard = ({ children, content, contentClass, darkTitle, secondary, sx = {
             {!content && children}
         </Card>
     );
-};
+}
 
 SubCard.propTypes = {
     children: PropTypes.node,

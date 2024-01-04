@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/system';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { TreeView, TreeItem } from '@mui/lab';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -9,12 +10,20 @@ import PropTypes from 'prop-types';
 
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
-const useStyles = makeStyles((_theme) => ({
-    label: {
+const PREFIX = 'PatientView';
+
+const classes = {
+    label: `${PREFIX}-label`,
+    searchMatch: `${PREFIX}-searchMatch`
+};
+
+const StyledBox = styled(Box)(({ _theme }) => ({
+    [`& .${classes.label}`]: {
         textTransform: 'capitalize',
         display: 'inline-flex'
     },
-    searchMatch: {
+
+    [`& .${classes.searchMatch}`]: {
         backgroundColor: '#FFFF00'
     }
 }));
@@ -40,9 +49,9 @@ function applyHighlight(term, searchExp, highlightClass) {
     return term;
 }
 
-const JSONTree = (props) => {
+function JSONTree(props) {
     const { id, label, json, searchExp } = props;
-    const classes = useStyles();
+
     let value = typeof json === 'number' || typeof json === 'string' ? json : '';
     if (typeof json === 'boolean') {
         value = String(json);
@@ -91,19 +100,19 @@ const JSONTree = (props) => {
         <TreeItem
             nodeId={id}
             label={
-                <Box sx={{ justifyContent: 'flex-start', alignItems: 'center', p: 0.5, pr: 0 }}>
+                <StyledBox sx={{ justifyContent: 'flex-start', alignItems: 'center', p: 0.5, pr: 0 }}>
                     <Box color="inherit" sx={{ mr: 1 }} />
                     <div className={classes.label}>
                         <b>{prettyLabel}</b>
                     </div>{' '}
                     {value ? <>: {value}</> : ''}
-                </Box>
+                </StyledBox>
             }
         >
             {innerItem}
         </TreeItem>
     );
-};
+}
 
 JSONTree.propTypes = {
     id: PropTypes.string,

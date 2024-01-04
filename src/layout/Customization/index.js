@@ -36,7 +36,7 @@ function valueText(value) {
 
 // ===========================|| LIVE CUSTOMIZATION ||=========================== //
 
-const Customization = () => {
+function Customization() {
     const theme = useTheme();
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
@@ -213,6 +213,6 @@ const Customization = () => {
             </Drawer>
         </>
     );
-};
+}
 
 export default Customization;

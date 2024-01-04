@@ -256,6 +256,6 @@ function NotificationSection() {
             </Popper>
         </Root>
     );
-};
+}
 
 export default NotificationSection;

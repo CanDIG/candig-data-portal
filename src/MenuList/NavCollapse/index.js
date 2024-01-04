@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Collapse, List, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 
@@ -14,50 +14,74 @@ import NavItem from '../NavItem';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    collapseIcon: {
+const PREFIX = 'NavCollapse';
+
+const classes = {
+    collapseIcon: `${PREFIX}-collapseIcon`,
+    collapseIconSub: `${PREFIX}-collapseIconSub`,
+    menuIcon: `${PREFIX}-menuIcon`,
+    listIcon: `${PREFIX}-listIcon`,
+    listCustomIconSub: `${PREFIX}-listCustomIconSub`,
+    listCustomIconSubActive: `${PREFIX}-listCustomIconSubActive`,
+    listItem: `${PREFIX}-listItem`,
+    listItemNoBack: `${PREFIX}-listItemNoBack`,
+    subMenuCaption: `${PREFIX}-subMenuCaption`,
+    collapseWrapper: `${PREFIX}-collapseWrapper`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.collapseIcon}`]: {
         fontSize: '1rem',
         marginTop: 'auto',
         marginBottom: 'auto'
     },
-    collapseIconSub: {
+
+    [`& .${classes.collapseIconSub}`]: {
         fontSize: '1rem',
         marginTop: 'auto',
         marginBottom: 'auto'
     },
-    menuIcon: {
+
+    [`& .${classes.menuIcon}`]: {
         marginTop: 'auto',
         marginBottom: 'auto'
     },
-    listIcon: {
+
+    [`& .${classes.listIcon}`]: {
         minWidth: '18px',
         marginTop: 'auto',
         marginBottom: 'auto'
     },
-    listCustomIconSub: {
+
+    [`& .${classes.listCustomIconSub}`]: {
         width: '6px',
         height: '6px'
     },
-    listCustomIconSubActive: {
+
+    [`& .${classes.listCustomIconSubActive}`]: {
         width: '8px',
         height: '8px'
     },
-    listItem: {
+
+    [`& .${classes.listItem}`]: {
         marginBottom: '5px',
         alignItems: 'flex-start'
     },
-    listItemNoBack: {
+
+    [`& .${classes.listItemNoBack}`]: {
         marginBottom: '5px',
         backgroundColor: 'transparent !important',
         paddingTop: '8px',
         paddingBottom: '8px',
         alignItems: 'flex-start'
     },
-    subMenuCaption: {
+
+    [`& .${classes.subMenuCaption}`]: {
         ...theme.typography.subMenuCaption
     },
-    collapseWrapper: {
+
+    [`& .${classes.collapseWrapper}`]: {
         position: 'relative',
         '&:after': {
             content: "''",
@@ -74,8 +98,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| SIDEBAR MENU LIST COLLAPSE ITEMS ||=========================== //
 
-const NavCollapse = ({ menu, level }) => {
-    const classes = useStyles();
+function NavCollapse({ menu, level }) {
     const customization = useSelector((state) => state.customization);
 
     const [open, setOpen] = React.useState(false);
@@ -115,7 +138,7 @@ const NavCollapse = ({ menu, level }) => {
     const menuIconClass = !menu.icon ? classes.listIcon : classes.menuIcon;
 
     return (
-        <>
+        <Root>
             <ListItemButton
                 className={level > 1 ? classes.listItemNoBack : classes.listItem}
                 sx={{ borderRadius: `${customization.borderRadius}px` }}
@@ -149,9 +172,9 @@ const NavCollapse = ({ menu, level }) => {
                     {menus}
                 </List>
             </Collapse>
-        </>
+        </Root>
     );
-};
+}
 
 NavCollapse.propTypes = {
     menu: PropTypes.object,

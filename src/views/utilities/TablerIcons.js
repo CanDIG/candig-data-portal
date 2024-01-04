@@ -13,9 +13,9 @@ const classes = {
     headerAvatar: `${PREFIX}-headerAvatar`,
     boxContainer: `${PREFIX}-boxContainer`
 };
-const Root = styled('flex')(({ theme }) => ({
-const useStyles = makeStyles((theme) => ({
-    frame: {
+
+const StyledMainCard = styled(MainCard)(({ theme }) => ({
+    [`& .${classes.frame}`]: {
         height: 'calc(100vh - 210px)',
         border: '1px solid',
         borderColor: theme.palette.primary.light
@@ -24,16 +24,14 @@ const useStyles = makeStyles((theme) => ({
 
 //= ============================|| TABLER ICONS ||=============================//
 
-const TablerIcons = () => {
-    const classes = useStyles();
-
+function TablerIcons() {
     return (
-        <MainCard title="Tabler Icons" secondary={<SecondaryAction link="https://tablericons.com/" />}>
+        <StyledMainCard title="Tabler Icons" secondary={<SecondaryAction link="https://tablericons.com/" />}>
             <Card sx={{ overflow: 'hidden' }}>
                 <iframe title="Tabler Icons" className={classes.frame} width="100%" src="https://tablericons.com/" />
             </Card>
-        </MainCard>
+        </StyledMainCard>
     );
-};
+}
 
 export default TablerIcons;

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // project imports
@@ -18,9 +18,23 @@ import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
 import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'EarningCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    avatar: `${PREFIX}-avatar`,
+    avatarRight: `${PREFIX}-avatarRight`,
+    cardHeading: `${PREFIX}-cardHeading`,
+    subHeading: `${PREFIX}-subHeading`,
+    avatarCircle: `${PREFIX}-avatarCircle`,
+    circleIcon: `${PREFIX}-circleIcon`,
+    menuItem: `${PREFIX}-menuItem`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.card}`]: {
         backgroundColor: theme.palette.secondary.dark,
         color: '#fff',
         overflow: 'hidden',
@@ -55,44 +69,52 @@ const useStyles = makeStyles((theme) => ({
             }
         }
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: '20px !important'
     },
-    avatar: {
+
+    [`& .${classes.avatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: theme.palette.secondary[800],
         marginTop: '8px'
     },
-    avatarRight: {
+
+    [`& .${classes.avatarRight}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         backgroundColor: theme.palette.secondary.dark,
         color: theme.palette.secondary[200],
         zIndex: 1
     },
-    cardHeading: {
+
+    [`& .${classes.cardHeading}`]: {
         fontSize: '2.125rem',
         fontWeight: 500,
         marginRight: '8px',
         marginTop: '14px',
         marginBottom: '6px'
     },
-    subHeading: {
+
+    [`& .${classes.subHeading}`]: {
         fontSize: '1rem',
         fontWeight: 500,
         color: theme.palette.secondary[200]
     },
-    avatarCircle: {
+
+    [`& .${classes.avatarCircle}`]: {
         cursor: 'pointer',
         ...theme.typography.smallAvatar,
         backgroundColor: theme.palette.secondary[200],
         color: theme.palette.secondary.dark
     },
-    circleIcon: {
+
+    [`& .${classes.circleIcon}`]: {
         transform: 'rotate3d(1, 1, 1, 45deg)'
     },
-    menuItem: {
+
+    [`& .${classes.menuItem}`]: {
         marginRight: '14px',
         fontSize: '1.25rem'
     }
@@ -100,9 +122,7 @@ const useStyles = makeStyles((theme) => ({
 
 //= ==========================|| DASHBOARD DEFAULT - EARNING CARD ||===========================//
 
-const EarningCard = ({ isLoading }) => {
-    const classes = useStyles();
-
+function EarningCard({ isLoading }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleClick = (event) => {
@@ -114,7 +134,7 @@ const EarningCard = ({ isLoading }) => {
     };
 
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
@@ -187,9 +207,9 @@ const EarningCard = ({ isLoading }) => {
                     </Grid>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 EarningCard.propTypes = {
     isLoading: PropTypes.bool

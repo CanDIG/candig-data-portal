@@ -14,26 +14,42 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { makeStyles, useTheme } from '@mui/system';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
-const useStyles = makeStyles((_) => ({
-    tab: {
+const PREFIX = 'Sidebar';
+
+const classes = {
+    tab: `${PREFIX}-tab`,
+    checkbox: `${PREFIX}-checkbox`,
+    form: `${PREFIX}-form`,
+    checkboxLabel: `${PREFIX}-checkboxLabel`,
+    hidden: `${PREFIX}-hidden`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ _ }) => ({
+    [`& .${classes.tab}`]: {
         minWidth: 40
     },
-    checkbox: {
+
+    [`& .${classes.checkbox}`]: {
         paddingTop: 0,
         paddingBottom: 0
     },
-    form: {
+
+    [`& .${classes.form}`]: {
         width: '100%'
     },
-    checkboxLabel: {
+
+    [`& .${classes.checkboxLabel}`]: {
         textTransform: 'capitalize'
     },
-    hidden: {
+
+    [`& .${classes.hidden}`]: {
         height: 0
     }
 }));
@@ -44,7 +60,6 @@ const useStyles = makeStyles((_) => ({
 function SidebarGroup(props) {
     const theme = useTheme();
     const { name, children, hide } = props;
-    const classes = useStyles();
 
     return (
         <FormControl className={`${classes.form} ${hide ? classes.hidden : ''}`} component="fieldset" variant="standard">
@@ -83,10 +98,9 @@ function StyledCheckboxList(props) {
     const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
-    const classes = useStyles();
 
     if (hide) {
-        return <></>;
+        return <Root />;
     }
 
     // Check all of our options by default
@@ -217,7 +231,7 @@ function GenomicsGroup(props) {
     const [_timeout, setNewTimeout] = useState(null);
 
     if (hide) {
-        return <></>;
+        return null;
     }
 
     const HandleChange = (value, changer, toChange) => {
@@ -323,7 +337,6 @@ function Sidebar() {
     const [selectedtab, setSelectedTab] = useState('All');
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
-    const classes = useStyles();
 
     // Fill up a list of options from the results of a Katsu query
     // This includes treatment types within the dataset, etc.

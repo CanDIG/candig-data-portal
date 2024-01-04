@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
-import { makeStyles } from '@mui/system';
 import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
@@ -15,8 +15,20 @@ import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 
-const useStyles = makeStyles((_) => ({
-    stickytop: {
+const PREFIX = 'ClinicalGenomicSearch';
+
+const classes = {
+    stickytop: `${PREFIX}-stickytop`,
+    sidebarOffset: `${PREFIX}-sidebarOffset`,
+    noSidebarOffset: `${PREFIX}-noSidebarOffset`,
+    headerSpacing: `${PREFIX}-headerSpacing`,
+    anchor: `${PREFIX}-anchor`,
+    navigationLink: `${PREFIX}-navigationLink`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ _ }) => ({
+    [`& .${classes.stickytop}`]: {
         position: 'fixed',
         backgroundColor: 'white',
         zIndex: 1100,
@@ -24,24 +36,29 @@ const useStyles = makeStyles((_) => ({
         borderRadius: '1px 1px 0 0',
         outline: '20px solid #e3f2fd'
     },
-    sidebarOffset: {
+
+    [`& .${classes.sidebarOffset}`]: {
         width: 'calc(100% - 320px)',
         left: 280
     },
-    noSidebarOffset: {
+
+    [`& .${classes.noSidebarOffset}`]: {
         width: 'calc(100% - 80px)',
         left: 40
     },
-    headerSpacing: {
+
+    [`& .${classes.headerSpacing}`]: {
         height: 50
     },
-    anchor: {
+
+    [`& .${classes.anchor}`]: {
         display: 'block',
         position: 'relative',
         visibility: 'hidden',
         top: -150
     },
-    navigationLink: {
+
+    [`& .${classes.navigationLink}`]: {
         float: 'right',
         textAlign: 'right'
     }
@@ -77,7 +94,7 @@ const sections = [
 
 function ClinicalGenomicSearch() {
     const events = useSelector((state) => state);
-    const classes = useStyles();
+
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = useSelector((state) => state.customization.opened);
 
@@ -87,7 +104,7 @@ function ClinicalGenomicSearch() {
     }, [sidebarWriter]);
 
     return (
-        <>
+        <Root>
             {/* Top bar */}
             <AppBar
                 component="nav"
@@ -129,7 +146,7 @@ function ClinicalGenomicSearch() {
                     </div>
                 ))}
             </MainCard>
-        </>
+        </Root>
     );
 }
 

@@ -1,14 +1,20 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/system';
+import { styled } from '@mui/material/styles';
 
 // project import
 import MainCard from 'ui-component/cards/MainCard';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'AuthCardWrapper';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`
+};
+
+const StyledMainCard = styled(MainCard)(({ theme }) => ({
+    [`&.${classes.card}`]: {
         maxWidth: '475px',
         '& > *': {
             flexGrow: 1,
@@ -21,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
             maxWidth: '400px'
         }
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: `${theme.spacing(5)} !important`,
         [theme.breakpoints.down('xl')]: {
             padding: `${theme.spacing(3)} !important`
@@ -31,15 +38,13 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| AUTHENTICATION CARD WRAPPER ||=========================== //
 
-const AuthCardWrapper = ({ children, ...other }) => {
-    const classes = useStyles();
-
+function AuthCardWrapper({ children, ...other }) {
     return (
-        <MainCard className={classes.card} contentClass={classes.content} {...other}>
+        <StyledMainCard className={classes.card} contentClass={classes.content} {...other}>
             {children}
-        </MainCard>
+        </StyledMainCard>
     );
-};
+}
 
 AuthCardWrapper.propTypes = {
     children: PropTypes.node

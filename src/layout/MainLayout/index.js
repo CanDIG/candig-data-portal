@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 // material
 import { AppBar, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
-import { styled } from '@mui/system';
+import { styled, useTheme } from '@mui/system';
 
 // third-party
 import clsx from 'clsx';
@@ -135,6 +135,6 @@ function MainLayout() {
             </SidebarProvider>
         </Root>
     );
-};
+}
 
 export default MainLayout;

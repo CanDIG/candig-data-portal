@@ -297,8 +297,8 @@ function NotificationList() {
                     </Grid>
                 </Grid>
             </div>
-        </List>
+        </StyledList>
     );
-};
+}
 
 export default NotificationList;

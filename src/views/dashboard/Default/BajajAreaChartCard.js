@@ -1,7 +1,8 @@
 import React from 'react';
 
 // mui
-import { makeStyles, useTheme } from '@mui/system';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Card, CardContent, Grid, Typography } from '@mui/material';
 
 // third-party
@@ -11,28 +12,38 @@ import Chart from 'react-apexcharts';
 // project imports
 import chartData from './chart-data/bajaj-area-chart';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'BajajAreaChartCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    contentContainer: `${PREFIX}-contentContainer`,
+    fontStyle: `${PREFIX}-fontStyle`
+};
+
+const StyledCard = styled(Card)(({ theme }) => ({
+    [`&.${classes.card}`]: {
         backgroundColor: theme.palette.secondary.light
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: '0px !important'
     },
-    contentContainer: {
+
+    [`& .${classes.contentContainer}`]: {
         padding: '16px',
         paddingBottom: 0,
         color: '#fff'
     },
-    fontStyle: {
+
+    [`& .${classes.fontStyle}`]: {
         fontWeight: 400
     }
 }));
 
 //= ==========================|| DASHBOARD DEFAULT - BAJAJ AREA CHART CARD ||===========================//
 
-const BajajAreaChartCard = () => {
-    const classes = useStyles();
+function BajajAreaChartCard() {
     const theme = useTheme();
 
     const orangeDark = theme.palette.secondary[800];
@@ -49,7 +60,7 @@ const BajajAreaChartCard = () => {
     }, [orangeDark]);
 
     return (
-        <Card className={classes.card}>
+        <StyledCard className={classes.card}>
             <CardContent className={classes.content}>
                 <Grid container className={classes.contentContainer}>
                     <Grid item xs={12}>
@@ -74,8 +85,8 @@ const BajajAreaChartCard = () => {
                 </Grid>
                 <Chart {...chartData} />
             </CardContent>
-        </Card>
+        </StyledCard>
     );
-};
+}
 
 export default BajajAreaChartCard;
