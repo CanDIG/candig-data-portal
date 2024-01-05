@@ -17,7 +17,7 @@ const classes = {
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ theme }) => ({
+const DividerRoot = styled(Divider)(({ theme }) => ({
     [`& .${classes.menuCaption}`]: {
         ...theme.typography.menuCaption
     },
@@ -26,7 +26,7 @@ const Root = styled('div')(({ theme }) => ({
         ...theme.typography.subMenuCaption
     },
 
-    [`& .${classes.menuDivider}`]: {
+    [`&.${classes.menuDivider}`]: {
         marginTop: '2px',
         marginBottom: '10px'
     }
@@ -52,7 +52,7 @@ function NavGroup({ item }) {
     });
 
     return (
-        <Root>
+        <>
             <List
             // Adds bold header grouping best used in sidebar
             // subheader={
@@ -71,8 +71,8 @@ function NavGroup({ item }) {
                 {items}
             </List>
             {/* group divider */}
-            <Divider className={classes.menuDivider} />
-        </Root>
+            <DividerRoot className={classes.menuDivider} />
+        </>
     );
 }
 

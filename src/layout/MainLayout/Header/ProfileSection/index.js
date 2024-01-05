@@ -53,7 +53,6 @@ const classes = {
     usernamePadding: `${PREFIX}-usernamePadding`
 };
 
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
 const ChipRoot = styled(Chip)(({ theme }) => ({
     [`&.${classes.profileChip}`]: {
         height: '48px',
