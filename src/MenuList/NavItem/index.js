@@ -26,11 +26,7 @@ const classes = {
     subMenuCaption: `${PREFIX}-subMenuCaption`
 };
 
-const StyledListItemButton = styled(ListItemButton)((
-    {
-        theme
-    }
-) => ({
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     [`& .${classes.listIcon}`]: {
         minWidth: '14px',
         marginTop: 'auto',
@@ -66,7 +62,6 @@ const StyledListItemButton = styled(ListItemButton)((
 // ===========================|| SIDEBAR MENU LIST ITEMS ||=========================== //
 
 const NavItem = ({ item, level }) => {
-
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
     const matchesSM = useMediaQuery((theme) => theme.breakpoints.down('lg'));
