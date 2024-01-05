@@ -26,8 +26,7 @@ const classes = {
     card: `${PREFIX}-card`
 };
 
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ theme }) => ({
+const PopupBox = styled(Box)(({ theme }) => ({
     [`& .${classes.searchControl}`]: {
         width: '434px',
         marginLeft: '16px',
@@ -97,14 +96,40 @@ const Root = styled('div')(({ theme }) => ({
     }
 }));
 
+const InputBox = styled(Box)(({ theme }) => ({
+    [`& .${classes.searchControl}`]: {
+        width: '434px',
+        marginLeft: '16px',
+        paddingRight: '16px',
+        paddingLeft: '16px',
+        '& input': {
+            background: 'transparent !important',
+            paddingLeft: '5px !important'
+        },
+        [theme.breakpoints.down('xl')]: {
+            width: '250px'
+        },
+        [theme.breakpoints.down('lg')]: {
+            width: '100%',
+            marginLeft: '4px',
+            background: '#fff'
+        }
+    },
+
+    [`& .${classes.startAdornment}`]: {
+        fontSize: '1rem',
+        color: theme.palette.grey[500]
+    }
+}));
+
 // ===========================|| SEARCH INPUT ||=========================== //
 
 function SearchSection() {
     const [value, setValue] = useState('');
 
     return (
-        <Root>
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+        <>
+            <PopupBox sx={{ display: { xs: 'block', md: 'none' } }}>
                 <PopupState variant="popper" popupId="demo-popup-popper">
                     {(popupState) => (
                         <>
@@ -180,8 +205,8 @@ function SearchSection() {
                         </>
                     )}
                 </PopupState>
-            </Box>
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            </PopupBox>
+            <InputBox sx={{ display: { xs: 'none', md: 'block' } }}>
                 <OutlinedInput
                     className={classes.searchControl}
                     id="input-search-header"
@@ -198,8 +223,8 @@ function SearchSection() {
                         'aria-label': 'weight'
                     }}
                 />
-            </Box>
-        </Root>
+            </InputBox>
+        </>
     );
 }
 
