@@ -4,7 +4,8 @@ import { Outlet } from 'react-router-dom';
 
 // material
 import { AppBar, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
-import { styled, useTheme } from '@mui/system';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 
 // third-party
 import clsx from 'clsx';
@@ -31,19 +32,19 @@ const classes = {
     content: `${PREFIX}-content`,
     contentShift: `${PREFIX}-contentShift`
 };
-const Root = styled('flex')(({ theme }) => ({
+const Root = styled('div')(({ theme }) => ({
     [`&.${classes.root}`]: {
         display: 'flex'
     },
-    [`&.${classes.appBar}`]: {
+    [`& .${classes.appBar}`]: {
         backgroundColor: theme.palette.background.default
     },
-    [`&.${classes.appBarWidth}`]: {
+    [`& .${classes.appBarWidth}`]: {
         transition: theme.transitions.create('width'),
         backgroundColor: theme.palette.background.default,
         height: 100
     },
-    [`&.${classes.content}`]: {
+    [`& .${classes.content}`]: {
         ...theme.typography.mainContent,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
@@ -62,7 +63,7 @@ const Root = styled('flex')(({ theme }) => ({
             marginRight: '10px'
         }
     },
-    [`&.${classes.contentShift}`]: {
+    [`& .${classes.contentShift}`]: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen

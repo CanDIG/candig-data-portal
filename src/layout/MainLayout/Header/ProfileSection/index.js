@@ -54,25 +54,8 @@ const classes = {
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ theme }) => ({
-    [`& .${classes.navContainer}`]: {
-        width: '100%',
-        maxWidth: '350px',
-        minWidth: '300px',
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: '10px',
-        [theme.breakpoints.down('md')]: {
-            minWidth: '100%'
-        }
-    },
-
-    [`& .${classes.headerAvatar}`]: {
-        cursor: 'pointer',
-        ...theme.typography.mediumAvatar,
-        margin: '8px 0 8px 8px !important'
-    },
-
-    [`& .${classes.profileChip}`]: {
+const ChipRoot = styled(Chip)(({ theme }) => ({
+    [`&.${classes.profileChip}`]: {
         height: '48px',
         alignItems: 'center',
         borderRadius: '27px',
@@ -89,9 +72,28 @@ const Root = styled('div')(({ theme }) => ({
         }
     },
 
-    [`& .${classes.profileLabel}`]: {
+    [`&.${classes.profileLabel}`]: {
         lineHeight: 0,
         padding: '12px'
+    },
+
+    [`& .${classes.headerAvatar}`]: {
+        cursor: 'pointer',
+        ...theme.typography.mediumAvatar,
+        margin: '8px 0 8px 8px !important'
+    }
+}));
+
+const PopperRoot = styled(Popper)(({ theme }) => ({
+    [`& .${classes.navContainer}`]: {
+        width: '100%',
+        maxWidth: '350px',
+        minWidth: '300px',
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: '10px',
+        [theme.breakpoints.down('md')]: {
+            minWidth: '100%'
+        }
     },
 
     [`& .${classes.listItem}`]: {
@@ -102,7 +104,7 @@ const Root = styled('div')(({ theme }) => ({
         padding: '16px !important'
     },
 
-    [`& .${classes.showOnTop}`]: {
+    [`&.${classes.showOnTop}`]: {
         zIndex: 11001
     },
 
@@ -194,8 +196,8 @@ function ProfileSection() {
     };
 
     return (
-        <Root>
-            <Chip
+        <>
+            <ChipRoot
                 classes={{ label: classes.profileLabel }}
                 className={classes.profileChip}
                 icon={
@@ -216,7 +218,7 @@ function ProfileSection() {
                 onClick={handleToggle}
                 color="primary"
             />
-            <Popper
+            <PopperRoot
                 placement="bottom-end"
                 open={open}
                 anchorEl={anchorRef.current}
@@ -274,8 +276,8 @@ function ProfileSection() {
                         </Paper>
                     </Transitions>
                 )}
-            </Popper>
-        </Root>
+            </PopperRoot>
+        </>
     );
 }
 

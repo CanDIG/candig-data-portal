@@ -1,5 +1,5 @@
 // mui
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 
 // ===========================|| AUTHENTICATION 1 WRAPPER ||=========================== //
 

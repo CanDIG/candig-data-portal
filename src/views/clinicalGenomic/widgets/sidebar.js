@@ -100,7 +100,7 @@ function StyledCheckboxList(props) {
     const [initialized, setInitialized] = useState(false);
 
     if (hide) {
-        return <Root />;
+        return null;
     }
 
     // Check all of our options by default
@@ -370,7 +370,7 @@ function Sidebar() {
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
-        <>
+        <Root>
             <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
@@ -428,7 +428,7 @@ function Sidebar() {
                     hide={hideClinical}
                 />
             </SidebarGroup>
-        </>
+        </Root>
     );
 }
 

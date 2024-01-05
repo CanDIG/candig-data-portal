@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // project imports
@@ -20,11 +20,8 @@ const classes = {
     headerAvatar: `${PREFIX}-headerAvatar`,
     boxContainer: `${PREFIX}-boxContainer`
 };
-const Root = styled('flex')(({ theme }) => ({
-    [`&.${classes.grow}`]: {
-        flexGrow: 1
-    },
-    [`&.${classes.headerAvatar}`]: {
+const StyledBox = styled(Box)(({ theme }) => ({
+    [`& .${classes.headerAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         transition: 'all .2s ease-in-out',
@@ -35,12 +32,17 @@ const Root = styled('flex')(({ theme }) => ({
             color: theme.palette.primary.light
         }
     },
-    [`&.${classes.boxContainer}`]: {
+    [`& .${classes.boxContainer}`]: {
         width: '228px',
         display: 'flex',
         [theme.breakpoints.down('lg')]: {
             width: 'auto'
         }
+    }
+}));
+const StyledGrow = styled('div')(({ _ }) => ({
+    [`&.${classes.grow}`]: {
+        flexGrow: 1
     }
 }));
 
@@ -50,9 +52,9 @@ function Header({ handleLeftDrawerToggle }) {
     const sidebar = useSidebarReaderContext();
 
     return (
-        <Root>
+        <>
             {/* logo & toggler button */}
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <StyledBox sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <div className={classes.boxContainer}>
                     <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
                         <LogoSection />
@@ -68,16 +70,16 @@ function Header({ handleLeftDrawerToggle }) {
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
                 </Box>
-            </Box>
+            </StyledBox>
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
-            <div className={classes.grow} />
-            <div className={classes.grow} />
+            <StyledGrow className={classes.grow} />
+            <StyledGrow className={classes.grow} />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
             <ProfileSection />
-        </Root>
+        </>
     );
 }
 

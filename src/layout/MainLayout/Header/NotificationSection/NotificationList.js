@@ -1,4 +1,4 @@
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import {
     Avatar,
     Button,
@@ -21,7 +21,7 @@ import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@t
 import User1 from 'assets/images/users/user-round.svg';
 
 // style constant
-const PREFIX = 'MainLayoutHeader';
+const PREFIX = 'NotificationList';
 const classes = {
     grow: `${PREFIX}-grow`,
     navContainer: `${PREFIX}-navContainer`,

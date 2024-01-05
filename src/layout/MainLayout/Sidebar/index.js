@@ -15,7 +15,7 @@ import LogoSection from '../LogoSection';
 import { drawerWidth } from 'store/constant';
 import { useSidebarReaderContext } from './SidebarContext';
 
-const PREFIX = 'Sidebar';
+const PREFIX = 'MainLayoutSidebar';
 
 const classes = {
     drawer: `${PREFIX}-drawer`,
@@ -73,7 +73,7 @@ function Sidebar({ drawerOpen, drawerToggle, window }) {
             </Box>
             <BrowserView>
                 <PerfectScrollbar component="div" className={classes.ScrollHeight}>
-                    {sidebarContext || null}
+                    {sidebarContext || undefined}
                 </PerfectScrollbar>
             </BrowserView>
             <MobileView>

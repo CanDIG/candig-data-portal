@@ -45,7 +45,7 @@ const classes = {
     bodyPPacing: `${PREFIX}-bodyPPacing`,
     textBoxSpacing: `${PREFIX}-textBoxSpacing`
 };
-const Root = styled('flex')(({ theme }) => ({
+const Root = styled('div')(({ theme }) => ({
     [`&.${classes.ScrollHeight}`]: {
         height: '100%',
         maxHeight: 'calc(100vh - 205px)',
