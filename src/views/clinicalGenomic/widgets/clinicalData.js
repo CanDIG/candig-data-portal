@@ -40,7 +40,7 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
+        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id, cohort: row.program_id }));
     };
 
     // Tracks Screensize

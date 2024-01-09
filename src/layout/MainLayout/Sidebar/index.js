@@ -73,7 +73,11 @@ function Sidebar({ drawerOpen, drawerToggle, window }) {
             </Box>
             <BrowserView>
                 <PerfectScrollbar component="div" className={classes.ScrollHeight}>
-                    {sidebarContext || undefined}
+                    {
+                        // The fragment below suppresses a warning we get in console due to undefined passed as a child
+                        // eslint-disable-next-line react/jsx-no-useless-fragment
+                        sidebarContext || <></>
+                    }
                 </PerfectScrollbar>
             </BrowserView>
             <MobileView>

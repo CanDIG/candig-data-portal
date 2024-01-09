@@ -158,7 +158,7 @@ const recursivePrune = (json, searchTerm) => {
 
 function PatientView() {
     const resultsContext = useSearchResultsReaderContext();
-    const patient = resultsContext.donor?.map((loc) => loc?.results?.results?.[0])?.filter((donor) => donor)?.[0];
+    const patient = resultsContext.donor?.map((loc) => loc?.results)?.filter((donor) => donor)?.[0];
     const [expanded, setExpanded] = useState(['.']);
 
     // When searching: search, then prune the results

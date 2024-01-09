@@ -167,11 +167,11 @@ function SearchHandler() {
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
-        if (!reader.donorID) {
+        if (!reader.donorID || !reader.cohort) {
             return;
         }
 
-        const url = `v2/authorized/donor_with_clinical_data?submitter_donor_id=${reader.donorID}`;
+        const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu').then((data) => {
                 writer((old) => ({ ...old, donor: data }));
