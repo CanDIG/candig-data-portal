@@ -106,6 +106,7 @@ function StyledCheckboxList(props) {
     // Check all of our options by default
     if (!initialized && isFilterList && options.length) {
         const optionsObject = {};
+        console.log(options);
         options.forEach((option) => {
             optionsObject[option] = true;
         });
@@ -182,8 +183,12 @@ function StyledCheckboxList(props) {
             renderInput={(params) => <TextField {...params} label={groupName} />}
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
-            onChange={(_, __, reason, details) => {
-                HandleChange(details.option, reason === 'selectOption');
+            onChange={(_, value, reason, details) => {
+                console.log(_);
+                console.log(value);
+                console.log(reason);
+                console.log(details);
+                HandleChange(value, reason === 'selectOption');
             }}
         />
     ) : (
