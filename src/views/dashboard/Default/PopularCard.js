@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Avatar, Button, CardActions, CardContent, Divider, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // project imports
@@ -17,22 +17,37 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    cardAction: {
+const PREFIX = 'PopularCard';
+
+const classes = {
+    cardAction: `${PREFIX}-cardAction`,
+    primaryLight: `${PREFIX}-primaryLight`,
+    divider: `${PREFIX}-divider`,
+    avatarSuccess: `${PREFIX}-avatarSuccess`,
+    successDark: `${PREFIX}-successDark`,
+    avatarError: `${PREFIX}-avatarError`,
+    errorDark: `${PREFIX}-errorDark`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.cardAction}`]: {
         padding: '10px',
         paddingTop: 0,
         justifyContent: 'center'
     },
-    primaryLight: {
+
+    [`& .${classes.primaryLight}`]: {
         color: theme.palette.primary[200],
         cursor: 'pointer'
     },
-    divider: {
+
+    [`& .${classes.divider}`]: {
         marginTop: '12px',
         marginBottom: '12px'
     },
-    avatarSuccess: {
+
+    [`& .${classes.avatarSuccess}`]: {
         width: '16px',
         height: '16px',
         borderRadius: '5px',
@@ -40,10 +55,12 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.success.dark,
         marginLeft: '15px'
     },
-    successDark: {
+
+    [`& .${classes.successDark}`]: {
         color: theme.palette.success.dark
     },
-    avatarError: {
+
+    [`& .${classes.avatarError}`]: {
         width: '16px',
         height: '16px',
         borderRadius: '5px',
@@ -51,16 +68,15 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.orange.dark,
         marginLeft: '15px'
     },
-    errorDark: {
+
+    [`& .${classes.errorDark}`]: {
         color: theme.palette.orange.dark
     }
 }));
 
 // ===========================|| DASHBOARD DEFAULT - POPULAR CARD ||=========================== //
 
-const PopularCard = ({ isLoading }) => {
-    const classes = useStyles();
-
+function PopularCard({ isLoading }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleClick = (event) => {
@@ -72,7 +88,7 @@ const PopularCard = ({ isLoading }) => {
     };
 
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <SkeletonPopularCard />
             ) : (
@@ -284,9 +300,9 @@ const PopularCard = ({ isLoading }) => {
                     </CardActions>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 PopularCard.propTypes = {
     isLoading: PropTypes.bool

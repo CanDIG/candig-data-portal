@@ -1,10 +1,44 @@
 import { Button, Grid, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { makeField, DataRow } from 'ui-component/DataRow';
-import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 
-const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) => {
+const PREFIX = 'GenomicIngest';
+
+const classes = {
+    titleText: `${PREFIX}-titleText`,
+    bodyText: `${PREFIX}-bodyText`,
+    ingestButton: `${PREFIX}-ingestButton`,
+    ingestButtonDisabled: `${PREFIX}-ingestButtonDisabled`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')({
+    [`& .${classes.titleText}`]: {
+        color: 'black',
+        fontSize: '1.5em',
+        fontFamily: 'Roboto'
+    },
+    [`& .${classes.bodyText}`]: {
+        color: 'black',
+        fontSize: '1em',
+        fontFamily: 'Catamaran'
+    },
+    [`& .${classes.ingestButton}`]: {
+        backgroundColor: '#37CA50',
+        width: '7em',
+        height: '3em'
+    },
+    [`& .${classes.ingestButtonDisabled}`]: {
+        backgroundColor: 'grey',
+        '&:hover': {
+            backgroundColor: 'grey'
+        }
+    }
+});
+
+function GenomicIngest({ beginIngest, fileUpload, clinicalData, genomicData }) {
     const [ingestButtonEnabled, setIngestButtonEnabled] = useState(false);
 
     const cohort = [
@@ -13,35 +47,10 @@ const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) =
         makeField('Read Access', '1')
     ];
 
-    const useStyles = makeStyles({
-        titleText: {
-            color: 'black',
-            fontSize: '1.5em',
-            fontFamily: 'Roboto'
-        },
-        bodyText: {
-            color: 'black',
-            fontSize: '1em',
-            fontFamily: 'Catamaran'
-        },
-        ingestButton: {
-            backgroundColor: '#37CA50',
-            width: '7em',
-            height: '3em'
-        },
-        ingestButtonDisabled: {
-            backgroundColor: 'grey',
-            '&:hover': {
-                backgroundColor: 'grey'
-            }
-        }
-    });
-    const classes = useStyles();
-
     useEffect(() => genomicData !== undefined && genomicData !== null && setIngestButtonEnabled(true), [genomicData]);
 
     return (
-        <>
+        <Root>
             <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
@@ -78,9 +87,9 @@ const GenomicIngest = ({ beginIngest, fileUpload, clinicalData, genomicData }) =
                     </Button>
                 </Grid>
             </Grid>
-        </>
+        </Root>
     );
-};
+}
 
 GenomicIngest.propTypes = {
     beginIngest: PropTypes.func.isRequired,

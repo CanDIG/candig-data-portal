@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
 
 // ===========================|| CUSTOM SUB CARD ||=========================== //
 
-const SubCard = ({ children, content, contentClass, darkTitle, secondary, sx = {}, title, ...others }) => {
+function SubCard({ children, content, contentClass, darkTitle, secondary, sx = {}, title, ...others }) {
     const theme = useTheme();
 
     return (
@@ -44,7 +44,7 @@ const SubCard = ({ children, content, contentClass, darkTitle, secondary, sx = {
             {!content && children}
         </Card>
     );
-};
+}
 
 SubCard.propTypes = {
     children: PropTypes.node,

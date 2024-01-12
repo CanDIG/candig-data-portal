@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import {
     Drawer,
     Fab,
@@ -27,7 +27,7 @@ import { SET_BORDER_RADIUS, SET_FONT_FAMILY } from 'store/actions'; // THEME_RTL
 import { gridSpacing } from 'store/constant';
 
 // assets
-import { IconSettings } from '@tabler/icons';
+import { IconSettings } from '@tabler/icons-react';
 
 // concat 'px'
 function valueText(value) {
@@ -36,7 +36,7 @@ function valueText(value) {
 
 // ===========================|| LIVE CUSTOMIZATION ||=========================== //
 
-const Customization = () => {
+function Customization() {
     const theme = useTheme();
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
@@ -213,6 +213,6 @@ const Customization = () => {
             </Drawer>
         </>
     );
-};
+}
 
 export default Customization;

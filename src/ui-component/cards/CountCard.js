@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
 import { Avatar, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // REDUX
@@ -19,92 +19,113 @@ import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
 import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
-        backgroundColor: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark),
-        color: '#fff    ',
-        overflow: 'hidden',
-        position: 'relative',
-        '&:after': {
-            content: '""',
-            position: 'absolute',
-            width: '210px',
-            height: '210px',
-            background: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
-            borderRadius: '50%',
-            top: '-85px',
-            right: '-95px',
-            [theme.breakpoints.down('sm')]: {
-                top: '-105px',
-                right: '-140px'
-            }
-        },
-        '&:before': {
-            content: '""',
-            position: 'absolute',
-            width: '210px',
-            height: '210px',
-            background: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
-            borderRadius: '50%',
-            top: '-125px',
-            right: '-15px',
-            opacity: 0.5,
-            [theme.breakpoints.down('sm')]: {
-                top: '-155px',
-                right: '-70px'
-            }
-        }
-    },
-    content: {
-        padding: '20px !important'
-    },
-    avatar: {
-        ...theme.typography.commonAvatar,
-        ...theme.typography.largeAvatar,
-        backgroundColor: ({ primary }) => (primary ? theme.palette.primary[800] : theme.palette.secondary[800]),
-        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
-        marginTop: '8px'
-    },
-    avatarRight: {
-        ...theme.typography.commonAvatar,
-        ...theme.typography.mediumAvatar,
-        backgroundColor: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark),
-        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
-        zIndex: 1
-    },
-    cardHeading: {
-        fontSize: '2.125rem',
-        fontWeight: 500,
-        marginRight: '8px',
-        marginTop: '14px',
-        marginBottom: '6px'
-    },
-    subHeading: {
-        fontSize: '1rem',
-        fontWeight: 500,
-        color: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200])
-    },
-    avatarCircle: {
-        cursor: 'pointer',
-        ...theme.typography.smallAvatar,
-        backgroundColor: ({ primary }) => (primary ? theme.palette.primary[200] : theme.palette.secondary[200]),
-        color: ({ primary }) => (primary ? theme.palette.primary.dark : theme.palette.secondary.dark)
-    },
-    circleIcon: {
-        transform: 'rotate3d(1, 1, 1, 45deg)'
-    },
-    menuItem: {
-        marginRight: '14px',
-        fontSize: '1.25rem'
-    }
-}));
+const PREFIX = 'CountCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    avatar: `${PREFIX}-avatar`,
+    avatarRight: `${PREFIX}-avatarRight`,
+    cardHeading: `${PREFIX}-cardHeading`,
+    subHeading: `${PREFIX}-subHeading`,
+    avatarCircle: `${PREFIX}-avatarCircle`,
+    circleIcon: `${PREFIX}-circleIcon`,
+    menuItem: `${PREFIX}-menuItem`
+};
 
 //= ==========================|| INDIVIDUAL OVERVIEW - COUNT CARD ||===========================//
 
-const CountCard = ({ isLoading, title, count, primary, icon }) => {
-    const classes = useStyles({ primary });
+function CountCard({ isLoading, title, count, primary, icon }) {
     const events = useSelector((state) => state);
+
+    // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+    const Root = styled('div')(({ theme }) => ({
+        [`& .${classes.card}`]: {
+            backgroundColor: primary ? theme.palette.primary.dark : theme.palette.secondary.dark,
+            color: '#fff    ',
+            overflow: 'hidden',
+            position: 'relative',
+            '&:after': {
+                content: '""',
+                position: 'absolute',
+                width: '210px',
+                height: '210px',
+                background: primary ? theme.palette.primary[800] : theme.palette.secondary[800],
+                borderRadius: '50%',
+                top: '-85px',
+                right: '-95px',
+                [theme.breakpoints.down('sm')]: {
+                    top: '-105px',
+                    right: '-140px'
+                }
+            },
+            '&:before': {
+                content: '""',
+                position: 'absolute',
+                width: '210px',
+                height: '210px',
+                background: primary ? theme.palette.primary[800] : theme.palette.secondary[800],
+                borderRadius: '50%',
+                top: '-125px',
+                right: '-15px',
+                opacity: 0.5,
+                [theme.breakpoints.down('sm')]: {
+                    top: '-155px',
+                    right: '-70px'
+                }
+            }
+        },
+
+        [`& .${classes.content}`]: {
+            padding: '20px !important'
+        },
+
+        [`& .${classes.avatar}`]: {
+            ...theme.typography.commonAvatar,
+            ...theme.typography.largeAvatar,
+            backgroundColor: primary ? theme.palette.primary[800] : theme.palette.secondary[800],
+            color: primary ? theme.palette.primary[200] : theme.palette.secondary[200],
+            marginTop: '8px'
+        },
+
+        [`& .${classes.avatarRight}`]: {
+            ...theme.typography.commonAvatar,
+            ...theme.typography.mediumAvatar,
+            backgroundColor: primary ? theme.palette.primary.dark : theme.palette.secondary.dark,
+            color: primary ? theme.palette.primary[200] : theme.palette.secondary[200],
+            zIndex: 1
+        },
+
+        [`& .${classes.cardHeading}`]: {
+            fontSize: '2.125rem',
+            fontWeight: 500,
+            marginRight: '8px',
+            marginTop: '14px',
+            marginBottom: '6px'
+        },
+
+        [`& .${classes.subHeading}`]: {
+            fontSize: '1rem',
+            fontWeight: 500,
+            color: primary ? theme.palette.primary[200] : theme.palette.secondary[200]
+        },
+
+        [`& .${classes.avatarCircle}`]: {
+            cursor: 'pointer',
+            ...theme.typography.smallAvatar,
+            backgroundColor: primary ? theme.palette.primary[200] : theme.palette.secondary[200],
+            color: primary ? theme.palette.primary.dark : theme.palette.secondary.dark
+        },
+
+        [`& .${classes.circleIcon}`]: {
+            transform: 'rotate3d(1, 1, 1, 45deg)'
+        },
+
+        [`& .${classes.menuItem}`]: {
+            marginRight: '14px',
+            fontSize: '1.25rem'
+        }
+    }));
 
     // STATES
     const [anchorEl, setAnchorEl] = useState(null);
@@ -118,7 +139,7 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
     };
 
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <SkeletonEarningCard />
             ) : (
@@ -189,9 +210,9 @@ const CountCard = ({ isLoading, title, count, primary, icon }) => {
                     </Grid>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 CountCard.propTypes = {
     isLoading: PropTypes.bool,

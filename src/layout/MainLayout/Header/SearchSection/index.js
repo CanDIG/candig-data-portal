@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
+import { styled } from '@mui/material/styles';
+
 // material-ui
-import { makeStyles } from '@mui/styles';
 import { Avatar, Box, ButtonBase, Card, CardContent, Grid, InputAdornment, OutlinedInput, Popper } from '@mui/material';
 
 // third-party
@@ -11,11 +12,22 @@ import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import Transitions from 'ui-component/extended/Transitions';
 
 // assets
-import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons';
+import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons-react';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    searchControl: {
+const PREFIX = 'SearchSection';
+
+const classes = {
+    searchControl: `${PREFIX}-searchControl`,
+    startAdornment: `${PREFIX}-startAdornment`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    closeAvatar: `${PREFIX}-closeAvatar`,
+    popperContainer: `${PREFIX}-popperContainer`,
+    cardContent: `${PREFIX}-cardContent`,
+    card: `${PREFIX}-card`
+};
+
+const PopupBox = styled(Box)(({ theme }) => ({
+    [`& .${classes.searchControl}`]: {
         width: '434px',
         marginLeft: '16px',
         paddingRight: '16px',
@@ -33,11 +45,13 @@ const useStyles = makeStyles((theme) => ({
             background: '#fff'
         }
     },
-    startAdornment: {
+
+    [`& .${classes.startAdornment}`]: {
         fontSize: '1rem',
         color: theme.palette.grey[500]
     },
-    headerAvatar: {
+
+    [`& .${classes.headerAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         background: theme.palette.primary.light,
@@ -47,7 +61,8 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.light
         }
     },
-    closeAvatar: {
+
+    [`& .${classes.closeAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         background: theme.palette.orange.light,
@@ -57,7 +72,8 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.orange.light
         }
     },
-    popperContainer: {
+
+    [`& .${classes.popperContainer}`]: {
         zIndex: 1100,
         width: '99%',
         top: '-55px !important',
@@ -66,10 +82,12 @@ const useStyles = makeStyles((theme) => ({
             padding: '0 10px'
         }
     },
-    cardContent: {
+
+    [`& .${classes.cardContent}`]: {
         padding: '12px !important'
     },
-    card: {
+
+    [`& .${classes.card}`]: {
         background: '#fff',
         [theme.breakpoints.down('md')]: {
             border: 0,
@@ -78,15 +96,40 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const InputBox = styled(Box)(({ theme }) => ({
+    [`& .${classes.searchControl}`]: {
+        width: '434px',
+        marginLeft: '16px',
+        paddingRight: '16px',
+        paddingLeft: '16px',
+        '& input': {
+            background: 'transparent !important',
+            paddingLeft: '5px !important'
+        },
+        [theme.breakpoints.down('xl')]: {
+            width: '250px'
+        },
+        [theme.breakpoints.down('lg')]: {
+            width: '100%',
+            marginLeft: '4px',
+            background: '#fff'
+        }
+    },
+
+    [`& .${classes.startAdornment}`]: {
+        fontSize: '1rem',
+        color: theme.palette.grey[500]
+    }
+}));
+
 // ===========================|| SEARCH INPUT ||=========================== //
 
-const SearchSection = () => {
-    const classes = useStyles();
+function SearchSection() {
     const [value, setValue] = useState('');
 
     return (
         <>
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <PopupBox sx={{ display: { xs: 'block', md: 'none' } }}>
                 <PopupState variant="popper" popupId="demo-popup-popper">
                     {(popupState) => (
                         <>
@@ -162,8 +205,8 @@ const SearchSection = () => {
                         </>
                     )}
                 </PopupState>
-            </Box>
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            </PopupBox>
+            <InputBox sx={{ display: { xs: 'none', md: 'block' } }}>
                 <OutlinedInput
                     className={classes.searchControl}
                     id="input-search-header"
@@ -180,9 +223,9 @@ const SearchSection = () => {
                         'aria-label': 'weight'
                     }}
                 />
-            </Box>
+            </InputBox>
         </>
     );
-};
+}
 
 export default SearchSection;

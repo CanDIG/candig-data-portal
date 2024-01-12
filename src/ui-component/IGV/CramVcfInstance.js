@@ -18,11 +18,7 @@ function CramVcfInstance({ options }) {
         }
     }, [options]);
 
-    return (
-        <>
-            <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />
-        </>
-    );
+    return <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />;
 }
 
 CramVcfInstance.propTypes = {

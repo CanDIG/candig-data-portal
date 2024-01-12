@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { ButtonBase, Link, Tooltip } from '@mui/material';
 
 // project imports
@@ -9,7 +9,7 @@ import Avatar from '../extended/Avatar';
 
 // ===========================|| CARD SECONDARY ACTION ||=========================== //
 
-const CardSecondaryAction = ({ title, link, icon }) => {
+function CardSecondaryAction({ title, link, icon }) {
     const theme = useTheme();
 
     return (
@@ -49,7 +49,7 @@ const CardSecondaryAction = ({ title, link, icon }) => {
             </ButtonBase>
         </Tooltip>
     );
-};
+}
 
 CardSecondaryAction.propTypes = {
     icon: PropTypes.node,

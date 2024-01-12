@@ -4,23 +4,21 @@ import { Alert, Collapse } from '@mui/material';
 
 function AlertComponent({ open, setOpen, text, fontColor, severity, variant }) {
     return (
-        <>
-            <Collapse in={open}>
-                <Alert
-                    onClose={() => {
-                        setOpen(false);
-                    }}
-                    onClick={() => {
-                        setOpen(false);
-                    }}
-                    severity={severity}
-                    variant={variant}
-                    sx={{ color: fontColor }}
-                >
-                    {text}
-                </Alert>
-            </Collapse>
-        </>
+        <Collapse in={open}>
+            <Alert
+                onClose={() => {
+                    setOpen(false);
+                }}
+                onClick={() => {
+                    setOpen(false);
+                }}
+                severity={severity}
+                variant={variant}
+                sx={{ color: fontColor }}
+            >
+                {text}
+            </Alert>
+        </Collapse>
     );
 }
 

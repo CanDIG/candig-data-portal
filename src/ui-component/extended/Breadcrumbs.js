@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // mui
-import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Divider, Grid, Typography } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
@@ -16,53 +16,76 @@ import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
 import HomeIcon from '@mui/icons-material/Home';
 import HomeTwoToneIcon from '@mui/icons-material/HomeTwoTone';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    link: {
+const PREFIX = 'Breadcrumbs';
+
+const classes = {
+    link: `${PREFIX}-link`,
+    activeLink: `${PREFIX}-activeLink`,
+    icon: `${PREFIX}-icon`,
+    content: `${PREFIX}-content`,
+    noPadding: `${PREFIX}-noPadding`,
+    card: `${PREFIX}-card`,
+    root: `${PREFIX}-root`,
+    titleTop: `${PREFIX}-titleTop`,
+    titleBottom: `${PREFIX}-titleBottom`,
+    divider: `${PREFIX}-divider`
+};
+
+const StyledCard = styled(Card)(({ theme }) => ({
+    [`& .${classes.link}`]: {
         display: 'flex',
         color: theme.palette.grey[900],
         textDecoration: 'none',
         alignContent: 'center',
         alignItems: 'center'
     },
-    activeLink: {
+
+    [`& .${classes.activeLink}`]: {
         display: 'flex',
         textDecoration: 'none',
         alignContent: 'center',
         alignItems: 'center',
         color: theme.palette.grey[500]
     },
-    icon: {
+
+    [`& .${classes.icon}`]: {
         marginRight: theme.spacing(0.75),
         marginTop: `-${theme.spacing(0.25)}`,
         width: '1rem',
         height: '1rem',
         color: theme.palette.secondary.main
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: '16px !important'
     },
-    noPadding: {
+
+    [`& .${classes.noPadding}`]: {
         padding: '16px !important',
         paddingLeft: '0 !important'
     },
-    card: {
+
+    [`& .${classes.card}`]: {
         marginBottom: theme.spacing(gridSpacing),
         border: '1px solid',
         borderColor: theme.palette.primary[200] + 75
     },
-    root: {
+
+    [`& .${classes.root}`]: {
         background: 'transparent',
         boxShadow: 'none',
         border: 'none'
     },
-    titleTop: {
+
+    [`& .${classes.titleTop}`]: {
         marginBottom: theme.spacing(1)
     },
-    titleBottom: {
+
+    [`& .${classes.titleBottom}`]: {
         marginTop: theme.spacing(1)
     },
-    divider: {
+
+    [`& .${classes.divider}`]: {
         borderColor: theme.palette.primary.main,
         marginBottom: theme.spacing(gridSpacing)
     }
@@ -70,9 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| BREADCRUMBS ||=========================== //
 
-const Breadcrumbs = ({ card, divider, icon, icons, maxItems, navigation, rightAlign, separator, title, titleBottom, ...others }) => {
-    const classes = useStyles();
-
+function Breadcrumbs({ card, divider, icon, icons, maxItems, navigation, rightAlign, separator, title, titleBottom, ...others }) {
     const [main, setMain] = useState([]);
     const [item, setItem] = useState([]);
 
@@ -151,7 +172,7 @@ const Breadcrumbs = ({ card, divider, icon, icons, maxItems, navigation, rightAl
         // main
         if (item.breadcrumbs !== false) {
             breadcrumbContent = (
-                <Card className={cardClass} {...others}>
+                <StyledCard className={cardClass} {...others}>
                     <CardContent className={contentClass}>
                         <Grid
                             container
@@ -190,13 +211,13 @@ const Breadcrumbs = ({ card, divider, icon, icons, maxItems, navigation, rightAl
                         </Grid>
                     </CardContent>
                     {card === false && divider !== false && <Divider className={classes.divider} />}
-                </Card>
+                </StyledCard>
             );
         }
     }
 
     return breadcrumbContent;
-};
+}
 
 Breadcrumbs.propTypes = {
     card: PropTypes.bool,

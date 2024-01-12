@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Avatar, Chip, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 
@@ -15,31 +15,46 @@ import { MENU_OPEN, SET_MENU } from 'store/actions';
 // assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    listIcon: {
+const PREFIX = 'NavItem';
+
+const classes = {
+    listIcon: `${PREFIX}-listIcon`,
+    listCustomIconSub: `${PREFIX}-listCustomIconSub`,
+    listCustomIconSubActive: `${PREFIX}-listCustomIconSubActive`,
+    listItem: `${PREFIX}-listItem`,
+    listItemNoBack: `${PREFIX}-listItemNoBack`,
+    subMenuCaption: `${PREFIX}-subMenuCaption`
+};
+
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+    [`& .${classes.listIcon}`]: {
         minWidth: '14px',
         marginTop: 'auto',
         marginBottom: 'auto'
     },
-    listCustomIconSub: {
+
+    [`& .${classes.listCustomIconSub}`]: {
         width: '4px',
         height: '4px'
     },
-    listCustomIconSubActive: {
+
+    [`& .${classes.listCustomIconSubActive}`]: {
         width: '4px',
         height: '4px'
     },
-    listItem: {
+
+    [`& .${classes.listItem}`]: {
         alignItems: 'center'
     },
-    listItemNoBack: {
+
+    [`& .${classes.listItemNoBack}`]: {
         backgroundColor: 'transparent !important',
         paddingTop: '4px',
         paddingBottom: '4px',
         alignItems: 'flex-start'
     },
-    subMenuCaption: {
+
+    [`& .${classes.subMenuCaption}`]: {
         ...theme.typography.subMenuCaption
     }
 }));
@@ -47,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
 // ===========================|| SIDEBAR MENU LIST ITEMS ||=========================== //
 
 const NavItem = ({ item, level }) => {
-    const classes = useStyles();
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
     const matchesSM = useMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -95,7 +109,7 @@ const NavItem = ({ item, level }) => {
     }, []);
 
     return (
-        <ListItemButton
+        <StyledListItemButton
             {...listItemProps}
             disabled={item.disabled}
             className={level > 1 ? classes.listItemNoBack : classes.listItem}
@@ -128,7 +142,7 @@ const NavItem = ({ item, level }) => {
                     avatar={item.chip.avatar && <Avatar>{item.chip.avatar}</Avatar>}
                 />
             )}
-        </ListItemButton>
+        </StyledListItemButton>
     );
 };
 

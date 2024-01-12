@@ -78,10 +78,10 @@ export function fetchFederation(path, service) {
 /*
 Fetch the federation service for clinical search data
 */
-export function fetchFederationClinicalData() {
+/* export function fetchFederationClinicalData() {
     // Until I can debug the Tyk error
     return new Promise((resolve) => resolve({}));
-    /* return fetch(`${federation}/fanout`, {
+    return fetch(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -100,21 +100,14 @@ export function fetchFederationClinicalData() {
         .catch((error) => {
             console.log('Error:', error);
             return 'error';
-        }); */
-}
+        });
+} */
 
 /*
 Fetch peer federation stats from CanDIG federation service 
 */
 export function fetchSummaryStats(URL) {
     return federation !== '' ? fetchFederationStat() : fetchKatsu(URL);
-}
-
-/*
-Fetch peer federation stats from CanDIG federation service 
-*/
-export function fetchClinicalData(URL) {
-    return federation !== '' ? fetchFederationClinicalData() : fetchKatsu(URL);
 }
 
 /*

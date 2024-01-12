@@ -113,9 +113,9 @@ export const processMCodeMainData = (dataObject, site) => {
 
     row.id = dataObject?.subject?.id ? dataObject?.subject?.id : null;
     row.site = site;
-    row.sex = (dataObject?.subject?.sex).toLowerCase() ? (dataObject?.subject?.sex).toLowerCase() : 'NA';
+    row.sex = dataObject?.subject?.sex?.toLowerCase() ? dataObject.subject.sex.toLowerCase() : 'NA';
     row.deceased = dataObject?.subject?.deceased ? dataObject?.subject?.deceased : 'NA';
-    row.ethnicity = (dataObject?.subject?.ethnicity).toLowerCase() ? (dataObject?.subject?.ethnicity).toLowerCase() : 'NA';
+    row.ethnicity = dataObject?.subject?.ethnicity?.toLowerCase() ? dataObject.subject.ethnicity.toLowerCase() : 'NA';
     row.date_of_birth = dataObject?.subject?.date_of_birth ? dataObject?.subject?.date_of_birth : 'NA';
     row.date_of_death = dataObject?.date_of_death ? dataObject?.date_of_death : 'NA';
     row.genomic_id = dataObject?.genomics_report?.extra_properties?.genomic_id
@@ -250,9 +250,9 @@ export const processSexListData = (dataObject) => {
     const list = {};
     dataObject.forEach((federatedResult) => {
         federatedResult.results.forEach((patient) => {
-            const key = (patient?.subject?.sex).toLowerCase();
+            const key = patient?.subject?.sex?.toLowerCase();
             if (!(key in list)) {
-                list[key] = (patient?.subject?.sex).toLowerCase();
+                list[key] = patient?.subject?.sex?.toLowerCase();
             }
         });
     });
@@ -338,9 +338,9 @@ export const processHistologicalTypeListData = (dataObject) => {
                             for (let i = 0; i < HistologicalType.length; i += 1) {
                                 if (key === HistologicalType[i]['Tumour histological type code']) {
                                     // eslint-disable-next-line
-                                    list[
+                                    /*list[
                                         key
-                                    ] = `${HistologicalType[i]['Tumour histological type label']} ${HistologicalType[i]['Tumour histological type code']}`;
+                                        `${HistologicalType[i]['Tumour histological type label']} ${HistologicalType[i]['Tumour histological type code']}`;*/
                                     // list[key] = patient?.code?.label;
                                 }
                             }

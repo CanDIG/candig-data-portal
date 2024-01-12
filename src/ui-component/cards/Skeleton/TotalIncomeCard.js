@@ -1,13 +1,19 @@
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Skeleton } from '@mui/material';
 
-// style constant
-const useStyles = makeStyles({
-    content: {
+const PREFIX = 'TotalIncomeCard';
+
+const classes = {
+    content: `${PREFIX}-content`,
+    padding: `${PREFIX}-padding`
+};
+
+const StyledCard = styled(Card)({
+    [`& .${classes.content}`]: {
         padding: '16px !important'
     },
-    padding: {
+    [`& .${classes.padding}`]: {
         paddingTop: 0,
         paddingBottom: 0
     }
@@ -15,10 +21,9 @@ const useStyles = makeStyles({
 
 // ===========================|| SKELETON - TOTAL INCOME DARK/LIGHT Card ||=========================== //
 
-const TotalIncomeCard = () => {
-    const classes = useStyles();
+function TotalIncomeCard() {
     return (
-        <Card>
+        <StyledCard>
             <CardContent className={classes.content}>
                 <List className={classes.padding}>
                     <ListItem alignItems="center" disableGutters className={classes.padding}>
@@ -33,8 +38,8 @@ const TotalIncomeCard = () => {
                     </ListItem>
                 </List>
             </CardContent>
-        </Card>
+        </StyledCard>
     );
-};
+}
 
 export default TotalIncomeCard;

@@ -167,11 +167,11 @@ function SearchHandler() {
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
-        if (!reader.donorID) {
+        if (!reader.donorID || !reader.cohort) {
             return;
         }
 
-        const url = `v2/authorized/donor_with_clinical_data?submitter_donor_id=${reader.donorID}`;
+        const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu').then((data) => {
                 writer((old) => ({ ...old, donor: data }));
@@ -182,7 +182,7 @@ function SearchHandler() {
 
     // We don't really implement a graphical component
     // NB: This might be a good reason to have this be a function call instead of what it currently is.
-    return <></>;
+    return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
 

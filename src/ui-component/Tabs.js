@@ -1,11 +1,19 @@
 import PropTypes from 'prop-types';
 
+import { styled } from '@mui/material/styles';
+
 // mui
-import { makeStyles } from '@mui/styles';
 import { Grid, Box } from '@mui/material';
 
-const useStyles = makeStyles({
-    tabs: {
+const PREFIX = 'Tabs';
+
+const classes = {
+    tabs: `${PREFIX}-tabs`,
+    active: `${PREFIX}-active`
+};
+
+const StyledBox = styled(Box)({
+    [`& .${classes.tabs}`]: {
         background: 'white',
         border: 'none',
         fontWeight: 'bold',
@@ -17,7 +25,7 @@ const useStyles = makeStyles({
             color: '#2196f3'
         }
     },
-    active: {
+    [`& .${classes.active}`]: {
         background: 'white',
         fontWeight: 'bold',
         fontSize: '0.85em',
@@ -28,10 +36,8 @@ const useStyles = makeStyles({
 });
 
 function Tabs({ tabHeaders, setActiveTab, activeTab }) {
-    const classes = useStyles();
-
     return (
-        <Box mb={3}>
+        <StyledBox mb={3}>
             <Grid container direction="row">
                 {tabHeaders.map((header) => (
                     <Box
@@ -48,7 +54,7 @@ function Tabs({ tabHeaders, setActiveTab, activeTab }) {
                     </Box>
                 ))}
             </Grid>
-        </Box>
+        </StyledBox>
     );
 }
 

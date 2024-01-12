@@ -64,80 +64,78 @@ function HtsgetBrowser() {
     };
 
     return (
-        <>
-            <MainCard title="Htsget Browser" sx={{ minHeight: 830, position: 'relative' }}>
-                <AlertComponent
-                    open={open}
-                    setOpen={setOpen}
-                    text={alertMessage}
-                    severity={alertSeverity}
-                    variant="filled"
-                    fontColor={alertSeverity === 'error' ? 'white' : 'black'}
-                />
-                <Grid container direction="column" className="content">
-                    <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
-                        <Grid item sm={12} xs={12} md={4} lg={4}>
-                            {promiseInProgress === true ? (
-                                <LoadingIndicator />
-                            ) : (
-                                <LightCard
-                                    isLoading={isLoading}
-                                    header="VCFs"
-                                    value={VcfCount}
-                                    icon={<MapIcon fontSize="inherit" />}
-                                    color="primary"
-                                />
+        <MainCard title="Htsget Browser" sx={{ minHeight: 830, position: 'relative' }}>
+            <AlertComponent
+                open={open}
+                setOpen={setOpen}
+                text={alertMessage}
+                severity={alertSeverity}
+                variant="filled"
+                fontColor={alertSeverity === 'error' ? 'white' : 'black'}
+            />
+            <Grid container direction="column" className="content">
+                <Grid container direction="row" justifyContent="center" spacing={2} p={2}>
+                    <Grid item sm={12} xs={12} md={4} lg={4}>
+                        {promiseInProgress === true ? (
+                            <LoadingIndicator />
+                        ) : (
+                            <LightCard
+                                isLoading={isLoading}
+                                header="VCFs"
+                                value={VcfCount}
+                                icon={<MapIcon fontSize="inherit" />}
+                                color="primary"
+                            />
+                        )}
+                    </Grid>
+                    <Grid item sm={12} xs={12} md={4} lg={4}>
+                        {promiseInProgress === true ? (
+                            <LoadingIndicator />
+                        ) : (
+                            <LightCard
+                                isLoading={isLoading}
+                                header="BAMs"
+                                value={BamCount}
+                                icon={<DescriptionIcon fontSize="inherit" />}
+                                color="secondary"
+                            />
+                        )}
+                    </Grid>
+                </Grid>
+
+                <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
+                    <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
+                        <Grid item>
+                            {options.length > 0 && (
+                                <FormControl>
+                                    <Grid container direction="row" alignItems="center">
+                                        <Box mr={2}>
+                                            <p>Genomics Files</p>
+                                        </Box>
+                                        <MultiSelect // Width set in CSS
+                                            options={options}
+                                            value={selected}
+                                            onChange={setSelected}
+                                            labelledBy="Genomics Files"
+                                        />
+                                    </Grid>
+                                </FormControl>
                             )}
                         </Grid>
-                        <Grid item sm={12} xs={12} md={4} lg={4}>
-                            {promiseInProgress === true ? (
-                                <LoadingIndicator />
-                            ) : (
-                                <LightCard
-                                    isLoading={isLoading}
-                                    header="BAMs"
-                                    value={BamCount}
-                                    icon={<DescriptionIcon fontSize="inherit" />}
-                                    color="secondary"
-                                />
-                            )}
+
+                        <Grid item>
+                            <FormControl>
+                                <Button type="submit" variant="contained">
+                                    View
+                                </Button>
+                            </FormControl>
                         </Grid>
                     </Grid>
+                </form>
 
-                    <form onSubmit={formHandler} style={{ justifyContent: 'center' }}>
-                        <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2} p={2}>
-                            <Grid item>
-                                {options.length > 0 && (
-                                    <FormControl>
-                                        <Grid container direction="row" alignItems="center">
-                                            <Box mr={2}>
-                                                <p>Genomics Files</p>
-                                            </Box>
-                                            <MultiSelect // Width set in CSS
-                                                options={options}
-                                                value={selected}
-                                                onChange={setSelected}
-                                                labelledBy="Genomics Files"
-                                            />
-                                        </Grid>
-                                    </FormControl>
-                                )}
-                            </Grid>
-
-                            <Grid item>
-                                <FormControl>
-                                    <Button type="submit" variant="contained">
-                                        View
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                    </form>
-
-                    <HtsgetInstance BamIdList={selectedBamIds} VcfIdList={selectedVcfIds} />
-                </Grid>
-            </MainCard>
-        </>
+                <HtsgetInstance BamIdList={selectedBamIds} VcfIdList={selectedVcfIds} />
+            </Grid>
+        </MainCard>
     );
 }
 

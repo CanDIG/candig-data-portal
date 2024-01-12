@@ -14,26 +14,42 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
-const useStyles = makeStyles((_) => ({
-    tab: {
+const PREFIX = 'Sidebar';
+
+const classes = {
+    tab: `${PREFIX}-tab`,
+    checkbox: `${PREFIX}-checkbox`,
+    form: `${PREFIX}-form`,
+    checkboxLabel: `${PREFIX}-checkboxLabel`,
+    hidden: `${PREFIX}-hidden`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ _ }) => ({
+    [`& .${classes.tab}`]: {
         minWidth: 40
     },
-    checkbox: {
+
+    [`& .${classes.checkbox}`]: {
         paddingTop: 0,
         paddingBottom: 0
     },
-    form: {
+
+    [`& .${classes.form}`]: {
         width: '100%'
     },
-    checkboxLabel: {
+
+    [`& .${classes.checkboxLabel}`]: {
         textTransform: 'capitalize'
     },
-    hidden: {
+
+    [`& .${classes.hidden}`]: {
         height: 0
     }
 }));
@@ -44,7 +60,6 @@ const useStyles = makeStyles((_) => ({
 function SidebarGroup(props) {
     const theme = useTheme();
     const { name, children, hide } = props;
-    const classes = useStyles();
 
     return (
         <FormControl className={`${classes.form} ${hide ? classes.hidden : ''}`} component="fieldset" variant="standard">
@@ -83,15 +98,15 @@ function StyledCheckboxList(props) {
     const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
     const [checked, setChecked] = useState({});
     const [initialized, setInitialized] = useState(false);
-    const classes = useStyles();
 
     if (hide) {
-        return <></>;
+        return null;
     }
 
     // Check all of our options by default
     if (!initialized && isFilterList && options.length) {
         const optionsObject = {};
+        console.log(options);
         options.forEach((option) => {
             optionsObject[option] = true;
         });
@@ -168,8 +183,12 @@ function StyledCheckboxList(props) {
             renderInput={(params) => <TextField {...params} label={groupName} />}
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
-            onChange={(_, __, reason, details) => {
-                HandleChange(details.option, reason === 'selectOption');
+            onChange={(_, value, reason, details) => {
+                console.log(_);
+                console.log(value);
+                console.log(reason);
+                console.log(details);
+                HandleChange(value, reason === 'selectOption');
             }}
         />
     ) : (
@@ -217,7 +236,7 @@ function GenomicsGroup(props) {
     const [_timeout, setNewTimeout] = useState(null);
 
     if (hide) {
-        return <></>;
+        return null;
     }
 
     const HandleChange = (value, changer, toChange) => {
@@ -323,7 +342,6 @@ function Sidebar() {
     const [selectedtab, setSelectedTab] = useState('All');
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
-    const classes = useStyles();
 
     // Fill up a list of options from the results of a Katsu query
     // This includes treatment types within the dataset, etc.
@@ -357,7 +375,7 @@ function Sidebar() {
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
-        <>
+        <Root>
             <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
@@ -415,7 +433,7 @@ function Sidebar() {
                     hide={hideClinical}
                 />
             </SidebarGroup>
-        </>
+        </Root>
     );
 }
 

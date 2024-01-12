@@ -1,7 +1,8 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import {
     Avatar,
     CardContent,
@@ -27,29 +28,33 @@ import Transitions from 'ui-component/extended/Transitions';
 import { SITE } from 'store/constant';
 
 // assets
-import { IconLogout, IconSettings } from '@tabler/icons';
+import { IconLogout, IconSettings } from '@tabler/icons-react';
 import User1 from 'assets/images/users/user-round.svg';
 import BCGSC from 'assets/images/users/bcgsc.svg';
 import UHN from 'assets/images/users/UHN.svg';
 
-// style const
-const useStyles = makeStyles((theme) => ({
-    navContainer: {
-        width: '100%',
-        maxWidth: '350px',
-        minWidth: '300px',
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: '10px',
-        [theme.breakpoints.down('md')]: {
-            minWidth: '100%'
-        }
-    },
-    headerAvatar: {
-        cursor: 'pointer',
-        ...theme.typography.mediumAvatar,
-        margin: '8px 0 8px 8px !important'
-    },
-    profileChip: {
+const PREFIX = 'ProfileSection';
+
+const classes = {
+    navContainer: `${PREFIX}-navContainer`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    profileChip: `${PREFIX}-profileChip`,
+    profileLabel: `${PREFIX}-profileLabel`,
+    listItem: `${PREFIX}-listItem`,
+    cardContent: `${PREFIX}-cardContent`,
+    showOnTop: `${PREFIX}-showOnTop`,
+    card: `${PREFIX}-card`,
+    searchControl: `${PREFIX}-searchControl`,
+    startAdornment: `${PREFIX}-startAdornment`,
+    flex: `${PREFIX}-flex`,
+    name: `${PREFIX}-name`,
+    ScrollHeight: `${PREFIX}-ScrollHeight`,
+    badgeWarning: `${PREFIX}-badgeWarning`,
+    usernamePadding: `${PREFIX}-usernamePadding`
+};
+
+const ChipRoot = styled(Chip)(({ theme }) => ({
+    [`&.${classes.profileChip}`]: {
         height: '48px',
         alignItems: 'center',
         borderRadius: '27px',
@@ -65,60 +70,90 @@ const useStyles = makeStyles((theme) => ({
             }
         }
     },
-    profileLabel: {
+
+    [`&.${classes.profileLabel}`]: {
         lineHeight: 0,
         padding: '12px'
     },
-    listItem: {
+
+    [`& .${classes.headerAvatar}`]: {
+        cursor: 'pointer',
+        ...theme.typography.mediumAvatar,
+        margin: '8px 0 8px 8px !important'
+    }
+}));
+
+const PopperRoot = styled(Popper)(({ theme }) => ({
+    [`& .${classes.navContainer}`]: {
+        width: '100%',
+        maxWidth: '350px',
+        minWidth: '300px',
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: '10px',
+        [theme.breakpoints.down('md')]: {
+            minWidth: '100%'
+        }
+    },
+
+    [`& .${classes.listItem}`]: {
         marginTop: '5px'
     },
-    cardContent: {
+
+    [`& .${classes.cardContent}`]: {
         padding: '16px !important'
     },
-    showOnTop: {
+
+    [`&.${classes.showOnTop}`]: {
         zIndex: 11001
     },
-    card: {
+
+    [`& .${classes.card}`]: {
         backgroundColor: theme.palette.primary.light,
         marginBottom: '16px',
         marginTop: '16px'
     },
-    searchControl: {
+
+    [`& .${classes.searchControl}`]: {
         width: '100%',
         paddingRight: '8px',
         paddingLeft: '16px',
         marginBottom: '16px',
         marginTop: '16px'
     },
-    startAdornment: {
+
+    [`& .${classes.startAdornment}`]: {
         fontSize: '1rem',
         color: theme.palette.grey[500]
     },
-    flex: {
+
+    [`& .${classes.flex}`]: {
         display: 'flex'
     },
-    name: {
+
+    [`& .${classes.name}`]: {
         marginLeft: '2px',
         fontWeight: 400
     },
-    ScrollHeight: {
+
+    [`& .${classes.ScrollHeight}`]: {
         height: '100%',
         maxHeight: 'calc(100vh - 250px)',
         overflowX: 'hidden'
     },
-    badgeWarning: {
+
+    [`& .${classes.badgeWarning}`]: {
         backgroundColor: theme.palette.warning.dark,
         color: '#fff'
     },
-    usernamePadding: {
+
+    [`& .${classes.usernamePadding}`]: {
         paddingBottom: '1em'
     }
 }));
 
 // ===========================|| PROFILE MENU ||=========================== //
 
-const ProfileSection = () => {
-    const classes = useStyles();
+function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
@@ -161,7 +196,7 @@ const ProfileSection = () => {
 
     return (
         <>
-            <Chip
+            <ChipRoot
                 classes={{ label: classes.profileLabel }}
                 className={classes.profileChip}
                 icon={
@@ -182,7 +217,7 @@ const ProfileSection = () => {
                 onClick={handleToggle}
                 color="primary"
             />
-            <Popper
+            <PopperRoot
                 placement="bottom-end"
                 open={open}
                 anchorEl={anchorRef.current}
@@ -240,9 +275,9 @@ const ProfileSection = () => {
                         </Paper>
                     </Transitions>
                 )}
-            </Popper>
+            </PopperRoot>
         </>
     );
-};
+}
 
 export default ProfileSection;
