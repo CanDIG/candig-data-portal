@@ -2,36 +2,54 @@ import { useEffect, useState } from 'react';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import { fetchFederation } from '../../store/api';
 import PatientSidebar from './widgets/patientSidebar';
+import { formatKey } from '../../utils/utils';
 
+/*
+ * Custom hook to fetch and manage clinical patient data.
+ * @param {string} patientId - The ID of the patient.
+ * @param {string} programId - The ID of the program.
+ * @returns {Object} - An object containing data, rows, columns, title, and topLevel.
+ */
 function useClinicalPatientData(patientId, programId) {
+    // Access the SidebarContext to update the sidebar with patient information
     const sidebarWriter = useSidebarWriterContext();
+
+    // State variables to store fetched data, table rows, columns, title, and topLevel data
     const [data, setData] = useState({});
     const [rows, setRows] = useState([]);
     const [columns, setColumns] = useState([]);
     const [title, setTitle] = useState('');
     const [topLevel, setTopLevel] = useState({});
 
-    function formatKey(key) {
-        return key
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+    function filterNestedObject(obj) {
+        return Object.fromEntries(
+            Object.entries(obj).filter(
+                ([key, value]) =>
+                    value !== null &&
+                    !(
+                        (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
+                        typeof value === 'object' || // Exclude all objects
+                        value === ''
+                    )
+            )
+        );
     }
 
+    // useEffect to fetch data when patientId, programId, or sidebarWriter changes
     useEffect(() => {
+        // Asynchronous function to fetch data
         const fetchData = async () => {
             try {
-                // const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
-                const url = `v2/authorized/donor_with_clinical_data/program/SYNTHETIC-2/donor/DONOR_2`;
+                // Construct the API URL based on the provided parameters
+                const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
                 const result = await fetchFederation(url, 'katsu');
-                console.log('RESULTS', result);
+                // Extract patientData from the fetched result or use an empty object
                 const patientData = result[0].results || {};
 
+                // Update the sidebar with patientData using the PatientSidebar component
                 sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
-
-                const filteredData = Object.fromEntries(
-                    Object.entries(patientData).filter(([key, value]) => !Array.isArray(value) && typeof value !== 'object' && value !== '')
-                );
+                // Filter patientData to create topLevel data excluding arrays, objects, and empty values
+                const filteredData = filterNestedObject(patientData);
                 setTopLevel(filteredData);
                 setData(patientData);
             } catch (error) {
@@ -42,7 +60,7 @@ function useClinicalPatientData(patientId, programId) {
         fetchData();
     }, [patientId, programId, sidebarWriter]);
 
-    return { data, rows, columns, title, topLevel, formatKey };
+    return { data, rows, columns, title, topLevel };
 }
 
 export default useClinicalPatientData;

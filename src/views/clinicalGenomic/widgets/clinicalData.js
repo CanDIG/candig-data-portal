@@ -19,8 +19,6 @@ function ClinicalView() {
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
-
-    const resultsContext = useSearchResultsReaderContext();
     const searchResults = useSearchResultsReaderContext().clinical;
     const writerContext = useSearchQueryWriterContext();
 

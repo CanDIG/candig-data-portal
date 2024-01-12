@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Typography, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
 
 import { makeStyles, useTheme } from '@mui/styles';
-
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
-import { fetchFederation } from '../../../store/api';
 
 // Icons
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
+
+// Functions import
+import { formatKey } from '../../../utils/utils';
 
 const useStyles = makeStyles((theme) => ({
     header: {
@@ -60,16 +59,9 @@ const useStyles = makeStyles((theme) => ({
 
 function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     const classes = useStyles();
-    const theme = useTheme();
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
-    // Function to format keys for display removing _ and casing
-    const formatKey = (key) =>
-        key
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
 
     // Function to toggle expanded sections in the sidebar
     const toggleSection = (key) => {
@@ -80,7 +72,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     };
 
     // Function to handle setting data for the table
-    function handleTableSet(title, array, idKey) {
+    function handleTableSet(title, array) {
         const uniqueKeysSet = new Set();
 
         // Iterate through each object in the array
@@ -89,7 +81,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
             const entries = Object.entries(obj);
 
             // Filter out keys with no data or empty string in any row
-            const validEntries = entries.filter(([key, value]) => value !== null && value !== undefined && value !== '');
+            const validEntries = entries.filter((value) => value !== null && value !== undefined && value !== '');
 
             // Add the valid keys to the Set to ensure uniqueness
             validEntries.forEach(([key]) => {
@@ -133,8 +125,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
             if (!aEndsWithID && bEndsWithID) {
                 return 1;
             }
-
-            // eslint-disable-next-line no-else-return
             return 0;
         });
 
@@ -153,11 +143,15 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
         setRows(rows);
     }
 
+    // Function to find keys ending with '_id' in an array of objects
+    // @param {Array} obj - The array of objects to search for '_id' keys.
+    // @returns {Array} - An array containing keys ending with '_id'.
     function findIdKey(obj) {
         const idKeys = obj.map((item) => {
             const keyArray = Object.keys(item);
             return keyArray.find((key) => Object.prototype.hasOwnProperty.call(item, key) && key.toLowerCase().endsWith('_id'));
         });
+        // Filter out undefined or null values from the idKeys array
         return idKeys.filter((idKey) => idKey !== undefined && idKey !== null);
     }
 
@@ -188,14 +182,14 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
-    }, [initialHeader]);
+    }, [initialHeader, handleHeaderClick, sidebar]);
 
     // Function to create subheaders in the sidebar
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
         const sidebarTitles = [];
         const subTableMap = {};
         if (Array.isArray(array)) {
-            array.forEach((obj, index) => {
+            array.forEach((obj) => {
                 // PD
                 const subTablePart = {};
                 const idMap = {};
@@ -279,10 +273,9 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     }
 
     // Function to create main headers in the sidebar
-    function createMainSidebarHeaders(obj = {}, parentID = null, isFirstPass = true) {
+    function createMainSidebarHeaders(obj = {}, parentID = null) {
         let sidebarTitles = [];
         Object.keys(obj).forEach((key) => {
-            const isExpanded = expandedSections[key] ? expandedSections[key] : false;
             const value = obj[key];
 
             if (Array.isArray(obj[key]) && value.length > 0 && value.every((item) => typeof item === 'object')) {

@@ -6,14 +6,10 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { useSelector } from 'react-redux';
 
 import MainCard from 'ui-component/cards/MainCard';
-import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from './SearchResultsContext';
-
-import PatientSidebar from './widgets/patientSidebar';
-import SearchHandler from './search/SearchHandler';
 
 import useClinicalPatientData from './useClinicalPatientData';
+import { formatKey } from '../../utils/utils';
 
 const useStyles = makeStyles((theme) => ({
     topLevelClass: {
@@ -31,14 +27,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ClinicalPatientView() {
-    const theme = useTheme();
     const classes = useStyles();
     const { customization } = useSelector((state) => state);
-    const { opened: sidebarOpened } = customization;
 
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { data, rows, columns, title, topLevel, formatKey } = useClinicalPatientData(patientId, programId);
+    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
 
     useEffect(() => {
         // Extract patientId from URL parameters

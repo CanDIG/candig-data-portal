@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
@@ -8,13 +8,11 @@ import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
-import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
 import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
-import { DataGrid } from '@mui/x-data-grid';
 
 const useStyles = makeStyles((_) => ({
     stickytop: {
