@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 // third party
 import { BrowserRouter } from 'react-router-dom';
@@ -14,16 +14,16 @@ import { SearchResultsProvider } from 'views/clinicalGenomic/SearchResultsContex
 import './assets/scss/style.scss';
 
 // ===========================|| REACT DOM RENDER  ||=========================== //
-
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
     <Provider store={store}>
         <SearchResultsProvider>
             <BrowserRouter>
                 <App />
             </BrowserRouter>
         </SearchResultsProvider>
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
 );
 
 // If you want your app to work offline and load faster, you can change

@@ -1,13 +1,20 @@
 import * as React from 'react';
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 
 import { Box, Grid, Typography } from '@mui/material';
 
 import { useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
+const PREFIX = 'PatientCounts';
+
+const classes = {
+    divider: `${PREFIX}-divider`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.divider}`]: {
         borderColor: theme.palette.primary.main,
         marginTop: 20,
         marginBottom: 4
@@ -15,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function PatientCounts() {
-    const classes = useStyles();
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
     const searchResults = context?.clinical;
@@ -74,7 +80,7 @@ function PatientCounts() {
     }
 
     return (
-        <>
+        <Root>
             {/* Header */}
             <Box mr={2} ml={1} pr={5} sx={{ border: 1, borderRadius: 2, borderColor: 'white' }}>
                 <Grid container justifyContent="center" alignItems="center" spacing={2}>
@@ -108,7 +114,7 @@ function PatientCounts() {
                     <br />
                 </React.Fragment>
             ))}
-        </>
+        </Root>
     );
 }
 

@@ -25,11 +25,7 @@ function VcfInstance({ tracks, genome }) {
         }
     }, [tracks, genome]);
 
-    return (
-        <>
-            <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />
-        </>
-    );
+    return <div className="ml-auto mr-auto" style={{ background: 'white', marginTop: '15px' }} ref={igvBrowser} />;
 }
 
 VcfInstance.propTypes = {

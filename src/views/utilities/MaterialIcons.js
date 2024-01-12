@@ -1,14 +1,19 @@
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Card } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    frame: {
+const PREFIX = 'MaterialIcons';
+
+const classes = {
+    frame: `${PREFIX}-frame`
+};
+
+const StyledMainCard = styled(MainCard)(({ theme }) => ({
+    [`& .${classes.frame}`]: {
         height: 'calc(100vh - 210px)',
         border: '1px solid',
         borderColor: theme.palette.primary.light
@@ -17,11 +22,9 @@ const useStyles = makeStyles((theme) => ({
 
 //= ===========================|| MATERIAL ICONS ||============================//
 
-const MaterialIcons = () => {
-    const classes = useStyles();
-
+function MaterialIcons() {
     return (
-        <MainCard title="Material Icons" secondary={<SecondaryAction link="https://material-ui.com/components/material-icons/" />}>
+        <StyledMainCard title="Material Icons" secondary={<SecondaryAction link="https://material-ui.com/components/material-icons/" />}>
             <Card sx={{ overflow: 'hidden' }}>
                 <iframe
                     title="Material Icon"
@@ -30,8 +33,8 @@ const MaterialIcons = () => {
                     src="https://material-ui.com/components/material-icons/"
                 />
             </Card>
-        </MainCard>
+        </StyledMainCard>
     );
-};
+}
 
 export default MaterialIcons;

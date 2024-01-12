@@ -1,10 +1,15 @@
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import LinearProgress from '@mui/material/LinearProgress';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    root: {
+const PREFIX = 'Loader';
+
+const classes = {
+    root: `${PREFIX}-root`
+};
+
+const Root = styled('div')(({ theme }) => ({
+    [`&.${classes.root}`]: {
         position: 'fixed',
         top: 0,
         left: 0,
@@ -18,14 +23,12 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| Loader ||=========================== //
 
-const Loader = () => {
-    const classes = useStyles();
-
+function Loader() {
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <LinearProgress color="primary" />
-        </div>
+        </Root>
     );
-};
+}
 
 export default Loader;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 
@@ -39,7 +39,6 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        console.log(row);
         const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
         window.open(url, '_blank');
     };
@@ -70,8 +69,8 @@ function ClinicalView() {
 
     const totalRows = searchResults
         ? Object.values(searchResults)
-              ?.map((site) => site.count)
-              .reduce((partial, a) => partial + a, 0)
+            ?.map((site) => site.count)
+            .reduce((partial, a) => partial + a, 0)
         : 0;
 
     return (

@@ -2,11 +2,18 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 // mui
-import { useTheme, makeStyles } from '@mui/styles';
+import { useTheme } from '@mui/system';
+import { styled } from '@mui/material/styles';
 import { Grid, Box } from '@mui/material';
 
-const useStyles = makeStyles({
-    dropdownItem: {
+const PREFIX = 'DropDown';
+
+const classes = {
+    dropdownItem: `${PREFIX}-dropdownItem`
+};
+
+const StyledGrid = styled(Grid)({
+    [`& .${classes.dropdownItem}`]: {
         background: 'white',
         textAlign: 'left',
         paddingRight: '1.25em',
@@ -22,7 +29,7 @@ const useStyles = makeStyles({
 
 function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, isListOpen, dropDownItems, dropDownGroup }) {
     const theme = useTheme();
-    const classes = useStyles();
+
     const ref = React.useRef(null);
 
     React.useEffect(() => {
@@ -63,7 +70,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
     }
 
     return (
-        <Grid sx={{ width: '125px' }} ref={ref}>
+        <StyledGrid sx={{ width: '125px' }} ref={ref}>
             <Box mr={1} p={1} onClick={() => setListOpen(!isListOpen)} type="button">
                 <span style={{ color: theme.palette.primary.main }}>
                     <b>{dropDownLabel}</b>
@@ -105,7 +112,7 @@ function DropDown({ dropDownLabel, currentSelection, selectOption, setListOpen, 
                     {dropDownGroup === 'PATIENT' ? returnIds(dropDownItems) : returnListItem(dropDownItems)}
                 </Grid>
             )}
-        </Grid>
+        </StyledGrid>
     );
 }
 

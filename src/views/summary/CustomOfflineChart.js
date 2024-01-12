@@ -2,7 +2,7 @@ import { createRef, useState, useEffect } from 'react';
 
 // MUI
 import PropTypes from 'prop-types';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { Box, IconButton } from '@mui/material';
 
 // REDUX
@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
-import { IconTrash } from '@tabler/icons';
+import { IconTrash } from '@tabler/icons-react';
 
 // Custon Components and constants
 import MainCard from 'ui-component/cards/MainCard';
@@ -75,7 +75,12 @@ function CustomOfflineChart(props) {
             theme.palette.primary[800],
             theme.palette.secondary[800],
             theme.palette.tertiary[800]
-        ]
+        ],
+        title: {
+            style: {
+                fontWeight: 'normal'
+            }
+        }
     });
 
     // Function to create charts bar, line, pie, stacked, etc.
@@ -144,7 +149,10 @@ function CustomOfflineChart(props) {
                         height
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title
+                        text: DataVisualizationChartInfo[chartData].title,
+                        style: {
+                            fontWeight: 'normal'
+                        }
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
@@ -189,7 +197,10 @@ function CustomOfflineChart(props) {
                         type: chart
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData]?.title
+                        text: DataVisualizationChartInfo[chartData]?.title,
+                        style: {
+                            fontWeight: 'normal'
+                        }
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis } },
@@ -237,7 +248,10 @@ function CustomOfflineChart(props) {
                         plotShadow: false
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title
+                        text: DataVisualizationChartInfo[chartData].title,
+                        style: {
+                            fontWeight: 'normal'
+                        }
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis } },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },

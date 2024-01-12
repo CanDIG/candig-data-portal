@@ -1,22 +1,32 @@
 import PropTypes from 'prop-types';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Divider, List, Typography } from '@mui/material';
 
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    menuCaption: {
+const PREFIX = 'NavGroup';
+
+const classes = {
+    menuCaption: `${PREFIX}-menuCaption`,
+    subMenuCaption: `${PREFIX}-subMenuCaption`,
+    menuDivider: `${PREFIX}-menuDivider`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const DividerRoot = styled(Divider)(({ theme }) => ({
+    [`& .${classes.menuCaption}`]: {
         ...theme.typography.menuCaption
     },
-    subMenuCaption: {
+
+    [`& .${classes.subMenuCaption}`]: {
         ...theme.typography.subMenuCaption
     },
-    menuDivider: {
+
+    [`&.${classes.menuDivider}`]: {
         marginTop: '2px',
         marginBottom: '10px'
     }
@@ -24,9 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 // ===========================|| SIDEBAR MENU LIST GROUP ||=========================== //
 
-const NavGroup = ({ item }) => {
-    const classes = useStyles();
-
+function NavGroup({ item }) {
     // menu list collapse & items
     const items = item.children.map((menu) => {
         switch (menu.type) {
@@ -62,12 +70,11 @@ const NavGroup = ({ item }) => {
             >
                 {items}
             </List>
-
             {/* group divider */}
-            <Divider className={classes.menuDivider} />
+            <DividerRoot className={classes.menuDivider} />
         </>
     );
-};
+}
 
 NavGroup.propTypes = {
     item: PropTypes.object

@@ -11,6 +11,8 @@ import logo from '../assets/images/logo.svg';
 
 // ===========================|| LOGO SVG ||=========================== //
 
-const Logo = () => <img src={logo} alt="candig-logo" width="120" />;
+function Logo() {
+    return <img src={logo} alt="candig-logo" width="120" />;
+}
 
 export default Logo;
