@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { Typography, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { makeStyles, useTheme } from '@mui/styles';
-
 import { useSelector } from 'react-redux';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
-
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey } from '../../utils/utils';
 

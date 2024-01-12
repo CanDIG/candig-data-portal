@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Typography, Button } from '@mui/material';
 
-import { makeStyles, useTheme } from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 
 // Icons
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
@@ -163,6 +163,12 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
     };
 
     useEffect(() => {
+        const handleHeaderClick = (key, obj, parentID) => {
+            const idKey = findIdKey(obj[key]);
+            handleTableSet(key, obj[key], parentID, idKey);
+            setSelected(key);
+        };
+
         if (initialHeader) {
             // Find the first header key
             let firstHeaderKey = null;
@@ -182,7 +188,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
-    }, [initialHeader, handleHeaderClick, sidebar]);
+    }, [initialHeader, sidebar]);
 
     // Function to create subheaders in the sidebar
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {

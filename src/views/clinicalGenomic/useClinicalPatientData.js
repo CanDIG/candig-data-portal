@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import { fetchFederation } from '../../store/api';
 import PatientSidebar from './widgets/patientSidebar';
-import { formatKey } from '../../utils/utils';
 
 /*
  * Custom hook to fetch and manage clinical patient data.
@@ -41,17 +40,21 @@ function useClinicalPatientData(patientId, programId) {
         const fetchData = async () => {
             try {
                 // Construct the API URL based on the provided parameters
-                const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
-                const result = await fetchFederation(url, 'katsu');
-                // Extract patientData from the fetched result or use an empty object
-                const patientData = result[0].results || {};
+                if (programId && patientId) {
+                    const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
 
-                // Update the sidebar with patientData using the PatientSidebar component
-                sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
-                // Filter patientData to create topLevel data excluding arrays, objects, and empty values
-                const filteredData = filterNestedObject(patientData);
-                setTopLevel(filteredData);
-                setData(patientData);
+                    const result = await fetchFederation(url, 'katsu');
+                    // Extract patientData from the fetched result or use an empty object
+                    const patientData = result[0].results || {};
+
+                    // Update the sidebar with patientData using the PatientSidebar component
+                    sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
+                    // Filter patientData to create topLevel data excluding arrays, objects, and empty values
+                    const filteredData = filterNestedObject(patientData);
+                    console.log(filteredData);
+                    setTopLevel(filteredData);
+                    setData(patientData);
+                }
             } catch (error) {
                 console.error('Error fetching clinical patient data:', error);
             }
