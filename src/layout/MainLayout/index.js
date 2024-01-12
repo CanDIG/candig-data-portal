@@ -87,7 +87,7 @@ function MainLayout() {
     const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 
     // Handle left drawer
-    const [sidebarContent, setSidebarContent] = useState(false);
+    const [sidebarContent, setSidebarContent] = useState(null);
     const leftDrawerOpened = useSelector((state) => state.customization.opened) && !!sidebarContent;
     const dispatch = useDispatch();
     const handleLeftDrawerToggle = () => {
