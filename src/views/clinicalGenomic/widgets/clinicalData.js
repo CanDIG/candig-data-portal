@@ -57,14 +57,11 @@ function ClinicalView() {
         { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
     ];
 
-    const HandlePageChange = (newPage) => {
-        if (newPage !== paginationModel.page) {
-            writerContext((old) => ({ ...old, query: { ...old.query, page: newPage } }));
+    const HandlePageChange = (newModel) => {
+        if (newModel.page !== paginationModel.page) {
+            writerContext((old) => ({ ...old, query: { ...old.query, page: newModel.page, page_size: newModel.pageSize } }));
         }
-        setPaginationModel({
-            pageSize: 10,
-            page: newPage
-        });
+        setPaginationModel(newModel);
     };
 
     const totalRows = searchResults
@@ -87,7 +84,7 @@ function ClinicalView() {
                     rowsPerPageOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
                     paginationModel={paginationModel}
-                    onPageChange={HandlePageChange}
+                    onPaginationModelChange={HandlePageChange}
                     paginationMode="server"
                     hideFooterSelectedRowCount
                 />
