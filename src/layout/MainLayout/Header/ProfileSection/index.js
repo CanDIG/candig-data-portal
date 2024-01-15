@@ -30,6 +30,7 @@ import { SITE } from 'store/constant';
 import { IconLogout, IconSettings } from '@tabler/icons';
 import User1 from 'assets/images/users/user-round.svg';
 import BCGSC from 'assets/images/users/bcgsc.svg';
+import C3G from 'assets/images/users/c3g-globe.png';
 import UHN from 'assets/images/users/UHN.svg';
 
 // style const
@@ -154,6 +155,8 @@ const ProfileSection = () => {
                 return BCGSC;
             case 'UHN':
                 return UHN;
+            case 'C3G':
+                return C3G;
             default:
                 return User1;
         }
