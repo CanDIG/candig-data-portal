@@ -13,7 +13,7 @@ import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../S
 function ClinicalView() {
     const theme = useTheme();
     const [paginationModel, setPaginationModel] = React.useState({
-        pageSize: 25,
+        pageSize: 10,
         page: 0
     });
 
@@ -79,9 +79,8 @@ function ClinicalView() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pageSize={10}
                     rowCount={totalRows}
-                    rowsPerPageOptions={[10]}
+                    pageSizeOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
                     paginationModel={paginationModel}
                     onPaginationModelChange={HandlePageChange}
