@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/system';
+import { styled } from '@mui/system';
 import { Button, Typography } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -154,7 +154,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
-    }, [initialHeader, sidebar, handleTableSet]);
+    }, [initialHeader, sidebar]);
 
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
         const sidebarTitles = [];
