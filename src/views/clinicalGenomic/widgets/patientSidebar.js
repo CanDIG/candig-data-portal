@@ -268,7 +268,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
         return sidebarTitles;
     }
 
-    return <div>{createMainSidebarHeaders(sidebar)}</div>;
+    return <div style={{ marginTop: 12 }}>{createMainSidebarHeaders(sidebar)}</div>;
 }
 
 PatientSidebar.propTypes = {
