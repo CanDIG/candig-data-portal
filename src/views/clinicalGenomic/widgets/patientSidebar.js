@@ -18,7 +18,7 @@ const HeaderButton = styled(Button)(({ theme, selected }) => ({
     flexDirection: 'row'
 }));
 
-const SubHeader = styled('div')(({ theme, isExpanded, depth, selected, paddingValue, folderDepth }) => ({
+const SubHeader = styled('div')(({ theme, isExpanded, depth, selected, folderDepth }) => ({
     borderRadius: 0,
     margin: 0,
     fontWeight: 'bold',
@@ -45,13 +45,7 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-const CenteredIconText = styled('div')({
-    display: 'flex',
-    alignItems: 'center'
-});
-
 function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
-    const theme = useTheme();
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
@@ -136,12 +130,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
         return idKeys.filter((idKey) => idKey !== undefined && idKey !== null);
     }
 
-    const handleHeaderClick = (key, obj, parentID) => {
-        const idKey = findIdKey(obj[key]);
-        handleTableSet(key, obj[key], parentID, idKey);
-        setSelected(key);
-    };
-
     useEffect(() => {
         const handleHeaderClick = (key, obj, parentID) => {
             const idKey = findIdKey(obj[key]);
@@ -166,7 +154,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
-    }, [initialHeader, sidebar]);
+    }, [initialHeader, sidebar, handleTableSet]);
 
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
         const sidebarTitles = [];
@@ -199,7 +187,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
         Object.keys(subTableMap).forEach((key) => {
             const isExpanded = expandedSections[key] || false;
             const folderDepth = hasChildren ? 0 : 1.5;
-            const paddingValue = `${folderDepth + depth * 1}em`;
 
             sidebarTitles.push(
                 <div key={`${key}-${depth}-${folderDepth}`}>

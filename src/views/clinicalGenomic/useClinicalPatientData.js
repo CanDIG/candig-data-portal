@@ -23,7 +23,7 @@ function useClinicalPatientData(patientId, programId) {
     function filterNestedObject(obj) {
         return Object.fromEntries(
             Object.entries(obj).filter(
-                ([key, value]) =>
+                (value) =>
                     value !== null &&
                     !(
                         (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
