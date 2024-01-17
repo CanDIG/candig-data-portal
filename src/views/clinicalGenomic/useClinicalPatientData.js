@@ -28,7 +28,8 @@ function useClinicalPatientData(patientId, programId) {
                     !(
                         (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
                         typeof value === 'object' || // Exclude all objects
-                        value === '' || key === ''
+                        value === '' ||
+                        key === ''
                     )
             )
         );
