@@ -58,9 +58,7 @@ const Root = styled('nav')(({ theme }) => ({
 }));
 
 // ===========================|| SIDEBAR DRAWER ||=========================== //
-
-const Sidebar = ({ drawerOpen, drawerToggle, screen }) => {
-    const classes = useStyles();
+function Sidebar({ drawerOpen, drawerToggle, screen }) {
     const theme = useTheme();
     const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
     const sidebarContext = useSidebarReaderContext();
