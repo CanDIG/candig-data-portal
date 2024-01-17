@@ -23,12 +23,12 @@ function useClinicalPatientData(patientId, programId) {
     function filterNestedObject(obj) {
         return Object.fromEntries(
             Object.entries(obj).filter(
-                (value) =>
+                ([key, value]) =>
                     value !== null &&
                     !(
                         (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
                         typeof value === 'object' || // Exclude all objects
-                        value === ''
+                        value === '' || key === ''
                     )
             )
         );
@@ -51,7 +51,6 @@ function useClinicalPatientData(patientId, programId) {
                     sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
-                    console.log(filteredData);
                     setTopLevel(filteredData);
                     setData(patientData);
                 }
