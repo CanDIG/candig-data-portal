@@ -19,7 +19,6 @@ function ClinicalView() {
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
-
     const searchResults = useSearchResultsReaderContext().clinical;
     const writerContext = useSearchQueryWriterContext();
 
@@ -40,7 +39,8 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id, cohort: row.program_id }));
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
+        window.open(url, '_blank');
     };
 
     // Tracks Screensize

@@ -58,8 +58,7 @@ const Root = styled('nav')(({ theme }) => ({
 }));
 
 // ===========================|| SIDEBAR DRAWER ||=========================== //
-
-function Sidebar({ drawerOpen, drawerToggle, window }) {
+function Sidebar({ drawerOpen, drawerToggle, screen }) {
     const theme = useTheme();
     const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
     const sidebarContext = useSidebarReaderContext();
@@ -86,7 +85,7 @@ function Sidebar({ drawerOpen, drawerToggle, window }) {
         </>
     );
 
-    const container = window !== undefined ? () => window().document.body : undefined;
+    const container = screen !== undefined ? () => window().document.body : undefined;
 
     return (
         <Root className={classes.drawer} aria-label="mailbox folders">
@@ -111,7 +110,7 @@ function Sidebar({ drawerOpen, drawerToggle, window }) {
 Sidebar.propTypes = {
     drawerOpen: PropTypes.bool,
     drawerToggle: PropTypes.func,
-    window: PropTypes.object
+    screen: PropTypes.object
 };
 
 export default Sidebar;

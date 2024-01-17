@@ -8,7 +8,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
-import PatientView from './widgets/patientView';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
 import { COHORTS } from 'store/constant';
@@ -79,11 +78,6 @@ const sections = [
         id: 'clinical',
         header: 'Clinical Data',
         component: <ClinicalData />
-    },
-    {
-        id: 'patient',
-        header: 'Patient View',
-        component: <PatientView />
     },
     {
         id: 'genomic',
