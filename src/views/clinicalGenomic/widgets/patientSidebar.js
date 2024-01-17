@@ -206,16 +206,16 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
                     <SubHeader
                         isExpanded={isExpanded}
                         depth={depth}
-                        selected={selected === key}
+                        selected={selected === `${key}-${depth}-${folderDepth}`}
                         folderDepth={folderDepth}
                         onClick={() => {
                             toggleSection(key);
                             const idKey = findIdKey(subTableMap[key]);
                             handleTableSet(key, subTableMap[key], idKey);
-                            setSelected(key);
+                            setSelected(`${key}-${depth}-${folderDepth}`);
                         }}
                     >
-                        <SubHeaderTypography variant="body1" selected={selected === key}>
+                        <SubHeaderTypography variant="body1" selected={selected === `${key}-${depth}-${folderDepth}`}>
                             {hasChildren && isExpanded && <FolderOpenIcon style={{ marginRight: '0.25em' }} />}
                             {hasChildren && !isExpanded && <FolderIcon style={{ marginRight: '0.25em' }} />}
                             {formatKey(key)}
