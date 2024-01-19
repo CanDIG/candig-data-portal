@@ -141,7 +141,7 @@ export const DataVisualizationChartInfo = {
         yAxis: 'Number of Patients'
     },
     full_clinical_data: {
-        title: 'Mock Data: Complete Clincal',
+        title: 'Mock Data: Complete Clinical',
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     },
