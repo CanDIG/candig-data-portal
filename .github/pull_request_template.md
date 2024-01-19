@@ -39,3 +39,5 @@
 -   [ ] Locally tested
 -   [ ] Dev server tested
 -   [ ] Production tested when merging into stable/production branch
+-   [ ] [Runbook tasks](https://candig.atlassian.net/wiki/spaces/CA/pages/822018050/Frontend+Testing+Runbook) pass locally/on UHN-Dev
+-   [ ] If visuals have changed, [Runbook](https://candig.atlassian.net/wiki/spaces/CA/pages/822018050/Frontend+Testing+Runbook) has been updated with new screenshots
