@@ -12,7 +12,7 @@ import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // assets
 import MainCard from 'ui-component/cards/MainCard';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 
 window.Highcharts = Highcharts;
 

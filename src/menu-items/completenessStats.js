@@ -1,5 +1,5 @@
 // assets
-import { IconReportMedical } from '@tabler/icons';
+import { IconReportMedical } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
