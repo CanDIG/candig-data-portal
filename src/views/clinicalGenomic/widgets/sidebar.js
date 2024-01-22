@@ -135,7 +135,6 @@ function StyledCheckboxList(props) {
                 } else {
                     retVal.query[groupName] = ids;
                 }
-
                 return retVal;
             });
         } else {
@@ -154,8 +153,12 @@ function StyledCheckboxList(props) {
                     return retVal;
                 }
 
-                const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
-                retVal.query = newList;
+                const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name === groupName));
+                if (ids.length === 0) {
+                    delete retVal.query[groupName];
+                } else {
+                    retVal.query[groupName] = ids;
+                }
                 return retVal;
             });
         }
@@ -184,10 +187,6 @@ function StyledCheckboxList(props) {
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason, details) => {
-                console.log(_);
-                console.log(value);
-                console.log(reason);
-                console.log(details);
                 HandleChange(value, reason === 'selectOption');
             }}
         />
