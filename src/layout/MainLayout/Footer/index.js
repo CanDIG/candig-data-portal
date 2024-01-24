@@ -4,13 +4,13 @@ import { Avatar, Box, ButtonBase } from '@mui/material';
 
 // style constant
 
-function Footer() {
+function Footer(props) {
     return (
-        <Box>
-            <div>
-                <p>Test</p>
-            </div>
-        </Box>
+        <footer {...props}>
+            <Box>
+                <center>Test</center>
+            </Box>
+        </footer>
     );
 }
 

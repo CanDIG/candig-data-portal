@@ -28,14 +28,22 @@ import { IconChevronRight } from '@tabler/icons-react';
 const PREFIX = 'MainLayout';
 const classes = {
     root: `${PREFIX}-root`,
+    rootShift: `${PREFIX}-rootShift`,
     appBar: `${PREFIX}-appBar`,
     appBarWidth: `${PREFIX}-appBarWidth`,
     content: `${PREFIX}-content`,
-    contentShift: `${PREFIX}-contentShift`
+    contentShift: `${PREFIX}-contentShift`,
+    footer: `${PREFIX}-footer`,
+    footerWidth: `${PREFIX}-footerWidth`
 };
 const Root = styled('div')(({ theme }) => ({
     [`&.${classes.root}`]: {
-        display: 'flex'
+        display: 'flex',
+        flexDirection: 'column'
+    },
+    [`&.${classes.rootShift}`]: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`
     },
     [`& .${classes.appBar}`]: {
         backgroundColor: theme.palette.background.default
@@ -74,17 +82,23 @@ const Root = styled('div')(({ theme }) => ({
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
         [theme.breakpoints.down('lg')]: {
-            marginLeft: -(drawerWidth - 20)
+            marginLeft: '20px'
+            // marginLeft: -(drawerWidth - 20)
         },
         [theme.breakpoints.down('md')]: {
-            marginLeft: -(drawerWidth - 10)
+            marginLeft: '20px'
+            // marginLeft: -(drawerWidth - 10)
         }
     },
     [`& .${classes.footer}`]: {
-        backgroundColor: theme.palette.background.default
+        backgroundColor: theme.palette.background.default,
+        marginLeft: drawerWidth - 20,
+        width: `calc(100% - ${drawerWidth}px)`
     },
     [`& .${classes.footerWidth}`]: {
-        transition: theme.transitions.create('width')
+        transition: theme.transitions.create('width'),
+        marginLeft: drawerWidth - 20,
+        width: `calc(100% - ${drawerWidth}px)`
     }
 }));
 
@@ -108,7 +122,14 @@ function MainLayout() {
     }, [matchDownMd]);
 
     return (
-        <Root>
+        <Root
+            className={clsx([
+                classes.root,
+                {
+                    [classes.rootShift]: leftDrawerOpened
+                }
+            ])}
+        >
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
@@ -140,6 +161,7 @@ function MainLayout() {
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />
                 </main>
+
                 {/* FOOTER */}
                 <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
             </SidebarProvider>
