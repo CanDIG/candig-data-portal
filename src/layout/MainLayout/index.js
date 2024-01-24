@@ -13,6 +13,7 @@ import clsx from 'clsx';
 // project imports
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from './Header';
+import Footer from './Footer';
 import Sidebar from './Sidebar';
 import Customization from '../Customization';
 import navigation from 'menu-items';
@@ -48,12 +49,13 @@ const Root = styled('div')(({ theme }) => ({
         ...theme.typography.mainContent,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
+        borderBottom: `3px dashed ${theme.palette.primary.main}`,
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen
         }),
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: -(drawerWidth - 20),
+        // marginLeft: -(drawerWidth - 20),
+        // width: `calc(100% - ${drawerWidth}px)`,
         [theme.breakpoints.down('lg')]: {
             padding: '16px'
         },
@@ -72,11 +74,17 @@ const Root = styled('div')(({ theme }) => ({
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
         [theme.breakpoints.down('lg')]: {
-            marginLeft: '20px'
+            marginLeft: -(drawerWidth - 20)
         },
         [theme.breakpoints.down('md')]: {
-            marginLeft: '10px'
+            marginLeft: -(drawerWidth - 10)
         }
+    },
+    [`& .${classes.footer}`]: {
+        backgroundColor: theme.palette.background.default
+    },
+    [`& .${classes.footerWidth}`]: {
+        transition: theme.transitions.create('width')
     }
 }));
 
@@ -100,7 +108,7 @@ function MainLayout() {
     }, [matchDownMd]);
 
     return (
-        <Root className={classes.root}>
+        <Root>
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
@@ -132,7 +140,8 @@ function MainLayout() {
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />
                 </main>
-                <Customization />
+                {/* FOOTER */}
+                <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
             </SidebarProvider>
         </Root>
     );
