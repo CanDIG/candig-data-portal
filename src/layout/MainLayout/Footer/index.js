@@ -4,7 +4,7 @@ import { Avatar, Box, ButtonBase } from '@mui/material';
 import { useTheme } from '@mui/system';
 
 // Images
-// import MOHLogo from '../../assets/MOH/MOHCCN_Logo_EN.png';
+import MOHLogo from '../../../assets/images/MOH/MOHCCN_Logo_EN.png';
 
 // Icons
 import { IconBrandGithub, IconWorld, IconMail, IconCopyright } from '@tabler/icons-react';
@@ -156,7 +156,7 @@ function Footer(props) {
                         </div>
                     </div>
                 </div>
-                <img src={MOHLogo2} alt="MOH logo hyperlink" />
+                <img src={MOHLogo} alt="MOH logo hyperlink" />
             </Box>
         </FooterContainer>
     );
