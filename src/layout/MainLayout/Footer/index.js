@@ -1,5 +1,7 @@
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, ButtonBase, Link } from '@mui/material';
+import { Box, ButtonBase } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import { useTheme } from '@mui/system';
 import config from 'config';
 import MOHLogo from '../../../assets/images/MOH/MOHCCN_Logo_EN.png';
@@ -124,10 +126,54 @@ const ResponsiveFundingContainer = styled('div')(({ theme }) => ({
 }));
 
 function Footer(props) {
-    const theme = useTheme();
+    const [open, setOpen] = React.useState(false);
+
+    const handleTooltipClose = () => {
+        setOpen(false);
+    };
+
+    const handleTooltipOpen = () => {
+        setOpen(true);
+        setTimeout(() => {
+            handleTooltipClose();
+        }, 3000);
+    };
+
+    function fallbackCopyTextToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+            console.log('Email copied to clipboard');
+            handleTooltipOpen();
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
 
     function copyEmail(email) {
-        navigator.clipboard.writeText(email);
+        try {
+            if (navigator.clipboard) {
+                navigator.clipboard
+                    .writeText(email)
+                    .then(() => {
+                        console.log('Email copied to clipboard');
+                        handleTooltipOpen();
+                    })
+                    .catch(() => {
+                        fallbackCopyTextToClipboard(email);
+                    });
+            } else {
+                fallbackCopyTextToClipboard(email);
+            }
+        } catch (err) {
+            console.error('Error copying email:', err);
+        }
     }
 
     return (
@@ -145,6 +191,8 @@ function Footer(props) {
                                     ...linkFrame,
                                     textDecoration: 'none'
                                 }}
+                                target="_blank"
+                                rel="noreferrer"
                             >
                                 <IconWorld stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
                                 <span style={linkText}> CanDIG</span>
@@ -155,6 +203,8 @@ function Footer(props) {
                                     ...linkFrame,
                                     textDecoration: 'none'
                                 }}
+                                target="_blank"
+                                rel="noreferrer"
                             >
                                 <IconBrandGithub
                                     stroke={1.5}
@@ -171,9 +221,33 @@ function Footer(props) {
                     </div>
                     <HelpContainer style={{ color: theme.palette.primary.main, padding: 0 }}>
                         <p style={{ ...linkText, fontWeight: 'bold' }}>Have questions or want to share your feedback?</p>
-                        <ButtonBase onClick={() => copyEmail('info@distributedgenomics.ca')} style={{ ...linkFrame }}>
-                            <IconMail stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
-                            <span style={linkText}>info@distributedgenomics.ca</span>
+                        <ButtonBase
+                            onClick={() => copyEmail('info@distributedgenomics.ca')}
+                            onMouseOver={() => {
+                                document.body.style.cursor = 'pointer';
+                                return null;
+                            }}
+                            onMouseOut={() => {
+                                document.body.style.cursor = 'default';
+                                return null;
+                            }}
+                        >
+                            <Tooltip
+                                title="Email Copied!"
+                                placement="right"
+                                style={{ ...linkFrame, cursor: 'pointer' }}
+                                PopperProps={{
+                                    disablePortal: true
+                                }}
+                                onClose={handleTooltipClose}
+                                open={open}
+                                disableFocusListener
+                                disableHoverListener
+                                disableTouchListener
+                            >
+                                <IconMail stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
+                                <span style={linkText}>info@distributedgenomics.ca</span>
+                            </Tooltip>
                         </ButtonBase>
                     </HelpContainer>
                 </ResponsiveCanDIGContainer>
