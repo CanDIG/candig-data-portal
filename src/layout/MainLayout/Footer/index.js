@@ -216,7 +216,7 @@ function Footer(props) {
                             </a>
                             <LinkFrame>
                                 <IconCopyright stroke={1.5} size="1.3rem" style={{ color: 'grey', marginRight: '0.5em' }} />
-                                <p style={{ ...linkText, color: 'grey' }}>CanDIG v2.1.1</p>
+                                <p style={{ ...linkText, color: 'grey' }}>CanDIG {config.candigVersion}</p>
                             </LinkFrame>
                         </ResponsiveLinksContainer>
                     </div>
