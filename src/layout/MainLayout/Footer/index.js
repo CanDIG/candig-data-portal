@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, ButtonBase } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
@@ -127,7 +127,7 @@ const ResponsiveFundingContainer = styled('div')(({ theme }) => ({
 
 function Footer(props) {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleTooltipClose = () => {
         setOpen(false);
