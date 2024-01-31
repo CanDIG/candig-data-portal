@@ -126,6 +126,7 @@ const ResponsiveFundingContainer = styled('div')(({ theme }) => ({
 }));
 
 function Footer(props) {
+    const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
     const handleTooltipClose = () => {
