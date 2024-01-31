@@ -1,169 +1,211 @@
-import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { Avatar, Box, ButtonBase } from '@mui/material';
+import { Box, ButtonBase, Link } from '@mui/material';
 import { useTheme } from '@mui/system';
-
-// Images
+import config from 'config';
 import MOHLogo from '../../../assets/images/MOH/MOHCCN_Logo_EN.png';
-
-// Icons
+import CanDIGLogo from '../../../assets/images/logo-notext.png';
 import { IconBrandGithub, IconWorld, IconMail, IconCopyright } from '@tabler/icons-react';
 
-// style constant
-const PREFIX = 'footer';
-const classes = {
-    footer: `${PREFIX}-footer`,
-    socials: `${PREFIX}-socials`,
-    links: `${PREFIX}-links`,
-    linkFrame: `${PREFIX}-linkFrame`,
-    help: `${PREFIX}-help`,
-    fundedBox: `${PREFIX}-fundedBox`
+const flexFrame = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexShrink: 0,
+    margin: 0
 };
-const FooterContainer = styled('footer')(({ theme }) => ({
-    [`&.${classes.footer}`]: {
-        display: 'flex',
-        padding: '1.5em',
-        justifyContent: 'space-between',
-        alignItems: 'top',
-        flexShrink: 0
-    },
-    [`&.${classes.socials}`]: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'top',
-        gap: '5px',
-        flexShrink: 0,
-        margin: 0
-    },
-    [`&.${classes.links}`]: {
-        display: 'flex',
-        padding: '0px 5px',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        gap: '2px',
-        flexShrink: 0
-    },
-    [`&.${classes.linkFrame}`]: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        flexShrink: 0,
-        margin: 0,
-        padding: 0,
-        '& > svg': {
-            marginRight: '5px' // Adjust the spacing between the icon and text as needed
-        },
-        '& > span, & > p, & > a': {
-            margin: 0,
-            color: theme.palette.primary.main,
-            fontWeight: 'bold'
+
+const linkFrame = {
+    ...flexFrame,
+    alignItems: 'center'
+};
+
+const linkText = {
+    margin: 0,
+    fontWeight: 'bold'
+};
+
+const SocialsContainer = styled(Box)(({ theme }) => ({
+    ...flexFrame,
+    flexDirection: 'row',
+    gap: '5px',
+    margin: 0,
+    alignItems: 'flex-start'
+}));
+
+const LinksContainer = styled(Box)(({ theme }) => ({
+    ...flexFrame,
+    padding: '0px 5px',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: '2px',
+    '& a': {
+        ...linkFrame,
+        textDecoration: 'none',
+        color: theme.palette.primary.main,
+        '&:visited': {
+            color: theme.palette.primary.main
         }
-    },
-    [`&.${classes.help}`]: {
-        display: 'flex',
-        padding: '0px 25px',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        flexShrink: 0,
-        color: theme.palette.primary.main
-    },
-    [`&.${classes.fundedBox}`]: {
-        display: 'flex',
-        flexDirection: 'row'
     }
 }));
 
-const SocialsContainer = styled(Box)(({ theme }) => ({
+const LinkFrame = styled(Box)(({ theme }) => ({
+    ...linkFrame,
+    '& > svg': {
+        marginRight: '5px'
+    },
+    '& > *': {
+        ...linkText,
+        color: theme.palette.primary.main
+    }
+}));
+
+const FundingLink = styled('a')(({ theme }) => ({
+    ...linkFrame,
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:visited': {
+        color: theme.palette.primary.main
+    }
+}));
+
+const HelpContainer = styled(Box)(({ theme }) => ({
+    ...flexFrame,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    color: theme.palette.primary.main
+}));
+
+const ResponsiveFooterContainer = styled('footer')(({ theme }) => ({
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
+    paddingTop: '1.5em',
+    paddingRight: '1.5em',
+    paddingLeft: '1.5em',
     alignItems: 'top',
-    gap: '5px',
     flexShrink: 0,
-    margin: 0
+    margin: 0,
+
+    [theme.breakpoints.up('md')]: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start'
+    }
+}));
+
+const ResponsiveSocialsContainer = styled(SocialsContainer)(({ theme }) => ({
+    marginLeft: '1em',
+    [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        alignItems: 'flex-start'
+    }
+}));
+
+const ResponsiveLinksContainer = styled(LinksContainer)(({ theme }) => ({
+    [theme.breakpoints.down('md')]: {
+        marginRight: 0
+    }
+}));
+
+const ResponsiveCanDIGContainer = styled('div')(({ theme }) => ({
+    ...flexFrame,
+    [theme.breakpoints.down('md')]: {
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '2em'
+    }
+}));
+
+const ResponsiveFundingContainer = styled('div')(({ theme }) => ({
+    ...flexFrame,
+    [theme.breakpoints.down('md')]: {
+        marginTop: '2em',
+        justifyContent: 'space-between'
+    }
 }));
 
 function Footer(props) {
     const theme = useTheme();
-    const MOHLogo2 = '../../assets/MOH/MOHCCN_Logo_EN.png';
+
+    function copyEmail(email) {
+        navigator.clipboard.writeText(email);
+    }
+
     return (
-        <FooterContainer {...props} className={classes.footer}>
-            <SocialsContainer className={classes.socials}>
-                <img alt="CanDIG logo hyperlink" style={{ marginRight: '2em' }} />
-                <Box className={classes.links} style={{ marginRight: '2em' }}>
-                    <a className={classes.linkFrame} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <IconWorld stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
-                        <span style={{ margin: 0, color: theme.palette.primary.main, fontWeight: 'bold' }}> CanDIG</span>
-                    </a>
-                    <a className={classes.linkFrame} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <IconBrandGithub stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
-                        <span style={{ margin: 0, color: theme.palette.primary.main, fontWeight: 'bold' }}>CanDIG GitHub</span>
-                    </a>
-                    <div className={classes.linkFrame} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <IconCopyright stroke={1.5} size="1.3rem" style={{ color: 'grey', marginRight: '0.5em' }} />
-                        <p style={{ margin: 0, color: 'grey' }}>CanDIG v2.1.1</p>
+        <ResponsiveFooterContainer {...props}>
+            <ResponsiveSocialsContainer>
+                <ResponsiveCanDIGContainer>
+                    <div style={{ ...flexFrame }}>
+                        <a href={config.defaultPath}>
+                            <img src={CanDIGLogo} alt="CanDIG logo hyperlink" style={{ marginRight: '0.5em', height: '4.5em' }} />
+                        </a>
+                        <ResponsiveLinksContainer style={{ marginRight: '2em' }}>
+                            <a
+                                href="https://www.distributedgenomics.ca/"
+                                style={{
+                                    ...linkFrame,
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                <IconWorld stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
+                                <span style={linkText}> CanDIG</span>
+                            </a>
+                            <a
+                                href="https://github.com/CanDIG"
+                                style={{
+                                    ...linkFrame,
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                <IconBrandGithub
+                                    stroke={1.5}
+                                    size="1.3rem"
+                                    style={{ color: theme.palette.primary.main, marginRight: '0.5em' }}
+                                />
+                                <span style={linkText}>CanDIG GitHub</span>
+                            </a>
+                            <LinkFrame>
+                                <IconCopyright stroke={1.5} size="1.3rem" style={{ color: 'grey', marginRight: '0.5em' }} />
+                                <p style={{ ...linkText, color: 'grey' }}>CanDIG v2.1.1</p>
+                            </LinkFrame>
+                        </ResponsiveLinksContainer>
                     </div>
-                </Box>
-                <Box className={classes.help}>
-                    <p style={{ margin: 0, color: theme.palette.primary.main, fontWeight: 'bold' }}>
-                        Have questions or want to share your feedback?
-                    </p>
-                    <a style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <IconMail stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
-                        <span style={{ margin: 0, color: theme.palette.primary.main }}>info@distributedgenomics.ca</span>
-                    </a>
-                </Box>
-            </SocialsContainer>
-            <Box className={classes.fundedBox} style={{ display: 'flex', flexDirection: 'row', alignItems: 'top' }}>
-                <div style={{ marginRight: '2em' }}>
-                    <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '0.5em' }}>CanDIG Receives Funds from:</p>
+                    <HelpContainer style={{ color: theme.palette.primary.main, padding: 0 }}>
+                        <p style={{ ...linkText, fontWeight: 'bold' }}>Have questions or want to share your feedback?</p>
+                        <ButtonBase onClick={() => copyEmail('info@distributedgenomics.ca')} style={{ ...linkFrame }}>
+                            <IconMail stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
+                            <span style={linkText}>info@distributedgenomics.ca</span>
+                        </ButtonBase>
+                    </HelpContainer>
+                </ResponsiveCanDIGContainer>
+            </ResponsiveSocialsContainer>
+            <ResponsiveFundingContainer style={{ marginRight: '1em' }}>
+                <div style={{ marginRight: '1em' }}>
+                    <p style={{ ...linkText, fontWeight: 'bold', marginBottom: '0.5em' }}>CanDIG Receives Funds from:</p>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', marginRight: '3em' }}>
-                            <a
-                                href="https://www.tfri.ca/"
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', textDecoration: 'none' }}
-                            >
-                                <span style={{ margin: 0, color: theme.palette.primary.main }}>TFRI</span>
-                            </a>
-                            <a
-                                href="https://uhndata.io/"
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', textDecoration: 'none' }}
-                            >
-                                <span style={{ margin: 0, color: theme.palette.primary.main }}>UHN DATA</span>
-                            </a>
+                            <FundingLink href="https://www.tfri.ca/" target="_blank" rel="noreferrer">
+                                <span style={linkText}>TFRI</span>
+                            </FundingLink>
+                            <FundingLink href="https://uhndata.io/" target="_blank" rel="noreferrer">
+                                <span style={linkText}>UHN DATA</span>
+                            </FundingLink>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <a
-                                href="https://www.bcgsc.ca/"
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', textDecoration: 'none' }}
-                            >
-                                <span style={{ margin: 0, color: theme.palette.primary.main }}>BCGSC</span>
-                            </a>
-                            <a
-                                href="https://computationalgenomics.ca/"
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', textDecoration: 'none' }}
-                            >
-                                <span style={{ margin: 0, color: theme.palette.primary.main }}>C3G</span>
-                            </a>
+                            <FundingLink href="https://www.bcgsc.ca/" target="_blank" rel="noreferrer">
+                                <span style={linkText}>BCGSC</span>
+                            </FundingLink>
+                            <FundingLink href="https://computationalgenomics.ca/" target="_blank" rel="noreferrer">
+                                <span style={linkText}>C3G</span>
+                            </FundingLink>
                         </div>
                     </div>
                 </div>
-                <img src={MOHLogo} alt="MOH logo hyperlink" />
-            </Box>
-        </FooterContainer>
+                <a href="https://www.marathonofhopecancercentres.ca/" target="_blank" rel="noreferrer">
+                    <img src={MOHLogo} alt="MOH logo hyperlink" style={{ position: 'relative', top: '-1em', width: '6.5em' }} />
+                </a>
+            </ResponsiveFundingContainer>
+        </ResponsiveFooterContainer>
     );
 }
-
-Footer.propTypes = {
-    // Define your prop types here
-};
 
 export default Footer;

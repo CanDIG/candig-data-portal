@@ -36,7 +36,7 @@ const classes = {
     footer: `${PREFIX}-footer`,
     footerWidth: `${PREFIX}-footerWidth`
 };
-const Root = styled('div')(({ theme }) => ({
+const Root = styled('div')(({ theme, leftDrawerOpened }) => ({
     [`&.${classes.root}`]: {
         display: 'flex',
         flexDirection: 'column'
@@ -92,13 +92,13 @@ const Root = styled('div')(({ theme }) => ({
     },
     [`& .${classes.footer}`]: {
         backgroundColor: theme.palette.background.default,
-        marginLeft: drawerWidth - 20,
-        width: `calc(100% - ${drawerWidth}px)`
+        marginLeft: leftDrawerOpened ? drawerWidth - 20 : 0,
+        width: leftDrawerOpened ? `calc(100% - ${drawerWidth}px)` : `100%`
     },
     [`& .${classes.footerWidth}`]: {
         transition: theme.transitions.create('width'),
-        marginLeft: drawerWidth - 20,
-        width: `calc(100% - ${drawerWidth}px)`
+        marginLeft: leftDrawerOpened ? drawerWidth - 20 : 0,
+        width: leftDrawerOpened ? `calc(100% - ${drawerWidth}px)` : `100%`
     }
 }));
 
