@@ -214,10 +214,19 @@ function Footer(props) {
                                 />
                                 <span style={linkText}>CanDIG GitHub</span>
                             </a>
-                            <LinkFrame>
+                            <a
+                                href={`https://github.com/CanDIG/CanDIGv2/releases/tag/${config.candigVersion}`}
+                                style={{
+                                    ...linkText,
+                                    textDecoration: 'none',
+                                    color: 'grey'
+                                }}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
                                 <IconCopyright stroke={1.5} size="1.3rem" style={{ color: 'grey', marginRight: '0.5em' }} />
                                 <p style={{ ...linkText, color: 'grey' }}>CanDIG {config.candigVersion}</p>
-                            </LinkFrame>
+                            </a>
                         </ResponsiveLinksContainer>
                     </div>
                     <HelpContainer style={{ color: theme.palette.primary.main, padding: 0 }}>
@@ -255,7 +264,7 @@ function Footer(props) {
             </ResponsiveSocialsContainer>
             <ResponsiveFundingContainer style={{ marginRight: '1em' }}>
                 <div style={{ marginRight: '1em' }}>
-                    <p style={{ ...linkText, fontWeight: 'bold', marginBottom: '0.5em' }}>CanDIG Receives Funds from:</p>
+                    <p style={{ ...linkText, fontWeight: 'bold', marginBottom: '0.5em' }}>CanDIG receives funds from:</p>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', marginRight: '3em' }}>
                             <FundingLink href="https://www.tfri.ca/" target="_blank" rel="noreferrer">
