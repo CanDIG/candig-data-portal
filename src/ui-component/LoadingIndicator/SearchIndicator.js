@@ -6,7 +6,7 @@ import { trackPromise, usePromiseTracker } from 'react-promise-tracker';
  * SearchIndicator component
  * This loading indicator is used in search.
  */
-export const SearchIndicator = ({ area }) => {
+export function SearchIndicator({ area }) {
     const { promiseInProgress } = usePromiseTracker({ area });
     return (
         promiseInProgress && (
@@ -23,7 +23,7 @@ export const SearchIndicator = ({ area }) => {
             </div>
         )
     );
-};
+}
 
 SearchIndicator.propTypes = {
     area: PropTypes.string

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // mui
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 
@@ -12,10 +12,13 @@ import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../S
 
 function ClinicalView() {
     const theme = useTheme();
+    const [paginationModel, setPaginationModel] = React.useState({
+        pageSize: 10,
+        page: 0
+    });
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
-
     const searchResults = useSearchResultsReaderContext().clinical;
     const writerContext = useSearchQueryWriterContext();
 
@@ -24,6 +27,7 @@ function ClinicalView() {
     if (searchResults) {
         rows =
             Object.values(searchResults)
+                ?.map((results) => results.results)
                 ?.flat(1)
                 ?.map((patient, index) => {
                     // Make sure each row has an ID and a deceased status
@@ -35,7 +39,8 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        writerContext((old) => ({ ...old, donorID: row.submitter_donor_id }));
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
+        window.open(url, '_blank');
     };
 
     // Tracks Screensize
@@ -52,6 +57,19 @@ function ClinicalView() {
         { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
     ];
 
+    const HandlePageChange = (newModel) => {
+        if (newModel.page !== paginationModel.page) {
+            writerContext((old) => ({ ...old, query: { ...old.query, page: newModel.page, page_size: newModel.pageSize } }));
+        }
+        setPaginationModel(newModel);
+    };
+
+    const totalRows = searchResults
+        ? Object.values(searchResults)
+              ?.map((site) => site.count)
+              .reduce((partial, a) => partial + a, 0)
+        : 0;
+
     return (
         <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
@@ -61,9 +79,12 @@ function ClinicalView() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[10]}
+                    rowCount={totalRows}
+                    pageSizeOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={HandlePageChange}
+                    paginationMode="server"
                     hideFooterSelectedRowCount
                 />
             </div>

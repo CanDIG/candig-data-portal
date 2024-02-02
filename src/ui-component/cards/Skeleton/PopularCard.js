@@ -1,13 +1,18 @@
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Card, CardContent, Grid, Skeleton } from '@mui/material';
 
 // project imports
 import { gridSpacing } from 'store/constant';
 
-// style constant
-const useStyles = makeStyles({
-    cardAction: {
+const PREFIX = 'PopularCard';
+
+const classes = {
+    cardAction: `${PREFIX}-cardAction`
+};
+
+const StyledCard = styled(Card)({
+    [`& .${classes.cardAction}`]: {
         padding: '10px',
         display: 'flex',
         paddingTop: 0,
@@ -17,10 +22,9 @@ const useStyles = makeStyles({
 
 // ===========================|| SKELETON - POPULAR CARD ||=========================== //
 
-const PopularCard = () => {
-    const classes = useStyles();
+function PopularCard() {
     return (
-        <Card>
+        <StyledCard>
             <CardContent>
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12}>
@@ -161,8 +165,8 @@ const PopularCard = () => {
             <CardContent className={classes.cardAction}>
                 <Skeleton variant="rectangular" height={25} width={75} />
             </CardContent>
-        </Card>
+        </StyledCard>
     );
-};
+}
 
 export default PopularCard;

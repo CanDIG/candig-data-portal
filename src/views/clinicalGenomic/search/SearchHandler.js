@@ -76,9 +76,6 @@ function SearchHandler() {
     useEffect(() => {
         // First, we abort any currently-running search promises
         // controller.abort();
-        console.log('Query re-initiated');
-        console.log(reader.query);
-
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
@@ -146,7 +143,7 @@ function SearchHandler() {
                 const clinicalData = {};
                 data.forEach((site) => {
                     discoveryCounts.patients_per_cohort[site.location.name] = site.results?.summary?.patients_per_cohort;
-                    clinicalData[site.location.name] = site?.results?.results;
+                    clinicalData[site.location.name] = site?.results;
                 });
 
                 const genomicData = data
@@ -170,11 +167,11 @@ function SearchHandler() {
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
-        if (!reader.donorID) {
+        if (!reader.donorID || !reader.cohort) {
             return;
         }
 
-        const url = `v2/authorized/donor_with_clinical_data?submitter_donor_id=${reader.donorID}`;
+        const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu').then((data) => {
                 writer((old) => ({ ...old, donor: data }));
@@ -185,7 +182,7 @@ function SearchHandler() {
 
     // We don't really implement a graphical component
     // NB: This might be a good reason to have this be a function call instead of what it currently is.
-    return <></>;
+    return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
 

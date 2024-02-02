@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-import { makeStyles, useTheme } from '@mui/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
     Avatar,
     Box,
@@ -30,16 +29,29 @@ import Transitions from 'ui-component/extended/Transitions';
 import NotificationList from './NotificationList';
 
 // assets
-import { IconBell } from '@tabler/icons';
+import { IconBell } from '@tabler/icons-react';
 
 // style constant
-const useStyles = makeStyles((theme) => ({
-    ScrollHeight: {
+const PREFIX = 'MainLayoutHeaderNotificationSection';
+const classes = {
+    ScrollHeight: `${PREFIX}-ScrollHeight`,
+    headerAvatar: `${PREFIX}-headerAvatar`,
+    cardContent: `${PREFIX}-cardContent`,
+    notificationChip: `${PREFIX}-notificationChip`,
+    divider: `${PREFIX}-divider`,
+    cardAction: `${PREFIX}-cardAction`,
+    paddingBottom: `${PREFIX}-paddingBottom`,
+    box: `${PREFIX}-box`,
+    bodyPPacing: `${PREFIX}-bodyPPacing`,
+    textBoxSpacing: `${PREFIX}-textBoxSpacing`
+};
+const Root = styled('div')(({ theme }) => ({
+    [`&.${classes.ScrollHeight}`]: {
         height: '100%',
         maxHeight: 'calc(100vh - 205px)',
         overflowX: 'hidden'
     },
-    headerAvatar: {
+    [`&.${classes.headerAvatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.mediumAvatar,
         transition: 'all .2s ease-in-out',
@@ -50,35 +62,35 @@ const useStyles = makeStyles((theme) => ({
             color: theme.palette.primary.light
         }
     },
-    cardContent: {
+    [`&.${classes.cardContent}`]: {
         padding: '0px !important'
     },
-    notificationChip: {
+    [`&.${classes.notificationChip}`]: {
         color: theme.palette.background.default,
         backgroundColor: theme.palette.warning.dark
     },
-    divider: {
+    [`&.${classes.divider}`]: {
         marginTop: 0,
         marginBottom: 0
     },
-    cardAction: {
+    [`&.${classes.cardAction}`]: {
         padding: '10px',
         justifyContent: 'center'
     },
-    paddingBottom: {
+    [`&.${classes.paddingBottom}`]: {
         paddingBottom: '16px'
     },
-    box: {
+    [`&.${classes.box}`]: {
         marginLeft: '16px',
         marginRight: '24px',
         [theme.breakpoints.down('md')]: {
             marginRight: '16px'
         }
     },
-    bodyPPacing: {
+    [`&.${classes.bodyPPacing}`]: {
         padding: '16px 16px 0'
     },
-    textBoxSpacing: {
+    [`&.${classes.textBoxSpacing}`]: {
         padding: '0px 16px'
     }
 }));
@@ -105,8 +117,7 @@ const status = [
 
 // ===========================|| NOTIFICATION ||=========================== //
 
-const NotificationSection = () => {
-    const classes = useStyles();
+function NotificationSection() {
     const theme = useTheme();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -138,7 +149,7 @@ const NotificationSection = () => {
     };
 
     return (
-        <>
+        <Root>
             <Box component="span" className={classes.box}>
                 <ButtonBase sx={{ borderRadius: '12px' }}>
                     <Avatar
@@ -243,8 +254,8 @@ const NotificationSection = () => {
                     </Transitions>
                 )}
             </Popper>
-        </>
+        </Root>
     );
-};
+}
 
 export default NotificationSection;

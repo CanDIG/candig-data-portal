@@ -1,5 +1,5 @@
 // assets
-import { IconUpload } from '@tabler/icons';
+import { IconUpload } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';

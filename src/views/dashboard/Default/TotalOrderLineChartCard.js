@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 // mui
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Avatar, Button, Grid, Typography } from '@mui/material';
 
 // third-party
@@ -19,9 +19,21 @@ import ChartDataYear from './chart-data/total-order-year-line-chart';
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-// style constant
-const useStyles = makeStyles((theme) => ({
-    card: {
+const PREFIX = 'TotalOrderLineChartCard';
+
+const classes = {
+    card: `${PREFIX}-card`,
+    content: `${PREFIX}-content`,
+    avatar: `${PREFIX}-avatar`,
+    cardHeading: `${PREFIX}-cardHeading`,
+    subHeading: `${PREFIX}-subHeading`,
+    avatarCircle: `${PREFIX}-avatarCircle`,
+    circleIcon: `${PREFIX}-circleIcon`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.card}`]: {
         backgroundColor: theme.palette.primary.dark,
         color: '#fff',
         overflow: 'hidden',
@@ -62,51 +74,55 @@ const useStyles = makeStyles((theme) => ({
             }
         }
     },
-    content: {
+
+    [`& .${classes.content}`]: {
         padding: '20px !important'
     },
-    avatar: {
+
+    [`& .${classes.avatar}`]: {
         ...theme.typography.commonAvatar,
         ...theme.typography.largeAvatar,
         backgroundColor: theme.palette.primary[800],
         color: '#fff',
         marginTop: '8px'
     },
-    cardHeading: {
+
+    [`& .${classes.cardHeading}`]: {
         fontSize: '2.125rem',
         fontWeight: 500,
         marginRight: '8px',
         marginTop: '14px',
         marginBottom: '6px'
     },
-    subHeading: {
+
+    [`& .${classes.subHeading}`]: {
         fontSize: '1rem',
         fontWeight: 500,
         color: theme.palette.primary[200]
     },
-    avatarCircle: {
+
+    [`& .${classes.avatarCircle}`]: {
         ...theme.typography.smallAvatar,
         cursor: 'pointer',
         backgroundColor: theme.palette.primary[200],
         color: theme.palette.primary.dark
     },
-    circleIcon: {
+
+    [`& .${classes.circleIcon}`]: {
         transform: 'rotate3d(1, 1, 1, 45deg)'
     }
 }));
 
 // ===========================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||=========================== //
 
-const TotalOrderLineChartCard = ({ isLoading }) => {
-    const classes = useStyles();
-
+function TotalOrderLineChartCard({ isLoading }) {
     const [timeValue, setTimeValue] = React.useState(false);
     const handleChangeTime = (event, newValue) => {
         setTimeValue(newValue);
     };
 
     return (
-        <>
+        <Root>
             {isLoading ? (
                 <SkeletonTotalOrderCard />
             ) : (
@@ -168,9 +184,9 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                     </Grid>
                 </MainCard>
             )}
-        </>
+        </Root>
     );
-};
+}
 
 TotalOrderLineChartCard.propTypes = {
     isLoading: PropTypes.bool

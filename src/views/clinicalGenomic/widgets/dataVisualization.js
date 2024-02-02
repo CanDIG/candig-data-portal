@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/system';
 
 // MUI
 import { Box, Grid, IconButton, Typography } from '@mui/material';
@@ -11,7 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 
 // Third-party libraries
-import { IconEdit, IconX, IconPlus } from '@tabler/icons';
+import { IconEdit, IconX, IconPlus } from '@tabler/icons-react';
 
 // Custom Components and context
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';

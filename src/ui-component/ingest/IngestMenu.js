@@ -1,4 +1,4 @@
-import { makeStyles, styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Alert, Box, CircularProgress, Grid, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -7,6 +7,26 @@ import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
 import GenomicIngest from 'ui-component/ingest/GenomicIngest';
 import PersistentFile from 'ui-component/PersistentFile';
 import { ingestClinicalData, ingestGenomicData } from 'store/api';
+
+const PREFIX = 'IngestMenu';
+
+const classes = {
+    tabActive: `${PREFIX}-tabActive`,
+    tabInactive: `${PREFIX}-tabInactive`
+};
+
+const StyledBox = styled(Box)({
+    [`& .${classes.tabActive}`]: {
+        border: '0.125vw #2196F3 solid',
+        borderBottom: 'none',
+        background: '#FFFFFF'
+    },
+    [`& .${classes.tabInactive}`]: {
+        border: '0.1vw #2196F3 solid',
+        borderBottom: '0.15vw #2196F3 solid',
+        background: '#F4FAFF'
+    }
+});
 
 const IngestTab = styled(Tab)({
     height: '2.75em',
@@ -45,21 +65,6 @@ function IngestMenu() {
     const [genomicFile, setGenomicFile] = useState(undefined);
     const [ingestState, setIngestState] = useState(IngestStates.PENDING);
     const [ingestError, setIngestError] = useState('');
-
-    const useStyles = makeStyles({
-        tabActive: {
-            border: '0.125vw #2196F3 solid',
-            borderBottom: 'none',
-            background: '#FFFFFF'
-        },
-        tabInactive: {
-            border: '0.1vw #2196F3 solid',
-            borderBottom: '0.15vw #2196F3 solid',
-            background: '#F4FAFF'
-        }
-    });
-
-    const classes = useStyles();
 
     function getIngestStatusComponent(status) {
         function progressRow(component) {
@@ -142,7 +147,7 @@ function IngestMenu() {
     }
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <StyledBox sx={{ width: '100%' }}>
             <Tabs
                 value={value}
                 onChange={(_, value) => setValue(value)}
@@ -163,7 +168,7 @@ function IngestMenu() {
             </Tabs>
             <IngestTabPage> {getPage(value)} </IngestTabPage>
             {ingestState !== IngestStates.PENDING && getIngestStatusComponent(ingestState)}
-        </Box>
+        </StyledBox>
     );
 }
 

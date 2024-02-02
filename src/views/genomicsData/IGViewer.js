@@ -6,7 +6,7 @@ import NewWindow from 'react-new-window';
 import CramVcfInstance from 'ui-component/IGV/CramVcfInstance';
 import PropTypes from 'prop-types';
 
-const IGViewer = ({ closeWindow, options }) => {
+function IGViewer({ closeWindow, options }) {
     const [open, setOpen] = useState(false);
     const onClosed = () => {
         closeWindow();
@@ -32,7 +32,7 @@ const IGViewer = ({ closeWindow, options }) => {
             </NewWindow>
         </>
     );
-};
+}
 
 IGViewer.propTypes = {
     closeWindow: PropTypes.func.isRequired,

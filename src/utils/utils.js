@@ -101,3 +101,15 @@ export function mergeFederatedResults(data) {
     }
     return output;
 }
+
+/*
+ * Format a key by converting underscores to spaces and capitalizing each word
+ * @param {string} key - The key to be formatted
+ * @returns {string} - The formatted key
+ */
+export function formatKey(key) {
+    return key
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}

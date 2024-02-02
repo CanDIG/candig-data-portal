@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Box, Divider, Grid, Typography } from '@mui/material';
-import { useTheme, makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
+import { useTheme } from '@mui/system';
 
 function makeField(lab, val) {
     return {
@@ -11,35 +12,48 @@ function makeField(lab, val) {
     };
 }
 
-const useStyles = makeStyles((theme) => ({
-    rowText: {
-        color: 'black'
-    },
-    container: {
-        minHeight: 40,
-        marginRight: 0
-    },
-    locked: {
-        backgroundColor: theme.palette.action.disabledBackground
-    },
-    button: {
-        // Right-aligned
-        float: 'right',
-        marginLeft: 'auto'
-    },
-    divider: {
-        borderColor: theme.palette.primary.main,
-        marginTop: '0.25em',
-        marginBottom: '0.25em'
-    },
-    dataBox: {
+const PREFIX = 'UIComponentDataRow';
+
+const classes = {
+    dropdownItem: `${PREFIX}-dropdownItem`,
+    rowText: `${PREFIX}-rowText`,
+    container: `${PREFIX}-container`,
+    locked: `${PREFIX}-locked`,
+    button: `${PREFIX}-button`,
+    divider: `${PREFIX}-divider`,
+    dataBox: `${PREFIX}-dataBox`,
+    label: `${PREFIX}-label`
+};
+
+const StyledBox = styled(Box)(({ theme }) => ({
+    [`& .${classes.dataBox}`]: {
         maxHeight: 'none',
         height: 'fit-content',
         paddingTop: '0.75em',
         paddingBottom: '0.75em',
         marginTop: '3em'
     },
-    label: {
+    [`& .${classes.rowText}`]: {
+        color: 'black'
+    },
+    [`& .${classes.container}`]: {
+        minHeight: 40,
+        marginRight: 0
+    },
+    [`& .${classes.locked}`]: {
+        backgroundColor: theme.palette.action.disabledBackground
+    },
+    [`& .${classes.button}`]: {
+        // Right-aligned
+        float: 'right',
+        marginLeft: 'auto'
+    },
+    [`& .${classes.divider}`]: {
+        borderColor: theme.palette.primary.main,
+        marginTop: '0.25em',
+        marginBottom: '0.25em'
+    },
+    [`& .${classes.label}`]: {
         marginTop: '-3.5em',
         paddingBottom: '2em',
         color: 'black'
@@ -49,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
 function DataRow(props) {
     const { fields, itemSize, rowWidth } = props;
     const theme = useTheme();
-    const classes = useStyles();
     const primaryField = fields.shift();
 
     /* const avatarProps = locked
@@ -60,7 +73,7 @@ function DataRow(props) {
         : {}; */
 
     return (
-        <Box
+        <StyledBox
             className={classes.dataBox}
             sx={{
                 // These properties aren't working in useStyles for some reason...
@@ -96,7 +109,7 @@ function DataRow(props) {
                     </React.Fragment>
                 ))}
             </Grid>
-        </Box>
+        </StyledBox>
     );
 }
 
