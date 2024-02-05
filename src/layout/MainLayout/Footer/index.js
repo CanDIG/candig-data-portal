@@ -25,7 +25,7 @@ const linkText = {
     fontWeight: 'bold'
 };
 
-const SocialsContainer = styled(Box)(({ theme }) => ({
+const SocialsContainer = styled(Box)(({ _ }) => ({
     ...flexFrame,
     flexDirection: 'row',
     gap: '5px',
@@ -47,17 +47,6 @@ const LinksContainer = styled(Box)(({ theme }) => ({
         '&:visited': {
             color: theme.palette.primary.main
         }
-    }
-}));
-
-const LinkFrame = styled(Box)(({ theme }) => ({
-    ...linkFrame,
-    '& > svg': {
-        marginRight: '5px'
-    },
-    '& > *': {
-        ...linkText,
-        color: theme.palette.primary.main
     }
 }));
 
@@ -148,7 +137,6 @@ function Footer(props) {
 
         try {
             document.execCommand('copy');
-            console.log('Email copied to clipboard');
             handleTooltipOpen();
         } catch (err) {
             console.error('Fallback copy failed:', err);
@@ -163,7 +151,6 @@ function Footer(props) {
                 navigator.clipboard
                     .writeText(email)
                     .then(() => {
-                        console.log('Email copied to clipboard');
                         handleTooltipOpen();
                     })
                     .catch(() => {
