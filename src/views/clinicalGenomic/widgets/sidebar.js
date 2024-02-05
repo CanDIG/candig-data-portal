@@ -183,7 +183,7 @@ function StyledCheckboxList(props) {
             renderInput={(params) => <TextField {...params} label={groupName} />}
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
-            onChange={(_, value, reason, details) => {
+            onChange={(_, value, reason) => {
                 HandleChange(value, reason === 'selectOption');
             }}
         />
