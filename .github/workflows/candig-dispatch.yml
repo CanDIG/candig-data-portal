@@ -1,4 +1,4 @@
-name: Submodule PR
+name: Submodule-PR
 on:
     push:
         branches: [develop]
