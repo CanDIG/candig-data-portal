@@ -246,7 +246,9 @@ StyledCheckboxList.propTypes = {
     remap: PropTypes.func,
     onWrite: PropTypes.func,
     options: PropTypes.array,
-    useAutoComplete: PropTypes.bool
+    useAutoComplete: PropTypes.bool,
+    setChecked: PropTypes.func,
+    checked: PropTypes.object
 };
 
 // A group of genomics data
@@ -371,7 +373,15 @@ GenomicsGroup.propTypes = {
     chromosomes: PropTypes.array,
     genes: PropTypes.array,
     hide: PropTypes.bool,
-    onWrite: PropTypes.func
+    onWrite: PropTypes.func,
+    endPos: PropTypes.string,
+    setEndPos: PropTypes.func,
+    startPos: PropTypes.string,
+    setStartPos: PropTypes.func,
+    selectedGenes: PropTypes.string,
+    setSelectedGenes: PropTypes.func,
+    selectedChromosomes: PropTypes.string,
+    setSelectedChromosomes: PropTypes.func
 };
 
 function Sidebar() {
@@ -381,12 +391,10 @@ function Sidebar() {
 
     // Genomic data
     // const referenceGenomes = ['hg38'];
-    const [selectedGenome, _setSelectedGenome] = useState('hg38');
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState(0);
     const [endPos, setEndPos] = useState(0);
-    const [_timeout, setNewTimeout] = useState(null);
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
