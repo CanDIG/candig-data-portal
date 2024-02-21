@@ -168,6 +168,8 @@ function StyledCheckboxList(props) {
         }
     };
 
+    const checkedList = Object.keys(checked);
+
     return useAutoComplete ? (
         <Autocomplete
             size="small"
@@ -193,6 +195,7 @@ function StyledCheckboxList(props) {
             onChange={(_, value, reason) => {
                 HandleChange(value, reason === 'selectOption');
             }}
+            value={checkedList}
         />
     ) : (
         options?.map((option) => (
