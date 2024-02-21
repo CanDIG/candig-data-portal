@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { createRef, useState, useEffect } from 'react';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
@@ -12,11 +12,16 @@ import { fetchFederation } from 'store/api';
 
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // Test data
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import MainCard from 'ui-component/cards/MainCard';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
+
+window.Highcharts = Highcharts;
 
 function Completeness() {
     const theme = useTheme();
@@ -28,7 +33,36 @@ function Completeness() {
     const [numProvinces, setNumProvinces] = useState(0);
     const [numClinicalComplete, setNumClinicalComplete] = useState(0);
     const [numGenomicComplete, setNumGenomicComplete] = useState(0);
+    const [programData, setProgramData] = useState({});
     const [isLoading, setLoading] = useState(false);
+    const chartRef = createRef();
+
+    NoDataToDisplay(Highcharts);
+
+    const [chartOptions, setChartOptions] = useState({
+        credits: {
+            enabled: false
+        },
+        colors: [
+            theme.palette.primary[200],
+            theme.palette.secondary[200],
+            theme.palette.tertiary[200],
+            theme.palette.primary.main,
+            theme.palette.secondary.main,
+            theme.palette.tertiary.main,
+            theme.palette.primary.dark,
+            theme.palette.secondary.dark,
+            theme.palette.tertiary.dark,
+            theme.palette.primary[800],
+            theme.palette.secondary[800],
+            theme.palette.tertiary[800]
+        ],
+        title: {
+            style: {
+                fontWeight: 'normal'
+            }
+        }
+    });
 
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
@@ -104,12 +138,22 @@ function Completeness() {
         });
         */
 
-        fetchFederation('genomic-completeness', 'query').then((data) => {
+        fetchFederation('genomic_completeness', 'query').then((data) => {
             const numCompleteGenomic = {};
             data.filter((site) => site.status === 200).forEach((site) => {
-                numCompleteGenomic[site.location.name] = site.results.all;
+                numCompleteGenomic[site.location.name] = 0;
+                Object.keys(site.results).forEach((program) => {
+                    numCompleteGenomic[site.location.name] += site.results[program].all;
+                });
             });
+            console.log('numCompleteGenomic:');
+            console.log(numCompleteGenomic);
             setNumGenomicComplete(numCompleteGenomic);
+        });
+        fetchFederation('discovery/programs', 'query').then((data) => {
+            console.log('discovery/programs');
+            console.log(data.filter((site) => site.status === 200));
+            setProgramData(data.filter((site) => site.status === 200));
         });
     }, []);
 
@@ -204,6 +248,9 @@ function Completeness() {
                     orderByFrequency
                     cutoff={10}
                 />
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+                <FieldLevelCompletenessGraph data={programData} loading={programData.length === 0} />
             </Grid>
             {/* <Grid item xs={12} sm={12} md={6} lg={6}>
                 <MainCard>(Percentage complete graph)</MainCard>
