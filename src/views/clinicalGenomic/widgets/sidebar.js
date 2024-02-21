@@ -132,7 +132,19 @@ function StyledCheckboxList(props) {
         }
 
         if (isExclusion ? !isChecked : isChecked) {
-            setChecked((old) => ({ ...old, [ids]: true }));
+            if (useAutoComplete) {
+                // Autcomplete's onChange will have IDs be a list of options that are checked
+                setChecked((_) => {
+                    const retVal = {};
+                    ids.forEach((id) => {
+                        retVal[id] = true;
+                    });
+                    return retVal;
+                });
+            } else {
+                // FormControlLabel's onChange will have IDs be a list of IDs that have _changed_
+                setChecked((old) => ({ ...old, [ids]: true }));
+            }
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
 
@@ -147,6 +159,16 @@ function StyledCheckboxList(props) {
             });
         } else {
             setChecked((old) => {
+                // Autocomplete's onChange will return a list
+                if (useAutoComplete) {
+                    const retVal = {};
+                    ids.forEach((id) => {
+                        retVal[id] = true;
+                    });
+                    return retVal;
+                }
+
+                // FormControlLabel's onChange
                 const { [ids]: _, ...rest } = old;
                 return rest;
             });
