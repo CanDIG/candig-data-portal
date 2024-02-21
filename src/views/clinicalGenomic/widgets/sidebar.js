@@ -10,7 +10,8 @@ import {
     Tabs,
     Autocomplete,
     TextField,
-    Typography
+    Typography,
+    Button
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -27,30 +28,39 @@ const classes = {
     checkbox: `${PREFIX}-checkbox`,
     form: `${PREFIX}-form`,
     checkboxLabel: `${PREFIX}-checkboxLabel`,
-    hidden: `${PREFIX}-hidden`
+    hidden: `${PREFIX}-hidden`,
+    button: `${PREFIX}-button`
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ _ }) => ({
+const Root = styled('div')(({ theme }) => ({
     [`& .${classes.tab}`]: {
         minWidth: 40
     },
-
     [`& .${classes.checkbox}`]: {
         paddingTop: 0,
         paddingBottom: 0
     },
-
     [`& .${classes.form}`]: {
         width: '100%'
     },
-
     [`& .${classes.checkboxLabel}`]: {
         textTransform: 'capitalize'
     },
-
     [`& .${classes.hidden}`]: {
         height: 0
+    },
+    [`& .${classes.button}`]: {
+        margin: '0.5em',
+        paddingRight: '1em',
+        paddingLeft: '1em',
+        background: 'white',
+        color: theme.palette.primary.main,
+        borderRadius: '25px',
+        border: `1px solid ${theme.palette.primary.main}`,
+        height: '1.5em',
+        width: '90%',
+        boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.2)`
     }
 }));
 
@@ -95,8 +105,7 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide } = props;
-    const [checked, setChecked] = useState({});
+    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide, checked, setChecked } = props;
     const [initialized, setInitialized] = useState(false);
 
     if (hide) {
@@ -106,7 +115,6 @@ function StyledCheckboxList(props) {
     // Check all of our options by default
     if (!initialized && isFilterList && options.length) {
         const optionsObject = {};
-        console.log(options);
         options.forEach((option) => {
             optionsObject[option] = true;
         });
@@ -135,7 +143,6 @@ function StyledCheckboxList(props) {
                 } else {
                     retVal.query[groupName] = ids;
                 }
-
                 return retVal;
             });
         } else {
@@ -165,7 +172,7 @@ function StyledCheckboxList(props) {
         <Autocomplete
             size="small"
             multiple
-            id="checkboxes-tags-treatment"
+            id={`checkboxes-tags-${groupName}`}
             options={options}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
@@ -221,14 +228,22 @@ StyledCheckboxList.propTypes = {
 // Keeping this separate from the rest as it's all somewhat self-contained
 // NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
-    const { chromosomes, genes, onWrite, hide } = props;
-    // Genomic data
-    // const referenceGenomes = ['hg38'];
+    const {
+        chromosomes,
+        genes,
+        onWrite,
+        hide,
+        selectedChromosomes,
+        selectedGenes,
+        startPos,
+        endPos,
+        setSelectedChromosomes,
+        setSelectedGenes,
+        setStartPos,
+        setEndPos
+    } = props;
+
     const [selectedGenome, _setSelectedGenome] = useState('hg38');
-    const [selectedChromosomes, setSelectedChromosomes] = useState('');
-    const [selectedGenes, setSelectedGenes] = useState('');
-    const [startPos, setStartPos] = useState(0);
-    const [endPos, setEndPos] = useState(0);
     const [_timeout, setNewTimeout] = useState(null);
 
     if (hide) {
@@ -339,6 +354,64 @@ function Sidebar() {
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
 
+    // Genomic data
+    // const referenceGenomes = ['hg38'];
+    const [selectedGenome, _setSelectedGenome] = useState('hg38');
+    const [selectedChromosomes, setSelectedChromosomes] = useState('');
+    const [selectedGenes, setSelectedGenes] = useState('');
+    const [startPos, setStartPos] = useState(0);
+    const [endPos, setEndPos] = useState(0);
+    const [_timeout, setNewTimeout] = useState(null);
+
+    // Clinical Data
+    const [selectedNodes, setSelectedNodes] = useState({});
+    const [selectedCohorts, setSelectedCohorts] = useState({});
+    const [selectedTreatment, setSelectedTreatment] = useState({});
+    const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
+    const [selectedChemotherapy, setSelectedChemotherapy] = useState({});
+    const [selectedImmunotherapy, setSelectedImmunotherapy] = useState({});
+    const [selectedHormoneTherapy, setSelectedHormoneTherapy] = useState({});
+
+    function resetButton() {
+        // Reset state variables for checkboxes and dropdowns
+        const locations = readerContext?.programs?.map((loc) => loc.location.name);
+
+        if (locations) {
+            const selectedNodes = locations.reduce((acc, loc) => {
+                acc[loc] = true;
+                return acc;
+            }, {});
+
+            setSelectedNodes(selectedNodes);
+        }
+        setSelectedCohorts([readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || []]);
+
+        // Genomic
+        setSelectedGenes('');
+        setSelectedChromosomes('');
+        setStartPos(0);
+        setEndPos(0);
+
+        // Clinical
+        setSelectedTreatment({});
+        setSelectedPrimarySite({});
+        setSelectedChemotherapy({});
+        setSelectedImmunotherapy({});
+        setSelectedHormoneTherapy({});
+
+        // Set context writer to include only nodes and cohorts
+        writerContext({
+            // Set nodes and cohorts in the filter
+            filter: {
+                node: [readerContext?.programs?.map((loc) => loc.location.name) || []], // Set your default nodes
+                exclude_cohorts: [
+                    readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || []
+                ], // Set cohorts to empty array or whichever default value you want
+                query: {}
+            }
+        });
+    }
+
     // Fill up a list of options from the results of a Katsu query
     // This includes treatment types within the dataset, etc.
     const ExtractSidebarElements = (key) => {
@@ -377,13 +450,45 @@ function Sidebar() {
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
             </Tabs>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Button className={classes.button} onClick={() => resetButton()}>
+                    Reset Filters
+                </Button>
+            </div>
             <SidebarGroup name="Node">
-                <StyledCheckboxList options={sites} onWrite={writerContext} groupName="node" isFilterList />
+                <StyledCheckboxList
+                    options={sites}
+                    onWrite={writerContext}
+                    groupName="node"
+                    isFilterList
+                    checked={selectedNodes}
+                    setChecked={setSelectedNodes}
+                />
             </SidebarGroup>
             <SidebarGroup name="Cohort">
-                <StyledCheckboxList options={cohorts} onWrite={writerContext} groupName="exclude_cohorts" isExclusion />
+                <StyledCheckboxList
+                    options={cohorts}
+                    onWrite={writerContext}
+                    groupName="exclude_cohorts"
+                    isExclusion
+                    checked={selectedCohorts}
+                    setChecked={setSelectedCohorts}
+                />
             </SidebarGroup>
-            <GenomicsGroup chromosomes={chromosomes} genes={genes} onWrite={writerContext} hide={hideGenomic} />
+            <GenomicsGroup
+                chromosomes={chromosomes}
+                genes={genes}
+                onWrite={writerContext}
+                hide={hideGenomic}
+                selectedChromosomes={selectedChromosomes}
+                selectedGenes={selectedGenes}
+                startPos={startPos}
+                endPos={endPos}
+                setSelectedChromosomes={setSelectedChromosomes}
+                setSelectedGenes={setSelectedGenes}
+                setStartPos={setStartPos}
+                setEndPos={setEndPos}
+            />
             <SidebarGroup name="Treatment" hide={hideClinical}>
                 <StyledCheckboxList
                     options={treatmentTypes}
@@ -391,6 +496,8 @@ function Sidebar() {
                     groupName="treatment"
                     useAutoComplete={treatmentTypes.length >= 10}
                     hide={hideClinical}
+                    checked={selectedTreatment}
+                    setChecked={setSelectedTreatment}
                 />
             </SidebarGroup>
             <SidebarGroup name="Tumour Primary Site" hide={hideClinical}>
@@ -400,6 +507,8 @@ function Sidebar() {
                     groupName="primary_site"
                     useAutoComplete={tumourPrimarySites.length >= 10}
                     hide={hideClinical}
+                    checked={selectedPrimarySite}
+                    setChecked={setSelectedPrimarySite}
                 />
             </SidebarGroup>
             <SidebarGroup name="Chemotherapy" hide={hideClinical}>
@@ -409,6 +518,8 @@ function Sidebar() {
                     groupName="chemotherapy"
                     useAutoComplete={chemotherapyDrugNames.length >= 10}
                     hide={hideClinical}
+                    checked={selectedChemotherapy}
+                    setChecked={setSelectedChemotherapy}
                 />
             </SidebarGroup>
             <SidebarGroup name="Immunotherapy" hide={hideClinical}>
@@ -418,6 +529,8 @@ function Sidebar() {
                     groupName="immunotherapy"
                     useAutoComplete={immunotherapyDrugNames.length >= 10}
                     hide={hideClinical}
+                    checked={selectedImmunotherapy}
+                    setChecked={setSelectedImmunotherapy}
                 />
             </SidebarGroup>
             <SidebarGroup name="Hormone Therapy" hide={hideClinical}>
@@ -427,6 +540,8 @@ function Sidebar() {
                     groupName="hormone_therapy"
                     useAutoComplete={hormoneTherapyDrugNames.length >= 10}
                     hide={hideClinical}
+                    checked={selectedHormoneTherapy}
+                    setChecked={setSelectedHormoneTherapy}
                 />
             </SidebarGroup>
         </Root>
