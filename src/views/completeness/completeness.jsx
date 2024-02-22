@@ -12,16 +12,11 @@ import { fetchFederation } from 'store/api';
 
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // Test data
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import MainCard from 'ui-component/cards/MainCard';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
-
-window.Highcharts = Highcharts;
 
 function Completeness() {
     const theme = useTheme();
@@ -33,11 +28,7 @@ function Completeness() {
     const [numProvinces, setNumProvinces] = useState(0);
     const [numClinicalComplete, setNumClinicalComplete] = useState(0);
     const [numGenomicComplete, setNumGenomicComplete] = useState(0);
-    const [programData, setProgramData] = useState({});
     const [isLoading, setLoading] = useState(false);
-    const chartRef = createRef();
-
-    NoDataToDisplay(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -71,7 +62,7 @@ function Completeness() {
     }, [sidebarWriter]);
 
     useEffect(() => {
-        fetchFederation('v2/authorized/programs', 'katsu').then((data) => {
+        fetchFederation('discovery/programs', 'query').then((data) => {
             // Step 1: Determine the number of provinces
             const provinces = data.map((site) => site?.location?.province);
             const uniqueProvinces = [...new Set(provinces)];
@@ -86,10 +77,11 @@ function Completeness() {
             let totalCases = 0;
             let completeCases = 0;
             const completeClinical = {};
+            console.log(data);
             data.forEach((site) => {
                 totalSites += 1;
                 totalErroredSites += site.status === 200 ? 0 : 1;
-                site?.results?.results?.forEach((program) => {
+                site?.results?.programs?.forEach((program) => {
                     if (program?.metadata?.summary_cases) {
                         totalCases += program.metadata.summary_cases.total_cases;
                         completeCases += program.metadata.summary_cases.complete_cases;
@@ -104,6 +96,7 @@ function Completeness() {
             setNumErrorNodes(totalErroredSites);
             setNumDonors(totalCases);
             setNumCompleteDonors(completeCases);
+            console.log(completeClinical);
             setNumClinicalComplete(completeClinical);
             setClinicalComplete(data);
         });
@@ -146,18 +139,9 @@ function Completeness() {
                     numCompleteGenomic[site.location.name] += site.results[program].all;
                 });
             });
-            console.log('numCompleteGenomic:');
-            console.log(numCompleteGenomic);
             setNumGenomicComplete(numCompleteGenomic);
         });
-        fetchFederation('discovery/programs', 'query').then((data) => {
-            console.log('discovery/programs');
-            console.log(data.filter((site) => site.status === 200));
-            setProgramData(data.filter((site) => site.status === 200));
-        });
     }, []);
-
-    console.log(numGenomicComplete);
 
     return (
         <Grid container spacing={1}>
@@ -249,14 +233,11 @@ function Completeness() {
                     cutoff={10}
                 />
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <FieldLevelCompletenessGraph data={programData} loading={programData.length === 0} />
-            </Grid>
             {/* <Grid item xs={12} sm={12} md={6} lg={6}>
                 <MainCard>(Percentage complete graph)</MainCard>
             </Grid> */}
             <Grid item xs={12} sm={12} md={6} lg={6}>
-                <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} />
+                <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} title="Field Level" />
             </Grid>
         </Grid>
     );
