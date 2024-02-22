@@ -85,8 +85,9 @@ function FieldLevelCompletenessGraph(props) {
             // Convert each one into a singular field
             // Category -> Field name -> { missing & total }
             cohorts.forEach((cohort) => {
-                allCohorts.push(cohort.program_id);
-                if (cohort.program_id !== filter && filter !== 'All cohorts') {
+                const concatName = `${site.location.name} - ${cohort.program_id}`;
+                allCohorts.push(concatName);
+                if (concatName !== filter && filter !== 'All cohorts') {
                     return;
                 }
 
