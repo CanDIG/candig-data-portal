@@ -2,11 +2,12 @@ import { createRef, useState, useEffect } from 'react';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
-import { Box, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Divider, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 // project imports
-import Highcharts from 'highcharts';
+import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
@@ -16,9 +17,45 @@ import { useTheme } from '@mui/system';
 
 window.Highcharts = Highcharts;
 
+const PREFIX = 'FieldLevelCompletenessGraph';
+
+const classes = {
+    titleBar: `${PREFIX}-titleBar`,
+    title: `${PREFIX}-title`,
+    titleBox: `${PREFIX}-titleBox`,
+    siteSelection: `${PREFIX}-siteSelection`,
+    spacer: `${PREFIX}-spacer`
+};
+
+const Root = styled(Box)(({ _ }) => ({
+    [`& .${classes.titleBar}`]: {
+        display: 'flex',
+        alignItems: 'center'
+    },
+    [`& .${classes.titleBox}`]: {
+        flex: 2,
+        display: 'inline-flex',
+        marginLeft: 'auto'
+    },
+    [`& .${classes.title}`]: {
+        flex: 2,
+        display: 'inline-flex',
+        flexDirection: 'row-reverse',
+        marginLeft: 'auto'
+    },
+    [`& .${classes.spacer}`]: {
+        flexGrow: 3,
+        display: 'inline-flex'
+    },
+    [`& .${classes.siteSelection}`]: {
+        flex: 1,
+        display: 'inline-flex'
+    }
+}));
+
 function FieldLevelCompletenessGraph(props) {
-    const { data, loading } = props;
-    const [filter, setFilter] = useState('All sites');
+    const { data, loading, title } = props;
+    const [filter, setFilter] = useState('All cohorts');
     const theme = useTheme();
     const chartRef = createRef();
 
@@ -36,10 +73,11 @@ function FieldLevelCompletenessGraph(props) {
 
     // TODO: Filter fields here
     const fields = {};
-    const allCohorts = ['All sites'];
+    const allCohorts = ['All cohorts'];
     if (data) {
+        console.log(data);
         Object.values(data).forEach((site) => {
-            const cohorts = site.results?.results;
+            const cohorts = site.results?.programs;
             if (!cohorts) {
                 return;
             }
@@ -48,7 +86,7 @@ function FieldLevelCompletenessGraph(props) {
             // Category -> Field name -> { missing & total }
             cohorts.forEach((cohort) => {
                 allCohorts.push(cohort.program_id);
-                if (cohort.program_id !== filter && filter !== 'All sites') {
+                if (cohort.program_id !== filter && filter !== 'All cohorts') {
                     return;
                 }
 
@@ -71,10 +109,6 @@ function FieldLevelCompletenessGraph(props) {
         });
     }
 
-    /* Object.keys(fields).forEach((field) => {
-        fields[field].pct = 1 - fields[field].missing / fields[field].total;
-    }); */
-
     // Convert this into something HighCharts can understand
     // First, we need to convert the fields into a list, sorted by their width
     const series = Object.keys(fields)
@@ -88,6 +122,9 @@ function FieldLevelCompletenessGraph(props) {
     console.log(categories);
     console.log(dataPoints);
     const highChartSettings = {
+        legend: {
+            enabled: false
+        },
         credits: {
             enabled: false
         },
@@ -97,30 +134,23 @@ function FieldLevelCompletenessGraph(props) {
             plotBorderWidth: null,
             plotShadow: false
         },
-        colors: [
-            theme.palette.primary[200],
-            theme.palette.primary.main,
-            theme.palette.primary.dark,
-            theme.palette.primary[800],
-            theme.palette.secondary[200],
-            theme.palette.secondary.main,
-            theme.palette.secondary.dark,
-            theme.palette.secondary[800],
-            theme.palette.tertiary[200],
-            theme.palette.tertiary.main,
-            theme.palette.tertiary.dark,
-            theme.palette.tertiary[800]
-        ],
+        colors: [theme.palette.primary.main],
         plotOptions: {
             bar: {
                 dataLabels: {
+                    align: 'center',
+                    color: theme.palette.primary.light,
                     enabled: true,
-                    format: '{y}%'
+                    format: '{y}%',
+                    inside: true,
+                    style: {
+                        textOutline: 'none'
+                    }
                 }
             }
         },
         title: {
-            text: 'Data Completeness'
+            text: null
         },
         xAxis: {
             labels: {
@@ -130,23 +160,26 @@ function FieldLevelCompletenessGraph(props) {
                     const identifier = this.value.toString().split('/');
                     const field = identifier.slice(1).join('/').replaceAll('_', ' ');
                     let title = identifier[0][0].toUpperCase() + identifier[0].slice(1).toLowerCase();
-                    return `<b>${title}</b> <span style="text-transform:uppercase">${field}</span>`;
+                    return `<b>${title}:</b> <span style="text-transform:uppercase">${field}</span>`;
                 }
                 /* eslint-enable */
+            },
+            scrollbar: {
+                enabled: true
             },
             min: 0,
             max: 10,
             type: 'category'
         },
         yAxis: {
-            title: null,
+            labels: {
+                enabled: false
+            },
             min: 0,
-            max: 100
+            max: 100,
+            title: null
         },
-        scrollbar: {
-            enabled: true
-        },
-        series: [{ data: series, colorByPoint: true, showInLegend: false }],
+        series: [{ name: 'Complete', data: series, colorByPoint: true, showInLegend: false }],
         tooltip: {
             pointFormat: '<b>{point.name}:</b> {point.y}%'
         }
@@ -154,24 +187,38 @@ function FieldLevelCompletenessGraph(props) {
 
     // Determine what we can do with the data
     return (
-        <Box sx={{ position: 'relative' }}>
-            <MainCard sx={{ borderRadius: 0.25 }}>
-                <Select value={filter} onChange={(event) => setFilter(event.target.value)}>
-                    {allCohorts.map((cohort) => (
-                        <MenuItem value={cohort} key={cohort}>
-                            {cohort}
-                        </MenuItem>
-                    ))}
-                </Select>
+        <Root sx={{ position: 'relative' }}>
+            <MainCard sx={{ borderRadius: 0.25, height: 500 }}>
+                <div className={classes.titleBar}>
+                    {/* <div className={classes.titleBox}>
+                        <div className={classes.title}>{title}</div>
+                        <div className={classes.title}>{title}</div>
+                    </div> */}
+                    <Typography className={classes.title} variant="h2">
+                        {title}
+                    </Typography>
+                    <div className={classes.spacer} />
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>
+                            {allCohorts.map((cohort) => (
+                                <MenuItem value={cohort} key={cohort}>
+                                    {cohort}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+                <Divider />
                 <HighchartsReact Highcharts={Highcharts} options={highChartSettings} ref={chartRef} />
             </MainCard>
-        </Box>
+        </Root>
     );
 }
 
 FieldLevelCompletenessGraph.propTypes = {
     data: PropTypes.array,
-    loading: PropTypes.bool
+    loading: PropTypes.bool,
+    title: PropTypes.string
 };
 
 export default FieldLevelCompletenessGraph;
