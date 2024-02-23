@@ -1,4 +1,5 @@
 import { createRef, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
@@ -58,6 +59,7 @@ function FieldLevelCompletenessGraph(props) {
     const [filter, setFilter] = useState('All cohorts');
     const theme = useTheme();
     const chartRef = createRef();
+    const events = useSelector((state) => state);
 
     NoDataToDisplay(Highcharts);
 
@@ -130,6 +132,7 @@ function FieldLevelCompletenessGraph(props) {
             enabled: false
         },
         chart: {
+            height: '360px; auto',
             type: 'bar',
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -189,7 +192,7 @@ function FieldLevelCompletenessGraph(props) {
     // Determine what we can do with the data
     return (
         <Root sx={{ position: 'relative' }}>
-            <MainCard sx={{ borderRadius: 0.25, height: 500 }}>
+            <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25, height: '440px; auto' }}>
                 <div className={classes.titleBar}>
                     {/* <div className={classes.titleBox}>
                         <div className={classes.title}>{title}</div>
