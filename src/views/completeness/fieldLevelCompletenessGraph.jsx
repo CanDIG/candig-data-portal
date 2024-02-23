@@ -157,7 +157,7 @@ function FieldLevelCompletenessGraph(props) {
             labels: {
                 // Anonymous functions don't appear to work with highcharts for some reason?
                 /* eslint-disable */
-                formatter: function() {
+                formatter: function () {
                     const identifier = this.value.toString().split('/');
                     const field = identifier.slice(1).join('/').replaceAll('_', ' ');
                     let title = identifier[0][0].toUpperCase() + identifier[0].slice(1).toLowerCase();
