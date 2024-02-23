@@ -28,32 +28,7 @@ function Completeness() {
     const [numProvinces, setNumProvinces] = useState(0);
     const [numClinicalComplete, setNumClinicalComplete] = useState(0);
     const [numGenomicComplete, setNumGenomicComplete] = useState(0);
-    const [isLoading, setLoading] = useState(false);
-
-    const [chartOptions, setChartOptions] = useState({
-        credits: {
-            enabled: false
-        },
-        colors: [
-            theme.palette.primary[200],
-            theme.palette.secondary[200],
-            theme.palette.tertiary[200],
-            theme.palette.primary.main,
-            theme.palette.secondary.main,
-            theme.palette.tertiary.main,
-            theme.palette.primary.dark,
-            theme.palette.secondary.dark,
-            theme.palette.tertiary.dark,
-            theme.palette.primary[800],
-            theme.palette.secondary[800],
-            theme.palette.tertiary[800]
-        ],
-        title: {
-            style: {
-                fontWeight: 'normal'
-            }
-        }
-    });
+    const [isLoading, setLoading] = useState(true);
 
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
@@ -62,7 +37,7 @@ function Completeness() {
     }, [sidebarWriter]);
 
     useEffect(() => {
-        fetchFederation('discovery/programs', 'query').then((data) => {
+        const programsQuery = fetchFederation('discovery/programs', 'query').then((data) => {
             // Step 1: Determine the number of provinces
             const provinces = data.map((site) => site?.location?.province);
             const uniqueProvinces = [...new Set(provinces)];
@@ -101,37 +76,7 @@ function Completeness() {
             setClinicalComplete(data);
         });
 
-        /*
-        // TODO: This should be a query microservice endpoint, due to the amount of data that needs to be processed
-        // Also! This isn't a count of donors, but of samples. That also kind of messes with the counts
-        fetchFederation('ga4gh/drs/v1/objects', 'htsget').then((data) => {
-            // Find all samples
-            const samples = data.filter((drs) => drs.description === 'sample');
-            let numCompleteSamples = 0;
-
-            samples.forEach((sample) => {
-                let hasGenome = false;
-                let hasTranscriptome = false;
-
-                sample.contents.forEach((content) => {
-                    const asdf = data.find((drs) => drs.self_uri === content.self_uri);
-                    if (asdf?.description === 'wgs') {
-                        hasGenome = true;
-                    } else if (asdf?.description === 'wts') {
-                        hasTranscriptome = true;
-                    }
-                });
-
-                if (hasGenome && hasTranscriptome) {
-                    numCompleteSamples += 1;
-                }
-            });
-
-            setNumGenomicComplete(numCompleteSamples);
-        });
-        */
-
-        fetchFederation('genomic_completeness', 'query').then((data) => {
+        const genomicQuery = fetchFederation('genomic_completeness', 'query').then((data) => {
             const numCompleteGenomic = {};
             data.filter((site) => site.status === 200).forEach((site) => {
                 numCompleteGenomic[site.location.name] = 0;
@@ -140,6 +85,10 @@ function Completeness() {
                 });
             });
             setNumGenomicComplete(numCompleteGenomic);
+        });
+
+        Promise.all([programsQuery, genomicQuery]).then(() => {
+            setLoading(false);
         });
     }, []);
 
