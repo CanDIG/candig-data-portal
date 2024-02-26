@@ -1,4 +1,4 @@
-import { createRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // mui
 // import { useTheme, makeStyles } from '@mui/styles';
@@ -15,7 +15,6 @@ import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
 
 // Test data
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
-import MainCard from 'ui-component/cards/MainCard';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
 
 function Completeness() {
@@ -161,10 +160,10 @@ function Completeness() {
                     dataObject={numClinicalComplete || {}}
                     data="full_clinical_data"
                     dataVis=""
-                    chartType="column"
+                    chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={undefined}
+                    loading={isLoading}
                     orderByFrequency
                     cutoff={10}
                 />
@@ -174,10 +173,10 @@ function Completeness() {
                     dataObject={numGenomicComplete || {}}
                     data="full_genomic_data"
                     dataVis=""
-                    chartType="column"
+                    chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={undefined}
+                    loading={isLoading}
                     orderByFrequency
                     cutoff={10}
                 />
