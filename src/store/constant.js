@@ -121,7 +121,7 @@ export const DataVisualizationChartInfo = {
         yAxis: 'Number of Patients'
     },
     diagnosis_age_count: {
-        title: ' Age at Diagnosis Distribution',
+        title: ' Age at First Diagnosis',
         xAxis: 'Age Range',
         yAxis: 'Number of Patients'
     },

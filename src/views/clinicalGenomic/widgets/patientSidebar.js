@@ -45,7 +45,7 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtDiagnosis }) {
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
@@ -72,21 +72,41 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
 
         const uniqueKeys = Array.from(uniqueKeysSet);
 
+        let startDate;
+        let endDate;
         const columns = uniqueKeys.map((key) => {
             const hasNonEmptyValue = array.some(
                 (obj) =>
                     obj[key] !== null &&
                     obj[key] !== undefined &&
                     obj[key] !== '' &&
-                    !(typeof obj[key] === 'object') &&
-                    (!(typeof obj[key] === 'object') || Object.keys(obj[key]).length > 0)
+                    (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key]))
             );
+
+            let value = key;
+            if (key === 'date_of_diagnosis') {
+                // Calculate age at diagnosis using the difference between date of diagnosis and date of birth
+                // const ageAtDiagnosisMonths = obj['date_of_diagnosis'].month_interval - obj['date_of_birth'].month_interval;
+                // const yearsAtDiagnosis = Math.floor(ageAtDiagnosisMonths / 12);
+                // const remainingMonthsAtDiagnosis = ageAtDiagnosisMonths % 12;
+                // const formattedAgeAtDiagnosis = `${yearsAtDiagnosis}y${remainingMonthsAtDiagnosis}m`;
+                value = `Age at Diagnosis`;
+            } else if (key.endsWith('_start_date')) {
+                value = `Diagnosis_to_${key}`;
+            } else if (key.endsWith('_end_date')) {
+                value = key.split('_end_date')[0];
+                value = `${value.trim()} Duration`;
+            } else if (key.startsWith('date_of_')) {
+                value = key.split('date_of_')[1];
+                value = `Diagnosis_to_${value.trim()}`;
+            }
+
             return hasNonEmptyValue
                 ? {
                       field: key,
-                      headerName: formatKey(key),
+                      headerName: formatKey(value),
                       flex: 1,
-                      minWidth: 250
+                      minWidth: 275
                   }
                 : null;
         });
@@ -110,7 +130,29 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle }) {
             const row = { id: index };
 
             filteredColumns.forEach((column) => {
-                row[column.field] = obj[column.field];
+                if (Object.prototype.hasOwnProperty.call(obj[column.field], 'month_interval')) {
+                    if (column.field === endDate) {
+                        const ageInMonths = obj[endDate].month_interval - obj[startDate].month_interval;
+                        const years = Math.floor(ageInMonths / 12);
+                        const remainingMonths = ageInMonths % 12;
+
+                        // Format the years and months into a single string
+                        const formattedAge = years > 0 ? `${years}y ${remainingMonths}m` : `${remainingMonths}m`;
+                        row[column.field] = formattedAge;
+                    } else if (column.field === 'date_of_diagnosis') {
+                        row[column.field] = ageAtDiagnosis;
+                    } else {
+                        const ageInMonths = obj[column.field].month_interval;
+                        const years = Math.floor(ageInMonths / 12);
+                        const remainingMonths = ageInMonths % 12;
+
+                        // Format the years and months into a single string
+                        const formattedAge = years > 0 ? `${years}y ${remainingMonths}m` : `${remainingMonths}m`;
+                        row[column.field] = formattedAge;
+                    }
+                } else {
+                    row[column.field] = obj[column.field];
+                }
             });
 
             return row;
@@ -262,7 +304,8 @@ PatientSidebar.propTypes = {
     sidebar: PropTypes.object,
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
-    setTitle: PropTypes.func.isRequired
+    setTitle: PropTypes.func.isRequired,
+    ageAtDiagnosis: PropTypes.number
 };
 
 export default PatientSidebar;

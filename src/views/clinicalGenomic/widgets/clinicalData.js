@@ -33,6 +33,14 @@ function ClinicalView() {
                     // Make sure each row has an ID and a deceased status
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
+                    if (patient.date_of_birth && patient.date_of_death) {
+                        const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;
+                        patient.date_of_death = Math.floor(ageInMonths / 12);
+                        patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
+                    } else {
+                        delete patient.date_of_birth;
+                        delete patient.date_of_death;
+                    }
 
                     return patient;
                 }) || [];
@@ -53,8 +61,8 @@ function ClinicalView() {
         { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
         { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
         { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
-        { field: 'date_of_birth', headerName: 'Date of Birth', minWidth: 200, sortable: false },
-        { field: 'date_of_death', headerName: 'Date of Death', minWidth: 220, sortable: false }
+        { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false },
+        { field: 'date_of_death', headerName: 'Age at Death', minWidth: 220, sortable: false }
     ];
 
     const HandlePageChange = (newModel) => {
