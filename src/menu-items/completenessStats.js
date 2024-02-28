@@ -1,5 +1,5 @@
 // assets
-import { IconReportMedical } from '@tabler/icons-react';
+import { IconTrendingUp } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
@@ -8,7 +8,7 @@ import config from 'config';
 const { basename } = config;
 
 const icons = {
-    IconReportMedical
+    IconTrendingUp
 };
 
 // ===========================|| Completeness Stats MENU ITEMS ||=========================== //
@@ -23,7 +23,7 @@ const completenessStats = {
             title: 'Completeness Stats',
             type: 'item',
             url: `${basename}/completeness `,
-            icon: icons.IconReportMedical,
+            icon: icons.IconTrendingUp,
             breadcrumbs: false
         }
     ]

@@ -1,5 +1,5 @@
 // assets
-import { IconReportMedical } from '@tabler/icons-react';
+import { IconLayoutDashboard } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
@@ -8,7 +8,7 @@ import config from 'config';
 const { basename } = config;
 
 const icons = {
-    IconReportMedical
+    IconLayoutDashboard
 };
 
 // ===========================|| Clinical MENU ITEMS ||=========================== //
@@ -23,7 +23,7 @@ const summary = {
             title: 'Summary',
             type: 'item',
             url: `${basename}/summary`,
-            icon: icons.IconReportMedical,
+            icon: icons.IconLayoutDashboard,
             breadcrumbs: false
         }
     ]
