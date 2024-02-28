@@ -54,6 +54,7 @@ function useClinicalPatientData(patientId, programId) {
                     filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
                     delete filteredData.date_of_death;
                     delete filteredData.date_of_birth;
+
                     setTopLevel(filteredData);
                     setData(patientData);
                     // Update the sidebar with patientData using the PatientSidebar component
@@ -63,7 +64,7 @@ function useClinicalPatientData(patientId, programId) {
                             setRows={setRows}
                             setColumns={setColumns}
                             setTitle={setTitle}
-                            ageAtDiagnosis={filteredData.age_at_diagnosis}
+                            ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
                             resolution={filteredData.date_resolution}
                         />
                     );
