@@ -27,10 +27,10 @@ function useClinicalPatientData(patientId, programId) {
                     value !== null &&
                     !(
                         (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
-                        typeof value === 'object' || // Exclude all objects
                         value === '' ||
                         key === ''
-                    )
+                    ) &&
+                    (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key])) // Accept interval date objects remove all other objects
             )
         );
     }
@@ -47,13 +47,27 @@ function useClinicalPatientData(patientId, programId) {
                     const result = await fetchFederation(url, 'katsu');
                     // Extract patientData from the fetched result or use an empty object
                     const patientData = result[0].results || {};
-
-                    // Update the sidebar with patientData using the PatientSidebar component
-                    sidebarWriter(<PatientSidebar sidebar={patientData} setRows={setRows} setColumns={setColumns} setTitle={setTitle} />);
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
+                    const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
+                    filteredData.age_at_death = Math.floor(ageInMonths / 12);
+                    filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                    delete filteredData.date_of_death;
+                    delete filteredData.date_of_birth;
+
                     setTopLevel(filteredData);
                     setData(patientData);
+                    // Update the sidebar with patientData using the PatientSidebar component
+                    sidebarWriter(
+                        <PatientSidebar
+                            sidebar={patientData}
+                            setRows={setRows}
+                            setColumns={setColumns}
+                            setTitle={setTitle}
+                            ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
+                            resolution={filteredData.date_resolution}
+                        />
+                    );
                 }
             } catch (error) {
                 console.error('Error fetching clinical patient data:', error);
