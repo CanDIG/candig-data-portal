@@ -1,5 +1,5 @@
 // assets
-import { IconReportMedical } from '@tabler/icons-react';
+import { IconReportSearch } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
@@ -8,7 +8,7 @@ import config from 'config';
 const { basename } = config;
 
 const icons = {
-    IconReportMedical
+    IconReportSearch
 };
 
 // ===========================|| Clinical MENU ITEMS ||=========================== //
@@ -23,7 +23,7 @@ const clinicalGenomicSearch = {
             title: 'Clinical & Genomic Search',
             type: 'item',
             url: `${basename}/clinicalGenomicSearch `,
-            icon: icons.IconReportMedical,
+            icon: icons.IconReportSearch,
             breadcrumbs: false
         }
     ]
