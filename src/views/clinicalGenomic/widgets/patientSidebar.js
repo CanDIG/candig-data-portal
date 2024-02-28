@@ -45,7 +45,8 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtDiagnosis }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtDiagnosis, resolution }) {
+    console.log(resolution);
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
@@ -85,17 +86,14 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtDiag
 
             let value = key;
             if (key === 'date_of_diagnosis') {
-                // Calculate age at diagnosis using the difference between date of diagnosis and date of birth
-                // const ageAtDiagnosisMonths = obj['date_of_diagnosis'].month_interval - obj['date_of_birth'].month_interval;
-                // const yearsAtDiagnosis = Math.floor(ageAtDiagnosisMonths / 12);
-                // const remainingMonthsAtDiagnosis = ageAtDiagnosisMonths % 12;
-                // const formattedAgeAtDiagnosis = `${yearsAtDiagnosis}y${remainingMonthsAtDiagnosis}m`;
                 value = `Age at Diagnosis`;
             } else if (key.endsWith('_start_date')) {
                 value = `Diagnosis_to_${key}`;
+                startDate = key;
             } else if (key.endsWith('_end_date')) {
                 value = key.split('_end_date')[0];
                 value = `${value.trim()} Duration`;
+                endDate = key;
             } else if (key.startsWith('date_of_')) {
                 value = key.split('date_of_')[1];
                 value = `Diagnosis_to_${value.trim()}`;
@@ -305,7 +303,8 @@ PatientSidebar.propTypes = {
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
     setTitle: PropTypes.func.isRequired,
-    ageAtDiagnosis: PropTypes.number
+    ageAtDiagnosis: PropTypes.number,
+    resolution: PropTypes.string
 };
 
 export default PatientSidebar;

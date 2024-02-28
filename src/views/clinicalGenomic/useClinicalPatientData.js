@@ -51,7 +51,7 @@ function useClinicalPatientData(patientId, programId) {
                     const filteredData = filterNestedObject(patientData);
                     const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
                     filteredData.age_at_death = Math.floor(ageInMonths / 12);
-                    filteredData.age_at_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                    filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
                     delete filteredData.date_of_death;
                     delete filteredData.date_of_birth;
                     setTopLevel(filteredData);
@@ -64,6 +64,7 @@ function useClinicalPatientData(patientId, programId) {
                             setColumns={setColumns}
                             setTitle={setTitle}
                             ageAtDiagnosis={filteredData.age_at_diagnosis}
+                            resolution={filteredData.date_resolution}
                         />
                     );
                 }
