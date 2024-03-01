@@ -216,7 +216,9 @@ function CustomOfflineChart(props) {
                                 dataSum += point.y;
                             });
                             const pcnt = (this.y / dataSum) * 100;
-                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
+                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(
+                                pcnt
+                            )}%) total ${this.series.yAxis.axisTitle.textStr.toLowerCase()}`;
                         }
                         /* eslint-enable func-names */
                     }

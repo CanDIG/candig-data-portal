@@ -8,7 +8,7 @@ import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 
 // project imports
-import { fetchFederation } from 'store/api';
+import { fetchClinicalCompleteness, fetchFederation, fetchGenomicCompleteness } from 'store/api';
 
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
@@ -36,54 +36,18 @@ function Completeness() {
     }, [sidebarWriter]);
 
     useEffect(() => {
-        const programsQuery = fetchFederation('discovery/programs', 'query').then((data) => {
-            // Step 1: Determine the number of provinces
-            const provinces = data.map((site) => site?.location?.province);
-            const uniqueProvinces = [...new Set(provinces)];
-            setNumProvinces(uniqueProvinces.length);
-
-            // Step 2: Determine the number of nodes
-            setNumNodes(data.length);
-
-            // Step 3: Determine the number of donors
-            let totalSites = 0;
-            let totalErroredSites = 0;
-            let totalCases = 0;
-            let completeCases = 0;
-            const completeClinical = {};
-            console.log(data);
-            data.forEach((site) => {
-                totalSites += 1;
-                totalErroredSites += site.status === 200 ? 0 : 1;
-                site?.results?.programs?.forEach((program) => {
-                    if (program?.metadata?.summary_cases) {
-                        totalCases += program.metadata.summary_cases.total_cases;
-                        completeCases += program.metadata.summary_cases.complete_cases;
-                        if (!(site.location.name in completeClinical)) {
-                            completeClinical[site.location.name] = {};
-                        }
-                        completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.total_cases;
-                    }
-                });
-            });
-            setNumNodes(totalSites);
-            setNumErrorNodes(totalErroredSites);
-            setNumDonors(totalCases);
-            setNumCompleteDonors(completeCases);
-            console.log(completeClinical);
-            setNumClinicalComplete(completeClinical);
-            setClinicalComplete(data);
+        const programsQuery = fetchClinicalCompleteness().then((data) => {
+            setNumProvinces(data.numProvinces);
+            setNumNodes(data.numNodes);
+            setNumErrorNodes(data.numErrorNodes);
+            setNumDonors(data.numDonors);
+            setNumCompleteDonors(data.numCompleteDonors);
+            setNumClinicalComplete(data.numClinicalComplete);
+            setClinicalComplete(data.data);
         });
 
-        const genomicQuery = fetchFederation('genomic_completeness', 'query').then((data) => {
-            const numCompleteGenomic = {};
-            data.filter((site) => site.status === 200).forEach((site) => {
-                numCompleteGenomic[site.location.name] = 0;
-                Object.keys(site.results).forEach((program) => {
-                    numCompleteGenomic[site.location.name] += site.results[program].all;
-                });
-            });
-            setNumGenomicComplete(numCompleteGenomic);
+        const genomicQuery = fetchGenomicCompleteness().then((data) => {
+            setNumGenomicComplete(data);
         });
 
         Promise.all([programsQuery, genomicQuery]).then(() => {
