@@ -29,35 +29,7 @@ function DataVisualization() {
         patients_per_cohort: resultsContext?.patients_per_cohort || {},
         diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
         treatment_type_count: resultsContext?.treatment_type_count || {},
-        cancer_type_count: resultsContext?.cancer_type_count || {},
-        full_clinical_data: {
-            BCGSC: {
-                POG: 30
-            },
-            UHN: {
-                POG: 14,
-                Inspire: 20,
-                Biocan: 20,
-                Biodiva: 10
-            },
-            C3G: {
-                MOCK: 30
-            }
-        },
-        full_genomic_data: {
-            BCGSC: {
-                POG: 10
-            },
-            UHN: {
-                POG: 4,
-                Inspire: 10,
-                Biocan: 12,
-                Biodiva: 12
-            },
-            C3G: {
-                MOCK: 3
-            }
-        }
+        cancer_type_count: resultsContext?.cancer_type_count || {}
     };
     const theme = useTheme();
 
@@ -170,7 +142,6 @@ function DataVisualization() {
         );
     }
 
-    const completenessData = ['full_clinical_data', 'full_genomic_data'];
     function returndataVisData() {
         const data = dataVisData.map((item, index) => (
             <Grid item xs={12} sm={12} md={6} lg={3} key={item + index}>
@@ -184,7 +155,6 @@ function DataVisualization() {
                     dropDown
                     onRemoveChart={() => removeChart(index)}
                     edit={edit}
-                    grayscale={completenessData.includes(item)}
                     orderByFrequency={item !== 'diagnosis_age_count'}
                     orderAlphabetically={item === 'diagnosis_age_count'}
                     trimByDefault={dataVisTrim[index]}
