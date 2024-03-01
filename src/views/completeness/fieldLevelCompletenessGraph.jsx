@@ -42,7 +42,10 @@ const Root = styled(Box)(({ _ }) => ({
         flex: 2,
         display: 'inline-flex',
         flexDirection: 'row-reverse',
-        marginLeft: 'auto'
+        marginLeft: 'auto',
+        fontSize: '1.4em',
+        fontWeight: 'normal',
+        fontFamily: 'Helvetica, Arial, sans-serif' // Taken from HighCharts
     },
     [`& .${classes.spacer}`]: {
         flexGrow: 3,
@@ -119,8 +122,6 @@ function FieldLevelCompletenessGraph(props) {
             return [field, pct * 100];
         })
         .sort((a, b) => a[1] - b[1]);
-    const categories = series.map((point) => point[0]);
-    const dataPoints = series.map((point) => point[1]);
     const highChartSettings = {
         legend: {
             enabled: false
@@ -191,13 +192,7 @@ function FieldLevelCompletenessGraph(props) {
         <Root sx={{ position: 'relative' }}>
             <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25, height: '440px; auto' }}>
                 <div className={classes.titleBar}>
-                    {/* <div className={classes.titleBox}>
-                        <div className={classes.title}>{title}</div>
-                        <div className={classes.title}>{title}</div>
-                    </div> */}
-                    <Typography className={classes.title} variant="h2">
-                        {title}
-                    </Typography>
+                    <Typography className={classes.title}>{title}</Typography>
                     <div className={classes.spacer} />
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>
