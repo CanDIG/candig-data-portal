@@ -8,14 +8,11 @@ import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
-import { fetchFederationStat } from 'store/api';
+import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
 import { aggregateObj, aggregateObjStack } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
-
-// Test data
-import { fullClinicalData, fullGenomicData } from '../../store/constant';
 
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 
@@ -30,8 +27,8 @@ function Summary() {
     const [cohortCount, setCohortCount] = useState(undefined);
     const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
     const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
-    // const [fullClinicalData, setFullClinicalData] = useState({});
-    // const [fullGenomicData, setFullGenomicData] = useState({});
+    const [numClinicalComplete, setNumClinicalComplete] = useState({});
+    const [numGenomicComplete, setNumGenomicComplete] = useState({});
     const [connectionError, setConnectionError] = useState(0);
     const [sites, setSites] = useState(0);
     const [totalSites, setTotalSites] = useState(0);
@@ -134,6 +131,18 @@ function Summary() {
         }
     }
 
+    function fetchClinical() {
+        fetchClinicalCompleteness().then((data) => {
+            setNumClinicalComplete(data.numClinicalComplete);
+        });
+    }
+
+    function fetchGenomic() {
+        fetchGenomicCompleteness().then((numCompleteGenomic) => {
+            setNumGenomicComplete(numCompleteGenomic);
+        });
+    }
+
     useEffect(() => {
         function fetchData(endpoint) {
             return fetchFederationStat(endpoint)
@@ -155,6 +164,8 @@ function Summary() {
             .then(() => fetchData('/patients_per_cohort'))
             .then(() => fetchData('/treatment_type_count'))
             .then(() => fetchData('/diagnosis_age_count'))
+            .then(() => fetchGenomic())
+            .then(() => fetchClinical())
             .finally(() => setLoading(false));
     }, []);
 
@@ -272,28 +283,26 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={fullClinicalData || {}}
+                    dataObject={numClinicalComplete || {}}
                     data="full_clinical_data"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={fullClinicalData === undefined}
-                    grayscale
+                    loading={numClinicalComplete === undefined}
                     orderByFrequency
                     cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={fullGenomicData || {}}
+                    dataObject={numGenomicComplete || {}}
                     data="full_genomic_data"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={fullGenomicData === undefined}
-                    grayscale
+                    loading={numGenomicComplete === undefined}
                     orderByFrequency
                     cutoff={10}
                 />

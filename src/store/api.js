@@ -272,3 +272,56 @@ export function ingestGenomicData(data, program_id) {
             return error;
         });
 }
+
+export function fetchGenomicCompleteness() {
+    return fetchFederation('genomic_completeness', 'query').then((data) => {
+        const numCompleteGenomic = {};
+        data.filter((site) => site.status === 200).forEach((site) => {
+            numCompleteGenomic[site.location.name] = {};
+            Object.keys(site.results).forEach((program) => {
+                Object.keys(site.results[program]).forEach((type) => {
+                    numCompleteGenomic[site.location.name][`${program} (${type})`] = site.results[program][type];
+                });
+            });
+        });
+        return numCompleteGenomic;
+    });
+}
+
+export function fetchClinicalCompleteness() {
+    return fetchFederation('discovery/programs', 'query').then((data) => {
+        // Step 1: Determine the number of provinces
+        const provinces = data.map((site) => site?.location?.province);
+        const uniqueProvinces = [...new Set(provinces)];
+        const retVal = {};
+        retVal.numProvinces = uniqueProvinces.length;
+
+        // Step 3: Determine the number of donors
+        let totalSites = 0;
+        let totalErroredSites = 0;
+        let totalCases = 0;
+        let completeCases = 0;
+        const completeClinical = {};
+        data.forEach((site) => {
+            totalSites += 1;
+            totalErroredSites += site.status === 200 ? 0 : 1;
+            site?.results?.programs?.forEach((program) => {
+                if (program?.metadata?.summary_cases) {
+                    totalCases += program.metadata.summary_cases.total_cases;
+                    completeCases += program.metadata.summary_cases.complete_cases;
+                    if (!(site.location.name in completeClinical)) {
+                        completeClinical[site.location.name] = {};
+                    }
+                    completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.total_cases;
+                }
+            });
+        });
+        retVal.numNodes = totalSites;
+        retVal.numErrorNodes = totalErroredSites;
+        retVal.numDonors = totalCases;
+        retVal.numCompleteDonors = completeCases;
+        retVal.numClinicalComplete = completeClinical;
+        retVal.data = data;
+        return retVal;
+    });
+}

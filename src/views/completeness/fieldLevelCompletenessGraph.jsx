@@ -77,7 +77,6 @@ function FieldLevelCompletenessGraph(props) {
     const fields = {};
     const allCohorts = ['All cohorts'];
     if (data) {
-        console.log(data);
         Object.values(data).forEach((site) => {
             const cohorts = site.results?.programs;
             if (!cohorts) {
@@ -122,8 +121,6 @@ function FieldLevelCompletenessGraph(props) {
         .sort((a, b) => a[1] - b[1]);
     const categories = series.map((point) => point[0]);
     const dataPoints = series.map((point) => point[1]);
-    console.log(categories);
-    console.log(dataPoints);
     const highChartSettings = {
         legend: {
             enabled: false
