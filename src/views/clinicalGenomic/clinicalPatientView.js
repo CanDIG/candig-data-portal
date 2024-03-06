@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey } from '../../utils/utils';
+import Timeline from './widgets/timeline';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -33,10 +34,10 @@ function ClinicalPatientView() {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
-        const intitalProgramId = urlParams.get('programId');
+        const initialProgramId = urlParams.get('programId');
 
         setPatientId(initialPatientId || '');
-        setProgramId(intitalProgramId || '');
+        setProgramId(initialProgramId || '');
     }, []);
 
     const additionalClass = 'your-additional-class'; // Replace with your actual class
@@ -49,6 +50,7 @@ function ClinicalPatientView() {
             <Typography pb={1} variant="h6">
                 {patientId}
             </Typography>
+            <Timeline />
             <div style={{ width: '100%', height: '68vh' }}>
                 <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>
