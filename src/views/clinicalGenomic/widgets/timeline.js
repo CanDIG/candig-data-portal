@@ -5,6 +5,7 @@ import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
+import useClinicalPatientData from './useClinicalPatientData';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -13,6 +14,18 @@ HighchartsAccessibility(Highcharts);
 
 function Timeline() {
     // Data for the Gantt chart
+    let data = [{}]
+    const date_data = useClinicalPatientData(patientId, programId);
+
+    for (let x = 0; x < date_data.length; x++) {
+        data.push({
+            name: date_data[x].title,
+            start: date_data[x].start,
+            end: date_data[x],
+            y: x
+        })
+    };
+
     const chartOptions = {
         title: {
             text: 'Patient Timeline'
@@ -64,55 +77,9 @@ function Timeline() {
                 }
             }
         },
-        series: [
-            {
-                name: 'Project 1',
-                data: [
-                    {   y: 0,
-                        start: Date.UTC(2017, 11, 1),
-                        end: Date.UTC(2018, 1, 2),
-                        name: 'Treatment',
-                        completed: {
-                            amount: 1
-                        }
-                    },
-                    {   y: 1,
-                        start: Date.UTC(2018, 1, 2),
-                        end: Date.UTC(2018, 11, 5),
-                        name: 'Treatment',
-                        completed: {
-                            amount: 0.5
-                        }
-                    },
-                    {   y: 2,
-                        start: Date.UTC(2018, 11, 8),
-                        end: Date.UTC(2018, 11, 9),
-                        name: 'Treatment',
-                        completed: {
-                            amount: 0.15
-                        }
-                    },
-                    {   y: 3,
-                        start: Date.UTC(2018, 11, 9),
-                        end: Date.UTC(2018, 11, 19),
-                        name: 'Development',
-                        completed: {
-                            amount: 0.3
-                        }
-                    },
-                    {   y: 4,
-                        start: Date.UTC(2018, 11, 10),
-                        end: Date.UTC(2018, 11, 23),
-                        name: 'Testing'
-                    },
-                    {   y: 5,
-                        start: Date.UTC(2018, 11, 25, 8),
-                        end: Date.UTC(2018, 11, 25, 16),
-                        name: 'Release'
-                    }
-                ]
-            }
-        ]
+        series: [{
+            data: data,
+        }]
     };
 
     useEffect(() => {
