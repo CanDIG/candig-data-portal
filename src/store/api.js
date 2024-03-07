@@ -312,7 +312,7 @@ export function fetchClinicalCompleteness() {
                     if (!(site.location.name in completeClinical)) {
                         completeClinical[site.location.name] = {};
                     }
-                    completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.total_cases;
+                    completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.completeCases;
                 }
             });
         });
