@@ -68,45 +68,44 @@ function Timeline() {
             {
                 name: 'Project 1',
                 data: [
-                    {
+                    {   y: 0,
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
+                        name: 'Treatment',
                         completed: {
                             amount: 1
-                        },
-                        name: 'Treatment'
+                        }
                     },
-                    {
+                    {   y: 1,
                         start: Date.UTC(2018, 1, 2),
                         end: Date.UTC(2018, 11, 5),
+                        name: 'Treatment',
                         completed: {
                             amount: 0.5
-                        },
-                        name: 'Treatment'
+                        }
                     },
-                    {
+                    {   y: 2,
                         start: Date.UTC(2018, 11, 8),
                         end: Date.UTC(2018, 11, 9),
+                        name: 'Treatment',
                         completed: {
                             amount: 0.15
-                        },
-                        name: 'Treatment'
+                        }
                     },
-                    {
+                    {   y: 3,
                         start: Date.UTC(2018, 11, 9),
                         end: Date.UTC(2018, 11, 19),
+                        name: 'Development',
                         completed: {
-                            amount: 0.3,
-                            fill: '#fa0'
-                        },
-                        name: 'Development'
+                            amount: 0.3
+                        }
                     },
-                    {
+                    {   y: 4,
                         start: Date.UTC(2018, 11, 10),
                         end: Date.UTC(2018, 11, 23),
                         name: 'Testing'
                     },
-                    {
+                    {   y: 5,
                         start: Date.UTC(2018, 11, 25, 8),
                         end: Date.UTC(2018, 11, 25, 16),
                         name: 'Release'
@@ -121,7 +120,7 @@ function Timeline() {
         return () => Highcharts.charts.forEach((chart) => chart && chart.container && chart.destroy());
     }, []);
 
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+    return <HighchartsReact highcharts={Highcharts} constructorType={"ganttChart"} options={chartOptions} />;
 }
 
 export default Timeline;
