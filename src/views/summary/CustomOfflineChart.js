@@ -154,8 +154,8 @@ function CustomOfflineChart(props) {
                             fontWeight: 'normal'
                         }
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories, allowDecimals: false },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
                     colors: stackedTheme,
                     plotOptions: {
                         series: {
@@ -202,8 +202,8 @@ function CustomOfflineChart(props) {
                             fontWeight: 'normal'
                         }
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis } },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories, allowDecimals: false },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis }, allowDecimals: false },
                     colors: [theme.palette.primary.dark],
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
@@ -216,7 +216,9 @@ function CustomOfflineChart(props) {
                                 dataSum += point.y;
                             });
                             const pcnt = (this.y / dataSum) * 100;
-                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(pcnt)}%) total patient(s)`;
+                            return `<b> ${this.key}</b><br> - ${this.y} (${Highcharts.numberFormat(
+                                pcnt
+                            )}%) total ${this.series.yAxis.axisTitle.textStr.toLowerCase()}`;
                         }
                         /* eslint-enable func-names */
                     }
@@ -253,8 +255,8 @@ function CustomOfflineChart(props) {
                             fontWeight: 'normal'
                         }
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis } },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis } },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, allowDecimals: false },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
                     tooltip: {
                         pointFormat: '<b>{point.name}:</b> {point.y}'
                     },

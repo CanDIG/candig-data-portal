@@ -13,8 +13,8 @@ import clsx from 'clsx';
 // project imports
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from './Header';
+import Footer from './Footer';
 import Sidebar from './Sidebar';
-import Customization from '../Customization';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
 import { SET_MENU } from 'store/actions';
@@ -27,14 +27,22 @@ import { IconChevronRight } from '@tabler/icons-react';
 const PREFIX = 'MainLayout';
 const classes = {
     root: `${PREFIX}-root`,
+    rootShift: `${PREFIX}-rootShift`,
     appBar: `${PREFIX}-appBar`,
     appBarWidth: `${PREFIX}-appBarWidth`,
     content: `${PREFIX}-content`,
-    contentShift: `${PREFIX}-contentShift`
+    contentShift: `${PREFIX}-contentShift`,
+    footer: `${PREFIX}-footer`,
+    footerWidth: `${PREFIX}-footerWidth`
 };
-const Root = styled('div')(({ theme }) => ({
+const Root = styled('div')(({ theme, leftDrawerOpened }) => ({
     [`&.${classes.root}`]: {
-        display: 'flex'
+        display: 'flex',
+        flexDirection: 'column'
+    },
+    [`&.${classes.rootShift}`]: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`
     },
     [`& .${classes.appBar}`]: {
         backgroundColor: theme.palette.background.default
@@ -48,12 +56,13 @@ const Root = styled('div')(({ theme }) => ({
         ...theme.typography.mainContent,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
+        borderBottom: `3px dashed ${theme.palette.primary.main}`,
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen
         }),
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: -(drawerWidth - 20),
+        // marginLeft: -(drawerWidth - 20),
+        // width: `calc(100% - ${drawerWidth}px)`,
         [theme.breakpoints.down('lg')]: {
             padding: '16px'
         },
@@ -73,10 +82,22 @@ const Root = styled('div')(({ theme }) => ({
         borderBottomRightRadius: 0,
         [theme.breakpoints.down('lg')]: {
             marginLeft: '20px'
+            // marginLeft: -(drawerWidth - 20)
         },
         [theme.breakpoints.down('md')]: {
-            marginLeft: '10px'
+            marginLeft: '20px'
+            // marginLeft: -(drawerWidth - 10)
         }
+    },
+    [`& .${classes.footer}`]: {
+        backgroundColor: theme.palette.background.default,
+        marginLeft: leftDrawerOpened ? drawerWidth - 20 : 0,
+        width: leftDrawerOpened ? `calc(100% - ${drawerWidth}px)` : `100%`
+    },
+    [`& .${classes.footerWidth}`]: {
+        transition: theme.transitions.create('width'),
+        marginLeft: leftDrawerOpened ? drawerWidth - 20 : 0,
+        width: leftDrawerOpened ? `calc(100% - ${drawerWidth}px)` : `100%`
     }
 }));
 
@@ -100,7 +121,14 @@ function MainLayout() {
     }, [matchDownMd]);
 
     return (
-        <Root className={classes.root}>
+        <Root
+            className={clsx([
+                classes.root,
+                {
+                    [classes.rootShift]: leftDrawerOpened
+                }
+            ])}
+        >
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
                 {/* header */}
@@ -132,7 +160,9 @@ function MainLayout() {
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />
                 </main>
-                <Customization />
+
+                {/* FOOTER */}
+                <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
             </SidebarProvider>
         </Root>
     );

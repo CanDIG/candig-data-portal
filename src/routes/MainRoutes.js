@@ -23,6 +23,9 @@ const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
 // Ingest Portal
 // const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
 
+// Completeness
+const CompletenessStats = Loadable(lazy(() => import('views/completeness/completeness')));
+
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
 
@@ -47,6 +50,10 @@ const MainRoutes = {
         {
             path: `${basename}/clinicalGenomicSearch`,
             element: <ClinicalGenomicSearch />
+        },
+        {
+            path: `${basename}/completeness`,
+            element: <CompletenessStats />
         },
         /* {
             path: `${basename}/data-ingest`,
