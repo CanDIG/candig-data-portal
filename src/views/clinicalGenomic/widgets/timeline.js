@@ -1,11 +1,9 @@
-/* eslint-disable arrow-body-style */
 import React, { useEffect } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
-import useClinicalPatientData from './useClinicalPatientData';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -13,25 +11,27 @@ HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
 function Timeline() {
-    // Data for the Gantt chart
-    let data = [{}]
-    const date_data = useClinicalPatientData(patientId, programId);
-
-    for (let x = 0; x < date_data.length; x++) {
-        data.push({
-            name: date_data[x].title,
-            start: date_data[x].start,
-            end: date_data[x],
-            y: x
-        })
-    };
+    const taskColors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#f15c80'];
 
     const chartOptions = {
         title: {
-            text: 'Patient Timeline'
+            text: 'Patient Timeline',
+            style: {
+                fontFamily: 'Arial, sans-serif',
+                fontWeight: 'bold'
+            }
         },
         yAxis: {
-            uniqueNames: true
+            uniqueNames: true,
+            labels: {
+                style: {
+                    fontFamily: 'Arial, sans-serif'
+                }
+            }
+        },
+        xAxis: {
+            gridLineWidth: 1,
+            gridLineColor: '#e6e6e6'
         },
         navigator: {
             enabled: true,
@@ -58,28 +58,60 @@ function Timeline() {
             enabled: true,
             selected: 0
         },
-        accessibility: {
-            point: {
-                descriptionFormat:
-                    '{yCategory}. ' +
-                    '{#if completed}Task {(multiply completed.amount 100):.1f}% completed. {/if}' +
-                    'Start {x:%Y-%m-%d}, end {x2:%Y-%m-%d}.'
-            },
+        plotOptions: {
             series: {
-                descriptionFormat: '{name}'
-            }
-        },
-        lang: {
-            accessibility: {
-                axis: {
-                    xAxisDescriptionPlural: 'The chart has a two-part X axis showing time in both week numbers and days.',
-                    yAxisDescriptionPlural: 'The chart has one Y axis showing task categories.'
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.name}',
+                    style: {
+                        textOutline: 'none',
+                        color: '#333333',
+                        fontFamily: 'Arial, sans-serif'
+                    }
                 }
             }
         },
-        series: [{
-            data: data,
-        }]
+        series: [
+            {
+                name: 'Project 1',
+                data: [
+                    {
+                        y: 0,
+                        start: Date.UTC(2017, 11, 1),
+                        end: Date.UTC(2018, 1, 2),
+                        completed: { amount: 1 },
+                        name: 'Treatment',
+                        color: taskColors[0]
+                    },
+                    {
+                        y: 1,
+                        start: Date.UTC(2018, 1, 2),
+                        end: Date.UTC(2018, 11, 5),
+                        completed: { amount: 0.5 },
+                        name: 'Treatment',
+                        color: taskColors[1]
+                    },
+                    {
+                        y: 2,
+                        start: Date.UTC(2018, 11, 8),
+                        end: Date.UTC(2018, 11, 9),
+                        completed: { amount: 0.15 },
+                        name: 'Treatment',
+                        color: taskColors[2]
+                    },
+                    {
+                        y: 3,
+                        start: Date.UTC(2018, 11, 9),
+                        end: Date.UTC(2018, 11, 19),
+                        completed: { amount: 0.3 },
+                        name: 'Development',
+                        color: taskColors[3]
+                    },
+                    { y: 4, start: Date.UTC(2018, 11, 10), end: Date.UTC(2018, 11, 23), name: 'Testing', color: taskColors[4] },
+                    { y: 5, start: Date.UTC(2018, 11, 25, 8), end: Date.UTC(2018, 11, 25, 16), name: 'Release', color: taskColors[5] }
+                ]
+            }
+        ]
     };
 
     useEffect(() => {
@@ -87,7 +119,7 @@ function Timeline() {
         return () => Highcharts.charts.forEach((chart) => chart && chart.container && chart.destroy());
     }, []);
 
-    return <HighchartsReact highcharts={Highcharts} constructorType={"ganttChart"} options={chartOptions} />;
+    return <HighchartsReact highcharts={Highcharts} constructorType={'ganttChart'} options={chartOptions} />;
 }
 
 export default Timeline;
