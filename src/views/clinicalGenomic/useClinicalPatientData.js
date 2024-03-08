@@ -49,7 +49,7 @@ function useClinicalPatientData(patientId, programId) {
                     const patientData = result[0].results || {};
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
-                    if (filteredData.date_of_death && filteredData.date_of_death.month_interval) {
+                    if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
                         const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
                         filteredData.age_at_death = Math.floor(ageInMonths / 12);
                         filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
