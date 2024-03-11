@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
@@ -73,7 +73,7 @@ function Timeline() {
         },
         series: [
             {
-                name: 'Project 1',
+                name: 'Patient Events',
                 data: [
                     {
                         start: Date.UTC(2017, 11, 1),
@@ -106,6 +106,26 @@ function Timeline() {
                     { start: Date.UTC(2018, 11, 10), end: Date.UTC(2018, 11, 23), name: 'Comorbidities', color: taskColors[4] },
                     { start: Date.UTC(2018, 11, 25, 8), end: Date.UTC(2018, 11, 25, 16), name: 'Primary Diagnosis', color: taskColors[5] }
                 ]
+            },
+            {
+                type: 'scatter',
+                name: 'Key Dates',
+                data: [
+                    {
+                        x: Date.UTC(2018, 12, 11),
+                        y: 0,
+                        name: 'Specimen Collection'
+                    }
+                ],
+                marker: {
+                    enabled: true,
+                    symbol: 'circle',
+                    radius: 4
+                },
+                tooltip: {
+                    pointFormat: '{point.name}: {point.x:%e. %b}'
+                },
+                showInLegend: true
             }
         ]
     };
