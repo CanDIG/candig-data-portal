@@ -14,6 +14,9 @@ function Timeline() {
     const taskColors = ['#1565c0', '#1c812e', '#ffb800', '#1e88e5', '#36b84c', '#ffd34f'];
 
     const chartOptions = {
+        chart: {
+            height: 600
+        },
         title: {
             text: 'Patient Timeline',
             style: {
@@ -73,38 +76,22 @@ function Timeline() {
         },
         series: [
             {
-                name: 'Patient Events',
+                name: 'Treatment',
                 data: [
                     {
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
                         completed: { amount: 1 },
-                        name: 'Treatment',
+                        name: 'Surgery',
                         color: taskColors[0]
-                    },
-                    {
-                        start: Date.UTC(2018, 1, 2),
-                        end: Date.UTC(2018, 11, 5),
-                        completed: { amount: 0.5 },
-                        name: 'Comorbidities',
-                        color: taskColors[1]
-                    },
-                    {
-                        start: Date.UTC(2018, 11, 8),
-                        end: Date.UTC(2018, 11, 9),
-                        completed: { amount: 0.15 },
-                        name: 'Primary Diagnosis',
-                        color: taskColors[2]
                     },
                     {
                         start: Date.UTC(2018, 11, 9),
                         end: Date.UTC(2018, 11, 19),
                         completed: { amount: 0.3 },
-                        name: 'Treatment',
+                        name: 'Chemotherapy',
                         color: taskColors[3]
-                    },
-                    { start: Date.UTC(2018, 11, 10), end: Date.UTC(2018, 11, 23), name: 'Comorbidities', color: taskColors[4] },
-                    { start: Date.UTC(2018, 11, 25, 8), end: Date.UTC(2018, 11, 25, 16), name: 'Primary Diagnosis', color: taskColors[5] }
+                    }
                 ]
             },
             {
@@ -112,9 +99,34 @@ function Timeline() {
                 name: 'Key Dates',
                 data: [
                     {
-                        x: Date.UTC(2018, 12, 11),
+                        x: Date.UTC(2017, 12, 30),
                         y: 0,
                         name: 'Specimen Collection'
+                    }
+                ],
+                marker: {
+                    enabled: true,
+                    symbol: 'circle',
+                    radius: 4
+                },
+                tooltip: {
+                    pointFormat: '{point.name}: {point.x:%e. %b}'
+                },
+                showInLegend: true
+            },
+            {
+                type: 'scatter',
+                name: 'Primary Diagnosis',
+                data: [
+                    {
+                        x: Date.UTC(2017, 11, 30),
+                        y: 0,
+                        name: 'Breast'
+                    },
+                    {
+                        x: Date.UTC(2018, 1, 30),
+                        y: 0,
+                        name: 'Lip'
                     }
                 ],
                 marker: {
