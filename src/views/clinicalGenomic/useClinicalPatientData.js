@@ -30,7 +30,8 @@ function useClinicalPatientData(patientId, programId) {
                         value === '' ||
                         key === ''
                     ) &&
-                    (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key])) // Accept interval date objects remove all other objects
+                    (!(typeof value === 'object') ||
+                        (typeof value === 'object' && ('month_interval' in value || value.every((item) => typeof item === 'string')))) // Accept interval date objects remove all other objects
             )
         );
     }
