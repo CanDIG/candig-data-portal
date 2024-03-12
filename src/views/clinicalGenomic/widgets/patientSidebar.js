@@ -75,13 +75,19 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
         let startDate;
         let endDate;
         const columns = uniqueKeys.map((key) => {
-            const hasNonEmptyValue = array.some(
-                (obj) =>
+            const hasNonEmptyValue = array.some((obj) => {
+                if (Array.isArray(obj[key])) {
+                    // Include arrays of strings
+                    return obj[key].length > 0 && obj[key].every((item) => typeof item === 'string');
+                }
+
+                return (
                     obj[key] !== null &&
                     obj[key] !== undefined &&
                     obj[key] !== '' &&
                     (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key]))
-            );
+                );
+            });
 
             let value = key;
             if (key === 'date_of_diagnosis') {
