@@ -133,11 +133,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
             const row = { id: index };
 
             filteredColumns.forEach((column) => {
-                if (
-                    resolution === 'day' &&
-                    Object.prototype.hasOwnProperty.call(obj[column.field], 'day_interval') &&
-                    column.field !== 'date_of_diagnosis'
-                ) {
+                // eslint-disable-next-line no-prototype-builtins
+                if (resolution === 'day' && obj[column.field]?.hasOwnProperty('day_interval') && column.field !== 'date_of_diagnosis') {
                     if (column.field === 'endDate') {
                         const ageInDays = obj[endDate].day_interval - obj[startDate].day_interval;
                         const years = Math.floor(ageInDays / 365);
@@ -157,7 +154,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                     }
                 } else if (
                     resolution === 'month' &&
-                    Object.prototype.hasOwnProperty.call(obj[column.field], 'month_interval') &&
+                    // eslint-disable-next-line no-prototype-builtins
+                    obj[column.field]?.hasOwnProperty('day_interval') &&
                     column.field !== 'date_of_diagnosis'
                 ) {
                     if (column.field === endDate) {
@@ -180,7 +178,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                 } else if (column.field === 'date_of_diagnosis') {
                     row[column.field] = ageAtFirstDiagnosis + Math.floor(obj[column.field].month_interval / 12);
                 } else {
-                    row[column.field] = obj[column.field];
+                    console.log(obj[column.field]);
+                    row[column.field] = Array.isArray(obj[column.field]) ? obj[column.field].join(', ') : obj[column.field]; // Add spaces to arrays
                 }
             });
 
