@@ -4,14 +4,22 @@ import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
+import { styled } from '@mui/material/styles';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-function Timeline() {
+// Create a styled container for the Timeline
+const TimelineContainer = styled.div`
+  border: 2px solid #ccc; // Example border
+  padding: 20px;
+  margin-top: 20px; // Adjust spacing as needed
+  border-radius: 10px; // Optional for rounded corners
+`;
 
+function Timeline() {
     const chartOptions = {
         chart: {
             height: 600
@@ -84,19 +92,19 @@ function Timeline() {
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
                         name: 'Treatment',
-                        id: 'treatment', 
+                        id: 'treatment'
                     },
                     {
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
                         name: 'Surgery',
-                        parent: 'treatment',
+                        parent: 'treatment'
                     },
                     {
                         start: Date.UTC(2018, 11, 9),
                         end: Date.UTC(2018, 11, 19),
                         name: 'Chemotherapy',
-                        parent: 'treatment', 
+                        parent: 'treatment'
                     }
                 ]
             },
