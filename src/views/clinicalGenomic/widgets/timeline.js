@@ -33,8 +33,15 @@ function Timeline() {
             }
         },
         xAxis: {
-            gridLineWidth: 1,
-            gridLineColor: '#e6e6e6'
+            type: 'datetime',
+            tickInterval: 30 * 24 * 3600 * 1000, // one week in milliseconds
+            labels: {
+                formatter: function () {
+                    const startDate = Date.UTC(2017, 11, 1); 
+                    const weeksSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
+                    return 'Month ' + weeksSinceStart;
+                }
+            }
         },
         navigator: {
             enabled: true,
@@ -81,14 +88,12 @@ function Timeline() {
                     {
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
-                        completed: { amount: 1 },
                         name: 'Surgery',
                         color: taskColors[0]
                     },
                     {
                         start: Date.UTC(2018, 11, 9),
                         end: Date.UTC(2018, 11, 19),
-                        completed: { amount: 0.3 },
                         name: 'Chemotherapy',
                         color: taskColors[3]
                     }
