@@ -11,7 +11,6 @@ HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
 function Timeline() {
-    const taskColors = ['#1565c0', '#1c812e', '#ffb800', '#1e88e5', '#36b84c', '#ffd34f'];
 
     const chartOptions = {
         chart: {
@@ -34,12 +33,12 @@ function Timeline() {
         },
         xAxis: {
             type: 'datetime',
-            tickInterval: 30 * 24 * 3600 * 1000, // one week in milliseconds
+            tickInterval: 30 * 24 * 3600 * 1000,
             labels: {
                 formatter: function () {
-                    const startDate = Date.UTC(2017, 11, 1); 
-                    const weeksSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
-                    return 'Month ' + weeksSinceStart;
+                    const startDate = Date.UTC(2017, 11, 1);
+                    const monthsSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
+                    return 'Month ' + monthsSinceStart;
                 }
             }
         },
@@ -64,10 +63,6 @@ function Timeline() {
         scrollbar: {
             enabled: true
         },
-        rangeSelector: {
-            enabled: true,
-            selected: 0
-        },
         plotOptions: {
             series: {
                 dataLabels: {
@@ -88,14 +83,20 @@ function Timeline() {
                     {
                         start: Date.UTC(2017, 11, 1),
                         end: Date.UTC(2018, 1, 2),
+                        name: 'Treatment',
+                        id: 'treatment', 
+                    },
+                    {
+                        start: Date.UTC(2017, 11, 1),
+                        end: Date.UTC(2018, 1, 2),
                         name: 'Surgery',
-                        color: taskColors[0]
+                        parent: 'treatment',
                     },
                     {
                         start: Date.UTC(2018, 11, 9),
                         end: Date.UTC(2018, 11, 19),
                         name: 'Chemotherapy',
-                        color: taskColors[3]
+                        parent: 'treatment', 
                     }
                 ]
             },
