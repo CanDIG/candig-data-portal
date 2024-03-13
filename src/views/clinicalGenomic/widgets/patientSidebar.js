@@ -225,6 +225,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
+        // Ignore deps on the next line as it appears to prevent this component from working otherwise
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialHeader, sidebar]);
 
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {
