@@ -33,11 +33,11 @@ function ClinicalView() {
                     // Make sure each row has an ID and a deceased status
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
-                    if (patient.date_of_birth && patient.date_of_death) {
+                    if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
                         const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;
                         patient.date_of_death = Math.floor(ageInMonths / 12);
                         patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
-                    } else if (patient.date_of_birth && patient.deceased) {
+                    } else if (patient?.date_of_birth?.month_interval && !patient?.date_of_death?.month_interval) {
                         patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
                     } else {
                         delete patient.date_of_birth;

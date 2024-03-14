@@ -75,13 +75,19 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
         let startDate;
         let endDate;
         const columns = uniqueKeys.map((key) => {
-            const hasNonEmptyValue = array.some(
-                (obj) =>
+            const hasNonEmptyValue = array.some((obj) => {
+                if (Array.isArray(obj[key])) {
+                    // Include arrays of strings
+                    return obj[key].length > 0 && obj[key].every((item) => typeof item === 'string');
+                }
+
+                return (
                     obj[key] !== null &&
                     obj[key] !== undefined &&
                     obj[key] !== '' &&
                     (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key]))
-            );
+                );
+            });
 
             let value = key;
             if (key === 'date_of_diagnosis') {
@@ -127,11 +133,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
             const row = { id: index };
 
             filteredColumns.forEach((column) => {
-                if (
-                    resolution === 'day' &&
-                    Object.prototype.hasOwnProperty.call(obj[column.field], 'day_interval') &&
-                    column.field !== 'date_of_diagnosis'
-                ) {
+                // eslint-disable-next-line no-prototype-builtins
+                if (resolution === 'day' && obj[column.field]?.hasOwnProperty('day_interval') && column.field !== 'date_of_diagnosis') {
                     if (column.field === 'endDate') {
                         const ageInDays = obj[endDate].day_interval - obj[startDate].day_interval;
                         const years = Math.floor(ageInDays / 365);
@@ -151,7 +154,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                     }
                 } else if (
                     resolution === 'month' &&
-                    Object.prototype.hasOwnProperty.call(obj[column.field], 'month_interval') &&
+                    // eslint-disable-next-line no-prototype-builtins
+                    obj[column.field]?.hasOwnProperty('day_interval') &&
                     column.field !== 'date_of_diagnosis'
                 ) {
                     if (column.field === endDate) {
@@ -174,7 +178,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                 } else if (column.field === 'date_of_diagnosis') {
                     row[column.field] = ageAtFirstDiagnosis + Math.floor(obj[column.field].month_interval / 12);
                 } else {
-                    row[column.field] = obj[column.field];
+                    console.log(obj[column.field]);
+                    row[column.field] = Array.isArray(obj[column.field]) ? obj[column.field].join(', ') : obj[column.field]; // Add spaces to arrays
                 }
             });
 
@@ -219,6 +224,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                 handleHeaderClick(firstHeaderKey, sidebar, null);
             }
         }
+        // Ignore deps on the next line as it appears to prevent this component from working otherwise
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialHeader, sidebar]);
 
     function createSubSidebarHeaders(array = [], depth = 0, hasChildren = false) {

@@ -8,7 +8,7 @@ import SmallCountCard from 'ui-component/cards/SmallCountCard';
 import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 
 // project imports
-import { fetchClinicalCompleteness, fetchFederation, fetchGenomicCompleteness } from 'store/api';
+import { fetchClinicalCompleteness, fetchGenomicCompleteness } from 'store/api';
 
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
