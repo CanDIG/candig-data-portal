@@ -119,7 +119,7 @@ function FieldLevelCompletenessGraph(props) {
     const series = Object.keys(fields)
         .map((field) => {
             const pct = fields[field].total === 0 ? 0 : 1 - fields[field].missing / fields[field].total;
-            return [field, pct * 100];
+            return [field, Math.round(pct * 100)];
         })
         .sort((a, b) => a[1] - b[1]);
     const highChartSettings = {
