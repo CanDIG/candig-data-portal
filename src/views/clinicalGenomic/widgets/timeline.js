@@ -4,20 +4,41 @@ import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
-import { styled } from '@mui/material/styles';
+import patientData from '../useClinicalPatientData';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-// Create a styled container for the Timeline
-const TimelineContainer = styled.div`
-  border: 2px solid #ccc; // Example border
-  padding: 20px;
-  margin-top: 20px; // Adjust spacing as needed
-  border-radius: 10px; // Optional for rounded corners
-`;
+const headerFormatter = () =>
+    function () {
+        const startDate = Date.UTC(2017, 11, 1);
+        const monthsSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
+        return `Month ${monthsSinceStart}`;
+    };
+    
+function calculateDateFromMonthInterval(initialDateUTC, monthInterval) {
+    // Parse the initial UTC date string to a Date object
+    const initialDate = new Date(initialDateUTC);
+    // Calculate the new date by adding the month interval
+    initialDate.setMonth(initialDate.getMonth() + monthInterval);
+    // Return the time in milliseconds (suitable for Highcharts)
+    return initialDate.getTime();
+    };
+
+const treatmentStartDate = filteredData.primary_diagnoses.treatments.start_date.month_interval;
+const treatmentEndDate = filteredData.primary_diagnoses.treatments.end_date.month_interval;
+const treatments = patientData.treatments.map(treatment => ({
+    start: calculateDateFromMonthInterval(startDate, treatmentEndDate),
+    end: calculateDateFromMonthInterval(startDate, treatmentStartDate ),
+    name: treatment.name
+    }));
+    
+const keyDates = patientData.keyDates.map(event => ({
+    x: calculateDateFromMonthInterval(patientData.initialDate, event.monthInterval),
+    name: event.name
+    }));
 
 function Timeline() {
     const chartOptions = {
@@ -37,17 +58,13 @@ function Timeline() {
                 style: {
                     fontFamily: 'Arial, sans-serif'
                 }
-            }
+            },
+            minRange: '200px'
         },
         xAxis: {
-            type: 'datetime',
-            tickInterval: 30 * 24 * 3600 * 1000,
+            minRange: 14 * 24 * 3600 * 1000,
             labels: {
-                formatter: function () {
-                    const startDate = Date.UTC(2017, 11, 1);
-                    const monthsSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
-                    return 'Month ' + monthsSinceStart;
-                }
+                formatter: headerFormatter()
             }
         },
         navigator: {
