@@ -72,7 +72,7 @@ function useClinicalPatientData(patientId, programId) {
                         filteredData.age_at_first_diagnosis = null;
                     }
 
-                    if (filteredData.date_alive_after_lost_to_followup.day_interval) {
+                    if (filteredData?.date_alive_after_lost_to_followup?.day_interval) {
                         const ageInDays = filteredData.date_alive_after_lost_to_followup.day_interval;
                         const years = Math.floor(ageInDays / 365);
                         const remainingDays = ageInDays % 365;
