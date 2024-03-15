@@ -1,7 +1,7 @@
 ARG alpine_version
 ARG katsu_api_target_url
 
-FROM node:17.7.1-alpine${alpine_version} as build
+FROM node:21.7.0-alpine${alpine_version} as build
 
 LABEL Maintainer="CanDIG Project"
 LABEL "candigv2"="candig-data-portal"
