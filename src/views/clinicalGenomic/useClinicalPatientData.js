@@ -60,26 +60,7 @@ function useClinicalPatientData(patientId, programId) {
                     const filteredData = filterNestedObject(patientData);
 
                     if (filteredData?.date_of_birth) {
-                        if (filteredData.date_of_birth.month_interval) {
-                            // Logic for 'month' resolution
-                            if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
-                                const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
-                                filteredData.age_at_death = Math.floor(ageInMonths / 12);
-                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
-                            } else if (filteredData?.date_of_birth?.month_interval && !filteredData?.date_of_death?.month_interval) {
-                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
-                            }
-                            delete filteredData.date_of_death;
-                            delete filteredData.date_of_birth;
-
-                            if (filteredData?.date_alive_after_lost_to_followup?.month_interval) {
-                                const ageInMonths = filteredData.date_alive_after_lost_to_followup.month_interval;
-                                const years = Math.floor(ageInMonths / 12);
-                                const remainingMonths = ageInMonths % 12;
-                                filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
-                                delete filteredData.date_alive_after_lost_to_followup;
-                            }
-                        } else if (filteredData.date_of_birth.day_interval) {
+                        if (filteredData.date_of_birth.day_interval) {
                             // Logic for 'day' resolution
                             if (filteredData?.date_of_death?.day_interval && filteredData?.date_of_birth?.day_interval) {
                                 const ageInDays = filteredData.date_of_death.day_interval - filteredData.date_of_birth.day_interval;
@@ -99,6 +80,25 @@ function useClinicalPatientData(patientId, programId) {
                                 const days = remainingDays % 30;
 
                                 filteredData.time_from_diagnosis_to_last_followup = `${years}y ${months}m ${days}d`;
+                                delete filteredData.date_alive_after_lost_to_followup;
+                            }
+                        } else if (filteredData.date_of_birth.month_interval) {
+                            // Logic for 'month' resolution
+                            if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
+                                const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
+                                filteredData.age_at_death = Math.floor(ageInMonths / 12);
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            } else if (filteredData?.date_of_birth?.month_interval && !filteredData?.date_of_death?.month_interval) {
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            }
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+
+                            if (filteredData?.date_alive_after_lost_to_followup?.month_interval) {
+                                const ageInMonths = filteredData.date_alive_after_lost_to_followup.month_interval;
+                                const years = Math.floor(ageInMonths / 12);
+                                const remainingMonths = ageInMonths % 12;
+                                filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
                                 delete filteredData.date_alive_after_lost_to_followup;
                             }
                         }
