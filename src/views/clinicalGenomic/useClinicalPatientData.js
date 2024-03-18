@@ -58,48 +58,54 @@ function useClinicalPatientData(patientId, programId) {
                     const patientData = result[0].results || {};
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
-                    if (filteredData?.date_resolution === 'month') {
-                        if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
-                            const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
-                            filteredData.age_at_death = Math.floor(ageInMonths / 12);
-                            filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
-                        } else if (filteredData?.date_of_birth?.month_interval && !filteredData?.date_of_death?.month_interval) {
-                            filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
-                        }
-                        delete filteredData.date_of_death;
-                        delete filteredData.date_of_birth;
 
-                        if (filteredData?.date_alive_after_lost_to_followup?.month_interval) {
-                            const ageInMonths = filteredData.date_alive_after_lost_to_followup.month_interval;
-                            const years = Math.floor(ageInMonths / 12);
-                            const remainingMonths = ageInMonths % 12;
-                            filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
-                            delete filteredData.date_alive_after_lost_to_followup;
-                        }
-                    } else if (filteredData?.date_resolution === 'day') {
-                        if (filteredData?.date_of_death?.day_interval && filteredData?.date_of_birth?.day_interval) {
-                            const ageInDays = filteredData.date_of_death.day_interval - filteredData.date_of_birth.day_interval;
-                            filteredData.age_at_death = Math.floor(ageInDays / 365);
-                            filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
-                        } else if (filteredData?.date_of_birth?.day_interval && !filteredData?.date_of_death?.day_interval) {
-                            filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
-                        }
-                        delete filteredData.date_of_death;
-                        delete filteredData.date_of_birth;
-
-                        if (filteredData?.date_alive_after_lost_to_followup?.day_interval) {
-                            const ageInDays = filteredData.date_alive_after_lost_to_followup.day_interval;
-                            const years = Math.floor(ageInDays / 365);
-                            const remainingDays = ageInDays % 365;
-                            const months = Math.floor(remainingDays / 30);
-                            const days = remainingDays % 30;
-
-                            filteredData.time_from_diagnosis_to_last_followup = `${years}y ${months}m ${days}d`;
-                            delete filteredData.date_alive_after_lost_to_followup;
+                    if (filteredData?.date_of_birth) {
+                        if (filteredData.date_of_birth.day_interval) {
+                            // Logic for 'day' resolution
+                            if (filteredData?.date_of_death?.day_interval && filteredData?.date_of_birth?.day_interval) {
+                                const ageInDays = filteredData.date_of_death.day_interval - filteredData.date_of_birth.day_interval;
+                                filteredData.age_at_death = Math.floor(ageInDays / 365);
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
+                            } else if (filteredData?.date_of_birth?.day_interval && !filteredData?.date_of_death?.day_interval) {
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
+                            }
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+                        } else if (filteredData.date_of_birth.month_interval) {
+                            // Logic for 'month' resolution
+                            if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
+                                const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
+                                filteredData.age_at_death = Math.floor(ageInMonths / 12);
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            } else if (filteredData?.date_of_birth?.month_interval && !filteredData?.date_of_death?.month_interval) {
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            }
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+                        } else {
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
                         }
                     } else {
                         delete filteredData.date_of_death;
                         filteredData.age_at_first_diagnosis = null;
+                    }
+
+                    if (filteredData?.date_alive_after_lost_to_followup?.day_interval) {
+                        const ageInDays = filteredData.date_alive_after_lost_to_followup.day_interval;
+                        const years = Math.floor(ageInDays / 365);
+                        const remainingDays = ageInDays % 365;
+                        const months = Math.floor(remainingDays / 30);
+                        const days = remainingDays % 30;
+
+                        filteredData.time_from_diagnosis_to_last_followup = `${years}y ${months}m ${days}d`;
+                        delete filteredData.date_alive_after_lost_to_followup;
+                    } else if (filteredData?.date_alive_after_lost_to_followup?.month_interval) {
+                        const ageInMonths = filteredData.date_alive_after_lost_to_followup.month_interval;
+                        const years = Math.floor(ageInMonths / 12);
+                        const remainingMonths = ageInMonths % 12;
+                        filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
+                        delete filteredData.date_alive_after_lost_to_followup;
                     }
 
                     setTopLevel(filteredData);
@@ -112,7 +118,6 @@ function useClinicalPatientData(patientId, programId) {
                             setColumns={setColumns}
                             setTitle={setTitle}
                             ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
-                            resolution={filteredData.date_resolution}
                         />
                     );
                 }

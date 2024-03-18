@@ -45,7 +45,7 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis, resolution }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis }) {
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
@@ -134,7 +134,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
 
             filteredColumns.forEach((column) => {
                 // eslint-disable-next-line no-prototype-builtins
-                if (resolution === 'day' && obj[column.field]?.hasOwnProperty('day_interval') && column.field !== 'date_of_diagnosis') {
+                if (obj[column.field]?.hasOwnProperty('day_interval') && column.field !== 'date_of_diagnosis') {
                     if (column.field === 'endDate') {
                         const ageInDays = obj[endDate].day_interval - obj[startDate].day_interval;
                         const years = Math.floor(ageInDays / 365);
@@ -153,9 +153,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                         row[column.field] = `${years}y ${months}m ${days}d`;
                     }
                 } else if (
-                    resolution === 'month' &&
                     // eslint-disable-next-line no-prototype-builtins
-                    obj[column.field]?.hasOwnProperty('day_interval') &&
+                    obj[column.field]?.hasOwnProperty('month_interval') &&
                     column.field !== 'date_of_diagnosis'
                 ) {
                     if (column.field === endDate) {
@@ -178,7 +177,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                 } else if (column.field === 'date_of_diagnosis') {
                     row[column.field] = ageAtFirstDiagnosis + Math.floor(obj[column.field].month_interval / 12);
                 } else {
-                    console.log(obj[column.field]);
                     row[column.field] = Array.isArray(obj[column.field]) ? obj[column.field].join(', ') : obj[column.field]; // Add spaces to arrays
                 }
             });
@@ -335,8 +333,7 @@ PatientSidebar.propTypes = {
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
     setTitle: PropTypes.func.isRequired,
-    ageAtFirstDiagnosis: PropTypes.number,
-    resolution: PropTypes.string
+    ageAtFirstDiagnosis: PropTypes.number
 };
 
 export default PatientSidebar;
