@@ -82,6 +82,9 @@ function useClinicalPatientData(patientId, programId) {
                             }
                             delete filteredData.date_of_death;
                             delete filteredData.date_of_birth;
+                        } else {
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
                         }
                     } else {
                         delete filteredData.date_of_death;
