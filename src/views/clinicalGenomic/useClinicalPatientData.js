@@ -81,16 +81,11 @@ function useClinicalPatientData(patientId, programId) {
                             const ageInDays = filteredData.date_of_death.day_interval - filteredData.date_of_birth.day_interval;
                             filteredData.age_at_death = Math.floor(ageInDays / 365);
                             filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
-                            delete filteredData.date_of_death;
-                            delete filteredData.date_of_birth;
                         } else if (filteredData?.date_of_birth?.day_interval && !filteredData?.date_of_death?.day_interval) {
                             filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
-                            delete filteredData.date_of_birth;
-                            delete filteredData.date_of_death;
-                        } else {
-                            delete filteredData.date_of_death;
-                            delete filteredData.date_of_birth;
                         }
+                        delete filteredData.date_of_death;
+                        delete filteredData.date_of_birth;
 
                         if (filteredData?.date_alive_after_lost_to_followup?.day_interval) {
                             const ageInDays = filteredData.date_alive_after_lost_to_followup.day_interval;
