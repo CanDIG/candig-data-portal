@@ -4,41 +4,24 @@ import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
-import patientData from '../useClinicalPatientData';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-const headerFormatter = () =>
+const headerFormatterMonth = () =>
     function () {
-        const startDate = Date.UTC(2017, 11, 1);
-        const monthsSinceStart = Math.floor((this.value - startDate) / (30 * 24 * 3600 * 1000)) + 1;
+        const startDate = 0;
+        const monthsSinceStart = Math.floor(this.value - startDate) + 1;
         return `Month ${monthsSinceStart}`;
     };
-    
-function calculateDateFromMonthInterval(initialDateUTC, monthInterval) {
-    // Parse the initial UTC date string to a Date object
-    const initialDate = new Date(initialDateUTC);
-    // Calculate the new date by adding the month interval
-    initialDate.setMonth(initialDate.getMonth() + monthInterval);
-    // Return the time in milliseconds (suitable for Highcharts)
-    return initialDate.getTime();
-    };
 
-const treatmentStartDate = filteredData.primary_diagnoses.treatments.start_date.month_interval;
-const treatmentEndDate = filteredData.primary_diagnoses.treatments.end_date.month_interval;
-const treatments = patientData.treatments.map(treatment => ({
-    start: calculateDateFromMonthInterval(startDate, treatmentEndDate),
-    end: calculateDateFromMonthInterval(startDate, treatmentStartDate ),
-    name: treatment.name
-    }));
-    
-const keyDates = patientData.keyDates.map(event => ({
-    x: calculateDateFromMonthInterval(patientData.initialDate, event.monthInterval),
-    name: event.name
-    }));
+const headerFormatterYear = () =>
+    function () {
+        const yearSinceStart = Math.ceil((this.value + 1) / 12);
+        return `Year ${yearSinceStart}`;
+    };
 
 function Timeline() {
     const chartOptions = {
@@ -61,12 +44,28 @@ function Timeline() {
             },
             minRange: '200px'
         },
-        xAxis: {
-            minRange: 14 * 24 * 3600 * 1000,
-            labels: {
-                formatter: headerFormatter()
+        xAxis: [
+            {
+                type: 'linear',
+                tickInterval: 1,
+                minRange: 12,
+                labels: {
+                    align: 'center',
+                    formatter: headerFormatterMonth()
+                }
+            },
+            {
+                type: 'linear',
+                linkedTo: 0,
+                tickInterval: 1,
+                minRange: 12,
+                labels: {
+                    align: 'center',
+                    formatter: headerFormatterYear()
+                },
+                opposite: true
             }
-        },
+        ],
         navigator: {
             enabled: true,
             liveRedraw: true,
@@ -75,6 +74,11 @@ function Timeline() {
                 pointPlacement: 0.5,
                 pointPadding: 0.25,
                 accessibility: {
+                    enabled: false
+                }
+            },
+            xAxis: {
+                labels: {
                     enabled: false
                 }
             },
@@ -106,31 +110,34 @@ function Timeline() {
                 name: 'Treatment',
                 data: [
                     {
-                        start: Date.UTC(2017, 11, 1),
-                        end: Date.UTC(2018, 1, 2),
+                        start: 0,
+                        end: 100,
                         name: 'Treatment',
                         id: 'treatment'
                     },
                     {
-                        start: Date.UTC(2017, 11, 1),
-                        end: Date.UTC(2018, 1, 2),
+                        start: 2,
+                        end: 15,
                         name: 'Surgery',
                         parent: 'treatment'
                     },
                     {
-                        start: Date.UTC(2018, 11, 9),
-                        end: Date.UTC(2018, 11, 19),
+                        start: 3,
+                        end: 28,
                         name: 'Chemotherapy',
                         parent: 'treatment'
                     }
-                ]
+                ],
+                tooltip: {
+                    pointFormat: 'Start: Month {point.start} End: Month {point.end}'
+                }
             },
             {
                 type: 'scatter',
                 name: 'Key Dates',
                 data: [
                     {
-                        x: Date.UTC(2017, 12, 30),
+                        x: 5,
                         y: 0,
                         name: 'Specimen Collection'
                     }
@@ -141,7 +148,7 @@ function Timeline() {
                     radius: 4
                 },
                 tooltip: {
-                    pointFormat: '{point.name}: {point.x:%e. %b}'
+                    pointFormat: '{point.name}: {point.x}'
                 },
                 showInLegend: true
             },
@@ -150,12 +157,12 @@ function Timeline() {
                 name: 'Primary Diagnosis',
                 data: [
                     {
-                        x: Date.UTC(2017, 11, 30),
+                        x: 10,
                         y: 0,
                         name: 'Breast'
                     },
                     {
-                        x: Date.UTC(2018, 1, 30),
+                        x: 25,
                         y: 0,
                         name: 'Lip'
                     }
@@ -166,7 +173,7 @@ function Timeline() {
                     radius: 4
                 },
                 tooltip: {
-                    pointFormat: '{point.name}: {point.x:%e. %b}'
+                    pointFormat: '{point.name}: {point.x}'
                 },
                 showInLegend: true
             }
