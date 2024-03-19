@@ -23,6 +23,16 @@ const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)'
 }));
 
+const TimelineContainer = styled(Box)(({ theme }) => ({
+    border: `2px solid ${theme.palette.divider}`,
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    marginBottom: theme.spacing(2),
+    maxHeight: '600px',
+    overflowY: 'auto'
+}));
+
 function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
 
@@ -50,7 +60,6 @@ function ClinicalPatientView() {
             <Typography pb={1} variant="h6">
                 {patientId}
             </Typography>
-            <Timeline />
             <div style={{ width: '100%', height: '68vh' }}>
                 <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>
@@ -69,6 +78,9 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
+            <TimelineContainer>
+                <Timeline />
+            </TimelineContainer>
         </MainCard>
     );
 }
