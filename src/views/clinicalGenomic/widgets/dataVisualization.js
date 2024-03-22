@@ -51,7 +51,7 @@ function DataVisualization() {
         localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData')) : topKeys
     );
     const [dataVisChartType, setDataVisChartType] = useState(
-        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType')) : ['bar', 'line', 'column', 'bar']
+        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType')) : ['bar', 'bar', 'bar', 'bar']
     );
     const [dataVisTrim, setDataVisTrim] = useState(
         localStorage.getItem('dataVisTrim') ? JSON.parse(localStorage.getItem('dataVisTrim')) : [false, false, false, false]
