@@ -79,7 +79,7 @@ function ClinicalPatientView() {
                 ))}
             </StyledTopLevelBox>
             <TimelineContainer>
-                <Timeline />
+                <Timeline patientId={patientId} programId={programId} />
             </TimelineContainer>
         </MainCard>
     );

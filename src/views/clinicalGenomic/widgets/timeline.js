@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
+import useClinicalPatientData from '../useClinicalPatientData';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
+
+const yAxisFormatter = () =>
+    function () {
+        if (this.value.includes('TREATMENT')) {
+            return 'Treatment';
+        }
+        return this.value;
+    };
 
 const headerFormatterMonth = () =>
     function () {
@@ -23,162 +32,329 @@ const headerFormatterYear = () =>
         return `Year ${yearSinceStart}`;
     };
 
-function Timeline() {
-    const chartOptions = {
-        chart: {
-            height: 600
-        },
-        title: {
-            text: 'Patient Timeline',
-            style: {
-                fontFamily: 'Arial, sans-serif',
-                fontWeight: 'bold'
+function Timeline({ patientId, programId }) {
+    const { data } = useClinicalPatientData(patientId, programId);
+    console.log(data);
+    const [chartOptions, setChartOptions] = useState({});
+    useEffect(() => {
+        const primaryDiagnosisSeries =
+            data.primary_diagnoses?.map((diagnosis) => ({
+                x: diagnosis.date_of_diagnosis?.month_interval,
+                name: 'Date of Diagnosis'
+            })) || [];
+
+        const treatmentSeriesData =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.treatments?.map((treatment) => ({
+                        start: treatment.treatment_start_date?.month_interval,
+                        end: treatment.treatment_end_date?.month_interval,
+                        name: treatment.submitter_treatment_id,
+                        y: 0
+                    })) || []
+            ) || [];
+
+        const dateOfBirthSeries = [
+            {
+                x: data?.date_of_birth?.month_interval,
+                name: 'Major Life Events',
+                dataLabels: {
+                    enabled: true,
+                    format: 'Date of Birth'
+                }
             }
-        },
-        yAxis: {
-            uniqueNames: true,
-            labels: {
+        ];
+
+        const dateOfDeathSeries = data?.date_of_death?.month_interval
+            ? [
+                  {
+                      x: data.date_of_death.month_interval,
+                      name: 'Major Life Events',
+                      dataLabels: {
+                          enabled: true,
+                          format: 'Date of Death'
+                      }
+                  }
+              ]
+            : [];
+
+        const dateAliveAfterLostToFollowup = data?.date_alive_after_lost_to_followup?.month_interval
+            ? [
+                  {
+                      x: data.date_alive_after_lost_to_followup?.month_interval,
+                      name: 'Major Life Events',
+                      dataLabels: {
+                          enabled: true,
+                          format: 'Date Alive After Lost to Followup'
+                      }
+                  }
+              ]
+            : [];
+
+        const testDateSeries =
+            data.biomarkers?.map((biomarker) => ({
+                x: biomarker.test_date?.month_interval,
+                name: 'Biomarkers',
+                dataLabels: {
+                    enabled: true,
+                    format: 'Test Date'
+                }
+            })) || [];
+
+        const followupSeries1 =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.followups?.map((followup) => ({
+                        x: followup.date_of_followup?.month_interval,
+                        name: 'Followups'
+                    })) || []
+            ) || [];
+
+        const relapseSeries1 =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.followups?.map((followup) => ({
+                        x: followup.date_of_relapse?.month_interval,
+                        name: 'Followups'
+                    })) || []
+            ) || [];
+        
+        const followupSeries2 =
+            data.followups?.flatMap(
+                (diagnosis) =>
+                    diagnosis.followups?.map((followup) => ({
+                        x: followup.date_of_followup?.month_interval,
+                        name: 'Followups'
+                    })) || []
+            ) || [];
+
+        const relapseSeries2 =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.followups?.map((followup) => ({
+                        x: followup.date_of_relapse?.month_interval,
+                        name: 'Followups'
+                    })) || []
+            ) || [];
+
+        const specimenCollectionSeries =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.specimens?.map((specimen) => ({
+                        x: specimen.specimen_collection_date?.month_interval,
+                        name: 'Specimens',
+                        dataLabels: {
+                            enabled: true,
+                            format: 'Specimen Collection Date'
+                        }
+                    })) || []
+            ) || [];
+
+        setChartOptions({
+            chart: {
+                height: 600,
+                marginRight: 50
+            },
+            title: {
+                text: 'Patient Timeline',
                 style: {
-                    fontFamily: 'Arial, sans-serif'
-                }
-            },
-            minRange: '200px'
-        },
-        xAxis: [
-            {
-                type: 'linear',
-                tickInterval: 1,
-                minRange: 12,
-                labels: {
-                    align: 'center',
-                    formatter: headerFormatterMonth()
-                }
-            },
-            {
-                type: 'linear',
-                linkedTo: 0,
-                tickInterval: 1,
-                minRange: 12,
-                labels: {
-                    align: 'center',
-                    formatter: headerFormatterYear()
-                },
-                opposite: true
-            }
-        ],
-        navigator: {
-            enabled: true,
-            liveRedraw: true,
-            series: {
-                type: 'gantt',
-                pointPlacement: 0.5,
-                pointPadding: 0.25,
-                accessibility: {
-                    enabled: false
-                }
-            },
-            xAxis: {
-                labels: {
-                    enabled: false
+                    fontFamily: 'Arial, sans-serif',
+                    fontWeight: 'bold'
                 }
             },
             yAxis: {
-                min: 0,
-                max: 3,
-                reversed: true,
-                categories: []
-            }
-        },
-        scrollbar: {
-            enabled: true
-        },
-        plotOptions: {
-            series: {
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.name}',
+                uniqueNames: true,
+                labels: {
                     style: {
-                        textOutline: 'none',
-                        color: '#333333',
                         fontFamily: 'Arial, sans-serif'
+                    },
+                    formatter: yAxisFormatter()
+                },
+                minRange: 1
+            },
+            xAxis: [
+                {
+                    type: 'linear',
+                    tickInterval: 1,
+                    minRange: 12,
+                    labels: {
+                        align: 'center',
+                        formatter: headerFormatterMonth()
                     }
+                },
+                {
+                    type: 'linear',
+                    linkedTo: 0,
+                    tickInterval: 1,
+                    minRange: 12,
+                    labels: {
+                        align: 'center',
+                        formatter: headerFormatterYear()
+                    },
+                    opposite: true
                 }
-            }
-        },
-        series: [
-            {
-                name: 'Treatment',
-                data: [
-                    {
-                        start: 0,
-                        end: 100,
-                        name: 'Treatment',
-                        id: 'treatment'
-                    },
-                    {
-                        start: 2,
-                        end: 15,
-                        name: 'Surgery',
-                        parent: 'treatment'
-                    },
-                    {
-                        start: 3,
-                        end: 28,
-                        name: 'Chemotherapy',
-                        parent: 'treatment'
+            ],
+            navigator: {
+                enabled: true,
+                liveRedraw: true,
+                series: {
+                    type: 'gantt',
+                    pointPlacement: 0.5,
+                    pointPadding: 0.25,
+                    accessibility: {
+                        enabled: false
                     }
-                ],
-                tooltip: {
-                    pointFormat: 'Start: Month {point.start} End: Month {point.end}'
+                },
+                xAxis: {
+                    labels: {
+                        enabled: false
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    max: 10,
+                    reversed: true
                 }
             },
-            {
-                type: 'scatter',
-                name: 'Key Dates',
-                data: [
-                    {
-                        x: 5,
-                        y: 0,
-                        name: 'Specimen Collection'
-                    }
-                ],
-                marker: {
-                    enabled: true,
-                    symbol: 'circle',
-                    radius: 4
-                },
-                tooltip: {
-                    pointFormat: '{point.name}: {point.x}'
-                },
-                showInLegend: true
+            scrollbar: {
+                enabled: true
             },
-            {
-                type: 'scatter',
-                name: 'Primary Diagnosis',
-                data: [
-                    {
-                        x: 10,
-                        y: 0,
-                        name: 'Breast'
-                    },
-                    {
-                        x: 25,
-                        y: 0,
-                        name: 'Lip'
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}',
+                        style: {
+                            textOutline: 'none',
+                            color: '#333333',
+                            fontFamily: 'Arial, sans-serif'
+                        }
                     }
-                ],
-                marker: {
-                    enabled: true,
-                    symbol: 'circle',
-                    radius: 4
+                }
+            },
+            series: [
+                {
+                    name: 'Treatment',
+                    data: treatmentSeriesData,
+                    tooltip: {
+                        pointFormat: 'Start: Month {point.start} End: Month {point.end}'
+                    }
                 },
-                tooltip: {
-                    pointFormat: '{point.name}: {point.x}'
+                {
+                    type: 'scatter',
+                    name: 'Primary Diagnosis',
+                    data: primaryDiagnosisSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
                 },
-                showInLegend: true
-            }
-        ]
-    };
+                {
+                    type: 'scatter',
+                    name: 'Date of Birth',
+                    data: dateOfBirthSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Date of Death',
+                    data: dateOfDeathSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Date after Lost to Followup',
+                    data: dateAliveAfterLostToFollowup,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Test Date',
+                    data: testDateSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Date of Followup',
+                    data: followupSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Date of Relapse',
+                    data: relapseSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Specimen Collection Date',
+                    data: specimenCollectionSeries,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                }
+            ]
+        });
+    }, [data]);
 
     return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
 }
