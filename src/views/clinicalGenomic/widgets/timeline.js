@@ -11,14 +11,6 @@ HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-const yAxisFormatter = () =>
-    function () {
-        if (this.value.includes('TREATMENT')) {
-            return 'Treatment';
-        }
-        return this.value;
-    };
-
 const headerFormatterMonth = () =>
     function () {
         const startDate = 0;
@@ -40,6 +32,7 @@ function Timeline({ patientId, programId }) {
         const primaryDiagnosisSeries =
             data.primary_diagnoses?.map((diagnosis) => ({
                 x: diagnosis.date_of_diagnosis?.month_interval,
+                y: 1,
                 name: 'Date of Diagnosis'
             })) || [];
 
@@ -50,26 +43,30 @@ function Timeline({ patientId, programId }) {
                         start: treatment.treatment_start_date?.month_interval,
                         end: treatment.treatment_end_date?.month_interval,
                         name: treatment.submitter_treatment_id,
-                        y: 0
+                        y: 2
                     })) || []
             ) || [];
 
-        const dateOfBirthSeries = [
-            {
-                x: data?.date_of_birth?.month_interval,
-                name: 'Major Life Events',
-                dataLabels: {
-                    enabled: true,
-                    format: 'Date of Birth'
-                }
-            }
-        ];
+        const dateOfBirthSeries = data?.date_of_birth?.month_interval
+            ? [
+                  {
+                      x: data.date_of_birth.month_interval,
+                      y: 0,
+                      name: 'Date of Birth',
+                      dataLabels: {
+                          enabled: true,
+                          format: 'Date of Birth'
+                      }
+                  }
+              ]
+            : [];
 
         const dateOfDeathSeries = data?.date_of_death?.month_interval
             ? [
                   {
                       x: data.date_of_death.month_interval,
-                      name: 'Major Life Events',
+                      y: 0,
+                      name: 'Date of Death',
                       dataLabels: {
                           enabled: true,
                           format: 'Date of Death'
@@ -82,7 +79,8 @@ function Timeline({ patientId, programId }) {
             ? [
                   {
                       x: data.date_alive_after_lost_to_followup?.month_interval,
-                      name: 'Major Life Events',
+                      y: 0,
+                      name: 'Date Alive After Lost to Followup',
                       dataLabels: {
                           enabled: true,
                           format: 'Date Alive After Lost to Followup'
@@ -94,6 +92,7 @@ function Timeline({ patientId, programId }) {
         const testDateSeries =
             data.biomarkers?.map((biomarker) => ({
                 x: biomarker.test_date?.month_interval,
+                y: 3,
                 name: 'Biomarkers',
                 dataLabels: {
                     enabled: true,
@@ -101,12 +100,27 @@ function Timeline({ patientId, programId }) {
                 }
             })) || [];
 
+        const specimenCollectionSeries =
+            data.primary_diagnoses?.flatMap(
+                (diagnosis) =>
+                    diagnosis.specimens?.map((specimen) => ({
+                        x: specimen.specimen_collection_date?.month_interval,
+                        y: 4,
+                        name: 'Specimens',
+                        dataLabels: {
+                            enabled: true,
+                            format: 'Specimen Collection Date'
+                        }
+                    })) || []
+            ) || [];
+
         const followupSeries1 =
             data.primary_diagnoses?.flatMap(
                 (diagnosis) =>
                     diagnosis.followups?.map((followup) => ({
                         x: followup.date_of_followup?.month_interval,
-                        name: 'Followups'
+                        name: `Followup ${followup.submitter_follow_up_id}`,
+                        y: 5
                     })) || []
             ) || [];
 
@@ -115,39 +129,49 @@ function Timeline({ patientId, programId }) {
                 (diagnosis) =>
                     diagnosis.followups?.map((followup) => ({
                         x: followup.date_of_relapse?.month_interval,
-                        name: 'Followups'
+                        name: `Relapse ${followup.submitter_follow_up_id}`,
+                        y: 5
                     })) || []
             ) || [];
-        
+
         const followupSeries2 =
-            data.followups?.flatMap(
-                (diagnosis) =>
-                    diagnosis.followups?.map((followup) => ({
-                        x: followup.date_of_followup?.month_interval,
-                        name: 'Followups'
-                    })) || []
-            ) || [];
+            data.followups?.map((followup) => ({
+                x: followup.date_of_followup?.month_interval,
+                name: `Followup ${followup.submitter_follow_up_id}`,
+                y: 5
+            })) || [];
 
         const relapseSeries2 =
+            data.followups?.map((followup) => ({
+                x: followup.date_of_relapse?.month_interval,
+                name: `Relapse ${followup.submitter_follow_up_id}`,
+                y: 5
+            })) || [];
+
+        const followupSeries3 =
             data.primary_diagnoses?.flatMap(
                 (diagnosis) =>
-                    diagnosis.followups?.map((followup) => ({
-                        x: followup.date_of_relapse?.month_interval,
-                        name: 'Followups'
-                    })) || []
+                    diagnosis.treatments?.flatMap(
+                        (treatment) =>
+                            treatment.followups?.map((followup) => ({
+                                x: followup.date_of_followup?.month_interval,
+                                name: `Followup ${followup.submitter_follow_up_id}`,
+                                y: 5
+                            })) || []
+                    ) || []
             ) || [];
 
-        const specimenCollectionSeries =
+        const relapseSeries3 =
             data.primary_diagnoses?.flatMap(
                 (diagnosis) =>
-                    diagnosis.specimens?.map((specimen) => ({
-                        x: specimen.specimen_collection_date?.month_interval,
-                        name: 'Specimens',
-                        dataLabels: {
-                            enabled: true,
-                            format: 'Specimen Collection Date'
-                        }
-                    })) || []
+                    diagnosis.treatments?.flatMap(
+                        (treatment) =>
+                            treatment.followups?.map((followup) => ({
+                                x: followup.date_of_relapse?.month_interval,
+                                name: `Relapse ${followup.submitter_follow_up_id}`,
+                                y: 5
+                            })) || []
+                    ) || []
             ) || [];
 
         setChartOptions({
@@ -166,11 +190,13 @@ function Timeline({ patientId, programId }) {
                 uniqueNames: true,
                 labels: {
                     style: {
-                        fontFamily: 'Arial, sans-serif'
-                    },
-                    formatter: yAxisFormatter()
+                        fontFamily: 'Arial, sans-serif',
+                        fontWeight: 'bold'
+                    }
                 },
-                minRange: 1
+                minRange: 1,
+                type: 'category',
+                categories: ['Major Life Events', 'Primary Diagnoses', 'Treatments', 'Biomarkers', 'Specimens', 'Followups & Relapses']
             },
             xAxis: [
                 {
@@ -313,7 +339,7 @@ function Timeline({ patientId, programId }) {
                 {
                     type: 'scatter',
                     name: 'Date of Followup',
-                    data: followupSeries,
+                    data: followupSeries1,
                     marker: {
                         enabled: true,
                         symbol: 'circle',
@@ -327,7 +353,63 @@ function Timeline({ patientId, programId }) {
                 {
                     type: 'scatter',
                     name: 'Date of Relapse',
-                    data: relapseSeries,
+                    data: relapseSeries1,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Followup',
+                    data: followupSeries2,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Followup',
+                    data: relapseSeries2,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Followup',
+                    data: followupSeries3,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
+                },
+                {
+                    type: 'scatter',
+                    name: 'Followup',
+                    data: relapseSeries3,
                     marker: {
                         enabled: true,
                         symbol: 'circle',
