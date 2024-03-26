@@ -105,11 +105,7 @@ function Timeline({ patientId, programId }) {
             data.biomarkers?.map((biomarker) => ({
                 x: biomarker.test_date?.month_interval,
                 y: 3,
-                name: 'Biomarkers',
-                dataLabels: {
-                    enabled: true,
-                    format: 'Test Date'
-                }
+                name: `${biomarker.submitter_primary_diagnosis_id} Test Date`
             })) || [];
 
         const specimenCollectionSeries =
