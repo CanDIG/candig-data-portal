@@ -11,6 +11,15 @@ HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
+const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i += 1) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+
 const headerFormatterMonth = () =>
     function () {
         const startDate = 0;
@@ -26,7 +35,6 @@ const headerFormatterYear = () =>
 
 function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
-    console.log(data);
     const [chartOptions, setChartOptions] = useState({});
     useEffect(() => {
         const primaryDiagnosisSeries =
@@ -42,8 +50,12 @@ function Timeline({ patientId, programId }) {
                     diagnosis.treatments?.map((treatment) => ({
                         start: treatment.treatment_start_date?.month_interval,
                         end: treatment.treatment_end_date?.month_interval,
-                        name: treatment.submitter_treatment_id,
-                        y: 2
+                        name: `${treatment.submitter_treatment_id}`,
+                        y: 2,
+                        color: generateRandomColor(),
+                        dataLabels: {
+                            enabled: false
+                        }
                     })) || []
             ) || [];
 
@@ -194,6 +206,7 @@ function Timeline({ patientId, programId }) {
                         fontWeight: 'bold'
                     }
                 },
+                min: 0,
                 minRange: 1,
                 type: 'category',
                 categories: ['Major Life Events', 'Primary Diagnoses', 'Treatments', 'Biomarkers', 'Specimens', 'Followups & Relapses']
@@ -263,7 +276,7 @@ function Timeline({ patientId, programId }) {
                     name: 'Treatment',
                     data: treatmentSeriesData,
                     tooltip: {
-                        pointFormat: 'Start: Month {point.start} End: Month {point.end}'
+                        pointFormat: '{point.name} Start: Month {point.start} End: Month {point.end}'
                     }
                 },
                 {
