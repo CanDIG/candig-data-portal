@@ -211,7 +211,7 @@ function Timeline({ patientId, programId }) {
                 {
                     type: 'linear',
                     linkedTo: 0,
-                    tickInterval: 1,
+                    tickInterval: 12,
                     minRange: 12,
                     labels: {
                         align: 'center',
