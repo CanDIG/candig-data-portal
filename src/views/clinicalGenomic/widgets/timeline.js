@@ -41,7 +41,7 @@ function Timeline({ patientId, programId }) {
             data.primary_diagnoses?.map((diagnosis) => ({
                 x: diagnosis.date_of_diagnosis?.month_interval,
                 y: 1,
-                name: 'Date of Diagnosis'
+                name: `${diagnosis.submitter_primary_diagnosis_id}`
             })) || [];
 
         const treatmentSeriesData =
@@ -118,11 +118,7 @@ function Timeline({ patientId, programId }) {
                     diagnosis.specimens?.map((specimen) => ({
                         x: specimen.specimen_collection_date?.month_interval,
                         y: 4,
-                        name: 'Specimens',
-                        dataLabels: {
-                            enabled: true,
-                            format: 'Specimen Collection Date'
-                        }
+                        name: `${specimen.submitter_specimen_id}`
                     })) || []
             ) || [];
 
@@ -379,7 +375,7 @@ function Timeline({ patientId, programId }) {
                 },
                 {
                     type: 'scatter',
-                    name: 'Followup',
+                    name: 'Date of Followup',
                     data: followupSeries2,
                     marker: {
                         enabled: true,
@@ -393,7 +389,7 @@ function Timeline({ patientId, programId }) {
                 },
                 {
                     type: 'scatter',
-                    name: 'Followup',
+                    name: 'Date of Relapse',
                     data: relapseSeries2,
                     marker: {
                         enabled: true,
@@ -407,7 +403,7 @@ function Timeline({ patientId, programId }) {
                 },
                 {
                     type: 'scatter',
-                    name: 'Followup',
+                    name: 'Date of Followup',
                     data: followupSeries3,
                     marker: {
                         enabled: true,
@@ -421,7 +417,7 @@ function Timeline({ patientId, programId }) {
                 },
                 {
                     type: 'scatter',
-                    name: 'Followup',
+                    name: 'Date of Relapse',
                     data: relapseSeries3,
                     marker: {
                         enabled: true,
