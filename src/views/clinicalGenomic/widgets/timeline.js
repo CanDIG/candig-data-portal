@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import useClinicalPatientData from '../useClinicalPatientData';
+import PropTypes from 'prop-types';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -21,14 +22,14 @@ const generateRandomColor = () => {
 };
 
 const headerFormatterMonth = () =>
-    function () {
+    function headerFormatterMonth() {
         const startDate = 0;
         const monthsSinceStart = Math.floor(this.value - startDate) + 1;
         return `Month ${monthsSinceStart}`;
     };
 
 const headerFormatterYear = () =>
-    function () {
+    function headerFormatterYear() {
         const yearSinceStart = Math.ceil((this.value + 1) / 12);
         return `Year ${yearSinceStart}`;
     };
@@ -445,5 +446,10 @@ function Timeline({ patientId, programId }) {
 
     return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
 }
+
+Timeline.propTypes = {
+    patientId: PropTypes.string.isRequired,
+    programId: PropTypes.string.isRequired
+};
 
 export default Timeline;
