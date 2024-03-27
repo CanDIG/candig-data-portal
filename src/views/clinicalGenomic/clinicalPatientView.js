@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey } from '../../utils/utils';
+import Timeline from './widgets/timeline';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -22,6 +23,16 @@ const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)'
 }));
 
+const TimelineContainer = styled(Box)(({ theme }) => ({
+    border: `2px solid ${theme.palette.divider}`,
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    marginBottom: theme.spacing(2),
+    maxHeight: '600px',
+    overflowY: 'auto'
+}));
+
 function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
 
@@ -33,10 +44,10 @@ function ClinicalPatientView() {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
-        const intitalProgramId = urlParams.get('programId');
+        const initialProgramId = urlParams.get('programId');
 
         setPatientId(initialPatientId || '');
-        setProgramId(intitalProgramId || '');
+        setProgramId(initialProgramId || '');
     }, []);
 
     const additionalClass = 'your-additional-class'; // Replace with your actual class
@@ -67,6 +78,9 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
+            <TimelineContainer>
+                <Timeline patientId={patientId} programId={programId} />
+            </TimelineContainer>
         </MainCard>
     );
 }
