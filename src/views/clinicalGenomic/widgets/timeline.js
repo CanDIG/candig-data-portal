@@ -226,7 +226,7 @@ function Timeline({ patientId, programId }) {
                     }
                 },
                 min: 0,
-                minRange: 1,
+                minRange: 0,
                 type: 'category',
                 categories: ['Major Life Events', 'Primary Diagnoses', 'Treatments', 'Biomarkers', 'Specimens', 'Followups & Relapses']
             },
