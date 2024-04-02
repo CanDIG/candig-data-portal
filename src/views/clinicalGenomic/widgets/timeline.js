@@ -12,14 +12,6 @@ HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
 const colorPalette = [
     '#0A407D', // Deep Sapphire
     '#0D5A1B', // Dark Fern
@@ -38,34 +30,29 @@ const colorPalette = [
     '#FFF8E4' // Early Dawn
 ];
 
-let shuffledPalette = shuffleArray([...colorPalette]);
-let index = 0;
+const generateRandomColor = () => {
+    const randomIndex = Math.floor(Math.random() * colorPalette.length);
+    return colorPalette[randomIndex];
+};
 
-function generateRandomColor() {
-    const color = shuffledPalette[index];
-    index = (index + 1) % shuffledPalette.length;
-    if (index === 0) {
-        shuffledPalette = shuffleArray([...colorPalette]);
-    }
-    return color;
-}
-
-const headerFormatterMonth = () =>
-    function headerFormatterMonth() {
-        const startDate = 0;
-        const monthsSinceStart = Math.floor(this.value - startDate) + 1;
-        return `Month ${monthsSinceStart}`;
-    };
-
-const headerFormatterYear = () =>
-    function headerFormatterYear() {
-        const yearSinceStart = Math.ceil((this.value + 1) / 12);
-        return `Year ${yearSinceStart}`;
+const headerFormatter = (birthDate, dateResolution) =>
+    function headerFormatter() {
+        if (dateResolution === 'Month' && typeof birthDate != 'undefined') {
+            const monthsSinceStart = Math.floor(this.value - birthDate) + 1;
+            return `${monthsSinceStart} Month(s) Old`;
+        }
+        if (dateResolution === 'Year' && typeof birthDate != 'undefined') {
+            const yearsSinceStart = Math.ceil((this.value - birthDate) / 12);
+            return `${yearsSinceStart} Year(s) Old`;
+        }
+        return `Age Unknown`;
     };
 
 function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
+    console.log(data);
+    console.log(data?.date_of_birth?.month_interval);
     useEffect(() => {
         const primaryDiagnosisSeries =
             data.primary_diagnoses?.map((diagnosis) => ({
@@ -237,7 +224,7 @@ function Timeline({ patientId, programId }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatterMonth()
+                        formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Month')
                     }
                 },
                 {
@@ -247,7 +234,7 @@ function Timeline({ patientId, programId }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatterYear()
+                        formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Year')
                     },
                     opposite: true
                 }
