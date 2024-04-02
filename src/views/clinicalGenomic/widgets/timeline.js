@@ -53,10 +53,7 @@ function Timeline({ patientId, programId }) {
                         end: treatment.treatment_end_date?.month_interval,
                         name: `${treatment.submitter_treatment_id}`,
                         y: 2,
-                        color: generateRandomColor(),
-                        dataLabels: {
-                            enabled: false
-                        }
+                        color: generateRandomColor()
                     })) || []
             ) || [];
 
@@ -79,11 +76,7 @@ function Timeline({ patientId, programId }) {
                   {
                       x: data.date_of_death.month_interval,
                       y: 0,
-                      name: 'Date of Death',
-                      dataLabels: {
-                          enabled: true,
-                          format: 'Date of Death'
-                      }
+                      name: 'Date of Death'
                   }
               ]
             : [];
