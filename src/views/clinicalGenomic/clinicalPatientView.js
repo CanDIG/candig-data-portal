@@ -24,7 +24,7 @@ const StyledTopLevelBox = styled(Box)(({ theme }) => ({
 }));
 
 const TimelineContainer = styled(Box)(({ theme }) => ({
-    border: `2px solid ${theme.palette.divider}`,
+    border: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(2),
     marginTop: theme.spacing(2),
     borderRadius: theme.shape.borderRadius,
