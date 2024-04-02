@@ -12,14 +12,43 @@ HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 HighchartsAccessibility(Highcharts);
 
-const generateRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i += 1) {
-        color += letters[Math.floor(Math.random() * 16)];
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+const colorPalette = [
+    '#0A407D', // Deep Sapphire
+    '#0D5A1B', // Dark Fern
+    '#FC9803', // California
+    '#1565C0', // Denim
+    '#1C821E', // Forest Green
+    '#FFB800', // Selective Yellow
+    '#1E88E5', // Picton Blue
+    '#368B4C', // Emerald
+    '#FFD34F', // Mustard
+    '#90CAF9', // Malibu
+    '#A8FEB6', // Mint Green
+    '#FBE7AA', // Banana Mania
+    '#E3F2FD', // Hawkes Blue
+    '#E4FFE9', // Hint of Green
+    '#FFF8E4' // Early Dawn
+];
+
+let shuffledPalette = shuffleArray([...colorPalette]);
+let index = 0;
+
+function generateRandomColor() {
+    const color = shuffledPalette[index];
+    index = (index + 1) % shuffledPalette.length;
+    if (index === 0) {
+        shuffledPalette = shuffleArray([...colorPalette]);
     }
     return color;
-};
+}
 
 const headerFormatterMonth = () =>
     function headerFormatterMonth() {
@@ -42,7 +71,8 @@ function Timeline({ patientId, programId }) {
             data.primary_diagnoses?.map((diagnosis) => ({
                 x: diagnosis.date_of_diagnosis?.month_interval,
                 y: 1,
-                name: `${diagnosis.submitter_primary_diagnosis_id}`
+                name: `${diagnosis.submitter_primary_diagnosis_id}`,
+                color: colorPalette[0]
             })) || [];
 
         const treatmentSeriesData =
@@ -63,10 +93,7 @@ function Timeline({ patientId, programId }) {
                       x: data.date_of_birth.month_interval,
                       y: 0,
                       name: 'Date of Birth',
-                      dataLabels: {
-                          enabled: true,
-                          format: 'Date of Birth'
-                      }
+                      color: colorPalette[1]
                   }
               ]
             : [];
@@ -76,7 +103,8 @@ function Timeline({ patientId, programId }) {
                   {
                       x: data.date_of_death.month_interval,
                       y: 0,
-                      name: 'Date of Death'
+                      name: 'Date of Death',
+                      color: colorPalette[2]
                   }
               ]
             : [];
@@ -87,10 +115,7 @@ function Timeline({ patientId, programId }) {
                       x: data.date_alive_after_lost_to_followup?.month_interval,
                       y: 0,
                       name: 'Date Alive After Lost to Followup',
-                      dataLabels: {
-                          enabled: true,
-                          format: 'Date Alive After Lost to Followup'
-                      }
+                      color: colorPalette[3]
                   }
               ]
             : [];
@@ -99,7 +124,8 @@ function Timeline({ patientId, programId }) {
             data.biomarkers?.map((biomarker) => ({
                 x: biomarker.test_date?.month_interval,
                 y: 3,
-                name: `${biomarker.submitter_primary_diagnosis_id} Test Date`
+                name: `${biomarker.submitter_primary_diagnosis_id} Test Date`,
+                color: colorPalette[4]
             })) || [];
 
         const specimenCollectionSeries =
@@ -108,7 +134,8 @@ function Timeline({ patientId, programId }) {
                     diagnosis.specimens?.map((specimen) => ({
                         x: specimen.specimen_collection_date?.month_interval,
                         y: 4,
-                        name: `${specimen.submitter_specimen_id}`
+                        name: `${specimen.submitter_specimen_id}`,
+                        color: colorPalette[5]
                     })) || []
             ) || [];
 
@@ -118,7 +145,8 @@ function Timeline({ patientId, programId }) {
                     diagnosis.followups?.map((followup) => ({
                         x: followup.date_of_followup?.month_interval,
                         name: `Followup ${followup.submitter_follow_up_id}`,
-                        y: 5
+                        y: 5,
+                        color: colorPalette[6]
                     })) || []
             ) || [];
 
@@ -128,7 +156,8 @@ function Timeline({ patientId, programId }) {
                     diagnosis.followups?.map((followup) => ({
                         x: followup.date_of_relapse?.month_interval,
                         name: `Relapse ${followup.submitter_follow_up_id}`,
-                        y: 5
+                        y: 5,
+                        color: colorPalette[7]
                     })) || []
             ) || [];
 
@@ -136,14 +165,16 @@ function Timeline({ patientId, programId }) {
             data.followups?.map((followup) => ({
                 x: followup.date_of_followup?.month_interval,
                 name: `Followup ${followup.submitter_follow_up_id}`,
-                y: 5
+                y: 5,
+                color: colorPalette[6]
             })) || [];
 
         const relapseSeries2 =
             data.followups?.map((followup) => ({
                 x: followup.date_of_relapse?.month_interval,
                 name: `Relapse ${followup.submitter_follow_up_id}`,
-                y: 5
+                y: 5,
+                color: colorPalette[7]
             })) || [];
 
         const followupSeries3 =
@@ -154,7 +185,8 @@ function Timeline({ patientId, programId }) {
                             treatment.followups?.map((followup) => ({
                                 x: followup.date_of_followup?.month_interval,
                                 name: `Followup ${followup.submitter_follow_up_id}`,
-                                y: 5
+                                y: 5,
+                                color: colorPalette[6]
                             })) || []
                     ) || []
             ) || [];
@@ -167,7 +199,8 @@ function Timeline({ patientId, programId }) {
                             treatment.followups?.map((followup) => ({
                                 x: followup.date_of_relapse?.month_interval,
                                 name: `Relapse ${followup.submitter_follow_up_id}`,
-                                y: 5
+                                y: 5,
+                                color: colorPalette[7]
                             })) || []
                     ) || []
             ) || [];
