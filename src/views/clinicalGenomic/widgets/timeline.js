@@ -6,6 +6,7 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import useClinicalPatientData from '../useClinicalPatientData';
 import PropTypes from 'prop-types';
+import Alert from '@mui/material/Alert';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -37,11 +38,11 @@ const generateRandomColor = () => {
 
 const headerFormatter = (birthDate, dateResolution) =>
     function headerFormatter() {
-        if (dateResolution === 'Month' && typeof birthDate != 'undefined') {
+        if (dateResolution === 'Month' && typeof birthDate !== 'undefined') {
             const monthsSinceStart = Math.floor(this.value - birthDate) + 1;
             return `${monthsSinceStart} Month(s) Old`;
         }
-        if (dateResolution === 'Year' && typeof birthDate != 'undefined') {
+        if (dateResolution === 'Year' && typeof birthDate !== 'undefined') {
             const yearsSinceStart = Math.ceil((this.value - birthDate) / 12);
             return `${yearsSinceStart} Year(s) Old`;
         }
@@ -52,7 +53,6 @@ function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
     console.log(data);
-    console.log(data?.date_of_birth?.month_interval);
     useEffect(() => {
         const primaryDiagnosisSeries =
             data.primary_diagnoses?.map((diagnosis) => ({
@@ -225,7 +225,29 @@ function Timeline({ patientId, programId }) {
                     labels: {
                         align: 'center',
                         formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Month')
-                    }
+                    },
+                    plotLines: [
+                        {
+                            color: colorPalette[0],
+                            value: 0,
+                            width: 2,
+                            zIndex: 5,
+                            label: {
+                                text: 'First Day of Diagnosis',
+                                align: 'left',
+                                verticalAlign: 'top',
+                                x: -130,
+                                y: 150,
+                                style: {
+                                    color: '#000000',
+                                    fontWeight: 'bold',
+                                    fontSize: '12px'
+                                },
+                                rotation: 0,
+                                useHTML: true
+                            }
+                        }
+                    ]
                 },
                 {
                     type: 'linear',
@@ -456,6 +478,10 @@ function Timeline({ patientId, programId }) {
             ]
         });
     }, [data]);
+
+    if (!data?.date_of_birth) {
+        return <Alert severity="warning">Unable to display the timeline due to missing Date of Birth information.</Alert>;
+    }
 
     return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
 }
