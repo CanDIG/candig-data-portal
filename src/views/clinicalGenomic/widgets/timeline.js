@@ -52,7 +52,6 @@ const headerFormatter = (birthDate, dateResolution) =>
 function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
-    console.log(data);
     useEffect(() => {
         const primaryDiagnosisSeries =
             data.primary_diagnoses?.map((diagnosis) => ({
@@ -62,17 +61,39 @@ function Timeline({ patientId, programId }) {
                 color: colorPalette[0]
             })) || [];
 
-        const treatmentSeriesData =
-            data.primary_diagnoses?.flatMap(
-                (diagnosis) =>
-                    diagnosis.treatments?.map((treatment) => ({
-                        start: treatment.treatment_start_date?.month_interval,
-                        end: treatment.treatment_end_date?.month_interval,
-                        name: `${treatment.submitter_treatment_id}`,
+        const treatmentIntervals = [];
+        const treatmentPoints = [];
+
+        data.primary_diagnoses?.forEach((diagnosis) =>
+            diagnosis.treatments?.forEach((treatment) => {
+                const treatmentStart = treatment.treatment_start_date?.month_interval;
+                const treatmentEnd = treatment.treatment_end_date?.month_interval;
+
+                if (treatmentStart !== null && treatmentStart !== undefined && treatmentEnd !== null && treatmentEnd !== undefined) {
+                    treatmentIntervals.push({
+                        name: treatment.submitter_treatment_id,
+                        start: treatmentStart,
+                        end: treatmentEnd,
                         y: 2,
                         color: generateRandomColor()
-                    })) || []
-            ) || [];
+                    });
+                } else if (treatmentStart !== null && treatmentStart !== undefined) {
+                    treatmentPoints.push({
+                        x: treatmentStart,
+                        title: treatment.submitter_treatment_id,
+                        y: 2,
+                        color: generateRandomColor()
+                    });
+                } else if (treatmentEnd !== null && treatmentEnd !== undefined) {
+                    treatmentPoints.push({
+                        x: treatmentEnd,
+                        title: treatment.submitter_treatment_id,
+                        y: 2,
+                        color: generateRandomColor()
+                    });
+                }
+            })
+        );
 
         const dateOfBirthSeries = data?.date_of_birth?.month_interval
             ? [
@@ -215,13 +236,20 @@ function Timeline({ patientId, programId }) {
                 min: 0,
                 minRange: 0,
                 type: 'category',
-                categories: ['Major Life Events', 'Primary Diagnoses', 'Treatments', 'Biomarkers', 'Specimens', 'Followups & Relapses']
+                categories: [
+                    'Major Life Events',
+                    'Primary Diagnosis',
+                    'Treatment',
+                    'Test Date',
+                    'Specimen Collection',
+                    'Followup & Relapse'
+                ]
             },
             xAxis: [
                 {
                     type: 'linear',
                     tickInterval: 1,
-                    minRange: 12,
+                    minRange: 6,
                     labels: {
                         align: 'center',
                         formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Month')
@@ -302,10 +330,24 @@ function Timeline({ patientId, programId }) {
             series: [
                 {
                     name: 'Treatment',
-                    data: treatmentSeriesData,
+                    data: treatmentIntervals,
                     tooltip: {
                         pointFormat: '{point.name} Start: Month {point.start} End: Month {point.end}'
                     }
+                },
+                {
+                    type: 'scatter',
+                    name: 'Treatment',
+                    data: treatmentPoints,
+                    marker: {
+                        enabled: true,
+                        symbol: 'circle',
+                        radius: 4
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: Month {point.x}'
+                    },
+                    showInLegend: true
                 },
                 {
                     type: 'scatter',
