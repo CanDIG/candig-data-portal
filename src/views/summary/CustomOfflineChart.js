@@ -52,7 +52,7 @@ function CustomOfflineChart(props) {
     const theme = useTheme();
 
     // State management
-    const events = useSelector((state) => state);
+    const customization = useSelector((state) => state.customization);
     const [chart, setChart] = useState(chartType);
     const [chartData, setChartData] = useState(data);
     const [trim, setTrim] = useState(trimByDefault || false);
@@ -351,7 +351,7 @@ function CustomOfflineChart(props) {
                     <IconTrash />
                 </IconButton>
             )}
-            <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25 }}>
+            <MainCard sx={{ borderRadius: customization.borderRadius * 0.25 }}>
                 <HighchartsReact highcharts={Highcharts} options={chartOptions} ref={chartRef} />
                 {dropDown && (
                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
