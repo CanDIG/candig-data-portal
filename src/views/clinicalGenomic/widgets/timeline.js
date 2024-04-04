@@ -52,8 +52,8 @@ const headerFormatter = (birthDate, dateResolution) =>
 const treatmentFormatter = (birthDate) =>
     function treatmentFormatter() {
         if (this.extra_info) {
-            const monthInAgeExtra = Math.floor(this.x - birthDate) + 1;
-            const extraInfo = `${this.extra_info} : ${monthInAgeExtra} Month(s) Old`;
+            const yearInAgeExtra = Math.ceil((this.x - birthDate) / 12);
+            const extraInfo = `${this.extra_info} : ${yearInAgeExtra} Year(s) Old`;
             const missingInfo = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
             const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
             return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
@@ -61,15 +61,22 @@ const treatmentFormatter = (birthDate) =>
                     ${extraInfo}<br/>
                     ${missingInfo}<br/>`;
         }
-        const monthInAgeStart = Math.floor(this.start - birthDate) + 1;
-        const monthInAgeEnd = Math.floor(this.end - birthDate) + 1;
-        const startMonth = `Start: ${monthInAgeStart} Month(s) Old`;
-        const endMonth = `End: ${monthInAgeEnd} Month(s) Old`;
+        const yearInAgeStart = Math.ceil((this.start - birthDate) / 12);
+        const yearInAgeEnd = Math.ceil((this.end - birthDate) / 12);
+        const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
+        const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
         const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
         return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
                 ${treatmentType}<br/>
-                ${startMonth}<br/>
-                ${endMonth}<br/>`;
+                ${startYear}<br/>
+                ${endYear}<br/>`;
+    };
+
+const tooltipFormatter = (birthDate) =>
+    function tooltipFormatter() {
+        const yearInAge = Math.ceil((this.x - birthDate) / 12);
+        return `<span style="font-weight: bold">${this.name}</span><br/>
+                ${yearInAge} Year(s) Old`;
     };
 
 function Timeline({ patientId, programId }) {
@@ -459,7 +466,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -473,7 +480,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -487,7 +494,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -501,7 +508,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -515,7 +522,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -529,7 +536,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -543,7 +550,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -557,7 +564,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -571,7 +578,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -585,7 +592,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -599,7 +606,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
@@ -613,7 +620,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 }
