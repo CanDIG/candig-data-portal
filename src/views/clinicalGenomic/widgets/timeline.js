@@ -49,6 +49,19 @@ const headerFormatter = (birthDate, dateResolution) =>
         return `Age Unknown`;
     };
 
+const treatmentFormatter = () =>
+    function treatmentFormatter() {
+        const startMonth = `Start: Month ${this.start}`;
+        console.log('test');
+        const endMonth = `End: Month ${this.end}`;
+        const treatmentType = `Type: ${this.treatment_type}`;
+
+        return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
+                ${treatmentType}<br/>
+                ${startMonth}<br/>
+                ${endMonth}<br/>`;
+    };
+
 function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
@@ -66,6 +79,7 @@ function Timeline({ patientId, programId }) {
                         name: treatment.submitter_treatment_id,
                         start: treatmentStart,
                         end: treatmentEnd,
+                        treatment_type: treatment?.treatment_type,
                         y: 2,
                         color: generateRandomColor()
                     });
@@ -75,9 +89,10 @@ function Timeline({ patientId, programId }) {
                 ) {
                     treatmentPoints.push({
                         x: treatmentStart,
-                        title: treatment.submitter_treatment_id,
+                        name: treatment.submitter_treatment_id,
                         y: 2,
-                        color: generateRandomColor()
+                        color: generateRandomColor(),
+                        treatment_type: treatment?.treatment_type
                     });
                 }
             })
@@ -405,7 +420,7 @@ function Timeline({ patientId, programId }) {
                     name: 'Treatment',
                     data: treatmentIntervals,
                     tooltip: {
-                        pointFormat: '{point.name} Start: Month {point.start} End: Month {point.end}'
+                        formatter: treatmentFormatter()
                     }
                 },
                 {
