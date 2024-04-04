@@ -49,13 +49,23 @@ const headerFormatter = (birthDate, dateResolution) =>
         return `Age Unknown`;
     };
 
-const treatmentFormatter = () =>
+const treatmentFormatter = (birthDate) =>
     function treatmentFormatter() {
-        const startMonth = `Start: Month ${this.start}`;
-        console.log('test');
-        const endMonth = `End: Month ${this.end}`;
-        const treatmentType = `Type: ${this.treatment_type}`;
-
+        if (this.extra_info) {
+            const monthInAgeExtra = Math.floor(this.x - birthDate) + 1;
+            const extraInfo = `${this.extra_info} : ${monthInAgeExtra} Month(s) Old`;
+            const missingInfo = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
+            const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
+            return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
+                    ${treatmentType}<br/>
+                    ${extraInfo}<br/>
+                    ${missingInfo}<br/>`;
+        }
+        const monthInAgeStart = Math.floor(this.start - birthDate) + 1;
+        const monthInAgeEnd = Math.floor(this.end - birthDate) + 1;
+        const startMonth = `Start: ${monthInAgeStart} Month(s) Old`;
+        const endMonth = `End: ${monthInAgeEnd} Month(s) Old`;
+        const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
         return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
                 ${treatmentType}<br/>
                 ${startMonth}<br/>
@@ -92,7 +102,9 @@ function Timeline({ patientId, programId }) {
                         name: treatment.submitter_treatment_id,
                         y: 2,
                         color: generateRandomColor(),
-                        treatment_type: treatment?.treatment_type
+                        treatment_type: treatment?.treatment_type,
+                        extra_info: treatmentStart !== null ? 'Start' : 'End',
+                        missing_info: treatmentStart !== null ? 'End' : 'Start'
                     });
                 }
             })
@@ -420,7 +432,7 @@ function Timeline({ patientId, programId }) {
                     name: 'Treatment',
                     data: treatmentIntervals,
                     tooltip: {
-                        formatter: treatmentFormatter()
+                        pointFormatter: treatmentFormatter(data?.date_of_birth?.month_interval)
                     }
                 },
                 {
@@ -433,7 +445,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: Month {point.x}'
+                        pointFormatter: treatmentFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
