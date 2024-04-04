@@ -71,10 +71,26 @@ function DataVisualization() {
         setOpen((prevOpen) => !prevOpen);
     };
 
+    function setDataVisChartTypeSingle(index, newVal) {
+        const newDataVisChartType = dataVisChartType.slice();
+        newDataVisChartType[index] = newVal;
+        setDataVisChartType(newDataVisChartType);
+        localStorage.setItem('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+    }
+
+    function setDataVisDataTypeSingle(index, newVal) {
+        const newDataVisData = dataVisData.slice();
+        newDataVisData[index] = newVal;
+        setdataVisData(newDataVisData);
+        localStorage.setItem('dataVisData', JSON.stringify(newDataVisData), { expires: 365 });
+    }
+
     function removeChart(index) {
         const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
         const newdataVisData = dataVisData.slice(0, index).concat(dataVisData.slice(index + 1));
         const newDataVisTrim = dataVisTrim.slice(0, index).concat(dataVisTrim.slice(index + 1));
+        console.log(dataVisData);
+        console.log(newdataVisData);
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         setDataVisTrim(newDataVisTrim);
@@ -158,6 +174,8 @@ function DataVisualization() {
                     orderByFrequency={item !== 'diagnosis_age_count'}
                     orderAlphabetically={item === 'diagnosis_age_count'}
                     trimByDefault={dataVisTrim[index]}
+                    onChangeDataVisChartType={(newType) => setDataVisChartTypeSingle(index, newType)}
+                    onChangeDataVisData={(newData) => setDataVisDataTypeSingle(index, newData)}
                 />
             </Grid>
         ));

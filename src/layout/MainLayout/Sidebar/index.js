@@ -86,6 +86,7 @@ function Sidebar({ drawerOpen, drawerToggle, screen }) {
     );
 
     const container = screen !== undefined ? () => window().document.body : undefined;
+    console.log(`Drawer is ${drawerOpen}`);
 
     return (
         <Root className={classes.drawer} aria-label="mailbox folders">
