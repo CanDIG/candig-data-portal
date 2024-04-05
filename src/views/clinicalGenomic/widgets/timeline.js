@@ -49,8 +49,8 @@ const headerFormatter = (birthDate, dateResolution) =>
         return `Age Unknown`;
     };
 
-const treatmentFormatter = (birthDate) =>
-    function treatmentFormatter() {
+const tooltipFormatter = (birthDate) =>
+    function tooltipFormatter() {
         if (this.extra_info) {
             const yearInAgeExtra = Math.ceil((this.x - birthDate) / 12);
             const extraInfo = `${this.extra_info} : ${yearInAgeExtra} Year(s) Old`;
@@ -61,6 +61,7 @@ const treatmentFormatter = (birthDate) =>
                     ${extraInfo}<br/>
                     ${missingInfo}<br/>`;
         }
+        if (this.start) {
         const yearInAgeStart = Math.ceil((this.start - birthDate) / 12);
         const yearInAgeEnd = Math.ceil((this.end - birthDate) / 12);
         const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
@@ -70,10 +71,7 @@ const treatmentFormatter = (birthDate) =>
                 ${treatmentType}<br/>
                 ${startYear}<br/>
                 ${endYear}<br/>`;
-    };
-
-const tooltipFormatter = (birthDate) =>
-    function tooltipFormatter() {
+        }
         const yearInAge = Math.ceil((this.x - birthDate) / 12);
         return `<span style="font-weight: bold">${this.name}</span><br/>
                 ${yearInAge} Year(s) Old`;
@@ -85,7 +83,6 @@ function Timeline({ patientId, programId }) {
     useEffect(() => {
         const treatmentIntervals = [];
         const treatmentPoints = [];
-
         data.primary_diagnoses?.forEach((diagnosis) =>
             diagnosis.treatments?.forEach((treatment) => {
                 const treatmentStart = treatment.treatment_start_date?.month_interval;
@@ -233,7 +230,7 @@ function Timeline({ patientId, programId }) {
             colorPalette[5],
             '',
             false,
-            'Specimens'
+            null
         );
         const primaryDiagnosisSeries = generateSeriesData(
             data,
@@ -439,7 +436,7 @@ function Timeline({ patientId, programId }) {
                     name: 'Treatment',
                     data: treatmentIntervals,
                     tooltip: {
-                        pointFormatter: treatmentFormatter(data?.date_of_birth?.month_interval)
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     }
                 },
                 {
@@ -452,7 +449,7 @@ function Timeline({ patientId, programId }) {
                         radius: 4
                     },
                     tooltip: {
-                        pointFormatter: treatmentFormatter(data?.date_of_birth?.month_interval)
+                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
                     },
                     showInLegend: true
                 },
