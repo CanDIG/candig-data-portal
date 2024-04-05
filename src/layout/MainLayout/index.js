@@ -137,7 +137,7 @@ function MainLayout() {
                     position="fixed"
                     color="inherit"
                     elevation={0}
-                    className={classes.appBar}
+                    className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
                 >
                     <Toolbar>
                         <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
