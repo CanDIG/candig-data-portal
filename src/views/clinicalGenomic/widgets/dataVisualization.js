@@ -89,8 +89,6 @@ function DataVisualization() {
         const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
         const newdataVisData = dataVisData.slice(0, index).concat(dataVisData.slice(index + 1));
         const newDataVisTrim = dataVisTrim.slice(0, index).concat(dataVisTrim.slice(index + 1));
-        console.log(dataVisData);
-        console.log(newdataVisData);
         setDataVisChartType(newDataVisChartType);
         setdataVisData(newdataVisData);
         setDataVisTrim(newDataVisTrim);
