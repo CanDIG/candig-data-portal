@@ -62,12 +62,12 @@ const tooltipFormatter = (birthDate) =>
                     ${missingInfo}<br/>`;
         }
         if (this.start) {
-        const yearInAgeStart = Math.ceil((this.start - birthDate) / 12);
-        const yearInAgeEnd = Math.ceil((this.end - birthDate) / 12);
-        const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
-        const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
-        const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
-        return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
+            const yearInAgeStart = Math.ceil((this.start - birthDate) / 12);
+            const yearInAgeEnd = Math.ceil((this.end - birthDate) / 12);
+            const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
+            const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
+            const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
+            return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
                 ${treatmentType}<br/>
                 ${startYear}<br/>
                 ${endYear}<br/>`;
@@ -128,7 +128,7 @@ function Timeline({ patientId, programId }) {
                     : [];
             }
 
-            if (path === 'biomarkers' || path === 'primary_diagnoses' || name === 'Followup&Relapse2') {
+            if (path === 'primary_diagnoses' || name === 'Followup&Relapse2') {
                 return Array.isArray(data?.[path])
                     ? data[path].map((item) => ({
                           x: item?.[date]?.month_interval,
@@ -136,6 +136,24 @@ function Timeline({ patientId, programId }) {
                           name: `${namePrefix}${item?.[id]}`,
                           color: colour
                       }))
+                    : [];
+            }
+
+            if (path === 'biomarkers') {
+                return Array.isArray(data?.[path])
+                    ? data[path].map((item) => {
+                          const id =
+                              item?.submitter_treatment_id ||
+                              item?.submitter_primary_diagnosis_id ||
+                              item?.submitter_follow_up_id ||
+                              item?.submitter_specimen_id;
+                          return {
+                              x: item?.[date]?.month_interval,
+                              y: yValue,
+                              name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
+                              color: colour
+                          };
+                      })
                     : [];
             }
 
@@ -208,18 +226,7 @@ function Timeline({ patientId, programId }) {
             true,
             null
         );
-        const testDateSeries = generateSeriesData(
-            data,
-            'biomarkers',
-            null,
-            'test_date',
-            'submitter_primary_diagnosis_id',
-            3,
-            colorPalette[4],
-            '',
-            false,
-            null
-        );
+        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 3, colorPalette[4], '', false, null);
         const specimenCollectionSeries = generateSeriesData(
             data?.primary_diagnoses,
             'specimens',
@@ -317,6 +324,57 @@ function Timeline({ patientId, programId }) {
             'Followup&Relapse3'
         );
 
+        const seriesData = {
+            treatmentIntervals,
+            treatmentPoints,
+            primaryDiagnosisSeries,
+            dateOfBirthSeries,
+            dateOfDeathSeries,
+            dateAliveAfterLostToFollowupSeries,
+            testDateSeries,
+            followupSeries1,
+            relapseSeries1,
+            followupSeries2,
+            relapseSeries2,
+            followupSeries3,
+            relapseSeries3,
+            specimenCollectionSeries
+        };
+
+        const seriesConfigs = [
+            { key: 'treatmentIntervals', name: 'Treatment', type: 'gantt' },
+            { key: 'treatmentPoints', name: 'Treatment', type: 'scatter' },
+            { key: 'primaryDiagnosisSeries', name: 'Primary Diagnosis', type: 'scatter' },
+            { key: 'dateOfBirthSeries', name: 'Date of Birth', type: 'scatter' },
+            { key: 'specimenCollectionSeries', name: 'Specimen Collection Date', type: 'scatter' },
+            { key: 'dateOfDeathSeries', name: 'Date of Death', type: 'scatter' },
+            { key: 'dateAliveAfterLostToFollowupSeries', name: 'Date Alive After Lost to Followup', type: 'scatter' },
+            { key: 'testDateSeries', name: 'Test Date', type: 'scatter' },
+            { key: 'followupSeries1', name: 'Followup', type: 'scatter' },
+            { key: 'relapseSeries1', name: 'Relapse', type: 'scatter' },
+            { key: 'followupSeries2', name: 'Followup', type: 'scatter' },
+            { key: 'relapseSeries2', name: 'Relapse', type: 'scatter' },
+            { key: 'followupSeries3', name: 'Followup', type: 'scatter' },
+            { key: 'relapseSeries3', name: 'Relapse', type: 'scatter' }
+        ];
+
+        const tooltip = {
+            pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
+        };
+
+        const series = seriesConfigs.map(({ key, name, type }) => ({
+            type: type || 'scatter',
+            name,
+            data: seriesData[key],
+            marker: {
+                enabled: true,
+                symbol: 'circle',
+                radius: 4
+            },
+            tooltip,
+            showInLegend: true
+        }));
+
         setChartOptions({
             chart: {
                 height: 600,
@@ -411,7 +469,6 @@ function Timeline({ patientId, programId }) {
                 },
                 yAxis: {
                     min: 0,
-                    max: 10,
                     reversed: true
                 }
             },
@@ -431,197 +488,7 @@ function Timeline({ patientId, programId }) {
                     }
                 }
             },
-            series: [
-                {
-                    name: 'Treatment',
-                    data: treatmentIntervals,
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    }
-                },
-                {
-                    type: 'scatter',
-                    name: 'Treatment',
-                    data: treatmentPoints,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Primary Diagnosis',
-                    data: primaryDiagnosisSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Birth',
-                    data: dateOfBirthSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Death',
-                    data: dateOfDeathSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date after Lost to Followup',
-                    data: dateAliveAfterLostToFollowupSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Test Date',
-                    data: testDateSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Followup',
-                    data: followupSeries1,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Relapse',
-                    data: relapseSeries1,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Followup',
-                    data: followupSeries2,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Relapse',
-                    data: relapseSeries2,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Followup',
-                    data: followupSeries3,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Date of Relapse',
-                    data: relapseSeries3,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                },
-                {
-                    type: 'scatter',
-                    name: 'Specimen Collection Date',
-                    data: specimenCollectionSeries,
-                    marker: {
-                        enabled: true,
-                        symbol: 'circle',
-                        radius: 4
-                    },
-                    tooltip: {
-                        pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
-                    },
-                    showInLegend: true
-                }
-            ]
+            series
         });
     }, [data]);
 
