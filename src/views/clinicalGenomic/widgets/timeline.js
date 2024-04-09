@@ -341,31 +341,48 @@ function Timeline({ patientId, programId }) {
             specimenCollectionSeries
         };
 
-        const seriesConfigs = [
-            { key: 'treatmentIntervals', name: 'Treatment', type: 'gantt' },
-            { key: 'treatmentPoints', name: 'Treatment', type: 'scatter' },
-            { key: 'primaryDiagnosisSeries', name: 'Primary Diagnosis', type: 'scatter' },
-            { key: 'dateOfBirthSeries', name: 'Date of Birth', type: 'scatter' },
-            { key: 'specimenCollectionSeries', name: 'Specimen Collection Date', type: 'scatter' },
-            { key: 'dateOfDeathSeries', name: 'Date of Death', type: 'scatter' },
-            { key: 'dateAliveAfterLostToFollowupSeries', name: 'Date Alive After Lost to Followup', type: 'scatter' },
-            { key: 'testDateSeries', name: 'Test Date', type: 'scatter' },
-            { key: 'followupSeries1', name: 'Followup', type: 'scatter' },
-            { key: 'relapseSeries1', name: 'Relapse', type: 'scatter' },
-            { key: 'followupSeries2', name: 'Followup', type: 'scatter' },
-            { key: 'relapseSeries2', name: 'Relapse', type: 'scatter' },
-            { key: 'followupSeries3', name: 'Followup', type: 'scatter' },
-            { key: 'relapseSeries3', name: 'Relapse', type: 'scatter' }
+        const initialCategories = [
+            'Major Life Events',
+            'Primary Diagnosis',
+            'Treatment',
+            'Test Date',
+            'Specimen Collection Date',
+            'Followup & Relapse'
         ];
+
+        const categorySeriesMap = {
+            'Major Life Events': ['dateOfBirthSeries', 'dateOfDeathSeries', 'dateAliveAfterLostToFollowupSeries'],
+            'Primary Diagnosis': ['primaryDiagnosisSeries'],
+            Treatment: ['treatmentIntervals', 'treatmentPoints'],
+            'Test Date': ['testDateSeries'],
+            'Specimen Collection Date': ['specimenCollectionSeries'],
+            'Followup & Relapse': [
+                'followupSeries1',
+                'relapseSeries1',
+                'followupSeries2',
+                'relapseSeries2',
+                'followupSeries3',
+                'relapseSeries3'
+            ]
+        };
+
+        const activeCategories = initialCategories.filter((category) =>
+            categorySeriesMap[category].some((seriesKey) => seriesData[seriesKey].length > 0)
+        );
+
+        const adjustedSeries = Object.entries(seriesData).flatMap(([key, series]) => {
+            const category = Object.keys(categorySeriesMap).find((category) => categorySeriesMap[category].includes(key));
+            const newY = activeCategories.indexOf(category);
+            return series.map((dataPoint) => ({ ...dataPoint, y: newY }));
+        });
 
         const tooltip = {
             pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
         };
 
-        const series = seriesConfigs.map(({ key, name, type }) => ({
-            type: type || 'scatter',
-            name,
-            data: seriesData[key],
+        const series = adjustedSeries.map((s) => ({
+            type: typeof s?.start !== 'undefined' ? 'gantt' : 'scatter',
+            data: [s],
             marker: {
                 enabled: true,
                 symbol: 'circle',
@@ -398,14 +415,7 @@ function Timeline({ patientId, programId }) {
                 min: 0,
                 minRange: 0,
                 type: 'category',
-                categories: [
-                    'Major Life Events',
-                    'Primary Diagnosis',
-                    'Treatment',
-                    'Test Date',
-                    'Specimen Collection Date',
-                    'Followup & Relapse'
-                ]
+                categories: activeCategories
             },
             xAxis: [
                 {
