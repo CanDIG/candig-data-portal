@@ -383,6 +383,7 @@ function Timeline({ patientId, programId }) {
         const series = adjustedSeries.map((s) => ({
             type: typeof s?.start !== 'undefined' ? 'gantt' : 'scatter',
             data: [s],
+            name: s.name,
             marker: {
                 enabled: true,
                 symbol: 'circle',
@@ -391,6 +392,8 @@ function Timeline({ patientId, programId }) {
             tooltip,
             showInLegend: true
         }));
+
+        console.log(series);
 
         setChartOptions({
             chart: {
@@ -421,7 +424,7 @@ function Timeline({ patientId, programId }) {
                 {
                     type: 'linear',
                     tickInterval: 1,
-                    minRange: 6,
+                    minRange: 1,
                     labels: {
                         align: 'center',
                         formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Month')
@@ -479,6 +482,7 @@ function Timeline({ patientId, programId }) {
                 },
                 yAxis: {
                     min: 0,
+                    max: activeCategories.length - 1,
                     reversed: true
                 }
             },
