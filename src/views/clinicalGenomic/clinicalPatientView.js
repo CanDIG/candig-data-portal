@@ -28,9 +28,7 @@ const TimelineContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(2),
     marginTop: theme.spacing(2),
     borderRadius: theme.shape.borderRadius,
-    marginBottom: theme.spacing(2),
-    maxHeight: '600px',
-    overflowY: 'auto'
+    marginBottom: theme.spacing(2)
 }));
 
 function ClinicalPatientView() {

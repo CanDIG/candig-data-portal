@@ -473,6 +473,7 @@ function Timeline({ patientId, programId }) {
                                 x: -150,
                                 y: 150,
                                 style: {
+                                    textOutline: '1px contrast',
                                     color: '#000000',
                                     fontWeight: 'bold',
                                     fontSize: '12px'
@@ -503,7 +504,7 @@ function Timeline({ patientId, programId }) {
                     pointPlacement: 0.5,
                     pointPadding: 0.25,
                     accessibility: {
-                        enabled: false
+                        enabled: true
                     }
                 },
                 xAxis: {
@@ -527,7 +528,7 @@ function Timeline({ patientId, programId }) {
                         enabled: true,
                         format: '{point.name}',
                         style: {
-                            textOutline: 'none',
+                            textOutline: '1px contrast',
                             color: '#333333',
                             fontFamily: 'Arial, sans-serif'
                         }
