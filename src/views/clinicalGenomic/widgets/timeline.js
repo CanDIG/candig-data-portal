@@ -36,23 +36,23 @@ const generateRandomColor = () => {
     return colorPalette[randomIndex];
 };
 
-const headerFormatter = (birthDate, dateResolution) =>
+const headerFormatter = (dateResolution) =>
     function headerFormatter() {
-        if (dateResolution === 'Month' && typeof birthDate !== 'undefined') {
-            const monthsSinceStart = Math.floor(this.value - birthDate) + 1;
+        if (dateResolution === 'Month') {
+            const monthsSinceStart = this.value % 12;
             return `${monthsSinceStart} Month(s) Old`;
         }
-        if (dateResolution === 'Year' && typeof birthDate !== 'undefined') {
-            const yearsSinceStart = Math.ceil((this.value - birthDate) / 12);
+        if (dateResolution === 'Year') {
+            const yearsSinceStart = Math.floor(this.value / 12);
             return `${yearsSinceStart} Year(s) Old`;
         }
         return `Age Unknown`;
     };
 
-const tooltipFormatter = (birthDate) =>
+const tooltipFormatter = () =>
     function tooltipFormatter() {
         if (this.extra_info) {
-            const yearInAgeExtra = Math.ceil((this.x - birthDate) / 12);
+            const yearInAgeExtra = Math.floor(this.x / 12);
             const extraInfo = `${this.extra_info} : ${yearInAgeExtra} Year(s) Old`;
             const missingInfo = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
             const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
@@ -62,8 +62,8 @@ const tooltipFormatter = (birthDate) =>
                     ${missingInfo}<br/>`;
         }
         if (this.start) {
-            const yearInAgeStart = Math.ceil((this.start - birthDate) / 12);
-            const yearInAgeEnd = Math.ceil((this.end - birthDate) / 12);
+            const yearInAgeStart = Math.floor(this.start / 12);
+            const yearInAgeEnd = Math.floor(this.end / 12);
             const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
             const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
             const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
@@ -72,7 +72,7 @@ const tooltipFormatter = (birthDate) =>
                 ${startYear}<br/>
                 ${endYear}<br/>`;
         }
-        const yearInAge = Math.ceil((this.x - birthDate) / 12);
+        const yearInAge = Math.ceil(this.x / 12);
         return `<span style="font-weight: bold">${this.name}</span><br/>
                 ${yearInAge} Year(s) Old`;
     };
@@ -80,6 +80,7 @@ const tooltipFormatter = (birthDate) =>
 function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
+    const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     useEffect(() => {
         const treatmentIntervals = [];
         const treatmentPoints = [];
@@ -90,9 +91,10 @@ function Timeline({ patientId, programId }) {
 
                 if (treatmentStart !== null && treatmentStart !== undefined && treatmentEnd !== null && treatmentEnd !== undefined) {
                     treatmentIntervals.push({
+                        id: 'treatmentParent',
                         name: treatment.submitter_treatment_id,
-                        start: treatmentStart,
-                        end: treatmentEnd,
+                        start: treatmentStart - birthMonthInterval,
+                        end: treatmentEnd - birthMonthInterval,
                         treatment_type: treatment?.treatment_type,
                         y: 2,
                         color: generateRandomColor()
@@ -102,7 +104,8 @@ function Timeline({ patientId, programId }) {
                     (treatmentEnd !== null && treatmentEnd !== undefined)
                 ) {
                     treatmentPoints.push({
-                        x: treatmentStart,
+                        id: 'treatmentParent',
+                        x: treatmentStart - birthMonthInterval,
                         name: treatment.submitter_treatment_id,
                         y: 2,
                         color: generateRandomColor(),
@@ -114,12 +117,23 @@ function Timeline({ patientId, programId }) {
             })
         );
 
-        const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name) => {
+        const treatmentIntervalsChildSeries = treatmentIntervals.map((treatment) => ({
+            ...treatment,
+            parent: 'treatmentParent'
+        }));
+
+        const treatmentPointsChildSeries = treatmentPoints.map((treatment) => ({
+            ...treatment,
+            parent: 'treatmentParent'
+        }));
+
+        const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name, birthDateValue) => {
+            const birthDate = birthDateValue ?? 0;
             if (isSingleItem) {
                 return data?.[path]?.month_interval
                     ? [
                           {
-                              x: data[path].month_interval,
+                              x: data[path].month_interval - birthDate,
                               y: yValue,
                               name: namePrefix,
                               color: colour
@@ -131,7 +145,8 @@ function Timeline({ patientId, programId }) {
             if (path === 'primary_diagnoses' || name === 'Followup&Relapse2') {
                 return Array.isArray(data?.[path])
                     ? data[path].map((item) => ({
-                          x: item?.[date]?.month_interval,
+                          // eslint-disable-next-line no-unsafe-optional-chaining
+                          x: item?.[date]?.month_interval ? item?.[date]?.month_interval - birthDate : '',
                           y: yValue,
                           name: `${namePrefix}${item?.[id]}`,
                           color: colour
@@ -148,7 +163,8 @@ function Timeline({ patientId, programId }) {
                               item?.submitter_follow_up_id ||
                               item?.submitter_specimen_id;
                           return {
-                              x: item?.[date]?.month_interval,
+                              // eslint-disable-next-line no-unsafe-optional-chaining
+                              x: item?.[date]?.month_interval ? item?.[date]?.month_interval - birthDate : '',
                               y: yValue,
                               name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
                               color: colour
@@ -162,7 +178,8 @@ function Timeline({ patientId, programId }) {
                     data?.flatMap((item) =>
                         Array.isArray(item?.[path])
                             ? item[path].map((subItem) => ({
-                                  x: subItem?.[date]?.month_interval,
+                                  // eslint-disable-next-line no-unsafe-optional-chaining
+                                  x: subItem?.[date]?.month_interval ? subItem?.[date]?.month_interval - birthDate : '',
                                   y: yValue,
                                   name: `${namePrefix}${subItem?.[id]}`,
                                   color: colour
@@ -178,7 +195,8 @@ function Timeline({ patientId, programId }) {
                         ? item[path].flatMap((subItem) =>
                               Array.isArray(subItem?.[path2])
                                   ? subItem[path2].map((subItem2) => ({
-                                        x: subItem2?.[date]?.month_interval,
+                                        // eslint-disable-next-line no-unsafe-optional-chaining
+                                        x: subItem2?.[date]?.month_interval ? subItem2?.[date]?.month_interval - birthDate : '',
                                         y: yValue,
                                         name: `${namePrefix}${subItem2?.[id]}`,
                                         color: colour
@@ -200,7 +218,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[1],
             'Date of Birth',
             true,
-            null
+            null,
+            data?.date_of_birth?.month_interval
         );
         const dateOfDeathSeries = generateSeriesData(
             data,
@@ -212,7 +231,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[2],
             'Date of Death',
             true,
-            null
+            null,
+            data?.date_of_birth?.month_interval
         );
         const dateAliveAfterLostToFollowupSeries = generateSeriesData(
             data,
@@ -224,7 +244,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[3],
             'Date Alive After Lost to Followup',
             true,
-            null
+            null,
+            data?.date_of_birth?.month_interval
         );
         const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 3, colorPalette[4], '', false, null);
         const specimenCollectionSeries = generateSeriesData(
@@ -237,7 +258,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[5],
             '',
             false,
-            null
+            null,
+            data?.date_of_birth?.month_interval
         );
         const primaryDiagnosisSeries = generateSeriesData(
             data,
@@ -249,7 +271,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[0],
             '',
             false,
-            null
+            null,
+            data?.date_of_birth?.month_interval
         );
         const followupSeries1 = generateSeriesData(
             data?.primary_diagnoses,
@@ -261,7 +284,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[6],
             'Followup ',
             false,
-            'Followup&Relapse1'
+            'Followup&Relapse1',
+            data?.date_of_birth?.month_interval
         );
         const relapseSeries1 = generateSeriesData(
             data?.primary_diagnoses,
@@ -273,7 +297,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[7],
             'Relapse ',
             false,
-            'Followup&Relapse1'
+            'Followup&Relapse1',
+            data?.date_of_birth?.month_interval
         );
         const followupSeries2 = generateSeriesData(
             data,
@@ -285,7 +310,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[6],
             'Followup ',
             false,
-            'Followup&Relapse2'
+            'Followup&Relapse2',
+            data?.date_of_birth?.month_interval
         );
         const relapseSeries2 = generateSeriesData(
             data,
@@ -297,7 +323,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[7],
             'Relapse ',
             false,
-            'Followup&Relapse2'
+            'Followup&Relapse2',
+            data?.date_of_birth?.month_interval
         );
         const followupSeries3 = generateSeriesData(
             data?.primary_diagnoses,
@@ -309,7 +336,8 @@ function Timeline({ patientId, programId }) {
             colorPalette[6],
             'Followup ',
             false,
-            'Followup&Relapse3'
+            'Followup&Relapse3',
+            data?.date_of_birth?.month_interval
         );
         const relapseSeries3 = generateSeriesData(
             data?.primary_diagnoses,
@@ -321,12 +349,15 @@ function Timeline({ patientId, programId }) {
             colorPalette[7],
             'Relapse ',
             false,
-            'Followup&Relapse3'
+            'Followup&Relapse3',
+            data?.date_of_birth?.month_interval
         );
 
         const seriesData = {
             treatmentIntervals,
             treatmentPoints,
+            treatmentIntervalsChildSeries,
+            treatmentPointsChildSeries,
             primaryDiagnosisSeries,
             dateOfBirthSeries,
             dateOfDeathSeries,
@@ -353,7 +384,7 @@ function Timeline({ patientId, programId }) {
         const categorySeriesMap = {
             'Major Life Events': ['dateOfBirthSeries', 'dateOfDeathSeries', 'dateAliveAfterLostToFollowupSeries'],
             'Primary Diagnosis': ['primaryDiagnosisSeries'],
-            Treatment: ['treatmentIntervals', 'treatmentPoints'],
+            Treatment: ['treatmentIntervals', 'treatmentPoints', 'treatmentIntervalsChildSeries', 'treatmentPointsChildSeries'],
             'Test Date': ['testDateSeries'],
             'Specimen Collection Date': ['specimenCollectionSeries'],
             'Followup & Relapse': [
@@ -377,7 +408,7 @@ function Timeline({ patientId, programId }) {
         });
 
         const tooltip = {
-            pointFormatter: tooltipFormatter(data?.date_of_birth?.month_interval)
+            pointFormatter: tooltipFormatter()
         };
 
         const series = adjustedSeries.map((s) => ({
@@ -424,22 +455,22 @@ function Timeline({ patientId, programId }) {
                 {
                     type: 'linear',
                     tickInterval: 1,
-                    minRange: 1,
+                    minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Month')
+                        formatter: headerFormatter('Month')
                     },
                     plotLines: [
                         {
                             color: colorPalette[0],
-                            value: 0,
+                            value: -birthMonthInterval,
                             width: 2,
                             zIndex: 5,
                             label: {
                                 text: 'First Day of Diagnosis',
                                 align: 'left',
                                 verticalAlign: 'top',
-                                x: -130,
+                                x: -150,
                                 y: 150,
                                 style: {
                                     color: '#000000',
@@ -459,7 +490,7 @@ function Timeline({ patientId, programId }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatter(data?.date_of_birth?.month_interval, 'Year')
+                        formatter: headerFormatter('Year')
                     },
                     opposite: true
                 }
@@ -482,8 +513,9 @@ function Timeline({ patientId, programId }) {
                 },
                 yAxis: {
                     min: 0,
-                    max: activeCategories.length - 1,
-                    reversed: true
+                    max: 10,
+                    reversed: true,
+                    categories: []
                 }
             },
             scrollbar: {
