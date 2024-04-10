@@ -38,12 +38,14 @@ const generateRandomColor = () => {
 
 const headerFormatter = (dateResolution) =>
     function headerFormatter() {
+        const value = Math.floor(this.value);
+
         if (dateResolution === 'Month') {
-            const monthsSinceStart = this.value % 12;
+            const monthsSinceStart = value % 12;
             return `${monthsSinceStart} Month(s) Old`;
         }
         if (dateResolution === 'Year') {
-            const yearsSinceStart = Math.floor(this.value / 12);
+            const yearsSinceStart = Math.floor(value / 12);
             return `${yearsSinceStart} Year(s) Old`;
         }
         return `Age Unknown`;
