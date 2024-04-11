@@ -61,7 +61,7 @@ const tooltipFormatter = () =>
                     ${extraInfo}<br/>
                     ${missingInfo}<br/>`;
         }
-        if (this.start) {
+        if (this.start && this.name !== 'Treatments') {
             const yearInAgeStart = Math.floor(this.start / 12);
             const yearInAgeEnd = Math.floor(this.end / 12);
             const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
@@ -71,6 +71,15 @@ const tooltipFormatter = () =>
                 ${treatmentType}<br/>
                 ${startYear}<br/>
                 ${endYear}<br/>`;
+        }
+        if (this.start && this.name === 'Treatments') {
+            const yearInAgeStart = Math.floor(this.start / 12);
+            const yearInAgeEnd = Math.floor(this.end / 12);
+            const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
+            const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
+            return `<span style="font-weight: bold">${this.name}</span><br/>
+                    ${startYear}<br/>  
+                    ${endYear}<br/>`;
         }
         const yearInAge = Math.ceil(this.x / 12);
         return `<span style="font-weight: bold">${this.name}</span><br/>
@@ -415,15 +424,18 @@ function Timeline({ patientId, programId }) {
                 symbol: 'circle',
                 radius: 4
             },
-            tooltip
+            tooltip,
+            name: 'Treatments'
         };
 
         treatmentIntervals.forEach((interval) => {
             interval.parent = 'treatmentParentSeries';
+            interval.collapsed = true;
         });
 
         treatmentPoints.forEach((point) => {
             point.parent = 'treatmentParentSeries';
+            point.collapsed = true;
         });
 
         adjustedSeries.push(...treatmentIntervals, ...treatmentPoints);
