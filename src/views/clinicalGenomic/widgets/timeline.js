@@ -84,51 +84,6 @@ function Timeline({ patientId, programId }) {
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     useEffect(() => {
-        const treatmentIntervals = [];
-        const treatmentPoints = [];
-        data.primary_diagnoses?.forEach((diagnosis) =>
-            diagnosis.treatments?.forEach((treatment) => {
-                const treatmentStart = treatment.treatment_start_date?.month_interval;
-                const treatmentEnd = treatment.treatment_end_date?.month_interval;
-
-                if (treatmentStart !== null && treatmentStart !== undefined && treatmentEnd !== null && treatmentEnd !== undefined) {
-                    treatmentIntervals.push({
-                        id: 'treatmentParent',
-                        name: treatment.submitter_treatment_id,
-                        start: treatmentStart - birthMonthInterval,
-                        end: treatmentEnd - birthMonthInterval,
-                        treatment_type: treatment?.treatment_type,
-                        y: 2,
-                        color: generateRandomColor()
-                    });
-                } else if (
-                    (treatmentStart !== null && treatmentStart !== undefined) ||
-                    (treatmentEnd !== null && treatmentEnd !== undefined)
-                ) {
-                    treatmentPoints.push({
-                        id: 'treatmentParent',
-                        x: treatmentStart - birthMonthInterval,
-                        name: treatment.submitter_treatment_id,
-                        y: 2,
-                        color: generateRandomColor(),
-                        treatment_type: treatment?.treatment_type,
-                        extra_info: treatmentStart !== null ? 'Start' : 'End',
-                        missing_info: treatmentStart !== null ? 'End' : 'Start'
-                    });
-                }
-            })
-        );
-
-        const treatmentIntervalsChildSeries = treatmentIntervals.map((treatment) => ({
-            ...treatment,
-            parent: 'treatmentParent'
-        }));
-
-        const treatmentPointsChildSeries = treatmentPoints.map((treatment) => ({
-            ...treatment,
-            parent: 'treatmentParent'
-        }));
-
         const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name, birthDateValue) => {
             const birthDate = birthDateValue ?? 0;
             if (isSingleItem) {
@@ -249,14 +204,14 @@ function Timeline({ patientId, programId }) {
             null,
             data?.date_of_birth?.month_interval
         );
-        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 3, colorPalette[4], '', false, null);
+        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 2, colorPalette[4], '', false, null);
         const specimenCollectionSeries = generateSeriesData(
             data?.primary_diagnoses,
             'specimens',
             null,
             'specimen_collection_date',
             'submitter_specimen_id',
-            4,
+            3,
             colorPalette[5],
             '',
             false,
@@ -282,7 +237,7 @@ function Timeline({ patientId, programId }) {
             null,
             'date_of_followup',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[6],
             'Followup ',
             false,
@@ -295,7 +250,7 @@ function Timeline({ patientId, programId }) {
             null,
             'date_of_relapse',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[7],
             'Relapse ',
             false,
@@ -308,7 +263,7 @@ function Timeline({ patientId, programId }) {
             null,
             'date_of_followup',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[6],
             'Followup ',
             false,
@@ -321,7 +276,7 @@ function Timeline({ patientId, programId }) {
             null,
             'date_of_relapse',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[7],
             'Relapse ',
             false,
@@ -334,7 +289,7 @@ function Timeline({ patientId, programId }) {
             'followups',
             'date_of_followup',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[6],
             'Followup ',
             false,
@@ -347,7 +302,7 @@ function Timeline({ patientId, programId }) {
             'followups',
             'date_of_relapse',
             'submitter_follow_up_id',
-            5,
+            4,
             colorPalette[7],
             'Relapse ',
             false,
@@ -356,10 +311,6 @@ function Timeline({ patientId, programId }) {
         );
 
         const seriesData = {
-            treatmentIntervals,
-            treatmentPoints,
-            treatmentIntervalsChildSeries,
-            treatmentPointsChildSeries,
             primaryDiagnosisSeries,
             dateOfBirthSeries,
             dateOfDeathSeries,
@@ -374,19 +325,11 @@ function Timeline({ patientId, programId }) {
             specimenCollectionSeries
         };
 
-        const initialCategories = [
-            'Major Life Events',
-            'Primary Diagnosis',
-            'Treatment',
-            'Test Date',
-            'Specimen Collection Date',
-            'Followup & Relapse'
-        ];
+        const initialCategories = ['Major Life Events', 'Primary Diagnosis', 'Test Date', 'Specimen Collection Date', 'Followup & Relapse'];
 
         const categorySeriesMap = {
             'Major Life Events': ['dateOfBirthSeries', 'dateOfDeathSeries', 'dateAliveAfterLostToFollowupSeries'],
             'Primary Diagnosis': ['primaryDiagnosisSeries'],
-            Treatment: ['treatmentIntervals', 'treatmentPoints', 'treatmentIntervalsChildSeries', 'treatmentPointsChildSeries'],
             'Test Date': ['testDateSeries'],
             'Specimen Collection Date': ['specimenCollectionSeries'],
             'Followup & Relapse': [
@@ -409,11 +352,47 @@ function Timeline({ patientId, programId }) {
             return series.map((dataPoint) => ({ ...dataPoint, y: newY }));
         });
 
+        let yIndex = activeCategories.length - 1;
+        const treatmentIntervals = [];
+        const treatmentPoints = [];
+        data.primary_diagnoses?.forEach((diagnosis) =>
+            diagnosis.treatments?.forEach((treatment) => {
+                const treatmentStart = treatment.treatment_start_date?.month_interval;
+                const treatmentEnd = treatment.treatment_end_date?.month_interval;
+
+                if (treatmentStart !== null && treatmentStart !== undefined && treatmentEnd !== null && treatmentEnd !== undefined) {
+                    treatmentIntervals.push({
+                        name: treatment.submitter_treatment_id,
+                        start: treatmentStart - birthMonthInterval,
+                        end: treatmentEnd - birthMonthInterval,
+                        treatment_type: treatment?.treatment_type,
+                        y: (yIndex += 1),
+                        color: generateRandomColor()
+                    });
+                } else if (
+                    (treatmentStart !== null && treatmentStart !== undefined) ||
+                    (treatmentEnd !== null && treatmentEnd !== undefined)
+                ) {
+                    treatmentPoints.push({
+                        x: treatmentStart - birthMonthInterval,
+                        name: treatment.submitter_treatment_id,
+                        y: (yIndex += 1),
+                        color: generateRandomColor(),
+                        treatment_type: treatment?.treatment_type,
+                        extra_info: treatmentStart !== null ? 'Start' : 'End',
+                        missing_info: treatmentStart !== null ? 'End' : 'Start'
+                    });
+                }
+            })
+        );
+
         const tooltip = {
             pointFormatter: tooltipFormatter()
         };
 
-        const series = adjustedSeries.map((s) => ({
+        adjustedSeries.push(...treatmentIntervals, ...treatmentPoints);
+
+        const Updatedseries = adjustedSeries.map((s) => ({
             type: typeof s?.start !== 'undefined' ? 'gantt' : 'scatter',
             data: [s],
             name: s.name,
@@ -426,7 +405,13 @@ function Timeline({ patientId, programId }) {
             showInLegend: true
         }));
 
-        console.log(series);
+        const newCategories = activeCategories.concat(
+            treatmentIntervals.map((t) => t.name),
+            treatmentPoints.map((t) => t.name)
+        );
+
+        console.log('series', Updatedseries);
+        console.log('categories', newCategories);
 
         setChartOptions({
             chart: {
@@ -451,7 +436,7 @@ function Timeline({ patientId, programId }) {
                 min: 0,
                 minRange: 0,
                 type: 'category',
-                categories: activeCategories
+                categories: newCategories
             },
             xAxis: [
                 {
@@ -516,7 +501,7 @@ function Timeline({ patientId, programId }) {
                 },
                 yAxis: {
                     min: 0,
-                    max: 10,
+                    max: 20,
                     reversed: true,
                     categories: []
                 }
@@ -537,7 +522,7 @@ function Timeline({ patientId, programId }) {
                     }
                 }
             },
-            series
+            series: Updatedseries
         });
     }, [data]);
 
