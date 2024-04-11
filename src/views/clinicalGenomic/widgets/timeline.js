@@ -3,7 +3,6 @@ import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
-import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import useClinicalPatientData from '../useClinicalPatientData';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
@@ -11,7 +10,6 @@ import Alert from '@mui/material/Alert';
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
-HighchartsAccessibility(Highcharts);
 
 const colorPalette = [
     '#0A407D', // Deep Sapphire
@@ -352,6 +350,13 @@ function Timeline({ patientId, programId }) {
             return series.map((dataPoint) => ({ ...dataPoint, y: newY }));
         });
 
+        const tooltip = {
+            pointFormatter: tooltipFormatter()
+        };
+
+        activeCategories.push('Treatments');
+
+        const yIndexParent = activeCategories.length - 1;
         let yIndex = activeCategories.length - 1;
         const treatmentIntervals = [];
         const treatmentPoints = [];
@@ -386,9 +391,40 @@ function Timeline({ patientId, programId }) {
             })
         );
 
-        const tooltip = {
-            pointFormatter: tooltipFormatter()
+        const startTimes = treatmentIntervals.map((interval) => interval.start);
+        const endTimes = treatmentIntervals.map((interval) => interval.end);
+        const xValues = treatmentPoints.map((point) => point.x);
+        const allValues = [...startTimes, ...endTimes, ...xValues];
+        const maxTime = allValues ? Math.max(...allValues) : 'undefined';
+        const minTime = allValues ? Math.min(...allValues) : 'undefined';
+
+        const treatmentParentSeries = {
+            type: 'gantt',
+            data: [
+                {
+                    start: minTime,
+                    end: maxTime,
+                    y: yIndexParent,
+                    color: generateRandomColor(),
+                    name: 'Treatments',
+                    id: 'treatmentParentSeries'
+                }
+            ],
+            marker: {
+                enabled: true,
+                symbol: 'circle',
+                radius: 4
+            },
+            tooltip
         };
+
+        treatmentIntervals.forEach((interval) => {
+            interval.parent = 'treatmentParentSeries';
+        });
+
+        treatmentPoints.forEach((point) => {
+            point.parent = 'treatmentParentSeries';
+        });
 
         adjustedSeries.push(...treatmentIntervals, ...treatmentPoints);
 
@@ -401,9 +437,10 @@ function Timeline({ patientId, programId }) {
                 symbol: 'circle',
                 radius: 4
             },
-            tooltip,
-            showInLegend: true
+            tooltip
         }));
+
+        Updatedseries.push(treatmentParentSeries);
 
         const newCategories = activeCategories.concat(
             treatmentIntervals.map((t) => t.name),
@@ -485,25 +522,10 @@ function Timeline({ patientId, programId }) {
             ],
             navigator: {
                 enabled: true,
-                liveRedraw: true,
-                series: {
-                    type: 'gantt',
-                    pointPlacement: 0.5,
-                    pointPadding: 0.25,
-                    accessibility: {
-                        enabled: true
-                    }
-                },
                 xAxis: {
                     labels: {
                         enabled: false
                     }
-                },
-                yAxis: {
-                    min: 0,
-                    max: 20,
-                    reversed: true,
-                    categories: []
                 }
             },
             scrollbar: {
