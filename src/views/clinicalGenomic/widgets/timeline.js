@@ -504,7 +504,10 @@ function Timeline({ patientId, programId }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatter('Month')
+                        formatter: headerFormatter('Month'),
+                        style: {
+                            fontSize: '8px'
+                        }
                     },
                     plotLines: [
                         {
