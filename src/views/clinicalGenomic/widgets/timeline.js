@@ -90,6 +90,7 @@ function Timeline({ patientId, programId }) {
     const { data } = useClinicalPatientData(patientId, programId);
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
+    const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
     useEffect(() => {
         const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name, birthDateValue) => {
             const birthDate = birthDateValue ?? 0;
@@ -381,7 +382,8 @@ function Timeline({ patientId, programId }) {
                         end: treatmentEnd - birthMonthInterval,
                         treatment_type: treatment?.treatment_type,
                         y: (yIndex += 1),
-                        color: generateRandomColor()
+                        color: generateRandomColor(),
+                        customGroupId: 'treatments'
                     });
                 } else if (
                     (treatmentStart !== null && treatmentStart !== undefined) ||
@@ -394,7 +396,8 @@ function Timeline({ patientId, programId }) {
                         color: generateRandomColor(),
                         treatment_type: treatment?.treatment_type,
                         extra_info: treatmentStart !== null ? 'Start' : 'End',
-                        missing_info: treatmentStart !== null ? 'End' : 'Start'
+                        missing_info: treatmentStart !== null ? 'End' : 'Start',
+                        customGroupId: 'treatments'
                     });
                 }
             })
@@ -415,8 +418,7 @@ function Timeline({ patientId, programId }) {
                     end: maxTime,
                     y: yIndexParent,
                     color: generateRandomColor(),
-                    name: 'Treatments',
-                    id: 'treatmentParentSeries'
+                    name: 'Treatments'
                 }
             ],
             marker: {
@@ -427,16 +429,6 @@ function Timeline({ patientId, programId }) {
             tooltip,
             name: 'Treatments'
         };
-
-        treatmentIntervals.forEach((interval) => {
-            interval.parent = 'treatmentParentSeries';
-            interval.collapsed = true;
-        });
-
-        treatmentPoints.forEach((point) => {
-            point.parent = 'treatmentParentSeries';
-            point.collapsed = true;
-        });
 
         adjustedSeries.push(...treatmentIntervals, ...treatmentPoints);
 
@@ -449,7 +441,8 @@ function Timeline({ patientId, programId }) {
                 symbol: 'circle',
                 radius: 4
             },
-            tooltip
+            tooltip,
+            visible: s?.customGroupId === 'treatments' ? !isTreatmentsCollapsed : true
         }));
 
         Updatedseries.push(treatmentParentSeries);
@@ -458,6 +451,23 @@ function Timeline({ patientId, programId }) {
             treatmentIntervals.map((t) => t.name),
             treatmentPoints.map((t) => t.name)
         );
+
+        const toggleTreatmentsCollapse = () => {
+            setIsTreatmentsCollapsed((current) => {
+                const newVisibility = !current;
+                Highcharts.charts.forEach((chart) => {
+                    if (chart) {
+                        chart.series.forEach((series) => {
+                            if (series.userOptions.customGroupId === 'treatments') {
+                                series.setVisible(newVisibility);
+                            }
+                        });
+                        chart.redraw();
+                    }
+                });
+                return newVisibility;
+            });
+        };
 
         console.log('series', Updatedseries);
         console.log('categories', newCategories);
@@ -558,7 +568,42 @@ function Timeline({ patientId, programId }) {
             },
             series: Updatedseries
         });
-    }, [data]);
+
+        setChartOptions((prevOptions) => ({
+            ...prevOptions,
+            chart: {
+                ...prevOptions.chart,
+                events: {
+                    render() {
+                        const chart = this;
+
+                        if (chart.customButton) {
+                            chart.customButton.destroy();
+                        }
+
+                        const treatmentCategoryIndex = chart.yAxis[0].categories.indexOf('Treatments');
+                        const yPosition = chart.yAxis[0].toPixels(treatmentCategoryIndex) - 5;
+                        chart.customButton = chart.renderer
+                            .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
+                            .attr({
+                                fill: '#7cb5ec',
+                                cursor: 'pointer',
+                                zIndex: 5
+                            })
+                            .add()
+                            .on('click', () => {
+                                toggleTreatmentsCollapse();
+                            });
+
+                        const rotationDeg = isTreatmentsCollapsed ? 180 : 0;
+                        chart.customButton.attr({
+                            transform: `rotate(${rotationDeg} ${chart.customButton.x + 5} ${chart.customButton.y + 5})`
+                        });
+                    }
+                }
+            }
+        }));
+    }, [data, isTreatmentsCollapsed]);
 
     if (!data?.date_of_birth) {
         return <Alert severity="warning">Unable to display the timeline due to missing Date of Birth information.</Alert>;
