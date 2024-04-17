@@ -36,6 +36,7 @@ function ClinicalPatientView() {
 
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
+    // eslint-disable-next-line prefer-const
     let { rows, columns, title, topLevel} = useClinicalPatientData(patientId, programId);
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
     const handleEventClick = (category, array) => {
