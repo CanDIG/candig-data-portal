@@ -577,9 +577,6 @@ function Timeline({ patientId, programId, onEventClick }) {
                         click(event) {
                             const seriesName = event.point.series.name;
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
-                            const [title, setTitle] = useState('');
-                            const [rows, setRows] = useState([]);
-                            const [columns, setColumns] = useState([]);
                             console.log(seriesID);
                             let category = null;
                             let array = null;

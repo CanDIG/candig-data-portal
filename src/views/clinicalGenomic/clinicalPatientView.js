@@ -36,17 +36,21 @@ function ClinicalPatientView() {
 
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    // eslint-disable-next-line prefer-const
-    let { rows, columns, title, topLevel} = useClinicalPatientData(patientId, programId);
+    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
+
+    const [clickRow, setClickRow] = useState([]);
+    const [clickTitle, setClickTitle] = useState('');
+    const [clickColumns, setClickColumns] = useState([]);
+
     const handleEventClick = (category, array) => {
         const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
-        title = titleClick;
-        columns = reorderedColumns;
-        rows = rowsClick;
-        console.log('rows', rows);
-        console.log('columns', columns);
-        console.log('title', title);
+        setClickTitle(titleClick);
+        setClickColumns(reorderedColumns);
+        setClickRow(rowsClick);
+        console.log('rows', clickRow);
+        console.log('columns', clickColumns);
+        console.log('title', clickTitle);
     };
 
     useEffect(() => {
@@ -64,13 +68,19 @@ function ClinicalPatientView() {
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
             <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
-                {title}
+                {clickTitle.length > 0 ? clickTitle : title}
             </Typography>
             <Typography pb={1} variant="h6">
                 {patientId}
             </Typography>
             <div style={{ width: '100%', height: '68vh' }}>
-                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
+                <DataGrid
+                    rows={clickRow.length > 0 ? clickRow : rows}
+                    columns={clickColumns.length > 0 ? clickColumns : columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    hideFooterSelectedRowCount
+                />
             </div>
             <StyledTopLevelBox className={clsx(additionalClass)}>
                 {Object.entries(topLevel).map(([key, value]) => (
