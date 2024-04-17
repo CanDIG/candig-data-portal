@@ -453,7 +453,6 @@ function Timeline({ patientId, programId, onEventClick }) {
         }));
 
         Updatedseries.push(treatmentParentSeries);
-        console.log('Updatedseries', Updatedseries);
 
         const newCategories = activeCategories.concat(
             treatmentIntervals.map((t) => t.name),
@@ -577,7 +576,6 @@ function Timeline({ patientId, programId, onEventClick }) {
                         click(event) {
                             const seriesName = event.point.series.name;
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
-                            console.log(seriesID);
                             let category = null;
                             let array = null;
 

@@ -48,9 +48,6 @@ function ClinicalPatientView() {
         setClickTitle(titleClick);
         setClickColumns(reorderedColumns);
         setClickRow(rowsClick);
-        console.log('rows', clickRow);
-        console.log('columns', clickColumns);
-        console.log('title', clickTitle);
     };
 
     useEffect(() => {
