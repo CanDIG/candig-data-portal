@@ -89,7 +89,6 @@ const tooltipFormatter = () =>
 
 function Timeline({ patientId, programId, onEventClick }) {
     const { data } = useClinicalPatientData(patientId, programId);
-    console.log('data', data);
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
@@ -116,7 +115,8 @@ function Timeline({ patientId, programId, onEventClick }) {
                           x: item?.[date]?.month_interval !== undefined ? item?.[date]?.month_interval - birthDate : '',
                           y: yValue,
                           name: `${namePrefix}${item?.[id]}`,
-                          color: colour
+                          color: colour,
+                          customGroupId: name
                       }))
                     : [];
             }
@@ -149,7 +149,8 @@ function Timeline({ patientId, programId, onEventClick }) {
                                   x: subItem?.[date]?.month_interval !== undefined ? subItem?.[date]?.month_interval - birthDate : '',
                                   y: yValue,
                                   name: `${namePrefix}${subItem?.[id]}`,
-                                  color: colour
+                                  color: colour,
+                                  customGroupId: name
                               }))
                             : []
                     ) || []
@@ -169,7 +170,8 @@ function Timeline({ patientId, programId, onEventClick }) {
                                                 : '',
                                         y: yValue,
                                         name: `${namePrefix}${subItem2?.[id]}`,
-                                        color: colour
+                                        color: colour,
+                                        customGroupId: name
                                     }))
                                   : []
                           )
@@ -451,6 +453,7 @@ function Timeline({ patientId, programId, onEventClick }) {
         }));
 
         Updatedseries.push(treatmentParentSeries);
+        console.log('Updatedseries', Updatedseries);
 
         const newCategories = activeCategories.concat(
             treatmentIntervals.map((t) => t.name),
@@ -573,6 +576,11 @@ function Timeline({ patientId, programId, onEventClick }) {
                     events: {
                         click(event) {
                             const seriesName = event.point.series.name;
+                            const seriesID = event.point.series.userOptions.data[0].customGroupId;
+                            const [title, setTitle] = useState('');
+                            const [rows, setRows] = useState([]);
+                            const [columns, setColumns] = useState([]);
+                            console.log(seriesID);
                             let category = null;
                             let array = null;
 
@@ -582,12 +590,53 @@ function Timeline({ patientId, programId, onEventClick }) {
                             } else if (seriesName.includes('SPECIMEN')) {
                                 category = 'specimens';
                                 array = data?.primary_diagnoses;
-                            } else if (seriesName.includes('TREATMENT') || seriesName === 'Treatments') {
-                                category = 'treatments';
-                                array = data?.treatments;
                             } else if (seriesName.includes('PRIMARY_DIAGNOSIS')) {
                                 category = 'primary_diagnoses';
                                 array = data?.primary_diagnoses;
+                            } else if (seriesID === 'treatments' || seriesName === 'Treatments') {
+                                category = 'treatments';
+                                const aggregateTreatments = () => {
+                                    let allTreatments = [];
+                                    data?.primary_diagnoses?.forEach((diagnosis) => {
+                                        if (Array.isArray(diagnosis.treatments)) {
+                                            allTreatments = allTreatments.concat(diagnosis.treatments);
+                                        }
+                                    });
+
+                                    return allTreatments;
+                                };
+                                array = aggregateTreatments(data);
+                            } else if (seriesID === 'Followup&Relapse1') {
+                                category = 'followups';
+                                array = data?.primary_diagnoses;
+                            } else if (seriesID === 'Followup&Relapse2') {
+                                category = 'followups';
+                                const aggregateFollowups = () => {
+                                    let allFollowups = [];
+                                    data?.primary_diagnoses?.forEach((diagnosis) => {
+                                        if (Array.isArray(diagnosis.followups)) {
+                                            allFollowups = allFollowups.concat(diagnosis.followups);
+                                        }
+                                    });
+
+                                    return allFollowups;
+                                };
+                                array = aggregateFollowups(data);
+                            } else if (seriesID === 'Followup&Relapse3') {
+                                category = 'followups';
+                                const aggregateFollowups = () => {
+                                    let allFollowups = [];
+                                    data?.primary_diagnoses?.forEach((diagnosis) => {
+                                        diagnosis.treatments?.forEach((treatment) => {
+                                            if (Array.isArray(treatment.followups)) {
+                                                allFollowups = allFollowups.concat(treatment.followups);
+                                            }
+                                        });
+                                    });
+
+                                    return allFollowups;
+                                };
+                                array = aggregateFollowups(data);
                             }
 
                             if (category && onEventClick) {

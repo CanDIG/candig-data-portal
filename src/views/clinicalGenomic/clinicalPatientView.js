@@ -44,6 +44,8 @@ function ClinicalPatientView() {
         columns = reorderedColumns;
         rows = rowsClick;
         console.log('rows', rows);
+        console.log('columns', columns);
+        console.log('title', title);
     };
 
     useEffect(() => {
