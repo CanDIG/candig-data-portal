@@ -7,7 +7,7 @@ import clsx from 'clsx';
 
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
-import { formatKey } from '../../utils/utils';
+import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
@@ -36,7 +36,15 @@ function ClinicalPatientView() {
 
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
+    let { rows, columns, title, topLevel} = useClinicalPatientData(patientId, programId);
+    const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
+    const handleEventClick = (category, array) => {
+        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
+        title = titleClick;
+        columns = reorderedColumns;
+        rows = rowsClick;
+        console.log('rows', rows);
+    };
 
     useEffect(() => {
         // Extract patientId from URL parameters
@@ -77,7 +85,7 @@ function ClinicalPatientView() {
                 ))}
             </StyledTopLevelBox>
             <TimelineContainer>
-                <Timeline patientId={patientId} programId={programId} />
+                <Timeline patientId={patientId} programId={programId} onEventClick={handleEventClick} />
             </TimelineContainer>
         </MainCard>
     );
