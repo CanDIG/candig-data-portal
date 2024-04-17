@@ -6,6 +6,7 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import useClinicalPatientData from '../useClinicalPatientData';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
+import { handleTableSet } from 'utils/utils';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -86,8 +87,9 @@ const tooltipFormatter = () =>
                 ${yearInAge} Year(s) Old`;
     };
 
-function Timeline({ patientId, programId }) {
+function Timeline({ patientId, programId, onEventClick }) {
     const { data } = useClinicalPatientData(patientId, programId);
+    console.log('data', data);
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
@@ -111,7 +113,7 @@ function Timeline({ patientId, programId }) {
                 return Array.isArray(data?.[path])
                     ? data[path].map((item) => ({
                           // eslint-disable-next-line no-unsafe-optional-chaining
-                          x: item?.[date]?.month_interval ? item?.[date]?.month_interval - birthDate : '',
+                          x: item?.[date]?.month_interval !== undefined ? item?.[date]?.month_interval - birthDate : '',
                           y: yValue,
                           name: `${namePrefix}${item?.[id]}`,
                           color: colour
@@ -129,7 +131,7 @@ function Timeline({ patientId, programId }) {
                               item?.submitter_specimen_id;
                           return {
                               // eslint-disable-next-line no-unsafe-optional-chaining
-                              x: item?.[date]?.month_interval ? item?.[date]?.month_interval - birthDate : '',
+                              x: item?.[date]?.month_interval !== undefined ? item?.[date]?.month_interval - birthDate : '',
                               y: yValue,
                               name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
                               color: colour
@@ -144,7 +146,7 @@ function Timeline({ patientId, programId }) {
                         Array.isArray(item?.[path])
                             ? item[path].map((subItem) => ({
                                   // eslint-disable-next-line no-unsafe-optional-chaining
-                                  x: subItem?.[date]?.month_interval ? subItem?.[date]?.month_interval - birthDate : '',
+                                  x: subItem?.[date]?.month_interval !== undefined ? subItem?.[date]?.month_interval - birthDate : '',
                                   y: yValue,
                                   name: `${namePrefix}${subItem?.[id]}`,
                                   color: colour
@@ -160,8 +162,11 @@ function Timeline({ patientId, programId }) {
                         ? item[path].flatMap((subItem) =>
                               Array.isArray(subItem?.[path2])
                                   ? subItem[path2].map((subItem2) => ({
-                                        // eslint-disable-next-line no-unsafe-optional-chaining
-                                        x: subItem2?.[date]?.month_interval ? subItem2?.[date]?.month_interval - birthDate : '',
+                                        x:
+                                            subItem2?.[date]?.month_interval !== undefined
+                                                ? // eslint-disable-next-line no-unsafe-optional-chaining
+                                                  subItem2?.[date]?.month_interval - birthDate
+                                                : '',
                                         y: yValue,
                                         name: `${namePrefix}${subItem2?.[id]}`,
                                         color: colour
@@ -212,7 +217,7 @@ function Timeline({ patientId, programId }) {
             null,
             data?.date_of_birth?.month_interval
         );
-        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 2, colorPalette[4], '', false, null);
+        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 2, colorPalette[4], 'Biomarker ', false, null);
         const specimenCollectionSeries = generateSeriesData(
             data?.primary_diagnoses,
             'specimens',
@@ -469,9 +474,6 @@ function Timeline({ patientId, programId }) {
             });
         };
 
-        console.log('series', Updatedseries);
-        console.log('categories', newCategories);
-
         setChartOptions({
             chart: {
                 height: 600,
@@ -566,6 +568,32 @@ function Timeline({ patientId, programId }) {
                             color: '#333333',
                             fontFamily: 'Arial, sans-serif'
                         }
+                    },
+                    cursor: 'pointer',
+                    events: {
+                        click(event) {
+                            const seriesName = event.point.series.name;
+                            let category = null;
+                            let array = null;
+
+                            if (seriesName.includes('Biomarker')) {
+                                category = 'biomarkers';
+                                array = data?.biomarkers;
+                            } else if (seriesName.includes('SPECIMEN')) {
+                                category = 'specimens';
+                                array = data?.primary_diagnoses;
+                            } else if (seriesName.includes('TREATMENT') || seriesName === 'Treatments') {
+                                category = 'treatments';
+                                array = data?.treatments;
+                            } else if (seriesName.includes('PRIMARY_DIAGNOSIS')) {
+                                category = 'primary_diagnoses';
+                                array = data?.primary_diagnoses;
+                            }
+
+                            if (category && onEventClick) {
+                                onEventClick(category, array);
+                            }
+                        }
                     }
                 }
             },
@@ -617,7 +645,8 @@ function Timeline({ patientId, programId }) {
 
 Timeline.propTypes = {
     patientId: PropTypes.string.isRequired,
-    programId: PropTypes.string.isRequired
+    programId: PropTypes.string.isRequired,
+    onEventClick: PropTypes.func
 };
 
 export default Timeline;
