@@ -6,7 +6,6 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import useClinicalPatientData from '../useClinicalPatientData';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
-import { handleTableSet } from 'utils/utils';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
@@ -678,7 +677,7 @@ function Timeline({ patientId, programId, onEventClick }) {
                 }
             }
         }));
-    }, [data, isTreatmentsCollapsed]);
+    }, [data, isTreatmentsCollapsed, birthMonthInterval, onEventClick]);
 
     if (!data?.date_of_birth) {
         return <Alert severity="warning">Unable to display the timeline due to missing Date of Birth information.</Alert>;
