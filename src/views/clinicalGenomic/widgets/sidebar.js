@@ -186,6 +186,7 @@ function StyledCheckboxList(props) {
                 }
 
                 const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
+                newList[groupName] = ids;
                 retVal.query = newList;
                 return retVal;
             });
