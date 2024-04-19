@@ -73,37 +73,7 @@ function SearchHandler() {
                         diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
                         treatment_type_count: CollateSummary(data, 'treatment_type_count'),
                         cancer_type_count: CollateSummary(data, 'cancer_type_count'),
-                        patients_per_cohort: {},
-
-                        // Below is test data
-                        full_clinical_data: {
-                            BCGSC: {
-                                POG: 30
-                            },
-                            UHN: {
-                                POG: 14,
-                                Inspire: 20,
-                                Biocan: 20,
-                                Biodiva: 10
-                            },
-                            C3G: {
-                                MOCK: 30
-                            }
-                        },
-                        full_genomic_data: {
-                            BCGSC: {
-                                POG: 10
-                            },
-                            UHN: {
-                                POG: 4,
-                                Inspire: 10,
-                                Biocan: 12,
-                                Biodiva: 12
-                            },
-                            C3G: {
-                                MOCK: 3
-                            }
-                        }
+                        patients_per_cohort: {}
                     };
                     data.forEach((site) => {
                         discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
