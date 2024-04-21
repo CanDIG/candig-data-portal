@@ -118,9 +118,6 @@ export function formatKey(key) {
  * Handles the setup of a table by processing the data and generating configuration for the columns and rows
  * @param {string} title - The title of the table
  * @param {Array} array - The table to be processed
- * @param {function} setTitle - Function to set the title of the table
- * @param {function} setColumns - Function to set the columns of the table
- * @param {function} setRows - Function to set the rows of the table
  */
 export function handleTableSet(title, array, ageAtFirstDiagnosis) {
     const uniqueKeysSet = new Set();

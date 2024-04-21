@@ -33,21 +33,16 @@ const TimelineContainer = styled(Box)(({ theme }) => ({
 
 function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
-
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
+    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId);
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
-
-    const [clickRow, setClickRow] = useState([]);
-    const [clickTitle, setClickTitle] = useState('');
-    const [clickColumns, setClickColumns] = useState([]);
 
     const handleEventClick = (category, array) => {
         const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
-        setClickTitle(titleClick);
-        setClickColumns(reorderedColumns);
-        setClickRow(rowsClick);
+        setTitle(titleClick);
+        setColumns(reorderedColumns);
+        setRows(rowsClick);
     };
 
     useEffect(() => {
@@ -65,19 +60,13 @@ function ClinicalPatientView() {
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
             <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
-                {clickTitle.length > 0 ? clickTitle : title}
+                {title}
             </Typography>
             <Typography pb={1} variant="h6">
                 {patientId}
             </Typography>
             <div style={{ width: '100%', height: '68vh' }}>
-                <DataGrid
-                    rows={clickRow.length > 0 ? clickRow : rows}
-                    columns={clickColumns.length > 0 ? clickColumns : columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[10]}
-                    hideFooterSelectedRowCount
-                />
+                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>
             <StyledTopLevelBox className={clsx(additionalClass)}>
                 {Object.entries(topLevel).map(([key, value]) => (
@@ -95,7 +84,7 @@ function ClinicalPatientView() {
                 ))}
             </StyledTopLevelBox>
             <TimelineContainer>
-                <Timeline patientId={patientId} programId={programId} onEventClick={handleEventClick} />
+                <Timeline data={data} onEventClick={handleEventClick} />
             </TimelineContainer>
         </MainCard>
     );
