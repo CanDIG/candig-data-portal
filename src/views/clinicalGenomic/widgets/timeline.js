@@ -3,39 +3,17 @@ import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
-import useClinicalPatientData from '../useClinicalPatientData';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
+import { useTheme } from '@mui/system';
 
 // Initialize the Gantt module
 HighchartsGantt(Highcharts);
 HighchartsExporting(Highcharts);
 
-const colorPalette = [
-    '#0A407D', // Deep Sapphire
-    '#0D5A1B', // Dark Fern
-    '#FC9803', // California
-    '#1565C0', // Denim
-    '#1C821E', // Forest Green
-    '#FFB800', // Selective Yellow
-    '#1E88E5', // Picton Blue
-    '#368B4C', // Emerald
-    '#FFD34F', // Mustard
-    '#90CAF9', // Malibu
-    '#A8FEB6', // Mint Green
-    '#FBE7AA', // Banana Mania
-    '#E3F2FD', // Hawkes Blue
-    '#E4FFE9', // Hint of Green
-    '#FFF8E4' // Early Dawn
-];
-
-const generateRandomColor = () => {
-    const randomIndex = Math.floor(Math.random() * colorPalette.length);
-    return colorPalette[randomIndex];
-};
-
-const headerFormatter = (dateResolution) =>
-    function headerFormatter() {
+// Formatter for xAxis labels based on the date resolution (Month/Year)
+const formatHeader = (dateResolution) =>
+    function formatHeader() {
         const value = Math.floor(this.value);
 
         if (dateResolution === 'Month') {
@@ -49,48 +27,44 @@ const headerFormatter = (dateResolution) =>
         return `Age Unknown`;
     };
 
+// Custom formatter for tooltips, displaying date, start/end and treatment type information
 const tooltipFormatter = () =>
     function tooltipFormatter() {
+        const boldName = `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>`;
+        const yearInAge = Math.floor(this.x / 12);
+
+        const getYearInAgeText = (prefix, value) => `${prefix}: ${Math.floor(value / 12)} Year(s) Old`;
+
+        const treatmentTypeText = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
+
+        let tooltipContent = '';
+
         if (this.extra_info) {
-            const yearInAgeExtra = Math.floor(this.x / 12);
-            const extraInfo = `${this.extra_info} : ${yearInAgeExtra} Year(s) Old`;
-            const missingInfo = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
-            const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
-            return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
-                    ${treatmentType}<br/>
-                    ${extraInfo}<br/>
-                    ${missingInfo}<br/>`;
+            const extraInfoText = `${this.extra_info} : ${yearInAge} Year(s) Old`;
+            const missingInfoText = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
+            tooltipContent = `${boldName}${treatmentTypeText}<br/>${extraInfoText}<br/>${missingInfoText}<br/>`;
+        } else if (this.start) {
+            const startYearText = getYearInAgeText('Start', this.start);
+            const endYearText = getYearInAgeText('End', this.end);
+
+            if (this.name === 'Treatments') {
+                tooltipContent = `${boldName}${startYearText}<br/>${endYearText}<br/>`;
+            } else {
+                tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}<br/>`;
+            }
+        } else {
+            tooltipContent = `${boldName}${yearInAge} Year(s) Old`;
         }
-        if (this.start && this.name !== 'Treatments') {
-            const yearInAgeStart = Math.floor(this.start / 12);
-            const yearInAgeEnd = Math.floor(this.end / 12);
-            const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
-            const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
-            const treatmentType = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
-            return `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>
-                ${treatmentType}<br/>
-                ${startYear}<br/>
-                ${endYear}<br/>`;
-        }
-        if (this.start && this.name === 'Treatments') {
-            const yearInAgeStart = Math.floor(this.start / 12);
-            const yearInAgeEnd = Math.floor(this.end / 12);
-            const startYear = `Start: ${yearInAgeStart} Year(s) Old`;
-            const endYear = `End: ${yearInAgeEnd} Year(s) Old`;
-            return `<span style="font-weight: bold">${this.name}</span><br/>
-                    ${startYear}<br/>  
-                    ${endYear}<br/>`;
-        }
-        const yearInAge = Math.ceil(this.x / 12);
-        return `<span style="font-weight: bold">${this.name}</span><br/>
-                ${yearInAge} Year(s) Old`;
+
+        return tooltipContent;
     };
 
-function Timeline({ patientId, programId, onEventClick }) {
-    const { data } = useClinicalPatientData(patientId, programId);
+// Main component for displaying the patient timeline
+function Timeline({ data, onEventClick }) {
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
+    const theme = useTheme();
     useEffect(() => {
         const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name, birthDateValue) => {
             const birthDate = birthDateValue ?? 0;
@@ -186,7 +160,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             null,
             null,
             0,
-            colorPalette[1],
+            theme.palette.primary.light,
             'Date of Birth',
             true,
             null,
@@ -199,7 +173,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             null,
             null,
             0,
-            colorPalette[2],
+            theme.palette.primary.main,
             'Date of Death',
             true,
             null,
@@ -212,13 +186,24 @@ function Timeline({ patientId, programId, onEventClick }) {
             null,
             null,
             0,
-            colorPalette[3],
+            theme.palette.primary.dark,
             'Date Alive After Lost to Followup',
             true,
             null,
             data?.date_of_birth?.month_interval
         );
-        const testDateSeries = generateSeriesData(data, 'biomarkers', null, 'test_date', '', 2, colorPalette[4], 'Biomarker ', false, null);
+        const testDateSeries = generateSeriesData(
+            data,
+            'biomarkers',
+            null,
+            'test_date',
+            '',
+            2,
+            theme.palette.secondary.dark,
+            'Biomarker ',
+            false,
+            null
+        );
         const specimenCollectionSeries = generateSeriesData(
             data?.primary_diagnoses,
             'specimens',
@@ -226,7 +211,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'specimen_collection_date',
             'submitter_specimen_id',
             3,
-            colorPalette[5],
+            theme.palette.secondary.light,
             '',
             false,
             null,
@@ -239,7 +224,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_diagnosis',
             'submitter_primary_diagnosis_id',
             1,
-            colorPalette[0],
+            theme.palette.secondary.main,
             '',
             false,
             null,
@@ -252,7 +237,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_followup',
             'submitter_follow_up_id',
             4,
-            colorPalette[6],
+            theme.palette.secondary.dark,
             'Followup ',
             false,
             'Followup&Relapse1',
@@ -265,7 +250,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_relapse',
             'submitter_follow_up_id',
             4,
-            colorPalette[7],
+            theme.palette.tertiary.light,
             'Relapse ',
             false,
             'Followup&Relapse1',
@@ -278,7 +263,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_followup',
             'submitter_follow_up_id',
             4,
-            colorPalette[6],
+            theme.palette.secondary.dark,
             'Followup ',
             false,
             'Followup&Relapse2',
@@ -291,7 +276,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_relapse',
             'submitter_follow_up_id',
             4,
-            colorPalette[7],
+            theme.palette.tertiary.light,
             'Relapse ',
             false,
             'Followup&Relapse2',
@@ -304,7 +289,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_followup',
             'submitter_follow_up_id',
             4,
-            colorPalette[6],
+            theme.palette.secondary.dark,
             'Followup ',
             false,
             'Followup&Relapse3',
@@ -317,7 +302,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             'date_of_relapse',
             'submitter_follow_up_id',
             4,
-            colorPalette[7],
+            theme.palette.tertiary.light,
             'Relapse ',
             false,
             'Followup&Relapse3',
@@ -388,7 +373,7 @@ function Timeline({ patientId, programId, onEventClick }) {
                         end: treatmentEnd - birthMonthInterval,
                         treatment_type: treatment?.treatment_type,
                         y: (yIndex += 1),
-                        color: generateRandomColor(),
+                        color: theme.palette.primary.main,
                         customGroupId: 'treatments'
                     });
                 } else if (
@@ -399,7 +384,7 @@ function Timeline({ patientId, programId, onEventClick }) {
                         x: treatmentStart - birthMonthInterval,
                         name: treatment.submitter_treatment_id,
                         y: (yIndex += 1),
-                        color: generateRandomColor(),
+                        color: theme.palette.primary.light,
                         treatment_type: treatment?.treatment_type,
                         extra_info: treatmentStart !== null ? 'Start' : 'End',
                         missing_info: treatmentStart !== null ? 'End' : 'Start',
@@ -423,7 +408,7 @@ function Timeline({ patientId, programId, onEventClick }) {
                     start: minTime,
                     end: maxTime,
                     y: yIndexParent,
-                    color: generateRandomColor(),
+                    color: theme.palette.primary.dark,
                     name: 'Treatments'
                 }
             ],
@@ -475,6 +460,7 @@ function Timeline({ patientId, programId, onEventClick }) {
             });
         };
 
+        // Handles setup of the Highcharts chart with the patient data
         setChartOptions({
             chart: {
                 height: 600,
@@ -507,14 +493,14 @@ function Timeline({ patientId, programId, onEventClick }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatter('Month'),
+                        formatter: formatHeader('Month'),
                         style: {
                             fontSize: '8px'
                         }
                     },
                     plotLines: [
                         {
-                            color: colorPalette[0],
+                            color: '#000000',
                             value: -birthMonthInterval,
                             width: 2,
                             zIndex: 5,
@@ -543,7 +529,7 @@ function Timeline({ patientId, programId, onEventClick }) {
                     minRange: 12,
                     labels: {
                         align: 'center',
-                        formatter: headerFormatter('Year')
+                        formatter: formatHeader('Year')
                     },
                     opposite: true
                 }
@@ -680,15 +666,17 @@ function Timeline({ patientId, programId, onEventClick }) {
     }, [data, isTreatmentsCollapsed, birthMonthInterval, onEventClick]);
 
     if (!data?.date_of_birth) {
+        // Display warning if necessary patient data is missing
         return <Alert severity="warning">Unable to display the timeline due to missing Date of Birth information.</Alert>;
     }
 
+    // Render the HighchartsReact component with the configured chart options
     return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
 }
 
+// PropTypes for component validation
 Timeline.propTypes = {
-    patientId: PropTypes.string.isRequired,
-    programId: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired,
     onEventClick: PropTypes.func
 };
 
