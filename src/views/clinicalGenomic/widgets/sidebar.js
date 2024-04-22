@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Checkbox,
@@ -108,18 +108,20 @@ function StyledCheckboxList(props) {
     const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide, checked, setChecked } = props;
     const [initialized, setInitialized] = useState(false);
 
+    // Check all of our options by default
+    useEffect(() => {
+        if (!initialized && isFilterList && options.length) {
+            const optionsObject = {};
+            options.forEach((option) => {
+                optionsObject[option] = true;
+            });
+            setInitialized(true);
+            setChecked(optionsObject);
+        }
+    }, [setInitialized, setChecked, initialized, isFilterList, options]);
+
     if (hide) {
         return null;
-    }
-
-    // Check all of our options by default
-    if (!initialized && isFilterList && options.length) {
-        const optionsObject = {};
-        options.forEach((option) => {
-            optionsObject[option] = true;
-        });
-        setInitialized(true);
-        setChecked(optionsObject);
     }
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -184,6 +186,7 @@ function StyledCheckboxList(props) {
                 }
 
                 const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
+                newList[groupName] = ids;
                 retVal.query = newList;
                 return retVal;
             });
@@ -393,8 +396,8 @@ function Sidebar() {
     // const referenceGenomes = ['hg38'];
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
-    const [startPos, setStartPos] = useState(0);
-    const [endPos, setEndPos] = useState(0);
+    const [startPos, setStartPos] = useState('0');
+    const [endPos, setEndPos] = useState('0');
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
@@ -422,8 +425,8 @@ function Sidebar() {
         // Genomic
         setSelectedGenes('');
         setSelectedChromosomes('');
-        setStartPos(0);
-        setEndPos(0);
+        setStartPos('0');
+        setEndPos('0');
 
         // Clinical
         setSelectedTreatment({});
