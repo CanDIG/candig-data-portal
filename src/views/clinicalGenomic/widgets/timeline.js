@@ -663,7 +663,18 @@ function Timeline({ data, onEventClick }) {
                 }
             }
         }));
-    }, [data, isTreatmentsCollapsed, birthMonthInterval, onEventClick]);
+    }, [
+        data,
+        isTreatmentsCollapsed,
+        birthMonthInterval,
+        onEventClick,
+        theme.palette.primary.dark,
+        theme.palette.primary.light,
+        theme.palette.primary.main,
+        theme.palette.secondary.dark,
+        theme.palette.secondary.light,
+        theme.palette.secondary.main
+    ]);
 
     if (!data?.date_of_birth) {
         // Display warning if necessary patient data is missing
