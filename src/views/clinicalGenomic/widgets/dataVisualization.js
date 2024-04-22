@@ -42,10 +42,14 @@ function DataVisualization() {
 
     // LocalStorage
     const [dataValue, setDataValue] = useState(
-        localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData'))[0] : 'patients_per_cohort'
+        localStorage.getItem('dataVisData') && JSON.parse(localStorage.getItem('dataVisData'))?.[0]
+            ? JSON.parse(localStorage.getItem('dataVisData'))[0]
+            : 'patients_per_cohort'
     );
     const [chartType, setChartType] = useState(
-        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType'))[0] : 'bar'
+        localStorage.getItem('dataVisChartType') && JSON.parse(localStorage.getItem('dataVisChartType'))?.[0]
+            ? JSON.parse(localStorage.getItem('dataVisChartType'))[0]
+            : 'bar'
     );
     const [dataVisData, setdataVisData] = useState(
         localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData')) : topKeys
@@ -149,7 +153,7 @@ function DataVisualization() {
                     </form>
                     <DialogActions>
                         <Button onClick={handleToggleDialog}>Cancel</Button>
-                        <Button onClick={() => AddChart(dataValue, chartType)}>Confirm</Button>
+                        <Button onClick={() => AddChart(dataValue, chartType || 'bar')}>Confirm</Button>
                     </DialogActions>
                 </DialogContent>
             </Dialog>
