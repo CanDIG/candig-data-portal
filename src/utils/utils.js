@@ -113,3 +113,139 @@ export function formatKey(key) {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 }
+
+/*
+ * Handles the setup of a table by processing the data and generating configuration for the columns and rows
+ * @param {string} title - The title of the table
+ * @param {Array} array - The table to be processed
+ */
+export function handleTableSet(title, array, ageAtFirstDiagnosis) {
+    const uniqueKeysSet = new Set();
+
+    array.forEach((obj) => {
+        const entries = Object.entries(obj);
+
+        const validEntries = entries.filter((value) => value !== null && value !== undefined && value !== '');
+
+        validEntries.forEach(([key]) => {
+            uniqueKeysSet.add(key);
+        });
+    });
+
+    const uniqueKeys = Array.from(uniqueKeysSet);
+
+    let startDate;
+    let endDate;
+    const columns = uniqueKeys.map((key) => {
+        const hasNonEmptyValue = array.some((obj) => {
+            if (Array.isArray(obj[key])) {
+                // Include arrays of strings
+                return obj[key].length > 0 && obj[key].every((item) => typeof item === 'string');
+            }
+
+            return (
+                obj[key] !== null &&
+                obj[key] !== undefined &&
+                obj[key] !== '' &&
+                (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key]))
+            );
+        });
+
+        let value = key;
+        if (key === 'date_of_diagnosis') {
+            value = `Age at Diagnosis`;
+        } else if (key.endsWith('_start_date')) {
+            value = `Diagnosis_to_${key}`;
+            startDate = key;
+        } else if (key.endsWith('_end_date')) {
+            value = key.split('_end_date')[0];
+            value = `${value.trim()} Duration`;
+            endDate = key;
+        } else if (key.startsWith('date_of_')) {
+            value = key.split('date_of_')[1];
+            value = `Diagnosis_to_${value.trim()}`;
+        }
+
+        return hasNonEmptyValue
+            ? {
+                  field: key,
+                  headerName: formatKey(value),
+                  flex: 1,
+                  minWidth: 275
+              }
+            : null;
+    });
+
+    const filteredColumns = columns.filter((column) => column !== null);
+
+    const reorderedColumns = [...filteredColumns].sort((a, b) => {
+        const aEndsWithID = a.headerName.endsWith('Id');
+        const bEndsWithID = b.headerName.endsWith('Id');
+
+        if (aEndsWithID && !bEndsWithID) {
+            return -1;
+        }
+        if (!aEndsWithID && bEndsWithID) {
+            return 1;
+        }
+        return 0;
+    });
+
+    const rowsClick = array.map((obj, index) => {
+        const row = { id: index };
+
+        filteredColumns.forEach((column) => {
+            // eslint-disable-next-line no-prototype-builtins
+            if (obj[column.field]?.hasOwnProperty('day_interval') && column.field !== 'date_of_diagnosis') {
+                if (column.field === 'endDate') {
+                    const ageInDays = obj[endDate].day_interval - obj[startDate].day_interval;
+                    const years = Math.floor(ageInDays / 365);
+                    const remainingDays = ageInDays % 365;
+                    const months = Math.floor(remainingDays / 30);
+                    const days = remainingDays % 30;
+
+                    row[column.field] = `${years}y ${months}m ${days}d`;
+                } else {
+                    const ageInDays = obj[column.field].day_interval;
+                    const years = Math.floor(ageInDays / 365);
+                    const remainingDays = ageInDays % 365;
+                    const months = Math.floor(remainingDays / 30);
+                    const days = remainingDays % 30;
+
+                    row[column.field] = `${years}y ${months}m ${days}d`;
+                }
+            } else if (
+                // eslint-disable-next-line no-prototype-builtins
+                obj[column.field]?.hasOwnProperty('month_interval') &&
+                column.field !== 'date_of_diagnosis'
+            ) {
+                if (column.field === endDate) {
+                    const ageInMonths = obj[endDate].month_interval - obj[startDate].month_interval;
+                    const years = Math.floor(ageInMonths / 12);
+                    const remainingMonths = ageInMonths % 12;
+
+                    // Format the years and months into a single string
+                    const formattedAge = years > 0 ? `${years}y ${remainingMonths}m` : `${remainingMonths}m`;
+                    row[column.field] = formattedAge;
+                } else {
+                    const ageInMonths = obj[column.field].month_interval;
+                    const years = Math.floor(ageInMonths / 12);
+                    const remainingMonths = ageInMonths % 12;
+
+                    // Format the years and months into a single string
+                    const formattedAge = years > 0 ? `${years}y ${remainingMonths}m` : `${remainingMonths}m`;
+                    row[column.field] = formattedAge;
+                }
+            } else if (column.field === 'date_of_diagnosis') {
+                row[column.field] = ageAtFirstDiagnosis + Math.floor(obj[column.field].month_interval / 12);
+            } else {
+                row[column.field] = Array.isArray(obj[column.field]) ? obj[column.field].join(', ') : obj[column.field]; // Add spaces to arrays
+            }
+        });
+
+        return row;
+    });
+
+    const titleClick = formatKey(title);
+    return { rowsClick, titleClick, reorderedColumns };
+}

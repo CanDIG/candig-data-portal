@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { styled } from '@mui/system';
 import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
-import { formatKey } from '../../utils/utils';
+import { formatKey, handleTableSet } from '../../utils/utils';
+import Timeline from './widgets/timeline';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -22,27 +24,53 @@ const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)'
 }));
 
+const TimelineContainer = styled(Box)(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    marginBottom: theme.spacing(2)
+}));
+
 function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
-
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
+    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId);
+    const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
+    const dateOfBirth = data?.date_of_birth;
+
+    const handleEventClick = (category, array) => {
+        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
+        setTitle(titleClick);
+        setColumns(reorderedColumns);
+        setRows(rowsClick);
+    };
 
     useEffect(() => {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
-        const intitalProgramId = urlParams.get('programId');
+        const initialProgramId = urlParams.get('programId');
 
         setPatientId(initialPatientId || '');
-        setProgramId(intitalProgramId || '');
+        setProgramId(initialProgramId || '');
     }, []);
 
     const additionalClass = 'your-additional-class'; // Replace with your actual class
 
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
+            {!dateOfBirth && (
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Alert
+                        style={{ width: '50%', marginTop: '20px', outline: '2px solid yellow', outlineOffset: '2px' }}
+                        severity="warning"
+                    >
+                        Unable to display timeline due to missing date of birth information.
+                    </Alert>
+                </div>
+            )}
             <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
                 {title}
             </Typography>
@@ -67,6 +95,11 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
+            {dateOfBirth && (
+                <TimelineContainer>
+                    <Timeline data={data} onEventClick={handleEventClick} />
+                </TimelineContainer>
+            )}
         </MainCard>
     );
 }
