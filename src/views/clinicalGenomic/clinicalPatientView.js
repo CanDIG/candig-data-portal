@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { styled } from '@mui/system';
 import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 
@@ -37,6 +38,7 @@ function ClinicalPatientView() {
     const [programId, setProgramId] = useState('');
     const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId);
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
+    const dateOfBirth = data?.date_of_birth;
 
     const handleEventClick = (category, array) => {
         const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
@@ -59,6 +61,13 @@ function ClinicalPatientView() {
 
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
+            {!dateOfBirth && (
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Alert style={{ width: '50%', marginTop: '20px' }} severity="warning">
+                        Unable to display timeline due to missing date of birth information.
+                    </Alert>
+                </div>
+            )}
             <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
                 {title}
             </Typography>
@@ -83,9 +92,11 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
-            <TimelineContainer>
-                <Timeline data={data} onEventClick={handleEventClick} />
-            </TimelineContainer>
+            {dateOfBirth && (
+                <TimelineContainer>
+                    <Timeline data={data} onEventClick={handleEventClick} />
+                </TimelineContainer>
+            )}
         </MainCard>
     );
 }

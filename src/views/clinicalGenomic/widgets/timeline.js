@@ -4,7 +4,6 @@ import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import PropTypes from 'prop-types';
-import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/system';
 
 // Initialize the Gantt module
@@ -18,11 +17,11 @@ const formatHeader = (dateResolution) =>
 
         if (dateResolution === 'Month') {
             const monthsSinceStart = value % 12;
-            return `${monthsSinceStart} Month(s) Old`;
+            return `${monthsSinceStart} Month(s)`;
         }
         if (dateResolution === 'Year') {
             const yearsSinceStart = Math.floor(value / 12);
-            return `${yearsSinceStart} Year(s) Old`;
+            return `${yearsSinceStart} Year(s)`;
         }
         return `Age Unknown`;
     };
@@ -675,11 +674,6 @@ function Timeline({ data, onEventClick }) {
         theme.palette.secondary.light,
         theme.palette.secondary.main
     ]);
-
-    if (!data?.date_of_birth) {
-        // Display warning if necessary patient data is missing
-        return <Alert severity="warning">Unable to display the timeline due to missing Date of Birth information.</Alert>;
-    }
 
     // Render the HighchartsReact component with the configured chart options
     return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
