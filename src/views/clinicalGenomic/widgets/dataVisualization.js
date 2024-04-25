@@ -42,10 +42,14 @@ function DataVisualization() {
 
     // LocalStorage
     const [dataValue, setDataValue] = useState(
-        localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData'))[0] : 'patients_per_cohort'
+        localStorage.getItem('dataVisData') && JSON.parse(localStorage.getItem('dataVisData'))?.[0]
+            ? JSON.parse(localStorage.getItem('dataVisData'))[0]
+            : 'patients_per_cohort'
     );
     const [chartType, setChartType] = useState(
-        localStorage.getItem('dataVisChartType') ? JSON.parse(localStorage.getItem('dataVisChartType'))[0] : 'bar'
+        localStorage.getItem('dataVisChartType') && JSON.parse(localStorage.getItem('dataVisChartType'))?.[0]
+            ? JSON.parse(localStorage.getItem('dataVisChartType'))[0]
+            : 'bar'
     );
     const [dataVisData, setdataVisData] = useState(
         localStorage.getItem('dataVisData') ? JSON.parse(localStorage.getItem('dataVisData')) : topKeys
@@ -70,6 +74,20 @@ function DataVisualization() {
     const handleToggleDialog = () => {
         setOpen((prevOpen) => !prevOpen);
     };
+
+    function setDataVisChartTypeSingle(index, newVal) {
+        const newDataVisChartType = dataVisChartType.slice();
+        newDataVisChartType[index] = newVal;
+        setDataVisChartType(newDataVisChartType);
+        localStorage.setItem('dataVisChartType', JSON.stringify(newDataVisChartType), { expires: 365 });
+    }
+
+    function setDataVisDataTypeSingle(index, newVal) {
+        const newDataVisData = dataVisData.slice();
+        newDataVisData[index] = newVal;
+        setdataVisData(newDataVisData);
+        localStorage.setItem('dataVisData', JSON.stringify(newDataVisData), { expires: 365 });
+    }
 
     function removeChart(index) {
         const newDataVisChartType = dataVisChartType.slice(0, index).concat(dataVisChartType.slice(index + 1));
@@ -135,7 +153,7 @@ function DataVisualization() {
                     </form>
                     <DialogActions>
                         <Button onClick={handleToggleDialog}>Cancel</Button>
-                        <Button onClick={() => AddChart(dataValue, chartType)}>Confirm</Button>
+                        <Button onClick={() => AddChart(dataValue, chartType || 'bar')}>Confirm</Button>
                     </DialogActions>
                 </DialogContent>
             </Dialog>
@@ -158,6 +176,8 @@ function DataVisualization() {
                     orderByFrequency={item !== 'diagnosis_age_count'}
                     orderAlphabetically={item === 'diagnosis_age_count'}
                     trimByDefault={dataVisTrim[index]}
+                    onChangeDataVisChartType={(newType) => setDataVisChartTypeSingle(index, newType)}
+                    onChangeDataVisData={(newData) => setDataVisDataTypeSingle(index, newData)}
                 />
             </Grid>
         ));
