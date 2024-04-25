@@ -21,7 +21,7 @@ const formatHeader = (dateResolution) =>
         }
         if (dateResolution === 'Year') {
             const yearsSinceStart = Math.floor(value / 12);
-            return `${yearsSinceStart} Year(s)`;
+            return `${yearsSinceStart} Year(s) Old`;
         }
         return `Age Unknown`;
     };
@@ -507,8 +507,8 @@ function Timeline({ data, onEventClick }) {
                                 text: 'First Day of Diagnosis',
                                 align: 'left',
                                 verticalAlign: 'top',
-                                x: -150,
-                                y: 150,
+                                x: 10,
+                                y: 20,
                                 style: {
                                     textOutline: '1px contrast',
                                     color: '#000000',
@@ -646,8 +646,7 @@ function Timeline({ data, onEventClick }) {
                             .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
                             .attr({
                                 fill: '#7cb5ec',
-                                cursor: 'pointer',
-                                zIndex: 5
+                                cursor: 'pointer'
                             })
                             .add()
                             .on('click', () => {
