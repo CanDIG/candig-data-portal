@@ -63,7 +63,7 @@ function ClinicalPatientView() {
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
             {!dateOfBirth && (
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                    <Alert variant="filled" severity="warning">
+                    <Alert variant="outlined" severity="warning">
                         Unable to display timeline due to missing date of birth information.
                     </Alert>
                 </div>
