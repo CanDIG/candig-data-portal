@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import { trackPromise } from 'react-promise-tracker';
 
@@ -42,7 +43,7 @@ import { fetchFederationStat, fetchFederation, query } from 'store/api';
 /* eslint-disable react-hooks/exhaustive-deps */
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
-function SearchHandler() {
+function SearchHandler({ setLoading }) {
     const reader = useSearchQueryReaderContext();
     const writer = useSearchResultsWriterContext();
     const [controller, _] = useState(new AbortController());
@@ -50,6 +51,7 @@ function SearchHandler() {
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
     useEffect(() => {
+        setLoading(true);
         lastPromise = trackPromise(
             fetchFederation('v2/discovery/sidebar_list', 'katsu')
                 .then((data) => {
@@ -67,7 +69,8 @@ function SearchHandler() {
                 .then((response) => (response.ok ? response.json() : console.log(response)))
                 .then((data) => {
                     writer((old) => ({ ...old, genes: data?.results }));
-                }),
+                })
+                .finally(setLoading(false)),
             'federation'
         );
     }, []);
@@ -75,6 +78,7 @@ function SearchHandler() {
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
         // First, we abort any currently-running search promises
+        setLoading(true);
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
@@ -95,67 +99,69 @@ function SearchHandler() {
         };
 
         const donorQueryPromise = () =>
-            query(reader.query, controller.signal).then((data) => {
-                if (reader.filter?.node) {
-                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                }
-
-                // We need to collate the discovery statistics from each site
-                const discoveryCounts = {
-                    diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
-                    treatment_type_count: CollateSummary(data, 'treatment_type_count'),
-                    cancer_type_count: CollateSummary(data, 'cancer_type_count'),
-                    patients_per_cohort: {},
-
-                    // Below is test data
-                    full_clinical_data: {
-                        BCGSC: {
-                            POG: 30
-                        },
-                        UHN: {
-                            POG: 14,
-                            Inspire: 20,
-                            Biocan: 20,
-                            Biodiva: 10
-                        },
-                        C3G: {
-                            MOCK: 30
-                        }
-                    },
-                    full_genomic_data: {
-                        BCGSC: {
-                            POG: 10
-                        },
-                        UHN: {
-                            POG: 4,
-                            Inspire: 10,
-                            Biocan: 12,
-                            Biodiva: 12
-                        },
-                        C3G: {
-                            MOCK: 3
-                        }
+            query(reader.query, controller.signal)
+                .then((data) => {
+                    if (reader.filter?.node) {
+                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
                     }
-                };
 
-                // Reorder the data, and fill out the patients per cohort
-                const clinicalData = {};
-                data.forEach((site) => {
-                    discoveryCounts.patients_per_cohort[site.location.name] = site.results?.summary?.patients_per_cohort;
-                    clinicalData[site.location.name] = site?.results;
-                });
+                    // We need to collate the discovery statistics from each site
+                    const discoveryCounts = {
+                        diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
+                        treatment_type_count: CollateSummary(data, 'treatment_type_count'),
+                        cancer_type_count: CollateSummary(data, 'cancer_type_count'),
+                        patients_per_cohort: {},
 
-                const genomicData = data
-                    .map((site) =>
-                        site.results.genomic?.map((caseData) => {
-                            caseData.location = site.location;
-                            return caseData;
-                        })
-                    )
-                    .flat(1);
+                        // Below is test data
+                        full_clinical_data: {
+                            BCGSC: {
+                                POG: 30
+                            },
+                            UHN: {
+                                POG: 14,
+                                Inspire: 20,
+                                Biocan: 20,
+                                Biodiva: 10
+                            },
+                            C3G: {
+                                MOCK: 30
+                            }
+                        },
+                        full_genomic_data: {
+                            BCGSC: {
+                                POG: 10
+                            },
+                            UHN: {
+                                POG: 4,
+                                Inspire: 10,
+                                Biocan: 12,
+                                Biodiva: 12
+                            },
+                            C3G: {
+                                MOCK: 3
+                            }
+                        }
+                    };
 
-                writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData, loading: false }));
-            });
+                    // Reorder the data, and fill out the patients per cohort
+                    const clinicalData = {};
+                    data.forEach((site) => {
+                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.summary?.patients_per_cohort;
+                        clinicalData[site.location.name] = site?.results;
+                    });
+
+                    const genomicData = data
+                        .map((site) =>
+                            site.results.genomic?.map((caseData) => {
+                                caseData.location = site.location;
+                                return caseData;
+                            })
+                        )
+                        .flat(1);
+
+                    writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData, loading: false }));
+                })
+                .finally(setLoading(false));
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
@@ -169,12 +175,15 @@ function SearchHandler() {
         if (!reader.donorID || !reader.cohort) {
             return;
         }
+        setLoading(true);
 
         const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
-            fetchFederation(url, 'katsu').then((data) => {
-                writer((old) => ({ ...old, donor: data }));
-            }),
+            fetchFederation(url, 'katsu')
+                .then((data) => {
+                    writer((old) => ({ ...old, donor: data }));
+                })
+                .finally(setLoading(false)),
             'donor'
         );
     }, [JSON.stringify(reader.donorID)]);
@@ -184,5 +193,9 @@ function SearchHandler() {
     return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
+
+SearchHandler.propTypes = {
+    setLoading: PropTypes.func
+};
 
 export default SearchHandler;
