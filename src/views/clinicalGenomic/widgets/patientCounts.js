@@ -24,8 +24,6 @@ const Root = styled('div')(({ theme }) => ({
 function PatientCounts() {
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
-    const searchResults = context?.clinical;
-    const filters = useSearchQueryReaderContext()?.filter;
     const programs = context?.programs;
 
     // Generate the map of site->cohort->numbers
@@ -33,40 +31,13 @@ function PatientCounts() {
     let siteData = [];
     if (Array.isArray(sites)) {
         siteData = sites.map((entry) => {
-            // Find this site within our search results
-            const counts = {};
-            if (searchResults && entry.location.name in searchResults) {
-                // Has this node been excluded from the results?
-                if (!(filters && filters?.node?.includes(entry.location.name))) {
-                    const match = searchResults[entry.location.name];
-                    Object.keys(match.summary.patients_per_cohort).forEach((cohort) => {
-                        if (cohort in counts) {
-                            counts[cohort] += match.summary.patients_per_cohort[cohort];
-                        } else {
-                            counts[cohort] = match.summary.patients_per_cohort[cohort];
-                        }
-                    });
-                    /* // Iterate through each donor in this site
-                    match.forEach((donor) => {
-                        if (filters && filters?.program_id?.includes(donor.program_id)) {
-                            // Exclude based on cohort
-                            return;
-                        }
-
-                        if (donor.program_id in counts) {
-                            counts[donor.program_id] += 1;
-                        } else {
-                            counts[donor.program_id] = 1;
-                        }
-                    }); */
-                }
-            }
+            const counts = context?.counts?.patients_per_cohort?.[entry.location.name] || {};
 
             let unlockedPrograms = [];
             if (Array.isArray(programs)) {
                 unlockedPrograms = programs
                     .filter((search) => entry.location.name === search.location.name)?.[0]
-                    ?.results?.results?.map((program) => program.program_id);
+                    ?.results?.items?.map((program) => program.program_id);
             }
 
             // Return the data that PatientCountSingle needs
