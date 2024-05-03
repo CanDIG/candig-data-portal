@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
@@ -157,9 +157,9 @@ function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [selectedIndex] = React.useState(1);
+    const [selectedIndex] = useState(1);
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const anchorRef = React.useRef(null);
 
@@ -175,7 +175,7 @@ function ProfileSection() {
     };
 
     const prevOpen = React.useRef(open);
-    React.useEffect(() => {
+    useEffect(() => {
         if (prevOpen.current === true && open === false) {
             anchorRef.current.focus();
         }
@@ -243,7 +243,7 @@ function ProfileSection() {
                                     <CardContent className={classes.cardContent}>
                                         <Grid container direction="column" spacing={0}>
                                             <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Hello!</Typography>
+                                                <Typography variant="h4">Hello, !</Typography>
                                                 {/* <Typography component="span" variant="h4" className={classes.name}>
                                                     First Name Last Name
                                                 </Typography> */}
