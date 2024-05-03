@@ -148,7 +148,7 @@ export const DataVisualizationChartInfo = {
     full_genomic_data: {
         title: 'Complete Genomic',
         xAxis: 'Site',
-        yAxis: 'Number of Patients'
+        yAxis: 'Number of Samples'
     }
 };
 export const validCharts = ['bar', 'line', 'scatter', 'column'];
