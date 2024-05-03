@@ -243,7 +243,7 @@ function ProfileSection() {
                                     <CardContent className={classes.cardContent}>
                                         <Grid container direction="column" spacing={0}>
                                             <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Hello, !</Typography>
+                                                <Typography variant="h4">Hello!</Typography>
                                                 {/* <Typography component="span" variant="h4" className={classes.name}>
                                                     First Name Last Name
                                                 </Typography> */}

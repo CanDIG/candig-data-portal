@@ -134,7 +134,6 @@ function StyledCheckboxList(props) {
         } else {
             ids = [ids];
         }
-        console.log(ids);
 
         if (isExclusion ? !isChecked : isChecked) {
             setChecked((_) => {
