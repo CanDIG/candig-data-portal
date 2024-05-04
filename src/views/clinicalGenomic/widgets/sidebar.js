@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Checkbox,
@@ -108,18 +108,20 @@ function StyledCheckboxList(props) {
     const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide, checked, setChecked } = props;
     const [initialized, setInitialized] = useState(false);
 
+    // Check all of our options by default
+    useEffect(() => {
+        if (!initialized && isFilterList && options.length) {
+            const optionsObject = {};
+            options.forEach((option) => {
+                optionsObject[option] = true;
+            });
+            setInitialized(true);
+            setChecked(optionsObject);
+        }
+    }, [setInitialized, setChecked, initialized, isFilterList, options]);
+
     if (hide) {
         return null;
-    }
-
-    // Check all of our options by default
-    if (!initialized && isFilterList && options.length) {
-        const optionsObject = {};
-        options.forEach((option) => {
-            optionsObject[option] = true;
-        });
-        setInitialized(true);
-        setChecked(optionsObject);
     }
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -129,61 +131,48 @@ function StyledCheckboxList(props) {
         // Remove duplicates
         if (Array.isArray(ids)) {
             ids = Array.from(new Set(ids?.flat(1)));
+        } else {
+            ids = [ids];
         }
 
         if (isExclusion ? !isChecked : isChecked) {
-            if (useAutoComplete) {
-                // Autcomplete's onChange will have IDs be a list of options that are checked
-                setChecked((_) => {
-                    const retVal = {};
-                    ids.forEach((id) => {
-                        retVal[id] = true;
-                    });
-                    return retVal;
+            setChecked((_) => {
+                const retVal = {};
+                ids.forEach((id) => {
+                    retVal[id] = true;
                 });
-            } else {
-                // FormControlLabel's onChange will have IDs be a list of IDs that have _changed_
-                setChecked((old) => ({ ...old, [ids]: true }));
-            }
+                return retVal;
+            });
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
 
-                // The following appends ourselves to the write context under 'query': {group: [list]} or 'donorList': {group: [list]}
-                if (isFilterList) {
-                    // Filter lists operate differently: you _remove_ the option when you check it
-                    retVal.filter[groupName].splice(retVal.filter[groupName].indexOf(ids));
-                } else {
-                    retVal.query[groupName] = ids;
+                // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
+                if (ids.length > 0) {
+                    retVal.query[groupName] = ids.join('|');
                 }
                 return retVal;
             });
         } else {
-            setChecked((old) => {
-                // Autocomplete's onChange will return a list
-                if (useAutoComplete) {
-                    const retVal = {};
-                    ids.forEach((id) => {
-                        retVal[id] = true;
-                    });
-                    return retVal;
-                }
-
-                // FormControlLabel's onChange
-                const { [ids]: _, ...rest } = old;
-                return rest;
+            setChecked((_) => {
+                const retVal = {};
+                ids.forEach((id) => {
+                    retVal[id] = true;
+                });
+                return retVal;
             });
             onWrite((old) => {
                 const retVal = { filter: {}, ...old };
                 if (isFilterList) {
-                    if (groupName in retVal.filter) {
-                        retVal.filter[groupName].push(ids);
-                    } else {
-                        retVal.filter[groupName] = [ids];
+                    if (ids.length > 0) {
+                        retVal.filter[groupName] = ids.join('|');
                     }
                     return retVal;
                 }
 
                 const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
+                if (ids.length > 0) {
+                    newList[groupName] = ids.join('|');
+                }
                 retVal.query = newList;
                 return retVal;
             });
@@ -227,7 +216,20 @@ function StyledCheckboxList(props) {
                     <Checkbox
                         className={classes.checkbox}
                         checked={isExclusion ? !(option in checked) : option in checked}
-                        onChange={(event) => HandleChange(option, event.target.checked)}
+                        onChange={(event) => {
+                            const newList = Object.keys(checked).slice();
+                            if (event.target.checked) {
+                                // Add to list
+                                newList.push(option);
+                            } else {
+                                // Remove from list
+                                const oldPos = newList.indexOf(option);
+                                if (oldPos >= 0) {
+                                    newList.splice(oldPos, 1);
+                                }
+                            }
+                            HandleChange(newList, event.target.checked);
+                        }}
                     />
                 }
                 key={option}
@@ -393,8 +395,8 @@ function Sidebar() {
     // const referenceGenomes = ['hg38'];
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
-    const [startPos, setStartPos] = useState(0);
-    const [endPos, setEndPos] = useState(0);
+    const [startPos, setStartPos] = useState('0');
+    const [endPos, setEndPos] = useState('0');
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
@@ -422,8 +424,8 @@ function Sidebar() {
         // Genomic
         setSelectedGenes('');
         setSelectedChromosomes('');
-        setStartPos(0);
-        setEndPos(0);
+        setStartPos('0');
+        setEndPos('0');
 
         // Clinical
         setSelectedTreatment({});

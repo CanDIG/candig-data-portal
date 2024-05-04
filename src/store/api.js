@@ -215,6 +215,34 @@ export function searchVariantByGene(geneName) {
         });
 }
 
+export function queryDiscovery(parameters, abort) {
+    const payload = {
+        ...parameters
+    };
+
+    return fetch(`${federation}/fanout`, {
+        method: 'post',
+        signal: abort,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'GET',
+            path: 'discovery/query',
+            service: 'query',
+            payload
+        })
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            return [];
+        })
+        .catch((error) => {
+            console.log('Error:', error);
+            return 'error';
+        });
+}
+
 export function query(parameters, abort) {
     const payload = {
         ...parameters
@@ -312,7 +340,7 @@ export function fetchClinicalCompleteness() {
                     if (!(site.location.name in completeClinical)) {
                         completeClinical[site.location.name] = {};
                     }
-                    completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.total_cases;
+                    completeClinical[site.location.name][program.program_id] = program.metadata.summary_cases.complete_cases;
                 }
             });
         });

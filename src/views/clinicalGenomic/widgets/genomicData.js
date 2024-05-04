@@ -49,9 +49,10 @@ function GenomicData() {
     const columns = [
         { field: 'location', headerName: 'Node', minWidth: 120, sortable: false },
         { field: 'donor_id', headerName: 'Donor ID', minWidth: 150, sortable: false },
+        { field: 'program_id', headerName: 'Cohort ID', minWidth: 150, sortable: false },
         { field: 'position', headerName: 'Position', minWidth: 150, sortable: false },
         { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200, sortable: false },
-        { field: 'submitter_specimen_id', headerName: 'Tumour Specimen ID', minWidth: 300, sortable: false },
+        { field: 'submitter_specimen_id', headerName: 'Sample Registration ID', minWidth: 300, sortable: false },
         { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300, sortable: false },
         { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200, sortable: false }
     ];

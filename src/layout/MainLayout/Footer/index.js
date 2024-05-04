@@ -242,8 +242,14 @@ function Footer(props) {
                                 disableHoverListener
                                 disableTouchListener
                             >
-                                <IconMail stroke={1.5} size="1.3rem" style={{ color: theme.palette.primary.main, marginRight: '0.5em' }} />
-                                <span style={linkText}>info@distributedgenomics.ca</span>
+                                <>
+                                    <IconMail
+                                        stroke={1.5}
+                                        size="1.3rem"
+                                        style={{ color: theme.palette.primary.main, marginRight: '0.5em' }}
+                                    />
+                                    <span style={linkText}>info@distributedgenomics.ca</span>
+                                </>
                             </Tooltip>
                         </ButtonBase>
                     </HelpContainer>

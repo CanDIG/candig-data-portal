@@ -4,8 +4,8 @@ A data analytics and visualization portal for CanDIG Services. Is built off the 
 
 ## Setup Development Server
 
--   Node: v17.7.1
--   npm: 10.2.5
+-   Node: v21.7.0
+-   npm: 10.5.0
 -   MUI: V5
 
 There was a migration from V4 - V5 of MUI following https://mui.com/material-ui/guides/migration-v4/

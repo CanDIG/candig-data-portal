@@ -22,16 +22,25 @@ function useClinicalPatientData(patientId, programId) {
 
     function filterNestedObject(obj) {
         return Object.fromEntries(
-            Object.entries(obj).filter(
-                ([key, value]) =>
-                    value !== null &&
-                    !(
-                        (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
-                        value === '' ||
-                        key === ''
-                    ) &&
-                    (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key])) // Accept interval date objects remove all other objects
-            )
+            Object.entries(obj)
+                .filter(
+                    ([key, value]) =>
+                        value !== null &&
+                        !(
+                            (Array.isArray(value) && value.length === 0) || // Exclude empty arrays
+                            value === '' ||
+                            key === ''
+                        ) &&
+                        (!(typeof value === 'object') ||
+                            (typeof value === 'object' && ('month_interval' in value || value.every((item) => typeof item === 'string'))))
+                )
+                .map(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        return [key, value.join(', ')];
+                    }
+
+                    return [key, value];
+                })
         );
     }
 
@@ -49,11 +58,55 @@ function useClinicalPatientData(patientId, programId) {
                     const patientData = result[0].results || {};
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
-                    const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
-                    filteredData.age_at_death = Math.floor(ageInMonths / 12);
-                    filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
-                    delete filteredData.date_of_death;
-                    delete filteredData.date_of_birth;
+
+                    if (filteredData?.date_of_birth) {
+                        if (filteredData.date_of_birth.day_interval) {
+                            // Logic for 'day' resolution
+                            if (filteredData?.date_of_death?.day_interval && filteredData?.date_of_birth?.day_interval) {
+                                const ageInDays = filteredData.date_of_death.day_interval - filteredData.date_of_birth.day_interval;
+                                filteredData.age_at_death = Math.floor(ageInDays / 365);
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
+                            } else if (filteredData?.date_of_birth?.day_interval && !filteredData?.date_of_death?.day_interval) {
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.day_interval / 365);
+                            }
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+                        } else if (filteredData.date_of_birth.month_interval) {
+                            // Logic for 'month' resolution
+                            if (filteredData?.date_of_death?.month_interval && filteredData?.date_of_birth?.month_interval) {
+                                const ageInMonths = filteredData.date_of_death.month_interval - filteredData.date_of_birth.month_interval;
+                                filteredData.age_at_death = Math.floor(ageInMonths / 12);
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            } else if (filteredData?.date_of_birth?.month_interval && !filteredData?.date_of_death?.month_interval) {
+                                filteredData.age_at_first_diagnosis = Math.floor(-filteredData.date_of_birth.month_interval / 12);
+                            }
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+                        } else {
+                            delete filteredData.date_of_death;
+                            delete filteredData.date_of_birth;
+                        }
+                    } else {
+                        delete filteredData.date_of_death;
+                        filteredData.age_at_first_diagnosis = null;
+                    }
+
+                    if (filteredData?.date_alive_after_lost_to_followup?.day_interval) {
+                        const ageInDays = filteredData.date_alive_after_lost_to_followup.day_interval;
+                        const years = Math.floor(ageInDays / 365);
+                        const remainingDays = ageInDays % 365;
+                        const months = Math.floor(remainingDays / 30);
+                        const days = remainingDays % 30;
+
+                        filteredData.time_from_diagnosis_to_last_followup = `${years}y ${months}m ${days}d`;
+                        delete filteredData.date_alive_after_lost_to_followup;
+                    } else if (filteredData?.date_alive_after_lost_to_followup?.month_interval) {
+                        const ageInMonths = filteredData.date_alive_after_lost_to_followup.month_interval;
+                        const years = Math.floor(ageInMonths / 12);
+                        const remainingMonths = ageInMonths % 12;
+                        filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
+                        delete filteredData.date_alive_after_lost_to_followup;
+                    }
 
                     setTopLevel(filteredData);
                     setData(patientData);
@@ -65,7 +118,6 @@ function useClinicalPatientData(patientId, programId) {
                             setColumns={setColumns}
                             setTitle={setTitle}
                             ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
-                            resolution={filteredData.date_resolution}
                         />
                     );
                 }
@@ -77,7 +129,7 @@ function useClinicalPatientData(patientId, programId) {
         fetchData();
     }, [patientId, programId, sidebarWriter]);
 
-    return { data, rows, columns, title, topLevel };
+    return { data, rows, columns, title, topLevel, setRows, setColumns, setTitle, setTopLevel };
 }
 
 export default useClinicalPatientData;
