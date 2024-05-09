@@ -27,16 +27,19 @@ function ClinicalPatientView() {
 
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId);
+    const [location, setLocation] = useState('');
+    const { rows, columns, title, topLevel } = useClinicalPatientData(patientId, programId, location);
 
     useEffect(() => {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
         const intitalProgramId = urlParams.get('programId');
+        const initiallocation = urlParams.get('location');
 
         setPatientId(initialPatientId || '');
         setProgramId(intitalProgramId || '');
+        setLocation(initiallocation || '');
     }, []);
 
     return (

@@ -33,6 +33,7 @@ function ClinicalView() {
                     // Make sure each row has an ID and a deceased status
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
+                    patient.location = Object.keys(searchResults)[0] || 'Unknown';
                     if (patient?.date_resolution === 'month') {
                         if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
                             const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;
@@ -65,7 +66,7 @@ function ClinicalView() {
     }
 
     const handleRowClick = (row) => {
-        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}`;
         window.open(url, '_blank');
     };
 
@@ -77,6 +78,8 @@ function ClinicalView() {
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
         { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
+        { field: 'location', headerName: 'Location', minWidth: 220, sortable: false },
+        { field: 'program_id', headerName: 'Program ID', minWidth: 220, sortable: false },
         { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
         { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
         { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false },
@@ -92,8 +95,8 @@ function ClinicalView() {
 
     const totalRows = searchResults
         ? Object.values(searchResults)
-              ?.map((site) => site.count)
-              .reduce((partial, a) => partial + a, 0)
+            ?.map((site) => site.count)
+            .reduce((partial, a) => partial + a, 0)
         : 0;
 
     return (
