@@ -135,7 +135,7 @@ function useClinicalPatientData(patientId, programId, location) {
         };
 
         fetchData();
-    }, [patientId, programId, sidebarWriter]);
+    }, [patientId, programId, location, sidebarWriter]);
 
     return { data, rows, columns, title, topLevel, setRows, setColumns, setTitle, setTopLevel };
 }

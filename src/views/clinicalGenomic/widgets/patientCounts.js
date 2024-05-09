@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 import { Box, Grid, Typography } from '@mui/material';
 
-import { useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
+import { useSearchResultsReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
 
 const PREFIX = 'PatientCounts';
