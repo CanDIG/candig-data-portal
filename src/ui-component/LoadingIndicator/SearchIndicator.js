@@ -7,21 +7,21 @@ import { trackPromise, usePromiseTracker } from 'react-promise-tracker';
  * This loading indicator is used in search.
  */
 export function SearchIndicator({ area }) {
-    // const { promiseInProgress } = usePromiseTracker({ area });
+    const { promiseInProgress } = usePromiseTracker({ area });
     return (
-        // promiseInProgress && (
-        <div
-            style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}
-        >
-            <MutatingDots color="#2BAD60" secondaryColor="#037DB5" height="100" width="110" />
-        </div>
-        // )
+        promiseInProgress && (
+            <div
+                style={{
+                    width: '100%',
+                    height: '100',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
+                <MutatingDots color="#2BAD60" secondaryColor="#037DB5" height="100" width="110" />
+            </div>
+        )
     );
 }
 

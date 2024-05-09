@@ -158,7 +158,6 @@ function DataVisualization() {
                     orderByFrequency={item !== 'diagnosis_age_count'}
                     orderAlphabetically={item === 'diagnosis_age_count'}
                     trimByDefault={dataVisTrim[index]}
-                    loading={dataVis[item] === undefined}
                 />
             </Grid>
         ));

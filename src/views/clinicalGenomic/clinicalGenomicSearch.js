@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
@@ -13,8 +13,6 @@ import Sidebar from './widgets/sidebar';
 import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
-import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
-import { usePromiseTracker } from 'react-promise-tracker';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -65,16 +63,6 @@ const Root = styled('div')(({ _ }) => ({
     }
 }));
 
-const StyledMainCard = styled(MainCard)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    minHeight: '400px',
-    height: '100%',
-    overflow: 'hidden',
-    position: 'relative'
-}));
-
 const sections = [
     {
         id: 'counts',
@@ -104,12 +92,9 @@ function ClinicalGenomicSearch() {
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = useSelector((state) => state.customization.opened);
 
-    const [isLoading, setLoading] = useState(true);
-    const { promiseInProgress } = usePromiseTracker(isLoading);
     // When we load, set the sidebar component
     useEffect(() => {
         sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
-        console.log('Promise in progress: ', isLoading);
     }, [sidebarWriter]);
 
     return (
@@ -141,7 +126,7 @@ function ClinicalGenomicSearch() {
                 </Toolbar>
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
-            <SearchHandler setLoading={() => setLoading()} />
+            <SearchHandler />
             <MainCard
                 sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
             >
@@ -150,18 +135,7 @@ function ClinicalGenomicSearch() {
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
                             &nbsp;
                         </a>
-                        {isLoading ? (
-                            <StyledMainCard
-                                key={section.id}
-                                border
-                                sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
-                                contentClass={{ padding: '16px !important' }}
-                            >
-                                <SearchIndicator />
-                            </StyledMainCard>
-                        ) : (
-                            section.component
-                        )}
+                        {section.component}
                         <div className={classes.spaceBetween} />
                     </div>
                 ))}
