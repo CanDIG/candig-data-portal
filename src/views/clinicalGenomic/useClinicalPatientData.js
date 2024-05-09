@@ -137,7 +137,7 @@ function useClinicalPatientData(patientId, programId, location) {
         fetchData();
     }, [patientId, programId, sidebarWriter]);
 
-    return { data, rows, columns, title, topLevel };
+    return { data, rows, columns, title, topLevel, setRows, setColumns, setTitle, setTopLevel };
 }
 
 export default useClinicalPatientData;

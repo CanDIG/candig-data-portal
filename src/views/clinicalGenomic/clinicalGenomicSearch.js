@@ -87,10 +87,10 @@ const sections = [
 ];
 
 function ClinicalGenomicSearch() {
-    const events = useSelector((state) => state);
+    const customization = useSelector((state) => state.customization);
 
     const sidebarWriter = useSidebarWriterContext();
-    const sidebarOpened = useSelector((state) => state.customization.opened);
+    const sidebarOpened = customization.opened;
 
     // When we load, set the sidebar component
     useEffect(() => {
@@ -127,9 +127,7 @@ function ClinicalGenomicSearch() {
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
             <SearchHandler />
-            <MainCard
-                sx={{ minHeight: 830, position: 'relative', borderRadius: events.customization.borderRadius * 0.25, marginTop: '2.5em' }}
-            >
+            <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
                 {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
