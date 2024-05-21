@@ -22,7 +22,7 @@ function Summary() {
 
     const [provinceCounter, setProvinceCount] = useState(0);
     const [individualCount, setIndividualCount] = useState(undefined);
-    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [primarySiteCount, setPrimarySiteCount] = useState(undefined);
     const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
     const [cohortCount, setCohortCount] = useState(undefined);
     const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
@@ -84,8 +84,8 @@ function Summary() {
                             aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
                         );
                         break;
-                    case '/cancer_type_count':
-                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
+                    case '/primary_site_count':
+                        setPrimarySiteCount((oldPrimarySiteCount) => aggregateObj(stat.results, oldPrimarySiteCount));
                         break;
                     case '/treatment_type_count':
                         setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
@@ -159,7 +159,7 @@ function Summary() {
         }
 
         fetchData('/individual_count')
-            .then(() => fetchData('/cancer_type_count'))
+            .then(() => fetchData('/primary_site_count'))
             .then(() => fetchData('/cohort_count'))
             .then(() => fetchData('/patients_per_cohort'))
             .then(() => fetchData('/treatment_type_count'))
@@ -257,13 +257,13 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={cancerTypeCount || {}}
-                    data="cancer_type_count"
+                    dataObject={primarySiteCount || {}}
+                    data="primary_site_count"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={cancerTypeCount === undefined}
+                    loading={primarySiteCount === undefined}
                     orderByFrequency
                     cutoff={10}
                 />

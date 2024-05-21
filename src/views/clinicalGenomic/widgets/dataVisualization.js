@@ -29,7 +29,7 @@ function DataVisualization() {
         patients_per_cohort: resultsContext?.patients_per_cohort || {},
         diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
         treatment_type_count: resultsContext?.treatment_type_count || {},
-        cancer_type_count: resultsContext?.cancer_type_count || {}
+        primary_site_count: resultsContext?.primary_site_count || {}
     };
     const theme = useTheme();
 
