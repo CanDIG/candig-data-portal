@@ -76,11 +76,11 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
-        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
-        { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
-        { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false },
-        { field: 'date_of_death', headerName: 'Age at Death', minWidth: 220, sortable: false }
+        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false, filterable: false },
+        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false, filterable: false },
+        { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false, filterable: false },
+        { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false, filterable: false },
+        { field: 'date_of_death', headerName: 'Age at Death', minWidth: 220, sortable: false, filterable: false }
     ];
 
     const HandlePageChange = (newModel) => {

@@ -223,12 +223,18 @@ function CustomOfflineChart(props) {
                             )}%) total ${this.series.yAxis.axisTitle.textStr.toLowerCase()}`;
                         }
                         /* eslint-enable func-names */
+                    },
+                    exporting: {
+                        enabled: false
                     }
                 });
             } else {
                 // Pie Chart
                 setChartOptions({
                     credits: {
+                        enabled: false
+                    },
+                    exporting: {
                         enabled: false
                     },
                     colors: [
