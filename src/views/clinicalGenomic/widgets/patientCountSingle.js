@@ -66,6 +66,9 @@ function PatientCountSingle(props) {
                     }
                     return partialSum + parseInt(cohortTotal.patients_count, 10);
                 }
+                if (typeof cohortTotal === 'string' && cohortTotal.startsWith('<')) {
+                    return [partialSum[0], partialSum[1] + parseInt(cohortTotal.substr(1), 10)];
+                }
                 return [partialSum[0] + cohortTotal, partialSum[1] + cohortTotal];
             },
             [0, 0]
