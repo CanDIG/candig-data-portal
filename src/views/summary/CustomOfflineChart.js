@@ -88,39 +88,38 @@ function CustomOfflineChart(props) {
     // Function to create charts bar, line, pie, stacked, etc.
     useEffect(() => {
         // Determine whether or not there exists censored data in the object provided
-        function hasCensoredData(data) {
+        function hasCensoredData(dataObj) {
             function isObjectCensored(obj) {
                 const realKey = Object.keys(obj).find((thisName) => thisName.endsWith('_count'));
                 return obj[realKey].startsWith('<');
             }
-            return (
-                typeof data === 'object' &&
-                Object.values(data).filter((datum) => {
-                    // datum is either going to be one of three things:
-                    // 1. an array of objects
-                    // 2. an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
-                    // 3. an object whose keys are cohorts and whose values are numbers
-                    // (Why the return value is formatted this way I have no idea)
+            return typeof dataObj === 'object'
+                ? Object.values(dataObj).some((datum) => {
+                      // datum is either going to be one of three things:
+                      // 1. an array of objects
+                      // 2. an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
+                      // 3. an object whose keys are cohorts and whose values are numbers
+                      // (Why the return value is formatted this way I have no idea)
 
-                    // Case 1: an array of objects
-                    if (Array.isArray(datum)) {
-                        return datum.filter((obj) => isObjectCensored(obj));
-                    }
+                      // Case 1: an array of objects
+                      if (Array.isArray(datum)) {
+                          return datum.some((obj) => isObjectCensored(obj));
+                      }
 
-                    if (typeof datum === 'object') {
-                        // Case 2: an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
-                        if (Object.values(datum).every((obj) => typeof obj === 'object')) {
-                            return isObjectCensored(datum);
-                        }
+                      if (typeof datum === 'object') {
+                          // Case 2: an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
+                          if (Object.values(datum).every((obj) => typeof obj === 'object')) {
+                              return isObjectCensored(datum);
+                          }
 
-                        // Case 3: an object whose keys are cohorts and whose values are numbers
-                        return Object.values(datum).every((obj) => typeof obj !== 'string' || obj.startsWith('<'));
-                    }
+                          // Case 3: an object whose keys are cohorts and whose values are numbers
+                          return Object.values(datum).some((val) => typeof val === 'string' && val.startsWith('<'));
+                      }
 
-                    console.log(`Could not parse input to hasCensoredData: ${datum}`);
-                    return false;
-                })
-            );
+                      console.log(`Could not parse input to hasCensoredData: ${datum}`);
+                      return false;
+                  })
+                : dataObj.some((datum) => isObjectCensored(datum));
         }
         const isCensored = hasCensoredData(dataObject);
         const censorshipCaption = isCensored
