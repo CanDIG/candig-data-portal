@@ -55,8 +55,26 @@ function PatientCountSingle(props) {
 
     const [expanded, setExpanded] = useState(false);
 
-    const totalPatients = Object.values(counts.totals)?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
-    const patientsInSearch = Object.values(counts.counts)?.reduce((partialSum, cohortTotal) => partialSum + cohortTotal, 0) || 0;
+    // Sum together an array of either numbers, or objects with patients_count in them
+    const SumCensoredTotals = (countsArray) =>
+        countsArray.reduce(
+            (partialSum, cohortTotal) => {
+                if (typeof cohortTotal === 'object') {
+                    // New notation
+                    if (cohortTotal.patients_count.startsWith('<')) {
+                        return [partialSum[0], partialSum[1] + parseInt(cohortTotal.patients_count.substr(1), 10)];
+                    }
+                    return partialSum + parseInt(cohortTotal.patients_count, 10);
+                }
+                return [partialSum[0] + cohortTotal, partialSum[1] + cohortTotal];
+            },
+            [0, 0]
+        );
+
+    const PrintCensoredCounts = (totals) => (totals[0] === totals[1] ? totals[0] : `${totals[0]}-${totals[1]}`);
+
+    const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
+    const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
     const numCohorts = Object.values(counts.totals)?.length || 0;
 
     /* const avatarProps = locked
@@ -75,13 +93,13 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {patientsInSearch}
+                        {PrintCensoredCounts(patientsInSearch)}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {totalPatients}
+                        {PrintCensoredCounts(totalPatients)}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
@@ -110,32 +128,32 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded
-                ? Object.keys(counts.totals).map((cohort) => {
-                      const locked = !counts.unlockedPrograms?.some((programID) => programID === cohort);
+                ? counts.totals.map((cohort) => {
+                      const locked = !counts.unlockedPrograms?.some((programID) => programID === cohort.program_id);
                       return (
                           <Grid
                               container
                               justifyContent="center"
                               alignItems="center"
                               spacing={2}
-                              key={cohort}
+                              key={cohort.program_id}
                               className={classes.container}
                           >
                               <Grid item xs={2}>
                                   <Typography variant="h5" align="center" className={classes.patientEntry}>
-                                      <b>{cohort}</b>
+                                      <b>{cohort.program_id}</b>
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
                               <Grid item xs={2}>
                                   <Typography align="center" className={classes.patientEntry}>
-                                      {counts.counts?.[cohort] || 0}
+                                      {counts.counts?.[cohort.program_id] || 0}
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
                               <Grid item xs={2}>
                                   <Typography align="center" className={classes.patientEntry}>
-                                      {counts.totals[cohort]}
+                                      {cohort.patients_count || 0}
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
