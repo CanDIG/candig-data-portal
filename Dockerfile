@@ -12,6 +12,8 @@ RUN apk update && apk add gettext
 
 RUN apk add --no-cache git curl vim bash
 
+RUN npm install -g npm@10.8.0
+
 RUN addgroup -S candig && adduser -S candig -G candig
 
 COPY --chown=candig:candig . /app/candig-data-portal
