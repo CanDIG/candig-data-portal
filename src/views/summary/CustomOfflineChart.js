@@ -17,6 +17,7 @@ import { IconTrash } from '@tabler/icons-react';
 // Custon Components and constants
 import MainCard from 'ui-component/cards/MainCard';
 import { DataVisualizationChartInfo, validCharts, validStackedCharts } from 'store/constant';
+import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
 
 window.Highcharts = Highcharts;
 
@@ -94,6 +95,11 @@ function CustomOfflineChart(props) {
                 return obj[realKey].startsWith('<');
             }
             if (typeof dataObj === 'object') {
+                // We've already marked this object as having censored data
+                if (dataObj[HAS_CENSORED_DATA_MARKER]) {
+                    return true;
+                }
+
                 return Object.values(dataObj).some((datum) => {
                     // datum is either going to be one of three things:
                     // 1. an array of objects
@@ -129,6 +135,7 @@ function CustomOfflineChart(props) {
             return false;
         }
         const isCensored = hasCensoredData(dataObject);
+        const { [HAS_CENSORED_DATA_MARKER]: _, ...dataObjectToUse } = dataObject;
         const censorshipCaption = isCensored
             ? {
                   align: 'left',
@@ -147,7 +154,7 @@ function CustomOfflineChart(props) {
                 // Stacked Bar Chart
                 const data = new Map();
                 let categories = [];
-                const thisData = dataObject === '' ? dataVis[chartData] : dataObject;
+                const thisData = dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse;
 
                 Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
@@ -226,9 +233,9 @@ function CustomOfflineChart(props) {
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                let entries = Object.keys((dataObject === '' ? dataVis[chartData] : dataObject) || []).map((key) => [
+                let entries = Object.keys((dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse) || []).map((key) => [
                     key,
-                    dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                    dataObjectToUse === '' ? dataVis[chartData][key] : dataObjectToUse[key]
                 ]);
 
                 // Order & truncate the categories by the data
@@ -325,9 +332,9 @@ function CustomOfflineChart(props) {
                     },
                     series: [
                         {
-                            data: Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => ({
+                            data: Object.keys(dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse).map((key) => ({
                                 name: key,
-                                y: dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                                y: dataObjectToUse === '' ? dataVis[chartData][key] : dataObjectToUse[key]
                             }))
                         }
                     ],

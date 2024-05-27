@@ -9,7 +9,7 @@ import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
 import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
-import { aggregateObj, aggregateObjStack } from 'utils/utils';
+import { aggregateObj, aggregateKatsuObj, aggregateObjStack } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
@@ -85,7 +85,7 @@ function Summary() {
                         );
                         break;
                     case '/primary_site_count':
-                        setPrimarySiteCount((oldPrimarySiteCount) => aggregateObj(stat.results, oldPrimarySiteCount));
+                        setPrimarySiteCount((oldPrimarySiteCount) => aggregateKatsuObj(stat.results, oldPrimarySiteCount));
                         break;
                     case '/treatment_type_count':
                         setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
