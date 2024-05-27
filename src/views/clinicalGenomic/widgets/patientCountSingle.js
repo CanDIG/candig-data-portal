@@ -62,14 +62,15 @@ function PatientCountSingle(props) {
                 if (typeof cohortTotal === 'object') {
                     // New notation
                     if (cohortTotal.patients_count.startsWith('<')) {
-                        return [partialSum[0], partialSum[1] + parseInt(cohortTotal.patients_count.substr(1), 10)];
+                        return [partialSum[0], partialSum[1] + parseInt(cohortTotal.patients_count.substring(1), 10)];
                     }
-                    return partialSum + parseInt(cohortTotal.patients_count, 10);
+                    const toAdd = parseInt(cohortTotal.patients_count, 10);
+                    return [partialSum[0] + toAdd, partialSum[1] + toAdd];
                 }
                 if (typeof cohortTotal === 'string' && cohortTotal.startsWith('<')) {
-                    return [partialSum[0], partialSum[1] + parseInt(cohortTotal.substr(1), 10)];
+                    return [partialSum[0], partialSum[1] + parseInt(cohortTotal.substring(1), 10)];
                 }
-                return [partialSum[0] + cohortTotal, partialSum[1] + cohortTotal];
+                return [partialSum[0] + parseInt(cohortTotal, 10), partialSum[1] + parseInt(cohortTotal, 10)];
             },
             [0, 0]
         );
