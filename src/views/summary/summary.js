@@ -61,6 +61,19 @@ function Summary() {
                     return;
                 }
 
+                // Invert an array looking like:
+                // [{_count: "<5", program_id: "TEST_2"}, { ... }]
+                // into { TEST_2: 0, ... }
+                const invertkatsu = (array) => {
+                    const retVal = {};
+                    array.forEach((item) => {
+                        const countKey = Object.keys(item).find((key) => key.endsWith('_count'));
+                        const nameKey = Object.keys(item).find((key) => !key.endsWith('_count'));
+                        retVal[item[nameKey]] = item[countKey].startsWith('<') ? 0 : parseInt(item[countKey], 10);
+                    });
+                    return retVal;
+                };
+
                 switch (endpoint) {
                     case '/individual_count':
                         setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
@@ -68,7 +81,7 @@ function Summary() {
                             if (!(stat.location['province-code'] in candigDataSouceCollection)) {
                                 candigDataSouceCollection[stat.location['province-code']] = 0;
                             }
-                            candigDataSouceCollection[stat.location['province-code']] += stat.results.individual_count;
+                            candigDataSouceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
 
                             if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
@@ -81,17 +94,17 @@ function Summary() {
                         break;
                     case '/patients_per_cohort':
                         setPatientsPerCohort((oldPatientsPerCohort) =>
-                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => invertkatsu(stat.results))
                         );
                         break;
                     case '/primary_site_count':
                         setPrimarySiteCount((oldPrimarySiteCount) => aggregateKatsuObj(stat.results, oldPrimarySiteCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateKatsuObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateKatsuObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);

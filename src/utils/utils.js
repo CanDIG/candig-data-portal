@@ -26,10 +26,11 @@ export function aggregateKatsuObj(stat, aggregateObj, aggregator = (object, key)
         // Unroll Katsu's arrays into count objects
         // From Katsu: [{ primary_site_count: "<5", primary_site_name: "Thyroid Gland" }, ...]
         // To: "Thyroid Gland": 0
-        const typeName = Object.keys(element).find((name) => name.endsWith('name'));
+        const typeName = Object.keys(element).find((name) => !name.endsWith('_count'));
         const countName = Object.keys(element).find((name) => name.endsWith('_count'));
         if (!countName || !typeName) {
-            console.log(`Could not parse object: ${element}`);
+            console.log(`Could not parse object:`);
+            console.log(element);
             return;
         }
 
@@ -44,7 +45,6 @@ export function aggregateKatsuObj(stat, aggregateObj, aggregator = (object, key)
             count[HAS_CENSORED_DATA_MARKER] = true;
         }
     });
-    console.log(count);
     return count;
 }
 
