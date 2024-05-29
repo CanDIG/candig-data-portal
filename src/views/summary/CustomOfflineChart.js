@@ -143,7 +143,8 @@ function CustomOfflineChart(props) {
             ? {
                   align: 'left',
                   verticalAlign: 'bottom',
-                  text: isCensored ? 'Attention: Totals do not include counts of less than 5 from any node' : '',
+                  text: isCensored ? '<b>Attention</b>: Totals do not include counts of less than 5 from any node' : '',
+                  useHTML: true,
                   style: {
                       color: 'gray'
                   }
