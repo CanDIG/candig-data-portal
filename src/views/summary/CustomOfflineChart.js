@@ -92,6 +92,9 @@ function CustomOfflineChart(props) {
         function hasCensoredData(dataObj) {
             function isObjectCensored(obj) {
                 const realKey = Object.keys(obj).find((thisName) => thisName.endsWith('_count'));
+                if (!realKey) {
+                    return false;
+                }
                 return obj[realKey].startsWith('<');
             }
             if (typeof dataObj === 'object') {
