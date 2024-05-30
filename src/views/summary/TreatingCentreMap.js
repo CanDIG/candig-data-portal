@@ -38,7 +38,10 @@ const initialState = {
                 }
             }
         }
-    ]
+    ],
+    exporting: {
+        enabled: false
+    }
 };
 
 function reducer(state, action) {

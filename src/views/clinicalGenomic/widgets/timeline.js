@@ -625,7 +625,10 @@ function Timeline({ data, onEventClick }) {
                     }
                 }
             },
-            series: Updatedseries
+            series: Updatedseries,
+            exporting: {
+                enabled: false
+            }
         });
 
         setChartOptions((prevOptions) => ({
