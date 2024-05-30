@@ -490,7 +490,7 @@ function Sidebar() {
                     Reset Filters
                 </Button>
             </div>
-            <SidebarGroup name="Node">
+            {/* <SidebarGroup name="Node">
                 <StyledCheckboxList
                     options={sites}
                     onWrite={writerContext}
@@ -509,7 +509,7 @@ function Sidebar() {
                     checked={selectedCohorts}
                     setChecked={setSelectedCohorts}
                 />
-            </SidebarGroup>
+            </SidebarGroup> */}
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}
