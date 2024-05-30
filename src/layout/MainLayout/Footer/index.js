@@ -277,10 +277,10 @@ function Footer(props) {
                         </div>
                     </div>
                 </div>
-	    {/*
+	    { /*············
 	    <a href="https://www.marathonofhopecancercentres.ca/" target="_blank" rel="noreferrer">
                     <img src={MOHLogo} alt="MOH logo hyperlink" style={{ position: 'relative', top: '-1em', width: '6.5em' }} />
-                </a>*/}
+                </a>············*/ }
             </ResponsiveFundingContainer>
         </ResponsiveFooterContainer>
     );
