@@ -19,18 +19,41 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
+import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
 
 function DataVisualization() {
     // Hooks
     const resultsContext = useSearchResultsReaderContext().counts;
     // Plan for context below see current dataVis for expected shape
     // const dataVis = resultsContext || {};
-    const dataVis = {
-        patients_per_cohort: resultsContext?.patients_per_cohort || {},
-        diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
-        treatment_type_count: resultsContext?.treatment_type_count || {},
-        primary_site_count: resultsContext?.primary_site_count || {}
+    const handleCensoring = (dataObj) => {
+        if (dataObj === null || typeof dataObj === 'undefined') {
+            return {};
+        }
+
+        let hasCensoredData = false;
+        const newDataObj = {};
+        Object.keys(dataObj).forEach((key) => {
+            if (typeof dataObj[key] === 'string' && dataObj[key].startsWith('<')) {
+                newDataObj[key] = 0;
+                hasCensoredData = true;
+            } else {
+                newDataObj[key] = dataObj[key];
+            }
+        });
+        if (hasCensoredData) {
+            newDataObj[HAS_CENSORED_DATA_MARKER] = true;
+        }
+        return newDataObj;
     };
+
+    const dataVis = {
+        patients_per_cohort: handleCensoring(resultsContext?.patients_per_cohort) || {},
+        diagnosis_age_count: handleCensoring(resultsContext?.diagnosis_age_count) || {},
+        treatment_type_count: handleCensoring(resultsContext?.treatment_type_count) || {},
+        primary_site_count: handleCensoring(resultsContext?.primary_site_count) || {}
+    };
+    console.log(dataVis);
     const theme = useTheme();
 
     // State management

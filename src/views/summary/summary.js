@@ -9,7 +9,7 @@ import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
 import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
-import { aggregateObj, aggregateKatsuObj, aggregateObjStack } from 'utils/utils';
+import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
@@ -60,19 +60,6 @@ function Summary() {
                     // Something went wrong
                     return;
                 }
-
-                // Invert an array looking like:
-                // [{_count: "<5", program_id: "TEST_2"}, { ... }]
-                // into { TEST_2: 0, ... }
-                const invertkatsu = (array) => {
-                    const retVal = {};
-                    array.forEach((item) => {
-                        const countKey = Object.keys(item).find((key) => key.endsWith('_count'));
-                        const nameKey = Object.keys(item).find((key) => !key.endsWith('_count'));
-                        retVal[item[nameKey]] = item[countKey].startsWith('<') ? 0 : parseInt(item[countKey], 10);
-                    });
-                    return retVal;
-                };
 
                 switch (endpoint) {
                     case '/individual_count':

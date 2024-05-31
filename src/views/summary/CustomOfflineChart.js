@@ -18,6 +18,7 @@ import { IconTrash } from '@tabler/icons-react';
 import MainCard from 'ui-component/cards/MainCard';
 import { DataVisualizationChartInfo, validCharts, validStackedCharts } from 'store/constant';
 import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
+import config from 'config';
 
 window.Highcharts = Highcharts;
 
@@ -91,6 +92,10 @@ function CustomOfflineChart(props) {
         // Determine whether or not there exists censored data in the object provided
         function hasCensoredData(dataObj) {
             function isObjectCensored(obj) {
+                if (dataObj[HAS_CENSORED_DATA_MARKER]) {
+                    return true;
+                }
+
                 const realKey = Object.keys(obj).find((thisName) => thisName.endsWith('_count'));
                 if (!realKey) {
                     return false;
@@ -137,13 +142,15 @@ function CustomOfflineChart(props) {
             // Usually if the data is undefined we'll get here: return false
             return false;
         }
-        const isCensored = hasCensoredData(dataObject);
-        const { [HAS_CENSORED_DATA_MARKER]: _, ...dataObjectToUse } = dataObject;
+        const isCensored = hasCensoredData(dataObject === '' ? dataVis[chartData] : dataObject);
+        const { [HAS_CENSORED_DATA_MARKER]: _, ...dataObjectToUse } = dataObject === '' ? dataVis[chartData] : dataObject;
         const censorshipCaption = isCensored
             ? {
                   align: 'left',
                   verticalAlign: 'bottom',
-                  text: isCensored ? '<b>Attention</b>: Totals do not include counts of less than 5 from any node' : '',
+                  text: isCensored
+                      ? `<b>Attention</b>: Totals do not include counts of less than ${config.aggregateThreshold} from any node`
+                      : '',
                   useHTML: true,
                   style: {
                       color: 'gray'
@@ -158,7 +165,7 @@ function CustomOfflineChart(props) {
                 // Stacked Bar Chart
                 const data = new Map();
                 let categories = [];
-                const thisData = dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse;
+                const thisData = dataObjectToUse;
 
                 Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
@@ -237,7 +244,7 @@ function CustomOfflineChart(props) {
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                let entries = Object.keys((dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse) || []).map((key) => [
+                let entries = Object.keys(dataObjectToUse || []).map((key) => [
                     key,
                     dataObjectToUse === '' ? dataVis[chartData][key] : dataObjectToUse[key]
                 ]);
@@ -336,9 +343,9 @@ function CustomOfflineChart(props) {
                     },
                     series: [
                         {
-                            data: Object.keys(dataObjectToUse === '' ? dataVis[chartData] : dataObjectToUse).map((key) => ({
+                            data: Object.keys(dataObjectToUse).map((key) => ({
                                 name: key,
-                                y: dataObjectToUse === '' ? dataVis[chartData][key] : dataObjectToUse[key]
+                                y: dataObjectToUse[key]
                             }))
                         }
                     ],

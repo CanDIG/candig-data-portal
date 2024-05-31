@@ -20,6 +20,24 @@ export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => o
 
 export const HAS_CENSORED_DATA_MARKER = '__HAS_CENSORED_DATA';
 
+// Invert an array looking like:
+// [{_count: "<5", program_id: "TEST_2"}, { ... }]
+// into { TEST_2: 0, ... }
+export function invertkatsu(array) {
+    const retVal = {};
+    array.forEach((item) => {
+        const countKey = Object.keys(item).find((key) => key.endsWith('_count'));
+        const nameKey = Object.keys(item).find((key) => !key.endsWith('_count'));
+        if (item[countKey].startsWith('<')) {
+            retVal[item[nameKey]] = 0;
+            retVal[HAS_CENSORED_DATA_MARKER] = true;
+        } else {
+            retVal[item[nameKey]] = parseInt(item[countKey], 10);
+        }
+    });
+    return retVal;
+}
+
 export function aggregateKatsuObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
     const count = { ...aggregateObj };
     stat.forEach((element) => {
