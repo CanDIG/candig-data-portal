@@ -50,7 +50,10 @@ const classes = {
     name: `${PREFIX}-name`,
     ScrollHeight: `${PREFIX}-ScrollHeight`,
     badgeWarning: `${PREFIX}-badgeWarning`,
-    usernamePadding: `${PREFIX}-usernamePadding`
+    loggedInAs: `${PREFIX}-loggedInAs`,
+    usernamePadding: `${PREFIX}-usernamePadding`,
+    username: `${PREFIX}-username`,
+    smallAvatar: `${PREFIX}-smallAvatar`
 };
 
 const ChipRoot = styled(Chip)(({ theme }) => ({
@@ -148,6 +151,21 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
 
     [`& .${classes.usernamePadding}`]: {
         paddingBottom: '1em'
+    },
+
+    [`& .${classes.loggedInAs}`]: {
+        fontSize: 18
+    },
+
+    [`& .${classes.username}`]: {
+        fontSize: 16
+    },
+
+    [`& .${classes.smallAvatar}`]: {
+        cursor: 'pointer',
+        ...theme.typography.mediumAvatar,
+        marginLeft: 'auto',
+        marginRight: 0
     }
 }));
 
@@ -262,15 +280,30 @@ function ProfileSection() {
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
                                     <CardContent className={classes.cardContent}>
-                                        <Grid container direction="column" spacing={0}>
-                                            <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Hello,</Typography>
-                                                <Typography component="span" variant="h4" className={classes.name}>
-                                                    {username}
-                                                </Typography>
+                                        <Grid container direction="row" spacing={0}>
+                                            <Grid item xs={8} className={classes.flex}>
+                                                <Grid container direction="column" spacing={0}>
+                                                    <Grid item className={classes.flex}>
+                                                        <Typography variant="h4" className={classes.loggedInAs}>
+                                                            Logged in as:
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item className={classes.usernamePadding}>
+                                                        <Typography variant="body1" className={classes.username}>
+                                                            {username}, {SITE}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item className={classes.usernamePadding}>
-                                                <Typography variant="subtitle2">{SITE}</Typography>
+                                            <Grid item xs={4} className={classes.flex}>
+                                                <Avatar
+                                                    src={setSite()}
+                                                    className={classes.smallAvatar}
+                                                    ref={anchorRef}
+                                                    aria-controls={open ? 'menu-list-grow' : undefined}
+                                                    aria-haspopup="true"
+                                                    color="inherit"
+                                                />
                                             </Grid>
                                         </Grid>
                                         <Divider />
