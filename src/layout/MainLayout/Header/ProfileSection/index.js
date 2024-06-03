@@ -161,6 +161,8 @@ function ProfileSection() {
 
     const [open, setOpen] = useState(false);
 
+    const [username, setUsername] = useState('');
+
     const anchorRef = React.useRef(null);
 
     const handleToggle = () => {
@@ -182,6 +184,25 @@ function ProfileSection() {
 
         prevOpen.current = open;
     }, [open]);
+
+    // Grab the user key for the logged in user
+    useEffect(() => {
+        fetch(`/query/whoami`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                console.log(`whoami could not determine logged in user: ${response}`);
+                throw new Error(`${response}`);
+            })
+            .then((response) => {
+                setUsername(response?.key);
+            })
+            .catch((error) => {
+                console.log(`Whoami error: ${error}`);
+                return '';
+            });
+    }, []);
 
     const setSite = () => {
         switch (SITE) {
@@ -243,10 +264,10 @@ function ProfileSection() {
                                     <CardContent className={classes.cardContent}>
                                         <Grid container direction="column" spacing={0}>
                                             <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Hello!</Typography>
-                                                {/* <Typography component="span" variant="h4" className={classes.name}>
-                                                    First Name Last Name
-                                                </Typography> */}
+                                                <Typography variant="h4">Hello,</Typography>
+                                                <Typography component="span" variant="h4" className={classes.name}>
+                                                    {username}
+                                                </Typography>
                                             </Grid>
                                             <Grid item className={classes.usernamePadding}>
                                                 <Typography variant="subtitle2">{SITE}</Typography>
