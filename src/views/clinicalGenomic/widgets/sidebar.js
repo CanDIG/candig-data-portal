@@ -457,8 +457,8 @@ function Sidebar() {
     };
 
     // Parse out what we need:
-    const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    const cohorts = readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || [];
+    // const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
+    // const cohorts = readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');

@@ -95,8 +95,8 @@ function ClinicalView() {
 
     const totalRows = searchResults
         ? Object.values(searchResults)
-            ?.map((site) => site.count)
-            .reduce((partial, a) => partial + a, 0)
+              ?.map((site) => site.count)
+              .reduce((partial, a) => partial + a, 0)
         : 0;
 
     return (
