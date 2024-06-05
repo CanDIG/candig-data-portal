@@ -53,7 +53,6 @@ function DataVisualization() {
         treatment_type_count: handleCensoring(resultsContext?.treatment_type_count) || {},
         primary_site_count: handleCensoring(resultsContext?.primary_site_count) || {}
     };
-    console.log(dataVis);
     const theme = useTheme();
 
     // State management

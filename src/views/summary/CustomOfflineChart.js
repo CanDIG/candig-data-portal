@@ -143,7 +143,11 @@ function CustomOfflineChart(props) {
             return false;
         }
         const isCensored = hasCensoredData(dataObject === '' ? dataVis[chartData] : dataObject);
-        const { [HAS_CENSORED_DATA_MARKER]: _, ...dataObjectToUse } = dataObject === '' ? dataVis[chartData] : dataObject;
+        let dataObjectToUse;
+        if (dataObject === '' ? typeof dataVis[chartData] !== 'undefined' : typeof dataObject !== 'undefined') {
+            const { [HAS_CENSORED_DATA_MARKER]: _, ...rest } = dataObject === '' ? dataVis[chartData] : dataObject;
+            dataObjectToUse = rest;
+        }
         const censorshipCaption = isCensored
             ? {
                   align: 'left',
