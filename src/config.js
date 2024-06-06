@@ -4,6 +4,7 @@ const config = {
     basename: process.env.REACT_APP_BASE_NAME,
     defaultPath: process.env.REACT_APP_BASE_NAME,
     candigVersion: process.env.REACT_APP_CANDIG_VERSION,
+    aggregateThreshold: process.env.REACT_APP_AGGREGATE_COUNT_THRESHOLD,
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12
 };
