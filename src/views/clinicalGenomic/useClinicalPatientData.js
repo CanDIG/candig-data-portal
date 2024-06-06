@@ -56,10 +56,7 @@ function useClinicalPatientData(patientId, programId, location) {
 
                     const result = await fetchFederation(url, 'katsu');
                     // Extract patientData from the fetched result or use an empty object
-                    const matchingObj = result.find((obj) => {
-                        const match = obj.location && obj.location.name === location;
-                        return match;
-                    });
+                    const matchingObj = result.find((obj) => obj.location?.name === location);
 
                     const patientData = matchingObj ? matchingObj.results : {};
 
