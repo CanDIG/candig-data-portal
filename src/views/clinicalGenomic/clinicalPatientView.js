@@ -36,7 +36,8 @@ function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
-    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId);
+    const [location, setLocation] = useState('');
+    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId, location);
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
     const dateOfBirth = data?.date_of_birth;
 
@@ -51,10 +52,12 @@ function ClinicalPatientView() {
         // Extract patientId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const initialPatientId = urlParams.get('patientId');
-        const initialProgramId = urlParams.get('programId');
+        const intitalProgramId = urlParams.get('programId');
+        const initiallocation = urlParams.get('location');
 
         setPatientId(initialPatientId || '');
-        setProgramId(initialProgramId || '');
+        setProgramId(intitalProgramId || '');
+        setLocation(initiallocation || '');
     }, []);
 
     const additionalClass = 'your-additional-class'; // Replace with your actual class
