@@ -24,6 +24,7 @@ function ClinicalView() {
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
+
     if (searchResults) {
         rows =
             Object.values(searchResults)
@@ -31,9 +32,9 @@ function ClinicalView() {
                 ?.flat(1)
                 ?.map((patient, index) => {
                     // Make sure each row has an ID and a deceased status
+                    console.log(patient.location);
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
-                    patient.location = Object.keys(searchResults)[0] || 'Unknown';
                     if (patient?.date_resolution === 'month') {
                         if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
                             const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;

@@ -58,7 +58,6 @@ function useClinicalPatientData(patientId, programId, location) {
                     // Extract patientData from the fetched result or use an empty object
                     const matchingObj = result.find((obj) => {
                         const match = obj.location && obj.location.name === location;
-                        // Debugging: Print the object being checked and whether it matches
                         return match;
                     });
 
