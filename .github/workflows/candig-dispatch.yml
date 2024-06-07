@@ -30,7 +30,7 @@ jobs:
                       print(escaped)    
                   with open(os.environ['GITHUB_ENV'], 'a') as fh:
                       print(f'PR_TITLE={escaped}', file=fh)
-                      print(f'PR_NUMBER={pr_number}', file=fh
+                      print(f'PR_NUMBER={pr_number}', file=fh)
             - name: Create PR in CanDIGv2
               id: make_pr
               uses: CanDIG/github-action-pr-expanded@v4
