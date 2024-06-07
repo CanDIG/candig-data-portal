@@ -26,9 +26,11 @@ jobs:
                       event = json.load(fh)
                       pprint.pprint(event)
                       escaped = shlex.quote(event['pull_request']['title'])
+                      pr_number = event["number"]
                       print(escaped)    
                   with open(os.environ['GITHUB_ENV'], 'a') as fh:
                       print(f'PR_TITLE={escaped}', file=fh)
+                      print(f'PR_NUMBER={pr_number}', file=fh
             - name: Create PR in CanDIGv2
               id: make_pr
               uses: CanDIG/github-action-pr-expanded@v4
@@ -38,6 +40,6 @@ jobs:
                   checkout_branch: ${{ env.CHECKOUT_BRANCH}}
                   pr_against_branch: ${{ env.PR_AGAINST_BRANCH }}
                   pr_title: "${{ github.repository }} merging: ${{ env.PR_TITLE }}"
-                  pr_description: "PR triggered by update to develop branch on ${{ github.repository }}. Commit hash: `${{ github.sha }}`. PR link: [#${{ fromJson(steps.get_pr_data.outputs.result).number }}](https://github.com/${{ github.repository }}/pull/${{ fromJson(steps.get_pr_data.outputs.result).number }})"
+                  pr_description: "PR triggered by update to develop branch on ${{ github.repository }}. Commit hash: `${{ github.sha }}`. PR link: [#${{ env.PR_NUMBER }}](https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }})"
                   owner: ${{ env.OWNER }}
                   submodule_path: lib/candig-data-portal/candig-data-portal
