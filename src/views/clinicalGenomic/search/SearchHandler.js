@@ -4,7 +4,6 @@ import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
-import { invertkatsu } from 'utils/utils';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -41,7 +40,14 @@ function SearchHandler() {
         );
     }, []);
 
-    // Query 2: when the search query changes, re-query the server
+    // Query 2: when the search query changes (but not the page number), re-query the discovery stats
+    const { ...queryNoPageSize } = reader.query || {};
+    if (queryNoPageSize.page) {
+        delete queryNoPageSize.page;
+    }
+    if (queryNoPageSize.page_size) {
+        delete queryNoPageSize.page_size;
+    }
     useEffect(() => {
         // First, we abort any currently-running search promises
         const CollateSummary = (data, statName) => {
@@ -63,48 +69,56 @@ function SearchHandler() {
             return summaryStat;
         };
 
+        const discoveryPromise = () =>
+            queryDiscovery(queryNoPageSize, controller.signal).then((data) => {
+                if (reader.filter?.node) {
+                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                }
+
+                const discoveryCounts = {
+                    diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
+                    treatment_type_count: CollateSummary(data, 'treatment_type_count'),
+                    primary_site_count: CollateSummary(data, 'primary_site_count'),
+                    patients_per_cohort: {}
+                };
+                data.forEach((site) => {
+                    discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
+                });
+
+                writer((old) => ({ ...old, counts: discoveryCounts }));
+            });
+
+        if (lastPromise === null) {
+            lastPromise = discoveryPromise();
+        } else {
+            lastPromise.then(discoveryPromise);
+        }
+    }, [JSON.stringify(queryNoPageSize), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic), JSON.stringify(reader.filter)]);
+
+    // Query 2: when the search query changes, re-query the server
+    useEffect(() => {
         const donorQueryPromise = () =>
-            queryDiscovery(reader.query, controller.signal)
-                .then((data) => {
-                    if (reader.filter?.node) {
-                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                    }
+            query(reader.query, controller.signal).then((data) => {
+                if (reader.filter?.node) {
+                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                }
+                // Reorder the data, and fill out the patients per cohort
+                const clinicalData = {};
+                data.forEach((site) => {
+                    clinicalData[site.location.name] = site?.results;
+                });
 
-                    const discoveryCounts = {
-                        diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
-                        treatment_type_count: CollateSummary(data, 'treatment_type_count'),
-                        primary_site_count: CollateSummary(data, 'primary_site_count'),
-                        patients_per_cohort: {}
-                    };
-                    data.forEach((site) => {
-                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
-                    });
+                const genomicData = data
+                    .map((site) =>
+                        site.results.genomic?.map((caseData) => {
+                            caseData.location = site.location;
+                            return caseData;
+                        })
+                    )
+                    .flat(1);
 
-                    writer((old) => ({ ...old, counts: discoveryCounts }));
-                })
-                .then(() =>
-                    query(reader.query, controller.signal).then((data) => {
-                        if (reader.filter?.node) {
-                            data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                        }
-                        // Reorder the data, and fill out the patients per cohort
-                        const clinicalData = {};
-                        data.forEach((site) => {
-                            clinicalData[site.location.name] = site?.results;
-                        });
-
-                        const genomicData = data
-                            .map((site) =>
-                                site.results.genomic?.map((caseData) => {
-                                    caseData.location = site.location;
-                                    return caseData;
-                                })
-                            )
-                            .flat(1);
-
-                        writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
-                    })
-                );
+                writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+            });
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
