@@ -4,7 +4,6 @@ import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
-import { invertkatsu } from 'utils/utils';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
