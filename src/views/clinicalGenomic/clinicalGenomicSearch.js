@@ -64,7 +64,7 @@ const Root = styled('div')(({ _ }) => ({
     }
 }));
 
-const StyledMainCard = styled(MainCard)(({ theme }) => ({
+const StyledMainCard = styled(MainCard)((_) => ({
     display: 'flex',
     justifyContent: 'center',
     backgroundColor: 'white',

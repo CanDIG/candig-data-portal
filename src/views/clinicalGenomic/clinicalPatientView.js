@@ -4,7 +4,6 @@ import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
-import clsx from 'clsx';
 
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
