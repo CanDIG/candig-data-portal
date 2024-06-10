@@ -89,11 +89,7 @@ function TreatingCentreMap({ data }) {
 
     return (
         <MainCard>
-            {promiseInProgress ? (
-                <LoadingIndicator />
-            ) : (
-                <HighchartsReact options={chartOptions} highcharts={Highcharts} constructorType="mapChart" />
-            )}
+            <HighchartsReact options={chartOptions} highcharts={Highcharts} constructorType="mapChart" />
         </MainCard>
     );
 }

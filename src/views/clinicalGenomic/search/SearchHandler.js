@@ -5,7 +5,6 @@ import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
-import { invertkatsu } from 'utils/utils';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -39,7 +38,7 @@ function SearchHandler({ setLoading }) {
                 .then((data) => {
                     writer((old) => ({ ...old, genes: data?.results }));
                 })
-                .finally(setLoading(false)),
+                .finally(() => setLoading(false)),
             'federation'
         );
     }, []);
@@ -100,7 +99,7 @@ function SearchHandler({ setLoading }) {
 
                     writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData, loading: false }));
                 })
-                .finally(setLoading(false));
+                .finally(() => setLoading(false));
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
@@ -122,7 +121,7 @@ function SearchHandler({ setLoading }) {
                 .then((data) => {
                     writer((old) => ({ ...old, donor: data }));
                 })
-                .finally(setLoading(false)),
+                .finally(() => setLoading(false)),
             'donor'
         );
     }, [JSON.stringify(reader.donorID)]);

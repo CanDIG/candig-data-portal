@@ -14,7 +14,6 @@ import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
-import { usePromiseTracker } from 'react-promise-tracker';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -105,12 +104,10 @@ function ClinicalGenomicSearch() {
     const sidebarOpened = customization.opened;
 
     const [isLoading, setLoading] = useState(true);
-    const { promiseInProgress } = usePromiseTracker(isLoading);
 
     // When we load, set the sidebar component
     useEffect(() => {
         sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
-        console.log('Promise in progress: ', isLoading);
     }, [sidebarWriter]);
 
     return (
@@ -142,7 +139,7 @@ function ClinicalGenomicSearch() {
                 </Toolbar>
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
-            <SearchHandler setLoading={() => setLoading()} />
+            <SearchHandler setLoading={setLoading} />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
                 {sections.map((section) => (
                     <div key={section.id}>
