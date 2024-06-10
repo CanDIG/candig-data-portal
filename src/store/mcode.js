@@ -283,6 +283,7 @@ export const processCondtionsListData = (dataObject) => {
 
 /**
  * Process data for cancerType list
+ * NB: Unused?
  * @param {*} dataObject
  * @returns a list of cancerType valid for dropdown
  */

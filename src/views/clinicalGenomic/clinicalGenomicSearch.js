@@ -153,7 +153,7 @@ function ClinicalGenomicSearch() {
                             <StyledMainCard
                                 key={section.id}
                                 border
-                                sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                                sx={{ borderRadius: customization.borderRadius * 0.25 }}
                                 contentClass={{ padding: '16px !important' }}
                             >
                                 <SearchIndicator />

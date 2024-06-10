@@ -9,7 +9,7 @@ import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
 import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
-import { aggregateObj, aggregateObjStack } from 'utils/utils';
+import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
@@ -22,7 +22,7 @@ function Summary() {
 
     const [provinceCounter, setProvinceCount] = useState(0);
     const [individualCount, setIndividualCount] = useState(undefined);
-    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [primarySiteCount, setPrimarySiteCount] = useState(undefined);
     const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
     const [cohortCount, setCohortCount] = useState(undefined);
     const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
@@ -68,7 +68,7 @@ function Summary() {
                             if (!(stat.location['province-code'] in candigDataSouceCollection)) {
                                 candigDataSouceCollection[stat.location['province-code']] = 0;
                             }
-                            candigDataSouceCollection[stat.location['province-code']] += stat.results.individual_count;
+                            candigDataSouceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
 
                             if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
@@ -81,17 +81,17 @@ function Summary() {
                         break;
                     case '/patients_per_cohort':
                         setPatientsPerCohort((oldPatientsPerCohort) =>
-                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => invertkatsu(stat.results))
                         );
                         break;
-                    case '/cancer_type_count':
-                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
+                    case '/primary_site_count':
+                        setPrimarySiteCount((oldPrimarySiteCount) => aggregateKatsuObj(stat.results, oldPrimarySiteCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateKatsuObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateKatsuObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);
@@ -159,7 +159,7 @@ function Summary() {
         }
 
         fetchData('/individual_count')
-            .then(() => fetchData('/cancer_type_count'))
+            .then(() => fetchData('/primary_site_count'))
             .then(() => fetchData('/cohort_count'))
             .then(() => fetchData('/patients_per_cohort'))
             .then(() => fetchData('/treatment_type_count'))
@@ -257,13 +257,13 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={cancerTypeCount || {}}
-                    data="cancer_type_count"
+                    dataObject={primarySiteCount || {}}
+                    data="primary_site_count"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={cancerTypeCount === undefined}
+                    loading={primarySiteCount === undefined}
                     orderByFrequency
                     cutoff={10}
                 />

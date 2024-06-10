@@ -7,9 +7,10 @@ import PatientSidebar from './widgets/patientSidebar';
  * Custom hook to fetch and manage clinical patient data.
  * @param {string} patientId - The ID of the patient.
  * @param {string} programId - The ID of the program.
+ * @param {string} location - The location of the patient.
  * @returns {Object} - An object containing data, rows, columns, title, and topLevel.
  */
-function useClinicalPatientData(patientId, programId) {
+function useClinicalPatientData(patientId, programId, location) {
     // Access the SidebarContext to update the sidebar with patient information
     const sidebarWriter = useSidebarWriterContext();
 
@@ -55,7 +56,10 @@ function useClinicalPatientData(patientId, programId) {
 
                     const result = await fetchFederation(url, 'katsu');
                     // Extract patientData from the fetched result or use an empty object
-                    const patientData = result[0].results || {};
+                    const matchingObj = result.find((obj) => obj.location?.name === location);
+
+                    const patientData = matchingObj ? matchingObj.results : {};
+
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
 
@@ -127,7 +131,7 @@ function useClinicalPatientData(patientId, programId) {
         };
 
         fetchData();
-    }, [patientId, programId, sidebarWriter]);
+    }, [patientId, programId, location, sidebarWriter]);
 
     return { data, rows, columns, title, topLevel, setRows, setColumns, setTitle, setTopLevel };
 }

@@ -27,7 +27,7 @@ export const treatmentTypeCount = {
     Gum: 3
 };
 
-export const cancerTypeCount = {
+export const primarySiteCount = {
     'Breast C50.9': 50,
     'Ovary C56.9': 5,
     'Trachea C33': 30,
@@ -130,7 +130,7 @@ export const DataVisualizationChartInfo = {
         xAxis: 'Treatment Type',
         yAxis: 'Number of Treatments'
     },
-    cancer_type_count: {
+    primary_site_count: {
         title: 'Tumour Primary Site Distribution',
         xAxis: 'Primary Site',
         yAxis: 'Number of Primary Sites'
