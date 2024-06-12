@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, query } from 'store/api';
+import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -50,7 +50,7 @@ function SearchHandler({ setLoading }) {
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
-                const thisStat = site.results?.summary?.[statName];
+                const thisStat = site.results?.[statName];
                 if (!thisStat) {
                     return;
                 }
@@ -67,39 +67,49 @@ function SearchHandler({ setLoading }) {
         };
 
         const donorQueryPromise = () =>
-            query(reader.query, controller.signal)
+            queryDiscovery(reader.query, controller.signal)
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
                     }
 
-                    // We need to collate the discovery statistics from each site
                     const discoveryCounts = {
                         diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
                         treatment_type_count: CollateSummary(data, 'treatment_type_count'),
                         primary_site_count: CollateSummary(data, 'primary_site_count'),
                         patients_per_cohort: {}
                     };
-
-                    // Reorder the data, and fill out the patients per cohort
-                    const clinicalData = {};
                     data.forEach((site) => {
-                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.summary?.patients_per_cohort;
-                        clinicalData[site.location.name] = site?.results;
+                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
                     });
 
-                    const genomicData = data
-                        .map((site) =>
-                            site.results.genomic?.map((caseData) => {
-                                caseData.location = site.location;
-                                return caseData;
-                            })
-                        )
-                        .flat(1);
-
-                    writer((old) => ({ ...old, clinical: clinicalData, counts: discoveryCounts, genomic: genomicData, loading: false }));
+                    writer((old) => ({ ...old, counts: discoveryCounts }));
                 })
-                .finally(() => setLoading(false));
+                .then(() =>
+                    query(reader.query, controller.signal)
+                        .then((data) => {
+                            if (reader.filter?.node) {
+                                data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                            }
+                            // Reorder the data, and fill out the patients per cohort
+                            const clinicalData = {};
+                            data.forEach((site) => {
+                                clinicalData[site.location.name] = site?.results;
+                            });
+
+                            const genomicData = data
+                                .map((site) =>
+                                    site.results.genomic?.map((caseData) => {
+                                        caseData.location = site.location;
+                                        return caseData;
+                                    })
+                                )
+                                .flat(1);
+
+                            writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+                        })
+                        .finally(() => setLoading(false))
+                );
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
