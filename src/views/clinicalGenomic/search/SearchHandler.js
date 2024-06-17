@@ -95,7 +95,7 @@ function SearchHandler() {
 
                         const genomicData = data
                             .map((site) =>
-                                site.results.genomic?.map((caseData) => {
+                                site.results?.genomic?.map((caseData) => {
                                     caseData.location = site.location;
                                     return caseData;
                                 })

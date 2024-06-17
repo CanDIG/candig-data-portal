@@ -60,7 +60,7 @@ function Completeness() {
             {numErrorNodes > 0 ? (
                 <Grid item xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
                     <Grid container>
-                        <Grid item xs={3} pr={1}>
+                        <Grid item xs={6} pr={1}>
                             <SmallCountCard
                                 title="Nodes"
                                 count={`${numNodes}/${numNodes + numErrorNodes}`}
@@ -68,7 +68,7 @@ function Completeness() {
                                 color={theme.palette.secondary.main}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={6}>
                             <SmallCountCard
                                 title="Connection Error"
                                 count={`${numErrorNodes}/${numNodes + numErrorNodes}`}
