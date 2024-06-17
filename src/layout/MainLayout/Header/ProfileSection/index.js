@@ -179,27 +179,18 @@ function ProfileSection() {
 
     const [username, setUsername] = useState('');
 
-    const anchorRef = React.useRef(null);
+    const anchorEl = React.useRef(null);
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
     };
     const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+        if (anchorEl?.current?.contains(event.target)) {
             return;
         }
 
         setOpen(false);
     };
-
-    const prevOpen = React.useRef(open);
-    useEffect(() => {
-        if (prevOpen.current === true && open === false) {
-            anchorRef.current.focus();
-        }
-
-        prevOpen.current = open;
-    }, [open]);
 
     // Grab the user key for the logged in user
     useEffect(() => {
@@ -240,7 +231,6 @@ function ProfileSection() {
                     <Avatar
                         src={setSite()}
                         className={classes.headerAvatar}
-                        ref={anchorRef}
                         aria-controls={open ? 'menu-list-grow' : undefined}
                         aria-haspopup="true"
                         color="inherit"
@@ -248,16 +238,16 @@ function ProfileSection() {
                 }
                 label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
                 variant="outlined"
-                ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
                 aria-haspopup="true"
                 onClick={handleToggle}
+                ref={anchorEl}
                 color="primary"
             />
             <PopperRoot
                 placement="bottom-end"
                 open={open}
-                anchorEl={anchorRef.current}
+                anchorEl={anchorEl.current}
                 role={undefined}
                 transition
                 className={classes.showOnTop}
@@ -297,7 +287,6 @@ function ProfileSection() {
                                                 <Avatar
                                                     src={setSite()}
                                                     className={classes.smallAvatar}
-                                                    ref={anchorRef}
                                                     aria-controls={open ? 'menu-list-grow' : undefined}
                                                     aria-haspopup="true"
                                                     color="inherit"
