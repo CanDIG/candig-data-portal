@@ -27,8 +27,8 @@ function Summary() {
     const [cohortCount, setCohortCount] = useState(undefined);
     const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
     const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
-    const [numClinicalComplete, setNumClinicalComplete] = useState({});
-    const [numGenomicComplete, setNumGenomicComplete] = useState({});
+    const [numClinicalComplete, setNumClinicalComplete] = useState(undefined);
+    const [numGenomicComplete, setNumGenomicComplete] = useState(undefined);
     const [connectionError, setConnectionError] = useState(0);
     const [sites, setSites] = useState(0);
     const [totalSites, setTotalSites] = useState(0);
