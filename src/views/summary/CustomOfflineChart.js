@@ -144,9 +144,15 @@ function CustomOfflineChart(props) {
         }
         const isCensored = hasCensoredData(dataObject === '' ? dataVis[chartData] : dataObject);
         let dataObjectToUse;
+        // Filter out anything with censored data
         if (dataObject === '' ? typeof dataVis[chartData] !== 'undefined' : typeof dataObject !== 'undefined') {
             const { [HAS_CENSORED_DATA_MARKER]: _, ...rest } = dataObject === '' ? dataVis[chartData] : dataObject;
             dataObjectToUse = rest;
+
+            // Also filter out any undefined options in the data object
+            dataObjectToUse = Object.keys(dataObjectToUse)
+                .filter((key) => typeof dataObjectToUse[key] !== 'undefined')
+                .reduce((finalObj, key) => Object.assign(finalObj, { [key]: dataObjectToUse[key] }), {});
         }
         const censorshipCaption = isCensored
             ? {
