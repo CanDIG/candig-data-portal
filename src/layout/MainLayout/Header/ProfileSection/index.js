@@ -19,9 +19,6 @@ import {
 } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 
-// third-party
-import PerfectScrollbar from 'react-perfect-scrollbar';
-
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
@@ -93,6 +90,7 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
         minWidth: '300px',
         backgroundColor: theme.palette.background.paper,
         borderRadius: '10px',
+        overflow: 'hidden',
         [theme.breakpoints.down('md')]: {
             minWidth: '100%'
         }
@@ -141,7 +139,7 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
     [`& .${classes.ScrollHeight}`]: {
         height: '100%',
         maxHeight: 'calc(100vh - 250px)',
-        overflowX: 'hidden'
+        overflow: 'hidden'
     },
 
     [`& .${classes.badgeWarning}`]: {
@@ -307,22 +305,19 @@ function ProfileSection() {
                                             </Grid>
                                         </Grid>
                                         <Divider />
-                                        <PerfectScrollbar className={classes.ScrollHeight}>
-                                            <Divider />
-                                            <List component="nav" className={classes.navContainer}>
-                                                <ListItemButton
-                                                    className={classes.listItem}
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 4}
-                                                    to="/auth/logout"
-                                                >
-                                                    <ListItemIcon>
-                                                        <IconLogout stroke={1.5} size="1.3rem" />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
-                                                </ListItemButton>
-                                            </List>
-                                        </PerfectScrollbar>
+                                        <List component="nav" className={classes.navContainer}>
+                                            <ListItemButton
+                                                className={classes.listItem}
+                                                sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                selected={selectedIndex === 4}
+                                                to="/auth/logout"
+                                            >
+                                                <ListItemIcon>
+                                                    <IconLogout stroke={1.5} size="1.3rem" />
+                                                </ListItemIcon>
+                                                <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                                            </ListItemButton>
+                                        </List>
                                     </CardContent>
                                 </MainCard>
                             </ClickAwayListener>
