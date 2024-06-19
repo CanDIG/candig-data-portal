@@ -74,6 +74,7 @@ function ClinicalView() {
             addLocationToPatients(searchResults);
 
             rows = Object.values(searchResults)
+                .filter((location) => typeof location !== 'undefined')
                 .flatMap((locationData) => locationData.results)
                 .map((patient, index) => {
                     patient.id = index;
@@ -148,6 +149,7 @@ function ClinicalView() {
 
     const totalRows = searchResults
         ? Object.values(searchResults)
+              ?.filter((location) => typeof location !== 'undefined')
               ?.map((site) => site.count)
               .reduce((partial, a) => partial + a, 0)
         : 0;

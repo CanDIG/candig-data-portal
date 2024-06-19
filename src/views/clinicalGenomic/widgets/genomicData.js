@@ -23,21 +23,27 @@ function GenomicData() {
     let rows = [];
     if (searchResults) {
         rows =
-            searchResults?.map((patient, index) => {
-                // Make sure each row has an ID
-                const retVal = { ...patient };
-                retVal.id = index;
-                retVal.genotypeLabel = patient.genotype.value;
-                if (patient.genotype.secondaryAlleleIds) {
-                    retVal.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
-                }
-                retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
-                retVal.location = patient.location.name;
+            searchResults
+                ?.map((patient, index) => {
+                    // Filter out undefined
+                    if (!patient) {
+                        return undefined;
+                    }
+                    // Make sure each row has an ID
+                    const retVal = { ...patient };
+                    retVal.id = index;
+                    retVal.genotypeLabel = patient.genotype.value;
+                    if (patient.genotype.secondaryAlleleIds) {
+                        retVal.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
+                    }
+                    retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
+                    retVal.location = patient.location.name;
 
-                // TODO: Fix the below with the actual normal ID
-                retVal.normalId = patient.biosampleId;
-                return retVal;
-            }) || [];
+                    // TODO: Fix the below with the actual normal ID
+                    retVal.normalId = patient.biosampleId;
+                    return retVal;
+                })
+                ?.filter((patient) => typeof patient !== 'undefined') || [];
     }
 
     // Tracks Screensize
