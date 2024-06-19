@@ -45,10 +45,10 @@ function SearchHandler({ setLoading }) {
 
     // Query 2: when the search query changes (but not the page number), re-query the discovery stats
     const { ...queryNoPageSize } = reader.query || {};
-    if (queryNoPageSize.page) {
+    if ('page' in queryNoPageSize) {
         delete queryNoPageSize.page;
     }
-    if (queryNoPageSize.page_size) {
+    if ('page_size' in queryNoPageSize) {
         delete queryNoPageSize.page_size;
     }
     useEffect(() => {
@@ -121,33 +121,8 @@ function SearchHandler({ setLoading }) {
                     )
                     .flat(1);
 
-                    writer((old) => ({ ...old, counts: discoveryCounts }));
-                })
-                .then(() =>
-                    query(reader.query, controller.signal)
-                        .then((data) => {
-                            if (reader.filter?.node) {
-                                data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                            }
-                            // Reorder the data, and fill out the patients per cohort
-                            const clinicalData = {};
-                            data.forEach((site) => {
-                                clinicalData[site.location.name] = site?.results;
-                            });
-
-                            const genomicData = data
-                                .map((site) =>
-                                    site.results.genomic?.map((caseData) => {
-                                        caseData.location = site.location;
-                                        return caseData;
-                                    })
-                                )
-                                .flat(1);
-
-                            writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
-                        })
-                        .finally(() => setLoading(false))
-                );
+                    writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+                });
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
+    Chip,
     Checkbox,
     FormControl,
     FormControlLabel,
