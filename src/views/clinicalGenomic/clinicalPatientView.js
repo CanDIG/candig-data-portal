@@ -4,7 +4,6 @@ import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
-import clsx from 'clsx';
 
 import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
@@ -60,8 +59,6 @@ function ClinicalPatientView() {
         setLocation(initiallocation || '');
     }, []);
 
-    const additionalClass = 'your-additional-class'; // Replace with your actual class
-
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
             {!dateOfBirth && (
@@ -80,7 +77,7 @@ function ClinicalPatientView() {
             <div style={{ width: '100%', height: '68vh' }}>
                 <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
             </div>
-            <StyledTopLevelBox className={clsx(additionalClass)}>
+            <StyledTopLevelBox>
                 {Object.entries(topLevel).map(([key, value]) => (
                     <div
                         key={key}
