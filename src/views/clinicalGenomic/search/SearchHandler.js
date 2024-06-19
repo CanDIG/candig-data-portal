@@ -102,24 +102,25 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         const donorQueryPromise = () =>
-            query(reader.query, controller.signal).then((data) => {
-                if (reader.filter?.node) {
-                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                }
-                // Reorder the data, and fill out the patients per cohort
-                const clinicalData = {};
-                data.forEach((site) => {
-                    clinicalData[site.location.name] = site?.results;
-                });
+            query(reader.query, controller.signal)
+                .then((data) => {
+                    if (reader.filter?.node) {
+                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                    }
+                    // Reorder the data, and fill out the patients per cohort
+                    const clinicalData = {};
+                    data.forEach((site) => {
+                        clinicalData[site.location.name] = site?.results;
+                    });
 
-                const genomicData = data
-                    .map((site) =>
-                        site.results.genomic?.map((caseData) => {
-                            caseData.location = site.location;
-                            return caseData;
-                        })
-                    )
-                    .flat(1);
+                    const genomicData = data
+                        .map((site) =>
+                            site.results.genomic?.map((caseData) => {
+                                caseData.location = site.location;
+                                return caseData;
+                            })
+                        )
+                        .flat(1);
 
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
                 })
