@@ -12,15 +12,14 @@ import Timeline from './widgets/timeline';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
-    marginTop: '1em',
+    marginBottom: '1em',
     padding: '1em',
-    borderBottomLeftRadius: '10px',
-    borderBottomRightRadius: '10px',
+    borderTopLeftRadius: '10px',
+    borderTopRightRadius: '10px',
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: '1em',
-    boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)'
+    gap: '1em'
 }));
 
 const TimelineContainer = styled(Box)(({ theme }) => ({
@@ -74,9 +73,6 @@ function ClinicalPatientView() {
             <Typography pb={1} variant="h6">
                 {patientId}
             </Typography>
-            <div style={{ width: '100%', height: '68vh' }}>
-                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
-            </div>
             <StyledTopLevelBox>
                 {Object.entries(topLevel).map(([key, value]) => (
                     <div
@@ -92,6 +88,9 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
+            <div style={{ width: '100%', height: '68vh' }}>
+                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
+            </div>
             {dateOfBirth && (
                 <TimelineContainer>
                     <Timeline data={data} onEventClick={handleEventClick} />

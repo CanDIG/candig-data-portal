@@ -4,7 +4,8 @@ import * as React from 'react';
 import { useTheme } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
-
+import Tooltip from '@mui/material/Tooltip';
+import { IconTableShare } from '@tabler/icons-react';
 // REDUX
 
 // project imports
@@ -99,7 +100,37 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
+        {
+            field: 'submitter_donor_id',
+            headerName: 'Donor ID',
+            minWidth: 220,
+            sortable: false,
+            renderCell: (params) => (
+                <Tooltip title="Open Patient View" placement="right">
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            '&:hover': {
+                                color: theme.palette.primary.main
+                            }
+                        }}
+                    >
+                        <Box
+                            component="span"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                marginRight: '1em'
+                            }}
+                        >
+                            <IconTableShare stroke={1.5} size="1.3rem" />
+                        </Box>
+                        <Typography>{params.value}</Typography>
+                    </Box>
+                </Tooltip>
+            )
+        },
         { field: 'location', headerName: 'Location', minWidth: 220, sortable: false },
         { field: 'program_id', headerName: 'Program ID', minWidth: 220, sortable: false },
         { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
