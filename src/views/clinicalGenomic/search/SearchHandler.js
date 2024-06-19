@@ -53,7 +53,6 @@ function SearchHandler({ setLoading }) {
     }
     useEffect(() => {
         // First, we abort any currently-running search promises
-        setLoading(true);
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
@@ -101,6 +100,7 @@ function SearchHandler({ setLoading }) {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
+        setLoading(true);
         const donorQueryPromise = () =>
             query(reader.query, controller.signal).then((data) => {
                 if (reader.filter?.node) {
@@ -122,7 +122,8 @@ function SearchHandler({ setLoading }) {
                     .flat(1);
 
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
-                });
+                })
+                .finally(() => setLoading(false));
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
