@@ -200,6 +200,7 @@ function DataVisualization() {
                     trimByDefault={dataVisTrim[index]}
                     onChangeDataVisChartType={(newType) => setDataVisChartTypeSingle(index, newType)}
                     onChangeDataVisData={(newData) => setDataVisDataTypeSingle(index, newData)}
+                    loading={dataVis[item] === undefined}
                 />
             </Grid>
         ));

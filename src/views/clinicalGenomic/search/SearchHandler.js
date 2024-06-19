@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
-import { invertkatsu } from 'utils/utils';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
 /* eslint-disable react-hooks/exhaustive-deps */
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
-function SearchHandler() {
+function SearchHandler({ setLoading }) {
     const reader = useSearchQueryReaderContext();
     const writer = useSearchResultsWriterContext();
     const [controller, _] = useState(new AbortController());
@@ -19,6 +19,7 @@ function SearchHandler() {
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
     useEffect(() => {
+        setLoading(true);
         lastPromise = trackPromise(
             fetchFederation('v2/discovery/sidebar_list', 'katsu')
                 .then((data) => {
@@ -36,7 +37,8 @@ function SearchHandler() {
                 .then((response) => (response.ok ? response.json() : console.log(response)))
                 .then((data) => {
                     writer((old) => ({ ...old, genes: data?.results }));
-                }),
+                })
+                .finally(() => setLoading(false)),
             'federation'
         );
     }, []);
@@ -44,6 +46,7 @@ function SearchHandler() {
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
         // First, we abort any currently-running search promises
+        setLoading(true);
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
@@ -83,27 +86,29 @@ function SearchHandler() {
                     writer((old) => ({ ...old, counts: discoveryCounts }));
                 })
                 .then(() =>
-                    query(reader.query, controller.signal).then((data) => {
-                        if (reader.filter?.node) {
-                            data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                        }
-                        // Reorder the data, and fill out the patients per cohort
-                        const clinicalData = {};
-                        data.forEach((site) => {
-                            clinicalData[site.location.name] = site?.results;
-                        });
+                    query(reader.query, controller.signal)
+                        .then((data) => {
+                            if (reader.filter?.node) {
+                                data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                            }
+                            // Reorder the data, and fill out the patients per cohort
+                            const clinicalData = {};
+                            data.forEach((site) => {
+                                clinicalData[site.location.name] = site?.results;
+                            });
 
-                        const genomicData = data
-                            .map((site) =>
-                                site.results?.genomic?.map((caseData) => {
-                                    caseData.location = site.location;
-                                    return caseData;
-                                })
-                            )
-                            .flat(1);
+                            const genomicData = data
+                                .map((site) =>
+                                    site.results.genomic?.map((caseData) => {
+                                        caseData.location = site.location;
+                                        return caseData;
+                                    })
+                                )
+                                .flat(1);
 
-                        writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
-                    })
+                            writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+                        })
+                        .finally(() => setLoading(false))
                 );
 
         if (lastPromise === null) {
@@ -118,12 +123,15 @@ function SearchHandler() {
         if (!reader.donorID || !reader.cohort) {
             return;
         }
+        setLoading(true);
 
         const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
-            fetchFederation(url, 'katsu').then((data) => {
-                writer((old) => ({ ...old, donor: data }));
-            }),
+            fetchFederation(url, 'katsu')
+                .then((data) => {
+                    writer((old) => ({ ...old, donor: data }));
+                })
+                .finally(() => setLoading(false)),
             'donor'
         );
     }, [JSON.stringify(reader.donorID)]);
@@ -133,5 +141,9 @@ function SearchHandler() {
     return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
+
+SearchHandler.propTypes = {
+    setLoading: PropTypes.func
+};
 
 export default SearchHandler;
