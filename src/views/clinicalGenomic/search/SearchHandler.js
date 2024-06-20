@@ -72,24 +72,27 @@ function SearchHandler({ setLoading }) {
             return summaryStat;
         };
 
+        setLoading(true);
         const discoveryPromise = () =>
-            queryDiscovery(queryNoPageSize, controller.signal).then((data) => {
-                if (reader.filter?.node) {
-                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                }
+            queryDiscovery(queryNoPageSize, controller.signal)
+                .then((data) => {
+                    if (reader.filter?.node) {
+                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                    }
 
-                const discoveryCounts = {
-                    diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
-                    treatment_type_count: CollateSummary(data, 'treatment_type_count'),
-                    primary_site_count: CollateSummary(data, 'primary_site_count'),
-                    patients_per_cohort: {}
-                };
-                data.forEach((site) => {
-                    discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
-                });
+                    const discoveryCounts = {
+                        diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
+                        treatment_type_count: CollateSummary(data, 'treatment_type_count'),
+                        primary_site_count: CollateSummary(data, 'primary_site_count'),
+                        patients_per_cohort: {}
+                    };
+                    data.forEach((site) => {
+                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
+                    });
 
-                writer((old) => ({ ...old, counts: discoveryCounts }));
-            });
+                    writer((old) => ({ ...old, counts: discoveryCounts }));
+                })
+                .finally(() => setLoading(false));
 
         if (lastPromise === null) {
             lastPromise = discoveryPromise();
@@ -100,31 +103,28 @@ function SearchHandler({ setLoading }) {
 
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
-        setLoading(true);
         const donorQueryPromise = () =>
-            query(reader.query, controller.signal)
-                .then((data) => {
-                    if (reader.filter?.node) {
-                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                    }
-                    // Reorder the data, and fill out the patients per cohort
-                    const clinicalData = {};
-                    data.forEach((site) => {
-                        clinicalData[site.location.name] = site?.results;
-                    });
+            query(reader.query, controller.signal).then((data) => {
+                if (reader.filter?.node) {
+                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                }
+                // Reorder the data, and fill out the patients per cohort
+                const clinicalData = {};
+                data.forEach((site) => {
+                    clinicalData[site.location.name] = site?.results;
+                });
 
-                    const genomicData = data
-                        .map((site) =>
-                            site.results.genomic?.map((caseData) => {
-                                caseData.location = site.location;
-                                return caseData;
-                            })
-                        )
-                        .flat(1);
+                const genomicData = data
+                    .map((site) =>
+                        site.results.genomic?.map((caseData) => {
+                            caseData.location = site.location;
+                            return caseData;
+                        })
+                    )
+                    .flat(1);
 
-                    writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
-                })
-                .finally(() => setLoading(false));
+                writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+            });
 
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();

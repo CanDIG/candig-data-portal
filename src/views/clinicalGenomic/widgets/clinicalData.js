@@ -8,19 +8,16 @@ import { Box, Typography } from '@mui/material';
 // REDUX
 
 // project imports
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useSearchQueryWriterContext, useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 
 function ClinicalView() {
     const theme = useTheme();
-    const [paginationModel, setPaginationModel] = React.useState({
-        pageSize: 10,
-        page: 0
-    });
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const searchResults = useSearchResultsReaderContext().clinical;
     const writerContext = useSearchQueryWriterContext();
+    const queryReader = useSearchQueryReaderContext();
 
     // Function to add location to each patient
     function addLocationToPatients(searchResults) {
@@ -109,10 +106,9 @@ function ClinicalView() {
     ];
 
     const HandlePageChange = (newModel) => {
-        if (newModel.page !== paginationModel.page) {
+        if (newModel.page !== queryReader.query?.page) {
             writerContext((old) => ({ ...old, query: { ...old.query, page: newModel.page, page_size: newModel.pageSize } }));
         }
-        setPaginationModel(newModel);
     };
 
     const totalRows = searchResults
@@ -120,6 +116,11 @@ function ClinicalView() {
               ?.map((site) => site.count)
               .reduce((partial, a) => partial + a, 0)
         : 0;
+
+    const paginationModel = {
+        page: queryReader.query?.page || 0,
+        pageSize: queryReader.query?.pageSize || 10
+    };
 
     return (
         <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
