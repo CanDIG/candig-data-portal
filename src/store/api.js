@@ -230,17 +230,12 @@ export function queryDiscovery(parameters, abort) {
             service: 'query',
             payload
         })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return [];
-        })
-        .catch((error) => {
-            console.log('Error:', error);
-            return 'error';
-        });
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error(`Error during discovery query: ${response.status} ${response.statusText}`);
+    });
 }
 
 export function query(parameters, abort) {
@@ -258,17 +253,12 @@ export function query(parameters, abort) {
             service: 'query',
             payload
         })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return [];
-        })
-        .catch((error) => {
-            console.log('Error:', error);
-            return 'error';
-        });
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error(`Error during query: ${response.status} ${response.statusText}`);
+    });
 }
 
 /*

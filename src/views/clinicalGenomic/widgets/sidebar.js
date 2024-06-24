@@ -407,6 +407,12 @@ function Sidebar() {
     const [selectedImmunotherapy, setSelectedImmunotherapy] = useState({});
     const [selectedHormoneTherapy, setSelectedHormoneTherapy] = useState({});
 
+    // On our first load, remove all query parameters
+    useEffect(() => {
+        writerContext(() => ({}));
+        console.log('Refreshing writer context');
+    }, [writerContext]);
+
     function resetButton() {
         // Reset state variables for checkboxes and dropdowns
         const locations = readerContext?.programs?.map((loc) => loc.location.name);
