@@ -215,7 +215,7 @@ export function searchVariantByGene(geneName) {
         });
 }
 
-export function queryDiscovery(parameters, abort) {
+export function query(parameters, abort, path = 'query') {
     const payload = {
         ...parameters
     };
@@ -226,39 +226,26 @@ export function queryDiscovery(parameters, abort) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: 'discovery/query',
+            path,
             service: 'query',
             payload
         })
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(`Error during discovery query: ${response.status} ${response.statusText}`);
-    });
-}
-
-export function query(parameters, abort) {
-    const payload = {
-        ...parameters
-    };
-
-    return fetch(`${federation}/fanout`, {
-        method: 'post',
-        signal: abort,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            method: 'GET',
-            path: 'query',
-            service: 'query',
-            payload
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error(`Error during ${path}: ${response.status} ${response.statusText}`);
         })
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(`Error during query: ${response.status} ${response.statusText}`);
-    });
+        .catch((error) => {
+            // Abort errors should halt execution, so we throw it along
+            // Otherwise, an error fro the backend means something's up, so we return nothing
+            if (error === 'New request started') {
+                throw error;
+            }
+            console.log(error);
+            return [];
+        });
 }
 
 /*

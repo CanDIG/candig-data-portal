@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, query, queryDiscovery } from 'store/api';
+import { fetchFederationStat, fetchFederation, query } from 'store/api';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -16,7 +16,6 @@ function SearchHandler({ setLoading }) {
     const writer = useSearchResultsWriterContext();
     const summaryFetchAbort = useRef(new AbortController());
     const clinicalFetchAbort = useRef(new AbortController());
-    console.log(JSON.stringify(reader));
 
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
@@ -79,7 +78,7 @@ function SearchHandler({ setLoading }) {
 
         setLoading(true);
         const discoveryPromise = () =>
-            queryDiscovery(queryNoPageSize, newAbort.signal)
+            query(queryNoPageSize, newAbort.signal, 'discovery/query')
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
@@ -99,7 +98,7 @@ function SearchHandler({ setLoading }) {
                 })
                 .catch((error) => {
                     // Ignore abort errors
-                    if (error.name !== 'AbortError') {
+                    if (error !== 'New request started') {
                         console.log(error.message);
                     }
                 });
@@ -116,14 +115,12 @@ function SearchHandler({ setLoading }) {
     // Query 2: when the search query changes, re-query the server
     useEffect(() => {
         // First, we abort any currently-running search promises
-        console.log('New request started');
         clinicalFetchAbort.current.abort('New request started');
         const newAbort = new AbortController();
 
         const donorQueryPromise = () =>
             query(reader.query, newAbort.signal)
                 .then((data) => {
-                    console.log('Reloading clinical data');
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
                     }
@@ -146,7 +143,7 @@ function SearchHandler({ setLoading }) {
                 })
                 .catch((error) => {
                     // Ignore abort errors
-                    if (error.name !== 'AbortError') {
+                    if (error !== 'New request started') {
                         console.log(error.message);
                     }
                 })
