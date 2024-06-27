@@ -8,9 +8,10 @@ import PatientSidebar from './widgets/patientSidebar';
  * @param {string} patientId - The ID of the patient.
  * @param {string} programId - The ID of the program.
  * @param {string} location - The location of the patient.
+ * @param {array} forceSelection - An array of [call #, folderToOpen] that forces a particular folder to be selected
  * @returns {Object} - An object containing data, rows, columns, title, and topLevel.
  */
-function useClinicalPatientData(patientId, programId, location) {
+function useClinicalPatientData(patientId, programId, location, forceSelection) {
     // Access the SidebarContext to update the sidebar with patient information
     const sidebarWriter = useSidebarWriterContext();
 
@@ -121,6 +122,7 @@ function useClinicalPatientData(patientId, programId, location) {
                             setRows={setRows}
                             setColumns={setColumns}
                             setTitle={setTitle}
+                            forceSelection={forceSelection}
                             ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
                         />
                     );
@@ -131,7 +133,8 @@ function useClinicalPatientData(patientId, programId, location) {
         };
 
         fetchData();
-    }, [patientId, programId, location, sidebarWriter]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [patientId, programId, location, sidebarWriter, forceSelection[0]]);
 
     return { data, rows, columns, title, topLevel, setRows, setColumns, setTitle, setTopLevel };
 }

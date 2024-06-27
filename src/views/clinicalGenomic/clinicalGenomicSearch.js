@@ -10,7 +10,6 @@ import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
-import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
@@ -107,7 +106,7 @@ function ClinicalGenomicSearch() {
 
     // When we load, set the sidebar component
     useEffect(() => {
-        sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
+        sidebarWriter(<Sidebar />);
     }, [sidebarWriter]);
 
     return (
