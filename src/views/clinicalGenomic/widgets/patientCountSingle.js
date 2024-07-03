@@ -1,16 +1,17 @@
-import { useState } from 'react';
-
-import { Avatar, Box, Button, CardHeader, Divider, Grid, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Avatar, Box, Button, CardHeader, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PropTypes from 'prop-types';
 
 const PREFIX = 'PatientCountSingle';
 
 const classes = {
     patientEntry: `${PREFIX}-patientEntry`,
+    lockIcon: `${PREFIX}-lockIcon`,
     container: `${PREFIX}-container`,
     siteName: `${PREFIX}-siteName`,
     locked: `${PREFIX}-locked`,
@@ -20,7 +21,15 @@ const classes = {
 
 const StyledBox = styled(Box)(({ theme }) => ({
     [`& .${classes.patientEntry}`]: {
-        // React center span?
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    [`& .${classes.lockIcon}`]: {
+        color: theme.palette.primary.main,
+        marginLeft: '0.25em',
+        fontSize: '1.25em'
     },
 
     [`& .${classes.container}`]: {
@@ -28,7 +37,6 @@ const StyledBox = styled(Box)(({ theme }) => ({
     },
 
     [`& .${classes.siteName}`]: {
-        // Left-aligned
         width: 120
     },
 
@@ -37,7 +45,6 @@ const StyledBox = styled(Box)(({ theme }) => ({
     },
 
     [`& .${classes.button}`]: {
-        // Right-aligned
         float: 'right',
         marginLeft: 'auto'
     },
@@ -55,12 +62,10 @@ function PatientCountSingle(props) {
 
     const [expanded, setExpanded] = useState(false);
 
-    // Sum together an array of either numbers, or objects with patients_count in them
     const SumCensoredTotals = (countsArray) =>
         countsArray.reduce(
             (partialSum, cohortTotal) => {
                 if (typeof cohortTotal === 'object') {
-                    // New notation
                     if (cohortTotal.patients_count.startsWith('<')) {
                         return [partialSum[0], partialSum[1] + parseInt(cohortTotal.patients_count.substring(1), 10)];
                     }
@@ -80,13 +85,6 @@ function PatientCountSingle(props) {
     const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
     const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
     const numCohorts = Object.values(counts.totals)?.length || 0;
-
-    /* const avatarProps = locked
-        ? {
-              // If we're locked out, gray out the avatar
-              sx: { bgcolor: theme.palette.action.disabled }
-          }
-        : {}; */
 
     return (
         <StyledBox pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
@@ -145,7 +143,14 @@ function PatientCountSingle(props) {
                           >
                               <Grid item xs={2}>
                                   <Typography variant="h5" align="center" className={classes.patientEntry}>
-                                      <b>{cohort.program_id}</b>
+                                      <b className={classes.patientEntry}>
+                                          {cohort.program_id}
+                                          {locked && (
+                                              <Tooltip title="Unauthorized Cohort" placement="right">
+                                                  <LockOutlinedIcon className={classes.lockIcon} />
+                                              </Tooltip>
+                                          )}
+                                      </b>
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
@@ -161,9 +166,6 @@ function PatientCountSingle(props) {
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
-                              <Grid item xs={2}>
-                                  {/* Num cohorts doesn't make any sense here */}
-                              </Grid>
                               <Grid item ml="auto" className={classes.button}>
                                   {locked ? (
                                       <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>

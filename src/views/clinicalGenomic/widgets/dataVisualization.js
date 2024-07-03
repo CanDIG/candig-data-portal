@@ -226,16 +226,10 @@ function DataVisualization() {
                 color="primary"
                 size="large"
                 sx={{
-                    background: 'white',
-                    border: 1,
-                    borderRadius: '100%',
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: theme.shadows[8],
                     position: 'absolute',
                     zIndex: '1000',
-                    padding: '0.5em',
-                    right: -15,
-                    top: -25
+                    right: -5,
+                    top: -5
                 }}
                 onClick={() => setEdit(!edit)}
             >
@@ -252,18 +246,16 @@ function DataVisualization() {
             {edit && (
                 <IconButton
                     color="primary"
-                    size="large"
+                    size="small"
                     sx={{
-                        background: 'white',
-                        border: 1,
-                        borderRadius: '100%',
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: theme.shadows[8],
                         position: 'absolute',
                         zIndex: '1000',
-                        padding: '0.5em',
-                        right: 50,
-                        top: -25
+                        right: 40,
+                        top: 5,
+                        borderRadius: '100%',
+                        border: 1,
+                        borderColor: theme.palette.primary.main,
+                        padding: '0.01em'
                     }}
                     onClick={() => handleToggleDialog()}
                 >

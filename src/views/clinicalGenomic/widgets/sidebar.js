@@ -11,13 +11,16 @@ import {
     Autocomplete,
     TextField,
     Typography,
-    Button
+    Button,
+    Tooltip
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
@@ -29,7 +32,9 @@ const classes = {
     form: `${PREFIX}-form`,
     checkboxLabel: `${PREFIX}-checkboxLabel`,
     hidden: `${PREFIX}-hidden`,
-    button: `${PREFIX}-button`
+    button: `${PREFIX}-button`,
+    lockIcon: `${PREFIX}-lockIcon`,
+    lockContainer: `${PREFIX}-lockContainer`
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -61,6 +66,16 @@ const Root = styled('div')(({ theme }) => ({
         height: '1.5em',
         width: '90%',
         boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.2)`
+    },
+    [`& .${classes.lockIcon}`]: {
+        color: theme.palette.primary.main,
+        marginLeft: '0.25em',
+        fontSize: '1.25em'
+    },
+    [`& .${classes.lockContainer}`]: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 }));
 
@@ -105,18 +120,20 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide, checked, setChecked } = props;
+    const { isExclusion, groupName, isFilterList, onWrite, options, authorizedCohorts, useAutoComplete, hide, checked, setChecked } = props;
     const [initialized, setInitialized] = useState(false);
 
     // Check all of our options by default
     useEffect(() => {
         if (!initialized && isFilterList && options.length) {
+            console.log('Intializing Options: ', options);
             const optionsObject = {};
             options.forEach((option) => {
                 optionsObject[option] = true;
             });
             setInitialized(true);
             setChecked(optionsObject);
+            console.log('optionsObject:', optionsObject);
         }
     }, [setInitialized, setChecked, initialized, isFilterList, options]);
 
@@ -128,51 +145,78 @@ function StyledCheckboxList(props) {
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
     const HandleChange = (ids, isChecked) => {
-        // Remove duplicates
+        console.log('Option:', ids, 'Checked:', isChecked);
+
         if (Array.isArray(ids)) {
-            ids = Array.from(new Set(ids?.flat(1)));
+            ids = Array.from(new Set(ids.flat(1)));
         } else {
             ids = [ids];
         }
 
         if (isExclusion ? !isChecked : isChecked) {
-            setChecked((_) => {
-                const retVal = {};
+            setChecked((prevChecked) => {
+                const newChecked = { ...prevChecked };
                 ids.forEach((id) => {
-                    retVal[id] = true;
+                    newChecked[id] = true;
                 });
-                return retVal;
+                console.log('New Checked:', newChecked);
+                return newChecked;
             });
             onWrite((old) => {
-                const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
+                console.log('Old Write:', old.query);
 
-                // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
-                if (ids.length > 0) {
-                    retVal.query[groupName] = ids.join('|');
-                }
-                return retVal;
+                const existingIds = old.query && old.query[groupName] ? old.query[groupName].split('|') : [];
+                const newIds = ids.filter((id) => !existingIds.includes(id)); // Avoid adding duplicate IDs
+                const combinedIds = [...existingIds, ...newIds].join('|');
+
+                const newWrite = {
+                    ...old,
+                    query: {
+                        ...old.query,
+                        [groupName]: combinedIds
+                    }
+                };
+
+                console.log('New Write:', newWrite);
+                return newWrite;
             });
         } else {
-            setChecked((_) => {
-                const retVal = {};
+            setChecked((prevChecked) => {
+                const newChecked = { ...prevChecked };
                 ids.forEach((id) => {
-                    retVal[id] = true;
+                    delete newChecked[id];
                 });
-                return retVal;
+                console.log('New Checked after delete:', newChecked);
+                return newChecked;
             });
             onWrite((old) => {
                 const retVal = { filter: {}, ...old };
+
                 if (isFilterList) {
+                    // Adding IDs to the filter for cohorts
                     if (ids.length > 0) {
-                        retVal.filter[groupName] = ids.join('|');
+                        retVal.filter[groupName] = (old.filter && old.filter[groupName] ? old.filter[groupName] + '|' : '') + ids.join('|');
                     }
                     return retVal;
                 }
 
-                const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
-                if (ids.length > 0) {
-                    newList[groupName] = ids.join('|');
-                }
+                // Handling for nodes (removing IDs from the query)
+                const newList = Object.fromEntries(
+                    Object.entries(old.query || {})
+                        .map(([name, value]) => {
+                            if (name !== groupName) {
+                                return [name, value];
+                            }
+                            const currentIds = value.split('|');
+                            const updatedIds = currentIds.filter((id) => !ids.includes(id));
+                            if (updatedIds.length > 0) {
+                                return [name, updatedIds.join('|')];
+                            }
+                            return null;
+                        })
+                        .filter((entry) => entry !== null)
+                );
+
                 retVal.query = newList;
                 return retVal;
             });
@@ -211,25 +255,21 @@ function StyledCheckboxList(props) {
     ) : (
         options?.map((option) => (
             <FormControlLabel
-                label={option}
+                label={
+                    <div className={classes.lockContainer}>
+                        {option}
+                        {groupName === 'exclude_cohorts' && authorizedCohorts && !authorizedCohorts.includes(option) && (
+                            <Tooltip title="Unauthorized Cohort" placement="right">
+                                <LockOutlinedIcon className={classes.lockIcon} />
+                            </Tooltip>
+                        )}
+                    </div>
+                }
                 control={
                     <Checkbox
                         className={classes.checkbox}
                         checked={isExclusion ? !(option in checked) : option in checked}
-                        onChange={(event) => {
-                            const newList = Object.keys(checked).slice();
-                            if (event.target.checked) {
-                                // Add to list
-                                newList.push(option);
-                            } else {
-                                // Remove from list
-                                const oldPos = newList.indexOf(option);
-                                if (oldPos >= 0) {
-                                    newList.splice(oldPos, 1);
-                                }
-                            }
-                            HandleChange(newList, event.target.checked);
-                        }}
+                        onChange={(event) => HandleChange(option, event.target.checked)}
                     />
                 }
                 key={option}
@@ -419,8 +459,8 @@ function Sidebar() {
 
             setSelectedNodes(selectedNodes);
         }
-        setSelectedCohorts([readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || []]);
 
+        setSelectedCohorts([readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id)).flat(1) || []]);
         // Genomic
         setSelectedGenes('');
         setSelectedChromosomes('');
@@ -457,8 +497,9 @@ function Sidebar() {
     };
 
     // Parse out what we need:
-    // const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    // const cohorts = readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || [];
+    const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
+    const cohorts = readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id))?.flat(1) || [] || [];
+    const authorizedCohorts = readerContext?.programs?.flatMap((loc) => loc?.results?.items.map((cohort) => cohort.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');
@@ -490,7 +531,7 @@ function Sidebar() {
                     Reset Filters
                 </Button>
             </div>
-            {/* <SidebarGroup name="Node">
+            <SidebarGroup name="Node">
                 <StyledCheckboxList
                     options={sites}
                     onWrite={writerContext}
@@ -503,13 +544,14 @@ function Sidebar() {
             <SidebarGroup name="Cohort">
                 <StyledCheckboxList
                     options={cohorts}
+                    authorizedCohorts={authorizedCohorts}
                     onWrite={writerContext}
                     groupName="exclude_cohorts"
                     isExclusion
                     checked={selectedCohorts}
                     setChecked={setSelectedCohorts}
                 />
-            </SidebarGroup> */}
+            </SidebarGroup>
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}

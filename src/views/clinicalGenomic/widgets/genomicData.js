@@ -67,7 +67,7 @@ function GenomicData() {
     const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene;
 
     return (
-        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+        <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
                 {hasValidQuery ? `Genomic Variants: ${queryParams}` : 'Genomic Variants: Please query from the sidebar to populate'}
             </Typography>
