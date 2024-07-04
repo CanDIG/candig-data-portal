@@ -126,14 +126,12 @@ function StyledCheckboxList(props) {
     // Check all of our options by default
     useEffect(() => {
         if (!initialized && isFilterList && options.length) {
-            console.log('Intializing Options: ', options);
             const optionsObject = {};
             options.forEach((option) => {
                 optionsObject[option] = true;
             });
             setInitialized(true);
             setChecked(optionsObject);
-            console.log('optionsObject:', optionsObject);
         }
     }, [setInitialized, setChecked, initialized, isFilterList, options]);
 
@@ -145,10 +143,9 @@ function StyledCheckboxList(props) {
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
     const HandleChange = (ids, isChecked) => {
-        console.log('Option:', ids, 'Checked:', isChecked);
-
+        // Remove duplicates
         if (Array.isArray(ids)) {
-            ids = Array.from(new Set(ids.flat(1)));
+            ids = Array.from(new Set(ids?.flat(1)));
         } else {
             ids = [ids];
         }
@@ -159,11 +156,22 @@ function StyledCheckboxList(props) {
                 ids.forEach((id) => {
                     newChecked[id] = true;
                 });
-                console.log('New Checked:', newChecked);
                 return newChecked;
             });
             onWrite((old) => {
-                console.log('Old Write:', old.query);
+                if (isFilterList) {
+                    const currentFilterIds = old.filter && old.filter[groupName] ? old.filter[groupName].split('|') : [];
+                    const updatedFilterIds = currentFilterIds.filter((id) => !ids.includes(id)).join('|');
+
+                    const newWrite = {
+                        filter: {
+                            ...old.filter,
+                            [groupName]: updatedFilterIds
+                        }
+                    };
+
+                    return newWrite;
+                }
 
                 const existingIds = old.query && old.query[groupName] ? old.query[groupName].split('|') : [];
                 const newIds = ids.filter((id) => !existingIds.includes(id)); // Avoid adding duplicate IDs
@@ -177,7 +185,6 @@ function StyledCheckboxList(props) {
                     }
                 };
 
-                console.log('New Write:', newWrite);
                 return newWrite;
             });
         } else {
@@ -186,21 +193,21 @@ function StyledCheckboxList(props) {
                 ids.forEach((id) => {
                     delete newChecked[id];
                 });
-                console.log('New Checked after delete:', newChecked);
                 return newChecked;
             });
             onWrite((old) => {
                 const retVal = { filter: {}, ...old };
 
                 if (isFilterList) {
-                    // Adding IDs to the filter for cohorts
+                    // Adding IDs to the filter for nodes
                     if (ids.length > 0) {
-                        retVal.filter[groupName] = (old.filter && old.filter[groupName] ? old.filter[groupName] + '|' : '') + ids.join('|');
+                        const previousFilter = old.filter && old.filter[groupName] ? `${old.filter[groupName]}|` : '';
+                        retVal.filter[groupName] = `${previousFilter}${ids.join('|')}`;
                     }
                     return retVal;
                 }
 
-                // Handling for nodes (removing IDs from the query)
+                // Handling for cohorts (removing IDs from the query)
                 const newList = Object.fromEntries(
                     Object.entries(old.query || {})
                         .map(([name, value]) => {

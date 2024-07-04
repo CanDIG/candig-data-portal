@@ -9,6 +9,8 @@ function AuthorizationSections({ title }) {
         <Box>
             <Box
                 mt={2}
+                mr={1}
+                ml={1}
                 sx={{
                     borderBottom: `1px ${theme.palette.primary.main} solid`
                 }}
