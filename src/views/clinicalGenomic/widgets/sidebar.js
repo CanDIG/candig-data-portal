@@ -121,19 +121,6 @@ SidebarGroup.propTypes = {
 
 function StyledCheckboxList(props) {
     const { isExclusion, groupName, isFilterList, onWrite, options, authorizedCohorts, useAutoComplete, hide, checked, setChecked } = props;
-    const [initialized, setInitialized] = useState(false);
-
-    // Check all of our options by default
-    useEffect(() => {
-        if (!initialized && isFilterList && options.length) {
-            const optionsObject = {};
-            options.forEach((option) => {
-                optionsObject[option] = true;
-            });
-            setInitialized(true);
-            setChecked(optionsObject);
-        }
-    }, [setInitialized, setChecked, initialized, isFilterList, options]);
 
     if (hide) {
         return null;
@@ -151,80 +138,47 @@ function StyledCheckboxList(props) {
         }
 
         if (isExclusion ? !isChecked : isChecked) {
-            setChecked((prevChecked) => {
-                const newChecked = { ...prevChecked };
+            setChecked((_) => {
+                const retVal = {};
+                console.log(ids);
                 ids.forEach((id) => {
-                    newChecked[id] = true;
+                    retVal[id] = true;
                 });
-                return newChecked;
+                return retVal;
             });
             onWrite((old) => {
+                const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
+
+                // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
                 if (isFilterList) {
-                    const currentFilterIds = old.filter && old.filter[groupName] ? old.filter[groupName].split('|') : [];
-                    const updatedFilterIds = currentFilterIds.filter((id) => !ids.includes(id)).join('|');
-
-                    const newWrite = {
-                        filter: {
-                            ...old.filter,
-                            [groupName]: updatedFilterIds
-                        }
-                    };
-
-                    return newWrite;
+                    retVal.filter[groupName] = ids;
+                } else if (ids.length > 0) {
+                    retVal.query[groupName] = ids.join('|');
                 }
-
-                const existingIds = old.query && old.query[groupName] ? old.query[groupName].split('|') : [];
-                const newIds = ids.filter((id) => !existingIds.includes(id)); // Avoid adding duplicate IDs
-                const combinedIds = [...existingIds, ...newIds].join('|');
-
-                const newWrite = {
-                    ...old,
-                    query: {
-                        ...old.query,
-                        [groupName]: combinedIds
-                    }
-                };
-
-                return newWrite;
+                return retVal;
             });
         } else {
-            setChecked((prevChecked) => {
-                const newChecked = { ...prevChecked };
+            setChecked((_) => {
+                const retVal = {};
                 ids.forEach((id) => {
-                    delete newChecked[id];
+                    retVal[id] = true;
                 });
-                return newChecked;
+                return retVal;
             });
             onWrite((old) => {
-                const retVal = { filter: {}, ...old };
-
+                const retVal = { filter: {}, query: {}, ...old };
                 if (isFilterList) {
-                    // Adding IDs to the filter for nodes
+                    const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
+                    newList[groupName] = ids;
+                    retVal.filter = newList;
+                } else {
+                    const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
-                        const previousFilter = old.filter && old.filter[groupName] ? `${old.filter[groupName]}|` : '';
-                        retVal.filter[groupName] = `${previousFilter}${ids.join('|')}`;
+                        newList[groupName] = ids.join('|');
                     }
-                    return retVal;
+                    retVal.query = newList;
                 }
 
-                // Handling for cohorts (removing IDs from the query)
-                const newList = Object.fromEntries(
-                    Object.entries(old.query || {})
-                        .map(([name, value]) => {
-                            if (name !== groupName) {
-                                return [name, value];
-                            }
-                            const currentIds = value.split('|');
-                            const updatedIds = currentIds.filter((id) => !ids.includes(id));
-                            if (updatedIds.length > 0) {
-                                return [name, updatedIds.join('|')];
-                            }
-                            return null;
-                        })
-                        .filter((entry) => entry !== null)
-                );
-
-                retVal.query = newList;
                 return retVal;
             });
         }
@@ -276,7 +230,20 @@ function StyledCheckboxList(props) {
                     <Checkbox
                         className={classes.checkbox}
                         checked={isExclusion ? !(option in checked) : option in checked}
-                        onChange={(event) => HandleChange(option, event.target.checked)}
+                        onChange={(event) => {
+                            const newList = Object.keys(checked).slice();
+                            if (!(option in checked)) {
+                                // Add to list
+                                newList.push(option);
+                            } else {
+                                // Remove from list
+                                const oldPos = newList.indexOf(option);
+                                if (oldPos >= 0) {
+                                    newList.splice(oldPos, 1);
+                                }
+                            }
+                            HandleChange(newList, event.target.checked);
+                        }}
                     />
                 }
                 key={option}
@@ -544,6 +511,7 @@ function Sidebar() {
                     onWrite={writerContext}
                     groupName="node"
                     isFilterList
+                    isExclusion
                     checked={selectedNodes}
                     setChecked={setSelectedNodes}
                 />
