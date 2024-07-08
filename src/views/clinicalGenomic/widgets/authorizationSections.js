@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Box, Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -25,7 +26,7 @@ function AuthorizationSections({ title }) {
 }
 
 AuthorizationSections.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
 };
 
 export default AuthorizationSections;
