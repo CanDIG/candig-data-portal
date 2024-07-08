@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
     Checkbox,
@@ -256,6 +256,7 @@ function StyledCheckboxList(props) {
 StyledCheckboxList.propTypes = {
     isExclusion: PropTypes.bool,
     groupName: PropTypes.string,
+    authorizedCohorts: PropTypes.array,
     hide: PropTypes.bool,
     isDonorList: PropTypes.bool,
     isFilterList: PropTypes.bool,

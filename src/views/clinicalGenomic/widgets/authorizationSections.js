@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
