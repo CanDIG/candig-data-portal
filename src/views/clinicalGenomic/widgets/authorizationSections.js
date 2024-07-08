@@ -24,4 +24,8 @@ function AuthorizationSections({ title }) {
     );
 }
 
+AuthorizationSections.propTypes = {
+    title: PropTypes.string.isRequired,
+};
+
 export default AuthorizationSections;
