@@ -429,7 +429,6 @@ function CustomOfflineChart(props) {
                         border: 1,
                         borderRadius: '100%',
                         borderColor: theme.palette.error.main,
-                        boxShadow: theme.shadows[8],
                         position: 'absolute',
                         zIndex: '1000',
                         padding: '0.10em',

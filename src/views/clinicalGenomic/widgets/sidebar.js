@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
     Checkbox,
@@ -11,13 +11,16 @@ import {
     Autocomplete,
     TextField,
     Typography,
-    Button
+    Button,
+    Tooltip
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
@@ -29,7 +32,9 @@ const classes = {
     form: `${PREFIX}-form`,
     checkboxLabel: `${PREFIX}-checkboxLabel`,
     hidden: `${PREFIX}-hidden`,
-    button: `${PREFIX}-button`
+    button: `${PREFIX}-button`,
+    lockIcon: `${PREFIX}-lockIcon`,
+    lockContainer: `${PREFIX}-lockContainer`
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -61,6 +66,16 @@ const Root = styled('div')(({ theme }) => ({
         height: '1.5em',
         width: '90%',
         boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.2)`
+    },
+    [`& .${classes.lockIcon}`]: {
+        color: theme.palette.primary.main,
+        marginLeft: '0.25em',
+        fontSize: '1.25em'
+    },
+    [`& .${classes.lockContainer}`]: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 }));
 
@@ -105,20 +120,7 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { isExclusion, groupName, isFilterList, onWrite, options, useAutoComplete, hide, checked, setChecked } = props;
-    const [initialized, setInitialized] = useState(false);
-
-    // Check all of our options by default
-    useEffect(() => {
-        if (!initialized && isFilterList && options.length) {
-            const optionsObject = {};
-            options.forEach((option) => {
-                optionsObject[option] = true;
-            });
-            setInitialized(true);
-            setChecked(optionsObject);
-        }
-    }, [setInitialized, setChecked, initialized, isFilterList, options]);
+    const { isExclusion, groupName, isFilterList, onWrite, options, authorizedCohorts, useAutoComplete, hide, checked, setChecked } = props;
 
     if (hide) {
         return null;
@@ -147,7 +149,9 @@ function StyledCheckboxList(props) {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
 
                 // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
-                if (ids.length > 0) {
+                if (isFilterList) {
+                    retVal.filter[groupName] = ids;
+                } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
                 return retVal;
@@ -161,19 +165,19 @@ function StyledCheckboxList(props) {
                 return retVal;
             });
             onWrite((old) => {
-                const retVal = { filter: {}, ...old };
+                const retVal = { filter: {}, query: {}, ...old };
                 if (isFilterList) {
+                    const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
+                    newList[groupName] = ids;
+                    retVal.filter = newList;
+                } else {
+                    const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
-                        retVal.filter[groupName] = ids.join('|');
+                        newList[groupName] = ids.join('|');
                     }
-                    return retVal;
+                    retVal.query = newList;
                 }
 
-                const newList = Object.fromEntries(Object.entries(old.query).filter(([name, _]) => name !== groupName));
-                if (ids.length > 0) {
-                    newList[groupName] = ids.join('|');
-                }
-                retVal.query = newList;
                 return retVal;
             });
         }
@@ -211,14 +215,23 @@ function StyledCheckboxList(props) {
     ) : (
         options?.map((option) => (
             <FormControlLabel
-                label={option}
+                label={
+                    <div className={classes.lockContainer}>
+                        {option}
+                        {groupName === 'exclude_cohorts' && authorizedCohorts && !authorizedCohorts.includes(option) && (
+                            <Tooltip title="Unauthorized Cohort" placement="right">
+                                <LockOutlinedIcon className={classes.lockIcon} />
+                            </Tooltip>
+                        )}
+                    </div>
+                }
                 control={
                     <Checkbox
                         className={classes.checkbox}
                         checked={isExclusion ? !(option in checked) : option in checked}
                         onChange={(event) => {
                             const newList = Object.keys(checked).slice();
-                            if (event.target.checked) {
+                            if (!(option in checked)) {
                                 // Add to list
                                 newList.push(option);
                             } else {
@@ -242,6 +255,7 @@ function StyledCheckboxList(props) {
 StyledCheckboxList.propTypes = {
     isExclusion: PropTypes.bool,
     groupName: PropTypes.string,
+    authorizedCohorts: PropTypes.array,
     hide: PropTypes.bool,
     isDonorList: PropTypes.bool,
     isFilterList: PropTypes.bool,
@@ -419,8 +433,8 @@ function Sidebar() {
 
             setSelectedNodes(selectedNodes);
         }
-        setSelectedCohorts([readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || []]);
 
+        setSelectedCohorts([readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id)).flat(1) || []]);
         // Genomic
         setSelectedGenes('');
         setSelectedChromosomes('');
@@ -457,8 +471,9 @@ function Sidebar() {
     };
 
     // Parse out what we need:
-    // const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    // const cohorts = readerContext?.programs?.map((loc) => loc?.results?.items.map((cohort) => cohort.program_id)).flat(1) || [];
+    const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
+    const cohorts = readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id))?.flat(1) || [] || [];
+    const authorizedCohorts = readerContext?.programs?.flatMap((loc) => loc?.results?.items.map((cohort) => cohort.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');
@@ -490,12 +505,13 @@ function Sidebar() {
                     Reset Filters
                 </Button>
             </div>
-            {/* <SidebarGroup name="Node">
+            <SidebarGroup name="Node">
                 <StyledCheckboxList
                     options={sites}
                     onWrite={writerContext}
                     groupName="node"
                     isFilterList
+                    isExclusion
                     checked={selectedNodes}
                     setChecked={setSelectedNodes}
                 />
@@ -503,13 +519,14 @@ function Sidebar() {
             <SidebarGroup name="Cohort">
                 <StyledCheckboxList
                     options={cohorts}
+                    authorizedCohorts={authorizedCohorts}
                     onWrite={writerContext}
                     groupName="exclude_cohorts"
                     isExclusion
                     checked={selectedCohorts}
                     setChecked={setSelectedCohorts}
                 />
-            </SidebarGroup> */}
+            </SidebarGroup>
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}

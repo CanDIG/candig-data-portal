@@ -14,6 +14,7 @@ import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
+import AuthorizationSections from './widgets/authorizationSections';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -76,6 +77,11 @@ const StyledMainCard = styled(MainCard)((_) => ({
 
 const sections = [
     {
+        id: 'cohorts summary',
+        header: 'Cohorts Summary',
+        component: <AuthorizationSections title="Cohorts Summary" />
+    },
+    {
         id: 'counts',
         header: 'Patient Counts',
         component: <PatientCounts />
@@ -84,6 +90,11 @@ const sections = [
         id: 'visualization',
         header: 'Data Visualization',
         component: <DataVisualization />
+    },
+    {
+        id: 'authorized cohorts',
+        header: 'Authorized Cohorts',
+        component: <AuthorizationSections title="Authorized Cohorts" />
     },
     {
         id: 'clinical',
@@ -96,7 +107,6 @@ const sections = [
         component: <GenomicData />
     }
 ];
-
 function ClinicalGenomicSearch() {
     const customization = useSelector((state) => state.customization);
 
