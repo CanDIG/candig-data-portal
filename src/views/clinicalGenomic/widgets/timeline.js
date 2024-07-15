@@ -30,21 +30,21 @@ const formatHeader = (dateResolution) =>
 const tooltipFormatter = () =>
     function tooltipFormatter() {
         const boldName = `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>`;
-        const yearInAge = Math.floor(this.x / 12);
 
-        const getYearInAgeText = (prefix, value) => `${prefix}: ${Math.floor(value / 12)} Year(s) Old`;
+        const getDateText = (value) =>
+            `${Math.floor(value / 12)}y / ${Math.floor(value % 12)}m ${value % 1 !== 0 ? `/ ${(value % 1) * 32}d` : ''}`;
 
         const treatmentTypeText = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
 
         let tooltipContent = '';
 
         if (this.extra_info) {
-            const extraInfoText = `${this.extra_info} : ${yearInAge} Year(s) Old`;
+            const extraInfoText = `${this.extra_info} : ${getDateText(this.x)}`;
             const missingInfoText = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
             tooltipContent = `${boldName}${treatmentTypeText}<br/>${extraInfoText}<br/>${missingInfoText}<br/>`;
         } else if (this.start) {
-            const startYearText = getYearInAgeText('Start', this.start);
-            const endYearText = getYearInAgeText('End', this.end);
+            const startYearText = `Start: ${getDateText(this.start)}`;
+            const endYearText = `End: ${getDateText(this.end)}`;
 
             if (this.name === 'Treatments') {
                 tooltipContent = `${boldName}${startYearText}<br/>${endYearText}<br/>`;
@@ -52,7 +52,7 @@ const tooltipFormatter = () =>
                 tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}<br/>`;
             }
         } else {
-            tooltipContent = `${boldName}${yearInAge} Year(s) Old`;
+            tooltipContent = `${boldName}${getDateText(this.x)}`;
         }
 
         return tooltipContent;
@@ -67,11 +67,21 @@ function Timeline({ data, onEventClick }) {
     useEffect(() => {
         const birthDate = data?.date_of_birth?.month_interval ?? 0;
 
+        const formatDate = (date) => {
+            if (date?.month_interval !== undefined) {
+                if (date?.day_interval) {
+                    return date.month_interval + date.day_interval / 32 - birthDate;
+                }
+                return date.month_interval - birthDate;
+            }
+            return '';
+        };
+
         const generateSeriesDataSingle = (data, name, y, colour) =>
             data?.month_interval
                 ? [
                       {
-                          x: data.month_interval - birthDate,
+                          x: formatDate(data),
                           y,
                           name,
                           color: colour,
@@ -83,7 +93,7 @@ function Timeline({ data, onEventClick }) {
         const generateSeriesDataPrimaryDiagnosis = (data, namePrefix, y, colour, date, name, id) =>
             Array.isArray(data)
                 ? data.map((item) => ({
-                      x: item?.[date]?.month_interval !== undefined ? item[date].month_interval - birthDate : '',
+                      x: formatDate(item?.[date]),
                       y,
                       name: `${namePrefix}${item?.[id]}`,
                       color: colour,
@@ -100,7 +110,7 @@ function Timeline({ data, onEventClick }) {
                           item?.submitter_follow_up_id ||
                           item?.submitter_specimen_id;
                       return {
-                          x: item?.[date]?.month_interval !== undefined ? item[date].month_interval - birthDate : '',
+                          x: formatDate(item?.[date]),
                           y,
                           name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
                           color: colour,
@@ -113,7 +123,7 @@ function Timeline({ data, onEventClick }) {
             data?.flatMap((item) =>
                 Array.isArray(item?.[path])
                     ? item[path].map((subItem) => ({
-                          x: subItem?.[date]?.month_interval !== undefined ? subItem[date].month_interval - birthDate : '',
+                          x: formatDate(subItem?.[date]),
                           y,
                           name: `${namePrefix}${subItem?.[id]}`,
                           color: colour,
@@ -129,7 +139,7 @@ function Timeline({ data, onEventClick }) {
                     ? item[path].flatMap((subItem) =>
                           Array.isArray(subItem?.[path2])
                               ? subItem[path2].map((subItem2) => ({
-                                    x: subItem2?.[date]?.month_interval !== undefined ? subItem2[date].month_interval - birthDate : '',
+                                    x: formatDate(subItem2?.[date]),
                                     y,
                                     name: `${namePrefix}${subItem2?.[id]}`,
                                     color: colour,
