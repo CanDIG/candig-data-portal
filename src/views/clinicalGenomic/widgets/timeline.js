@@ -535,11 +535,11 @@ function Timeline({ data, onEventClick }) {
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
 
                             if (seriesID === 'biomarkers') {
-                                onEventClick?.('biomarkers', data?.biomarkers);
+                                onEventClick?.(['biomarkers', 0], data?.biomarkers);
                             } else if (seriesID === 'specimens') {
-                                onEventClick?.('specimens', data?.primary_diagnoses?.map((diagnosis) => diagnosis.specimens)?.flat(1));
+                                onEventClick?.(['specimens', 1], data?.primary_diagnoses?.map((diagnosis) => diagnosis.specimens)?.flat(1));
                             } else if (seriesID === 'primary_diagnoses') {
-                                onEventClick?.('primary_diagnoses', data?.primary_diagnoses);
+                                onEventClick?.(['primary_diagnoses', 1], data?.primary_diagnoses);
                             } else if (seriesID === 'treatments') {
                                 const aggregateTreatments = () => {
                                     let allTreatments = [];
@@ -551,23 +551,23 @@ function Timeline({ data, onEventClick }) {
 
                                     return allTreatments;
                                 };
-                                onEventClick?.('treatments', aggregateTreatments(data));
+                                onEventClick?.(['treatments', 1], aggregateTreatments(data));
                             } else if (seriesID === 'Followup&Relapse1') {
                                 const aggregateFollowups = (diagnoses) =>
                                     diagnoses
                                         ?.map((diagnosis) => diagnosis?.followups)
                                         ?.filter((obj) => !!obj)
                                         ?.flat(1);
-                                onEventClick?.('followups', aggregateFollowups(data?.primary_diagnoses));
+                                onEventClick?.(['followups', 1], aggregateFollowups(data?.primary_diagnoses));
                             } else if (seriesID === 'Followup&Relapse2') {
-                                onEventClick?.('followups', data?.followups);
+                                onEventClick?.(['followups', 0], data?.followups);
                             } else if (seriesID === 'Followup&Relapse3') {
                                 const aggregateFollowups = (diagnoses) =>
                                     diagnoses
                                         ?.map((diagnosis) => diagnosis?.followups)
                                         ?.flat(1)
                                         ?.filter((obj) => !!obj);
-                                onEventClick?.('followups', aggregateFollowups(data?.primary_diagnoses));
+                                onEventClick?.(['followups', 1], aggregateFollowups(data?.primary_diagnoses));
                             }
                         }
                     }

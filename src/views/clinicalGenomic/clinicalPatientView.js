@@ -47,7 +47,7 @@ function ClinicalPatientView() {
     const dateOfBirth = data?.date_of_birth;
 
     const handleEventClick = (category, array) => {
-        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
+        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category[0], array, ageAtFirstDiagnosis);
         setTitle(titleClick);
         setColumns(reorderedColumns);
         setRows(rowsClick);

@@ -53,32 +53,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
     // If we're told to select a sidebar entry (e.g. by Timeline), do so
     useEffect(() => {
         if (forceSelection[1] != null) {
-            // We need to figure out which key actually corresponds to the folder they were trying to select
-            // This is a hack -- ideally timeline.js tells _us_ which depth the user has selected
-            const categoryName = forceSelection[1];
-            const findDepth = (lastDepth, obj) => {
-                if (typeof obj === 'object' && !Array.isArray(obj) && obj != null) {
-                    // Does this object have it?
-                    if (categoryName in obj) {
-                        return lastDepth;
-                    }
-                    // Otherwise recurse
-                    return Object.keys(obj)
-                        .map((key) => findDepth(lastDepth + 1, obj[key]))
-                        .flat()
-                        .filter((result) => !!result);
-                }
-
-                if (Array.isArray(obj)) {
-                    return obj
-                        .map((item) => findDepth(lastDepth, item))
-                        .flat()
-                        .filter((result) => !!result)?.[0];
-                }
-
-                return null;
-            };
-            const categoryDepth = findDepth(0, sidebar);
+            const categoryName = forceSelection[1][0];
+            const categoryDepth = forceSelection[1][1];
             const categoryKey = categoryName + (categoryDepth > 0 ? `-${categoryDepth - 1}-${categoryDepth > 1 ? 1.5 : 0}` : '');
             setSelected(categoryKey);
         }
