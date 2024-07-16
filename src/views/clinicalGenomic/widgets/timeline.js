@@ -187,7 +187,14 @@ function Timeline({ data, onEventClick }) {
             'Followup&Relapse2',
             'submitter_follow_up_id'
         );
-        const biomarkerSeries = generateSeriesDataBiomarker(data?.biomarkers, '', 2, theme.palette.secondary.dark, 'biomarkers');
+        const biomarkerSeries = generateSeriesDataBiomarker(
+            data?.biomarkers,
+            '',
+            2,
+            theme.palette.secondary.dark,
+            'test_date',
+            'biomarkers'
+        );
         const followupSeries1 = generateSeriesDataSpecimen(
             data?.primary_diagnoses,
             'followups',
@@ -525,13 +532,12 @@ function Timeline({ data, onEventClick }) {
                     cursor: 'pointer',
                     events: {
                         click(event) {
-                            // console.log(event.point.y);
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
 
                             if (seriesID === 'biomarkers') {
                                 onEventClick?.('biomarkers', data?.biomarkers);
                             } else if (seriesID === 'specimens') {
-                                onEventClick?.('specimens', data?.primary_diagnoses);
+                                onEventClick?.('specimens', data?.primary_diagnoses?.map((diagnosis) => diagnosis.specimens)?.flat(1));
                             } else if (seriesID === 'primary_diagnoses') {
                                 onEventClick?.('primary_diagnoses', data?.primary_diagnoses);
                             } else if (seriesID === 'treatments') {
