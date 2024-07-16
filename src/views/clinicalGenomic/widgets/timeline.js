@@ -563,7 +563,10 @@ function Timeline({ data, onEventClick }) {
                                 onEventClick?.('followups', data?.followups);
                             } else if (seriesID === 'Followup&Relapse3') {
                                 const aggregateFollowups = (diagnoses) =>
-                                    diagnoses?.map((diagnosis) => diagnosis?.followups).filter((obj) => !!obj);
+                                    diagnoses
+                                        ?.map((diagnosis) => diagnosis?.followups)
+                                        ?.flat(1)
+                                        ?.filter((obj) => !!obj);
                                 onEventClick?.('followups', aggregateFollowups(data?.primary_diagnoses));
                             }
                         }
