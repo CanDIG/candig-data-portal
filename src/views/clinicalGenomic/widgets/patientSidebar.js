@@ -45,10 +45,21 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis, forceSelection }) {
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
+
+    // If we're told to select a sidebar entry (e.g. by Timeline), do so
+    useEffect(() => {
+        if (forceSelection[1] != null) {
+            const categoryName = forceSelection[1][0];
+            const categoryDepth = forceSelection[1][1];
+            const categoryKey = categoryName + (categoryDepth > 0 ? `-${categoryDepth - 1}-${categoryDepth > 1 ? 1.5 : 0}` : '');
+            setSelected(categoryKey);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [forceSelection[0]]);
 
     const toggleSection = (key) => {
         setExpandedSections((prevExpanded) => ({
@@ -333,7 +344,8 @@ PatientSidebar.propTypes = {
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
     setTitle: PropTypes.func.isRequired,
-    ageAtFirstDiagnosis: PropTypes.number
+    ageAtFirstDiagnosis: PropTypes.number,
+    forceSelection: PropTypes.array
 };
 
 export default PatientSidebar;

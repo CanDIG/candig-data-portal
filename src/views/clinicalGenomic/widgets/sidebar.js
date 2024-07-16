@@ -413,8 +413,8 @@ function Sidebar() {
     const [endPos, setEndPos] = useState('0');
 
     // Clinical Data
-    const [selectedNodes, setSelectedNodes] = useState({});
-    const [selectedCohorts, setSelectedCohorts] = useState({});
+    const [_selectedNodes, setSelectedNodes] = useState({});
+    const [_selectedCohorts, setSelectedCohorts] = useState({});
     const [selectedTreatment, setSelectedTreatment] = useState({});
     const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
     const [selectedChemotherapy, setSelectedChemotherapy] = useState({});

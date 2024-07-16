@@ -30,21 +30,21 @@ const formatHeader = (dateResolution) =>
 const tooltipFormatter = () =>
     function tooltipFormatter() {
         const boldName = `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>`;
-        const yearInAge = Math.floor(this.x / 12);
 
-        const getYearInAgeText = (prefix, value) => `${prefix}: ${Math.floor(value / 12)} Year(s) Old`;
+        const getDateText = (value) =>
+            `${Math.floor(value / 12)}y ${Math.floor(value % 12)}m ${value % 1 !== 0 ? ` ${(value % 1) * 32}d` : ''}`;
 
         const treatmentTypeText = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
 
         let tooltipContent = '';
 
         if (this.extra_info) {
-            const extraInfoText = `${this.extra_info} : ${yearInAge} Year(s) Old`;
+            const extraInfoText = `${this.extra_info} : ${getDateText(this.x)}`;
             const missingInfoText = this.missing_info === 'Start' ? 'Start Date Missing' : 'End Date Missing';
             tooltipContent = `${boldName}${treatmentTypeText}<br/>${extraInfoText}<br/>${missingInfoText}<br/>`;
         } else if (this.start) {
-            const startYearText = getYearInAgeText('Start', this.start);
-            const endYearText = getYearInAgeText('End', this.end);
+            const startYearText = `Start: ${getDateText(this.start)}`;
+            const endYearText = `End: ${getDateText(this.end)}`;
 
             if (this.name === 'Treatments') {
                 tooltipContent = `${boldName}${startYearText}<br/>${endYearText}<br/>`;
@@ -52,7 +52,7 @@ const tooltipFormatter = () =>
                 tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}<br/>`;
             }
         } else {
-            tooltipContent = `${boldName}${yearInAge} Year(s) Old`;
+            tooltipContent = `${boldName}${getDateText(this.x)}`;
         }
 
         return tooltipContent;
@@ -65,221 +65,165 @@ function Timeline({ data, onEventClick }) {
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
     const theme = useTheme();
     useEffect(() => {
-        const generateSeriesData = (data, path, path2, date, id, yValue, colour, namePrefix, isSingleItem, name, birthDateValue) => {
-            const birthDate = birthDateValue ?? 0;
-            if (isSingleItem) {
-                return data?.[path]?.month_interval
-                    ? [
-                          {
-                              x: data[path].month_interval - birthDate,
-                              y: yValue,
-                              name: namePrefix,
-                              color: colour
-                          }
-                      ]
-                    : [];
-            }
+        const birthDate = data?.date_of_birth?.month_interval ?? 0;
 
-            if (path === 'primary_diagnoses' || name === 'Followup&Relapse2') {
-                return Array.isArray(data?.[path])
-                    ? data[path].map((item) => ({
-                          // eslint-disable-next-line no-unsafe-optional-chaining
-                          x: item?.[date]?.month_interval !== undefined ? item?.[date]?.month_interval - birthDate : '',
-                          y: yValue,
-                          name: `${namePrefix}${item?.[id]}`,
+        const formatDate = (date) => {
+            if (date?.month_interval !== undefined) {
+                if (date?.day_interval) {
+                    return date.month_interval + date.day_interval / 32 - birthDate;
+                }
+                return date.month_interval - birthDate;
+            }
+            return '';
+        };
+
+        const generateSeriesDataSingle = (data, name, y, colour) =>
+            data?.month_interval
+                ? [
+                      {
+                          x: formatDate(data),
+                          y,
+                          name,
+                          color: colour,
+                          customGroupId: name
+                      }
+                  ]
+                : [];
+
+        const generateSeriesDataPrimaryDiagnosis = (data, namePrefix, y, colour, date, name, id) =>
+            Array.isArray(data)
+                ? data.map((item) => ({
+                      x: formatDate(item?.[date]),
+                      y,
+                      name: `${namePrefix}${item?.[id]}`,
+                      color: colour,
+                      customGroupId: name
+                  }))
+                : [];
+
+        const generateSeriesDataBiomarker = (data, namePrefix, y, colour, date, name) =>
+            Array.isArray(data)
+                ? data.map((item) => {
+                      const id =
+                          item?.submitter_treatment_id ||
+                          item?.submitter_primary_diagnosis_id ||
+                          item?.submitter_follow_up_id ||
+                          item?.submitter_specimen_id;
+                      return {
+                          x: formatDate(item?.[date]),
+                          y,
+                          name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
+                          color: colour,
+                          customGroupId: name
+                      };
+                  })
+                : [];
+
+        const generateSeriesDataSpecimen = (data, path, namePrefix, y, colour, date, name, id) =>
+            data?.flatMap((item) =>
+                Array.isArray(item?.[path])
+                    ? item[path].map((subItem) => ({
+                          x: formatDate(subItem?.[date]),
+                          y,
+                          name: `${namePrefix}${subItem?.[id]}`,
                           color: colour,
                           customGroupId: name
                       }))
-                    : [];
-            }
+                    : []
+            ) || [];
 
-            if (path === 'biomarkers') {
-                return Array.isArray(data?.[path])
-                    ? data[path].map((item) => {
-                          const id =
-                              item?.submitter_treatment_id ||
-                              item?.submitter_primary_diagnosis_id ||
-                              item?.submitter_follow_up_id ||
-                              item?.submitter_specimen_id;
-                          return {
-                              // eslint-disable-next-line no-unsafe-optional-chaining
-                              x: item?.[date]?.month_interval !== undefined ? item?.[date]?.month_interval - birthDate : '',
-                              y: yValue,
-                              name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
-                              color: colour
-                          };
-                      })
-                    : [];
-            }
+        // eslint-disable-next-line no-unused-vars
+        const generateSeriesData = (data, path, path2, date, id, y, colour, namePrefix, name) =>
+            data?.flatMap((item) =>
+                Array.isArray(item?.[path])
+                    ? item[path].flatMap((subItem) =>
+                          Array.isArray(subItem?.[path2])
+                              ? subItem[path2].map((subItem2) => ({
+                                    x: formatDate(subItem2?.[date]),
+                                    y,
+                                    name: `${namePrefix}${subItem2?.[id]}`,
+                                    color: colour,
+                                    customGroupId: name
+                                }))
+                              : []
+                      )
+                    : []
+            ) || [];
 
-            if (name === 'Followup&Relapse1' || path === 'specimens') {
-                return (
-                    data?.flatMap((item) =>
-                        Array.isArray(item?.[path])
-                            ? item[path].map((subItem) => ({
-                                  // eslint-disable-next-line no-unsafe-optional-chaining
-                                  x: subItem?.[date]?.month_interval !== undefined ? subItem?.[date]?.month_interval - birthDate : '',
-                                  y: yValue,
-                                  name: `${namePrefix}${subItem?.[id]}`,
-                                  color: colour,
-                                  customGroupId: name
-                              }))
-                            : []
-                    ) || []
-                );
-            }
-
-            return (
-                data?.flatMap((item) =>
-                    Array.isArray(item?.[path])
-                        ? item[path].flatMap((subItem) =>
-                              Array.isArray(subItem?.[path2])
-                                  ? subItem[path2].map((subItem2) => ({
-                                        x:
-                                            subItem2?.[date]?.month_interval !== undefined
-                                                ? // eslint-disable-next-line no-unsafe-optional-chaining
-                                                  subItem2?.[date]?.month_interval - birthDate
-                                                : '',
-                                        y: yValue,
-                                        name: `${namePrefix}${subItem2?.[id]}`,
-                                        color: colour,
-                                        customGroupId: name
-                                    }))
-                                  : []
-                          )
-                        : []
-                ) || []
-            );
-        };
-
-        const dateOfBirthSeries = generateSeriesData(
-            data,
-            'date_of_birth',
-            null,
-            null,
-            null,
+        const dob = data?.date_of_birth?.month_interval;
+        const dateOfBirthSeries = generateSeriesDataSingle(data?.date_of_birth, 'Date of Birth', 0, theme.palette.primary.light, dob);
+        const dateOfDeathSeries = generateSeriesDataSingle(data?.date_of_death, 'Age at Death', 0, theme.palette.primary.main, dob);
+        const dateAliveAfterLostToFollowupSeries = generateSeriesDataSingle(
+            data?.date_alive_after_lost_to_followup,
+            'Date Alive After Lost To Followup',
             0,
             theme.palette.primary.light,
-            'Date of Birth',
-            true,
-            null,
-            data?.date_of_birth?.month_interval
+            dob
         );
-        const dateOfDeathSeries = generateSeriesData(
-            data,
-            'date_of_death',
-            null,
-            null,
-            null,
-            0,
-            theme.palette.primary.main,
-            'Date of Death',
-            true,
-            null,
-            data?.date_of_birth?.month_interval
+        const primaryDiagnosisSeries = generateSeriesDataPrimaryDiagnosis(
+            data?.primary_diagnoses,
+            '',
+            1,
+            theme.palette.secondary.main,
+            'date_of_diagnosis',
+            'primary_diagnoses',
+            'submitter_primary_diagnosis_id'
         );
-        const dateAliveAfterLostToFollowupSeries = generateSeriesData(
-            data,
-            'date_alive_after_lost_to_followup',
-            null,
-            null,
-            null,
-            0,
-            theme.palette.primary.dark,
-            'Date Alive After Lost to Followup',
-            true,
-            null,
-            data?.date_of_birth?.month_interval
+        const followupSeries2 = generateSeriesDataPrimaryDiagnosis(
+            data?.followups,
+            'Followup ',
+            4,
+            theme.palette.secondary.dark,
+            'date_of_followup',
+            'Followup&Relapse2',
+            'submitter_follow_up_id'
         );
-        const testDateSeries = generateSeriesData(
-            data,
-            'biomarkers',
-            null,
-            'test_date',
+        const relapseSeries2 = generateSeriesDataPrimaryDiagnosis(
+            data?.followups,
+            'Relapse ',
+            4,
+            theme.palette.secondary.main,
+            'date_of_relapse',
+            'Followup&Relapse2',
+            'submitter_follow_up_id'
+        );
+        const biomarkerSeries = generateSeriesDataBiomarker(
+            data?.biomarkers,
             '',
             2,
             theme.palette.secondary.dark,
-            'Biomarker ',
-            false,
-            null
+            'test_date',
+            'biomarkers'
         );
-        const specimenCollectionSeries = generateSeriesData(
+        const followupSeries1 = generateSeriesDataSpecimen(
+            data?.primary_diagnoses,
+            'followups',
+            'Followup ',
+            4,
+            theme.palette.secondary.dark,
+            'date_of_followup',
+            'Followup&Relapse1',
+            'submitter_follow_up_id'
+        );
+        const relapseSeries1 = generateSeriesDataSpecimen(
+            data?.primary_diagnoses,
+            'followups',
+            'Relapse ',
+            4,
+            theme.palette.secondary.main,
+            'date_of_relapse',
+            'Followup&Relapse1',
+            'submitter_follow_up_id'
+        );
+        const specimenCollectionSeries = generateSeriesDataSpecimen(
             data?.primary_diagnoses,
             'specimens',
-            null,
-            'specimen_collection_date',
-            'submitter_specimen_id',
+            '',
             3,
             theme.palette.secondary.light,
-            '',
-            false,
-            null,
-            data?.date_of_birth?.month_interval
-        );
-        const primaryDiagnosisSeries = generateSeriesData(
-            data,
-            'primary_diagnoses',
-            null,
-            'date_of_diagnosis',
-            'submitter_primary_diagnosis_id',
-            1,
-            theme.palette.secondary.main,
-            '',
-            false,
-            null,
-            data?.date_of_birth?.month_interval
-        );
-        const followupSeries1 = generateSeriesData(
-            data?.primary_diagnoses,
-            'followups',
-            null,
-            'date_of_followup',
-            'submitter_follow_up_id',
-            4,
-            theme.palette.secondary.dark,
-            'Followup ',
-            false,
-            'Followup&Relapse1',
-            data?.date_of_birth?.month_interval
-        );
-        const relapseSeries1 = generateSeriesData(
-            data?.primary_diagnoses,
-            'followups',
-            null,
-            'date_of_relapse',
-            'submitter_follow_up_id',
-            4,
-            theme.palette.secondary.main,
-            'Relapse ',
-            false,
-            'Followup&Relapse1',
-            data?.date_of_birth?.month_interval
-        );
-        const followupSeries2 = generateSeriesData(
-            data,
-            'followups',
-            null,
-            'date_of_followup',
-            'submitter_follow_up_id',
-            4,
-            theme.palette.secondary.dark,
-            'Followup ',
-            false,
-            'Followup&Relapse2',
-            data?.date_of_birth?.month_interval
-        );
-        const relapseSeries2 = generateSeriesData(
-            data,
-            'followups',
-            null,
-            'date_of_relapse',
-            'submitter_follow_up_id',
-            4,
-            theme.palette.secondary.main,
-            'Relapse ',
-            false,
-            'Followup&Relapse2',
-            data?.date_of_birth?.month_interval
+            'specimen_collection_date',
+            'specimens',
+            'submitter_specimen_id'
         );
         const followupSeries3 = generateSeriesData(
             data?.primary_diagnoses,
@@ -290,9 +234,7 @@ function Timeline({ data, onEventClick }) {
             4,
             theme.palette.secondary.dark,
             'Followup ',
-            false,
-            'Followup&Relapse3',
-            data?.date_of_birth?.month_interval
+            'Followup&Relapse3'
         );
         const relapseSeries3 = generateSeriesData(
             data?.primary_diagnoses,
@@ -303,9 +245,7 @@ function Timeline({ data, onEventClick }) {
             4,
             theme.palette.secondary.main,
             'Relapse ',
-            false,
-            'Followup&Relapse3',
-            data?.date_of_birth?.month_interval
+            'Followup&Relapse3'
         );
 
         const seriesData = {
@@ -313,7 +253,7 @@ function Timeline({ data, onEventClick }) {
             dateOfBirthSeries,
             dateOfDeathSeries,
             dateAliveAfterLostToFollowupSeries,
-            testDateSeries,
+            biomarkerSeries,
             followupSeries1,
             relapseSeries1,
             followupSeries2,
@@ -323,12 +263,18 @@ function Timeline({ data, onEventClick }) {
             specimenCollectionSeries
         };
 
-        const initialCategories = ['Major Life Events', 'Primary Diagnosis', 'Test Date', 'Specimen Collection Date', 'Followup & Relapse'];
+        const initialCategories = [
+            'Major Life Events',
+            'Primary Diagnosis',
+            'Biomarkers',
+            'Specimen Collection Date',
+            'Followup & Relapse'
+        ];
 
         const categorySeriesMap = {
             'Major Life Events': ['dateOfBirthSeries', 'dateOfDeathSeries', 'dateAliveAfterLostToFollowupSeries'],
             'Primary Diagnosis': ['primaryDiagnosisSeries'],
-            'Test Date': ['testDateSeries'],
+            Biomarkers: ['biomarkerSeries'],
             'Specimen Collection Date': ['specimenCollectionSeries'],
             'Followup & Relapse': [
                 'followupSeries1',
@@ -408,7 +354,8 @@ function Timeline({ data, onEventClick }) {
                     end: maxTime,
                     y: yIndexParent,
                     color: theme.palette.primary.dark,
-                    name: 'Treatments'
+                    name: 'Treatments',
+                    customGroupId: 'treatments'
                 }
             ],
             marker: {
@@ -463,7 +410,34 @@ function Timeline({ data, onEventClick }) {
         setChartOptions({
             chart: {
                 height: 600,
-                marginRight: 50
+                marginRight: 50,
+                events: {
+                    render() {
+                        const chart = this;
+
+                        if (chart.customButton) {
+                            chart.customButton.destroy();
+                        }
+
+                        const treatmentCategoryIndex = chart.yAxis[0].categories.indexOf('Treatments');
+                        const yPosition = chart.yAxis[0].toPixels(treatmentCategoryIndex) - 5;
+                        chart.customButton = chart.renderer
+                            .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
+                            .attr({
+                                fill: '#7cb5ec',
+                                cursor: 'pointer'
+                            })
+                            .add()
+                            .on('click', () => {
+                                toggleTreatmentsCollapse();
+                            });
+
+                        const rotationDeg = isTreatmentsCollapsed ? 180 : 0;
+                        chart.customButton.attr({
+                            transform: `rotate(${rotationDeg} ${chart.customButton.x + 5} ${chart.customButton.y + 5})`
+                        });
+                    }
+                }
             },
             title: {
                 text: 'Patient Timeline',
@@ -558,22 +532,15 @@ function Timeline({ data, onEventClick }) {
                     cursor: 'pointer',
                     events: {
                         click(event) {
-                            const seriesName = event.point.series.name;
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
-                            let category = null;
-                            let array = null;
 
-                            if (seriesName.includes('Biomarker')) {
-                                category = 'biomarkers';
-                                array = data?.biomarkers;
-                            } else if (seriesName.includes('SPECIMEN')) {
-                                category = 'specimens';
-                                array = data?.primary_diagnoses;
-                            } else if (seriesName.includes('PRIMARY_DIAGNOSIS')) {
-                                category = 'primary_diagnoses';
-                                array = data?.primary_diagnoses;
-                            } else if (seriesID === 'treatments' || seriesName === 'Treatments') {
-                                category = 'treatments';
+                            if (seriesID === 'biomarkers') {
+                                onEventClick?.(['biomarkers', 0], data?.biomarkers);
+                            } else if (seriesID === 'specimens') {
+                                onEventClick?.(['specimens', 1], data?.primary_diagnoses?.map((diagnosis) => diagnosis.specimens)?.flat(1));
+                            } else if (seriesID === 'primary_diagnoses') {
+                                onEventClick?.(['primary_diagnoses', 0], data?.primary_diagnoses);
+                            } else if (seriesID === 'treatments') {
                                 const aggregateTreatments = () => {
                                     let allTreatments = [];
                                     data?.primary_diagnoses?.forEach((diagnosis) => {
@@ -584,42 +551,23 @@ function Timeline({ data, onEventClick }) {
 
                                     return allTreatments;
                                 };
-                                array = aggregateTreatments(data);
+                                onEventClick?.(['treatments', 1], aggregateTreatments(data));
                             } else if (seriesID === 'Followup&Relapse1') {
-                                category = 'followups';
-                                array = data?.primary_diagnoses;
+                                const aggregateFollowups = (diagnoses) =>
+                                    diagnoses
+                                        ?.map((diagnosis) => diagnosis?.followups)
+                                        ?.filter((obj) => !!obj)
+                                        ?.flat(1);
+                                onEventClick?.(['followups', 1], aggregateFollowups(data?.primary_diagnoses));
                             } else if (seriesID === 'Followup&Relapse2') {
-                                category = 'followups';
-                                const aggregateFollowups = () => {
-                                    let allFollowups = [];
-                                    data?.primary_diagnoses?.forEach((diagnosis) => {
-                                        if (Array.isArray(diagnosis.followups)) {
-                                            allFollowups = allFollowups.concat(diagnosis.followups);
-                                        }
-                                    });
-
-                                    return allFollowups;
-                                };
-                                array = aggregateFollowups(data);
+                                onEventClick?.(['followups', 0], data?.followups);
                             } else if (seriesID === 'Followup&Relapse3') {
-                                category = 'followups';
-                                const aggregateFollowups = () => {
-                                    let allFollowups = [];
-                                    data?.primary_diagnoses?.forEach((diagnosis) => {
-                                        diagnosis.treatments?.forEach((treatment) => {
-                                            if (Array.isArray(treatment.followups)) {
-                                                allFollowups = allFollowups.concat(treatment.followups);
-                                            }
-                                        });
-                                    });
-
-                                    return allFollowups;
-                                };
-                                array = aggregateFollowups(data);
-                            }
-
-                            if (category && onEventClick) {
-                                onEventClick(category, array);
+                                const aggregateFollowups = (diagnoses) =>
+                                    diagnoses
+                                        ?.map((diagnosis) => diagnosis?.followups)
+                                        ?.flat(1)
+                                        ?.filter((obj) => !!obj);
+                                onEventClick?.(['followups', 1], aggregateFollowups(data?.primary_diagnoses));
                             }
                         }
                     }
@@ -630,40 +578,6 @@ function Timeline({ data, onEventClick }) {
                 enabled: false
             }
         });
-
-        setChartOptions((prevOptions) => ({
-            ...prevOptions,
-            chart: {
-                ...prevOptions.chart,
-                events: {
-                    render() {
-                        const chart = this;
-
-                        if (chart.customButton) {
-                            chart.customButton.destroy();
-                        }
-
-                        const treatmentCategoryIndex = chart.yAxis[0].categories.indexOf('Treatments');
-                        const yPosition = chart.yAxis[0].toPixels(treatmentCategoryIndex) - 5;
-                        chart.customButton = chart.renderer
-                            .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
-                            .attr({
-                                fill: '#7cb5ec',
-                                cursor: 'pointer'
-                            })
-                            .add()
-                            .on('click', () => {
-                                toggleTreatmentsCollapse();
-                            });
-
-                        const rotationDeg = isTreatmentsCollapsed ? 180 : 0;
-                        chart.customButton.attr({
-                            transform: `rotate(${rotationDeg} ${chart.customButton.x + 5} ${chart.customButton.y + 5})`
-                        });
-                    }
-                }
-            }
-        }));
     }, [
         data,
         isTreatmentsCollapsed,

@@ -35,15 +35,23 @@ function ClinicalPatientView() {
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
     const [location, setLocation] = useState('');
-    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(patientId, programId, location);
+    // When the following is changed, the folders of the clinical sidebar should also change (once per change)
+    const [forceSelection, setForceSelection] = useState([0, null]);
+    const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(
+        patientId,
+        programId,
+        location,
+        forceSelection
+    );
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
     const dateOfBirth = data?.date_of_birth;
 
     const handleEventClick = (category, array) => {
-        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category, array, ageAtFirstDiagnosis);
+        const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category[0], array, ageAtFirstDiagnosis);
         setTitle(titleClick);
         setColumns(reorderedColumns);
         setRows(rowsClick);
+        setForceSelection((old) => [old[0] + 1, category]);
     };
 
     useEffect(() => {
