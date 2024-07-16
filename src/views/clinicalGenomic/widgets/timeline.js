@@ -32,7 +32,7 @@ const tooltipFormatter = () =>
         const boldName = `<span style="font-weight: bold">${this.name || 'Treatment'}</span><br/>`;
 
         const getDateText = (value) =>
-            `${Math.floor(value / 12)}y / ${Math.floor(value % 12)}m ${value % 1 !== 0 ? `/ ${(value % 1) * 32}d` : ''}`;
+            `${Math.floor(value / 12)}y ${Math.floor(value % 12)}m ${value % 1 !== 0 ? ` ${(value % 1) * 32}d` : ''}`;
 
         const treatmentTypeText = this.treatment_type ? `Type: ${this.treatment_type}` : 'Treatment type not specified';
 
@@ -535,7 +535,6 @@ function Timeline({ data, onEventClick }) {
                             } else if (seriesID === 'primary_diagnoses') {
                                 onEventClick?.('primary_diagnoses', data?.primary_diagnoses);
                             } else if (seriesID === 'treatments') {
-                                console.log(data);
                                 const aggregateTreatments = () => {
                                     let allTreatments = [];
                                     data?.primary_diagnoses?.forEach((diagnosis) => {
@@ -549,7 +548,10 @@ function Timeline({ data, onEventClick }) {
                                 onEventClick?.('treatments', aggregateTreatments(data));
                             } else if (seriesID === 'Followup&Relapse1') {
                                 const aggregateFollowups = (diagnoses) =>
-                                    diagnoses?.map((diagnosis) => diagnosis?.followups).filter((obj) => !!obj);
+                                    diagnoses
+                                        ?.map((diagnosis) => diagnosis?.followups)
+                                        ?.filter((obj) => !!obj)
+                                        ?.flat(1);
                                 onEventClick?.('followups', aggregateFollowups(data?.primary_diagnoses));
                             } else if (seriesID === 'Followup&Relapse2') {
                                 onEventClick?.('followups', data?.followups);
@@ -557,19 +559,6 @@ function Timeline({ data, onEventClick }) {
                                 const aggregateFollowups = (diagnoses) =>
                                     diagnoses?.map((diagnosis) => diagnosis?.followups).filter((obj) => !!obj);
                                 onEventClick?.('followups', aggregateFollowups(data?.primary_diagnoses));
-                                /* const aggregateFollowups = () => {
-                                    let allFollowups = [];
-                                    data?.primary_diagnoses?.forEach((diagnosis) => {
-                                        diagnosis.treatments?.forEach((treatment) => {
-                                            if (Array.isArray(treatment.followups)) {
-                                                allFollowups = allFollowups.concat(treatment.followups);
-                                            }
-                                        });
-                                    });
-
-                                    return allFollowups;
-                                };
-                                onEventClick?.('followups', aggregateFollowups(data)); */
                             }
                         }
                     }
