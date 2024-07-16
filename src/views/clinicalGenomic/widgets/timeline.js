@@ -539,7 +539,7 @@ function Timeline({ data, onEventClick }) {
                             } else if (seriesID === 'specimens') {
                                 onEventClick?.(['specimens', 1], data?.primary_diagnoses?.map((diagnosis) => diagnosis.specimens)?.flat(1));
                             } else if (seriesID === 'primary_diagnoses') {
-                                onEventClick?.(['primary_diagnoses', 1], data?.primary_diagnoses);
+                                onEventClick?.(['primary_diagnoses', 0], data?.primary_diagnoses);
                             } else if (seriesID === 'treatments') {
                                 const aggregateTreatments = () => {
                                     let allTreatments = [];
