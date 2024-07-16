@@ -55,7 +55,6 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
         if (forceSelection[1] != null) {
             const categoryName = forceSelection[1][0];
             const categoryDepth = forceSelection[1][1];
-            console.log(sidebar);
             const categoryKey = categoryName + (categoryDepth > 0 ? `-${categoryDepth - 1}-${categoryDepth > 1 ? 1.5 : 0}` : '');
             setSelected(categoryKey);
         }
