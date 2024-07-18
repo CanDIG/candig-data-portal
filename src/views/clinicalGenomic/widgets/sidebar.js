@@ -424,7 +424,6 @@ function Sidebar() {
     // On our first load, remove all query parameters
     useEffect(() => {
         writerContext(() => ({}));
-        console.log('Refreshing writer context');
     }, [writerContext]);
 
     function resetButton() {
