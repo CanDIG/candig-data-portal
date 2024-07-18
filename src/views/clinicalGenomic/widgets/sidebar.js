@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Checkbox,
@@ -413,8 +413,8 @@ function Sidebar() {
     const [endPos, setEndPos] = useState('0');
 
     // Clinical Data
-    const [_selectedNodes, setSelectedNodes] = useState({});
-    const [_selectedCohorts, setSelectedCohorts] = useState({});
+    const [selectedNodes, setSelectedNodes] = useState({});
+    const [selectedCohorts, setSelectedCohorts] = useState({});
     const [selectedTreatment, setSelectedTreatment] = useState({});
     const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
     const [selectedChemotherapy, setSelectedChemotherapy] = useState({});
@@ -424,7 +424,6 @@ function Sidebar() {
     // On our first load, remove all query parameters
     useEffect(() => {
         writerContext(() => ({}));
-        console.log('Refreshing writer context');
     }, [writerContext]);
 
     function resetButton() {
