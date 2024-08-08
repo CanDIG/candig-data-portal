@@ -53,7 +53,7 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
             try {
                 // Construct the API URL based on the provided parameters
                 if (programId && patientId) {
-                    const url = `v2/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
+                    const url = `v3/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
 
                     const result = await fetchFederation(url, 'katsu');
                     // Extract patientData from the fetched result or use an empty object

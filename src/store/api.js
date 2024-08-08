@@ -58,7 +58,7 @@ export function fetchFederationStat(endpoint) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: `v2/discovery/overview${endpoint}`,
+            path: `v3/discovery/overview${endpoint}`,
             payload: {},
             service: 'katsu'
         })
