@@ -71,8 +71,6 @@ function Sidebar({ useFullScreen, drawerOpen, drawerToggle }) {
     //      To fix this, we're going to manually force the menu closed when we detect useFullScreen changes
     const useOpen = useFullScreen !== lastUsedFullscreen ? false : drawerOpen;
 
-    console.log(`drawerOpen: ${drawerOpen} useFullScreen: ${useFullScreen}`);
-
     return (
         <Root className={classes.drawer} aria-label="mailbox folders">
             <Drawer
