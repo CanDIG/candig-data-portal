@@ -124,7 +124,7 @@ function Timeline({ data, onEventClick }) {
                           }
 
                           // Determine the biomarker name
-                          const biomarkerName = `${namePrefix}${id || ''} Biomarker Test`;
+                          const biomarkerName = `${namePrefix}${id} 'Biomarker Test`;
 
                           // Return the series data point
                           return biomarkerDate
