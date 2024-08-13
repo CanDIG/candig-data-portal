@@ -65,14 +65,15 @@ function Timeline({ data, onEventClick }) {
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
     const theme = useTheme();
     useEffect(() => {
-        const birthDate = data?.date_of_birth?.month_interval ?? 0;
+        let dob = data?.date_of_birth?.month_interval ?? 0;
+        dob += data?.date_of_birth?.day_interval ? (data.date_of_birth.day_interval % 32) / 32 : 0;
 
         const formatDate = (date) => {
             if (date?.month_interval !== undefined) {
                 if (date?.day_interval) {
-                    return date.month_interval + date.day_interval / 32 - birthDate;
+                    return date.month_interval + (date.day_interval % 32) / 32 - dob;
                 }
-                return date.month_interval - birthDate;
+                return date.month_interval - dob;
             }
             return '';
         };
@@ -150,7 +151,6 @@ function Timeline({ data, onEventClick }) {
                     : []
             ) || [];
 
-        const dob = data?.date_of_birth?.month_interval;
         const dateOfBirthSeries = generateSeriesDataSingle(data?.date_of_birth, 'Date of Birth', 0, theme.palette.primary.light, dob);
         const dateOfDeathSeries = generateSeriesDataSingle(data?.date_of_death, 'Age at Death', 0, theme.palette.primary.main, dob);
         const dateAliveAfterLostToFollowupSeries = generateSeriesDataSingle(
