@@ -16,7 +16,7 @@ const formatHeader = (dateResolution) =>
         const value = Math.floor(this.value);
 
         if (dateResolution === 'Month') {
-            const monthsSinceStart = value % 12;
+            const monthsSinceStart = (value % 12) + 1;
             return `${monthsSinceStart} Month(s)`;
         }
         if (dateResolution === 'Year') {
@@ -102,22 +102,42 @@ function Timeline({ data, onEventClick }) {
                   }))
                 : [];
 
-        const generateSeriesDataBiomarker = (data, namePrefix, y, colour, date, name) =>
+        const generateSeriesDataBiomarker = (data, namePrefix, y, colour, date, name, fullData) =>
             Array.isArray(data)
-                ? data.map((item) => {
-                      const id =
-                          item?.submitter_treatment_id ||
-                          item?.submitter_primary_diagnosis_id ||
-                          item?.submitter_follow_up_id ||
-                          item?.submitter_specimen_id;
-                      return {
-                          x: formatDate(item?.[date]),
-                          y,
-                          name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
-                          color: colour,
-                          customGroupId: name
-                      };
-                  })
+                ? data
+                      .map((item) => {
+                          // Determine the biomarker linked ID
+                          const id =
+                              item?.submitter_treatment_id ||
+                              item?.submitter_primary_diagnosis_id ||
+                              item?.submitter_follow_up_id ||
+                              item?.submitter_specimen_id;
+
+                          const biomarkerDate = item?.[date];
+
+                          // Determine the linked object date if biomarkerDate is not available
+                          let linkedObjectDate;
+                          if (biomarkerDate === null) {
+                              linkedObjectDate = fullData.primary_diagnoses.find(
+                                  (diagnosis) => diagnosis.submitter_primary_diagnosis_id === item.submitter_primary_diagnosis_id
+                              )?.date_of_diagnosis;
+                          }
+
+                          // Determine the biomarker name
+                          const biomarkerName = `${namePrefix}${id || ''} Biomarker Test`;
+
+                          // Return the series data point
+                          return biomarkerDate
+                              ? {
+                                    x: formatDate(biomarkerDate),
+                                    y,
+                                    name: biomarkerName,
+                                    color: colour,
+                                    customGroupId: name
+                                }
+                              : null;
+                      })
+                      .filter((item) => item !== null)
                 : [];
 
         const generateSeriesDataSpecimen = (data, path, namePrefix, y, colour, date, name, id) =>
@@ -193,7 +213,8 @@ function Timeline({ data, onEventClick }) {
             2,
             theme.palette.secondary.dark,
             'test_date',
-            'biomarkers'
+            'biomarkers',
+            data
         );
         const followupSeries1 = generateSeriesDataSpecimen(
             data?.primary_diagnoses,
