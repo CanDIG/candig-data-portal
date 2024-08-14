@@ -566,7 +566,7 @@ function Sidebar() {
                 <StyledCheckboxList
                     options={systemicTherapyDrugNames}
                     onWrite={writerContext}
-                    groupName="systemic_therapy"
+                    groupName="drug_name"
                     useAutoComplete={systemicTherapyDrugNames.length >= 5}
                     hide={hideClinical}
                     checked={selectedSystemicTherapy}
