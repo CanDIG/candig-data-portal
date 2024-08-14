@@ -17,11 +17,11 @@ const formatHeader = (dateResolution) =>
 
         if (dateResolution === 'Month') {
             const monthsSinceStart = (value % 12) + 1;
-            return `${monthsSinceStart} Month(s)`;
+            return `${monthsSinceStart}M`;
         }
         if (dateResolution === 'Year') {
             const yearsSinceStart = Math.floor(value / 12);
-            return `${yearsSinceStart} Year(s) Old`;
+            return `${yearsSinceStart}Y`;
         }
         return `Age Unknown`;
     };
@@ -124,9 +124,30 @@ function Timeline({ data, onEventClick }) {
                           }
 
                           // Determine the biomarker name
-                          const biomarkerName = `${namePrefix}${id} 'Biomarker Test`;
+                          let dateLabel = '';
 
-                          // Return the series data point
+                          if (!id) {
+                              if (biomarkerDate || linkedObjectDate) {
+                                  const dateObject = biomarkerDate || linkedObjectDate;
+                                  if (dateObject.day_interval) {
+                                      const ageInDays = dateObject.day_interval;
+                                      const years = Math.floor(ageInDays / 365);
+                                      const remainingDays = ageInDays % 365;
+                                      const months = Math.floor(remainingDays / 30);
+                                      const days = remainingDays % 30;
+
+                                      dateLabel = `${years}y ${months}m ${days}d`;
+                                  } else if (dateObject.month_interval) {
+                                      const ageInMonths = dateObject.month_interval;
+                                      const years = Math.floor(ageInMonths / 12);
+                                      const remainingMonths = ageInMonths % 12;
+                                      dateLabel = `${years}y ${remainingMonths}m`;
+                                  }
+                              }
+                          }
+
+                          const biomarkerName = `${namePrefix}${id || ''} Biomarker ${id ? '' : `${dateLabel} since diagnosis`}`;
+                          // Return the series data pointy
                           return biomarkerDate
                               ? {
                                     x: formatDate(biomarkerDate),
