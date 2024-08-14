@@ -49,7 +49,7 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
 
     useEffect(() => {
         function fetchPrograms() {
-            return fetchFederation('v2/discovery/donors/', 'katsu')
+            return fetchFederation('v3/discovery/donors/', 'katsu')
                 .then((result) => {
                     result.forEach((site) => {
                         const programs = site.results.discovery_donor;

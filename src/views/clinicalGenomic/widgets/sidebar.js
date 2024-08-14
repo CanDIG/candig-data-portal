@@ -417,9 +417,7 @@ function Sidebar() {
     const [selectedCohorts, setSelectedCohorts] = useState({});
     const [selectedTreatment, setSelectedTreatment] = useState({});
     const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
-    const [selectedChemotherapy, setSelectedChemotherapy] = useState({});
-    const [selectedImmunotherapy, setSelectedImmunotherapy] = useState({});
-    const [selectedHormoneTherapy, setSelectedHormoneTherapy] = useState({});
+    const [selectedSystemicTherapy, setSelectedSystemicTherapy] = useState({});
 
     // On our first load, remove all query parameters
     useEffect(() => {
@@ -449,9 +447,7 @@ function Sidebar() {
         // Clinical
         setSelectedTreatment({});
         setSelectedPrimarySite({});
-        setSelectedChemotherapy({});
-        setSelectedImmunotherapy({});
-        setSelectedHormoneTherapy({});
+        setSelectedSystemicTherapy({});
 
         // Set context writer to include only nodes and cohorts
         writerContext({
@@ -481,9 +477,7 @@ function Sidebar() {
     const authorizedCohorts = readerContext?.programs?.flatMap((loc) => loc?.results?.items.map((cohort) => cohort.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
-    const chemotherapyDrugNames = ExtractSidebarElements('chemotherapy_drug_names');
-    const immunotherapyDrugNames = ExtractSidebarElements('immunotherapy_drug_names');
-    const hormoneTherapyDrugNames = ExtractSidebarElements('hormone_therapy_drug_names');
+    const systemicTherapyDrugNames = ExtractSidebarElements('drug_names');
     const chromosomes = [];
     const genes = readerContext?.genes;
 
@@ -551,7 +545,7 @@ function Sidebar() {
                     options={treatmentTypes}
                     onWrite={writerContext}
                     groupName="treatment"
-                    useAutoComplete={treatmentTypes.length >= 10}
+                    useAutoComplete={treatmentTypes.length >= 5}
                     hide={hideClinical}
                     checked={selectedTreatment}
                     setChecked={setSelectedTreatment}
@@ -562,43 +556,21 @@ function Sidebar() {
                     options={tumourPrimarySites}
                     onWrite={writerContext}
                     groupName="primary_site"
-                    useAutoComplete={tumourPrimarySites.length >= 10}
+                    useAutoComplete={tumourPrimarySites.length >= 5}
                     hide={hideClinical}
                     checked={selectedPrimarySite}
                     setChecked={setSelectedPrimarySite}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Chemotherapy" hide={hideClinical}>
+            <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
                 <StyledCheckboxList
-                    options={chemotherapyDrugNames}
+                    options={systemicTherapyDrugNames}
                     onWrite={writerContext}
-                    groupName="chemotherapy"
-                    useAutoComplete={chemotherapyDrugNames.length >= 10}
+                    groupName="drug_name"
+                    useAutoComplete={systemicTherapyDrugNames.length >= 5}
                     hide={hideClinical}
-                    checked={selectedChemotherapy}
-                    setChecked={setSelectedChemotherapy}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Immunotherapy" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={immunotherapyDrugNames}
-                    onWrite={writerContext}
-                    groupName="immunotherapy"
-                    useAutoComplete={immunotherapyDrugNames.length >= 10}
-                    hide={hideClinical}
-                    checked={selectedImmunotherapy}
-                    setChecked={setSelectedImmunotherapy}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Hormone Therapy" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={hormoneTherapyDrugNames}
-                    onWrite={writerContext}
-                    groupName="hormone_therapy"
-                    useAutoComplete={hormoneTherapyDrugNames.length >= 10}
-                    hide={hideClinical}
-                    checked={selectedHormoneTherapy}
-                    setChecked={setSelectedHormoneTherapy}
+                    checked={selectedSystemicTherapy}
+                    setChecked={setSelectedSystemicTherapy}
                 />
             </SidebarGroup>
         </Root>
