@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 
 import { styled } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
 
 // mui
-import { Box, Drawer } from '@mui/material';
+import { useTheme } from '@mui/system';
+import { Box, Drawer, useMediaQuery } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -58,48 +58,50 @@ const Root = styled('nav')(({ theme }) => ({
 }));
 
 // ===========================|| SIDEBAR DRAWER ||=========================== //
-function Sidebar({ useFullScreen, drawerOpen, drawerToggle }) {
+function Sidebar({ drawerOpen, drawerToggle, screen }) {
+    const theme = useTheme();
+    const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
     const sidebarContext = useSidebarReaderContext();
-    const [lastUsedFullscreen, setLastUsedFullscreen] = useState(useFullScreen);
 
-    useEffect(() => {
-        setLastUsedFullscreen(useFullScreen);
-    }, [useFullScreen]);
+    const drawer = (
+        <>
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                <div className={classes.boxContainer}>
+                    <LogoSection />
+                </div>
+            </Box>
+            <BrowserView>
+                <PerfectScrollbar component="div" className={classes.ScrollHeight}>
+                    {
+                        // The fragment below suppresses a warning we get in console due to undefined passed as a child
+                        // eslint-disable-next-line react/jsx-no-useless-fragment
+                        sidebarContext || <></>
+                    }
+                </PerfectScrollbar>
+            </BrowserView>
+            <MobileView>
+                <Box sx={{ px: 2 }}>{sidebarContext || null}</Box>
+            </MobileView>
+        </>
+    );
 
-    // NB: There's an issue where changing Drawer's `variant` and `open` too quickly (i.e. in a double-redraw update via useEffect)
-    //      causes a bug where the modal presentation is open (blocking user input) but nothing is displayed
-    //      To fix this, we're going to manually force the menu closed when we detect useFullScreen changes
-    const useOpen = useFullScreen !== lastUsedFullscreen ? false : drawerOpen;
+    const container = screen !== undefined ? () => window().document.body : undefined;
 
     return (
         <Root className={classes.drawer} aria-label="mailbox folders">
             <Drawer
-                variant={useFullScreen ? 'persistent' : 'temporary'}
+                container={container}
+                variant={matchUpMd ? 'persistent' : 'temporary'}
                 anchor="left"
-                open={useOpen}
+                open={drawerOpen}
                 onClose={drawerToggle}
                 classes={{
                     paper: classes.drawerPaper
                 }}
+                ModalProps={{ keepMounted: true }}
                 color="inherit"
             >
-                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                    <div className={classes.boxContainer}>
-                        <LogoSection />
-                    </div>
-                </Box>
-                <BrowserView>
-                    <PerfectScrollbar component="div" className={classes.ScrollHeight}>
-                        {
-                            // The fragment below suppresses a warning we get in console due to undefined passed as a child
-                            // eslint-disable-next-line react/jsx-no-useless-fragment
-                            sidebarContext || <></>
-                        }
-                    </PerfectScrollbar>
-                </BrowserView>
-                <MobileView>
-                    <Box sx={{ px: 2 }}>{sidebarContext || null}</Box>
-                </MobileView>
+                {drawer}
             </Drawer>
         </Root>
     );
@@ -108,7 +110,7 @@ function Sidebar({ useFullScreen, drawerOpen, drawerToggle }) {
 Sidebar.propTypes = {
     drawerOpen: PropTypes.bool,
     drawerToggle: PropTypes.func,
-    useFullScreen: PropTypes.bool
+    screen: PropTypes.object
 };
 
 export default Sidebar;

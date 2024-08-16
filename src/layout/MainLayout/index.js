@@ -145,7 +145,7 @@ function MainLayout() {
                 </AppBar>
 
                 {/* drawer */}
-                <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+                <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
                 {/* main content */}
                 <main
