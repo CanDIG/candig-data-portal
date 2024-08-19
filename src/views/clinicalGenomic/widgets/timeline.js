@@ -86,7 +86,8 @@ function Timeline({ data, onEventClick }) {
                           y,
                           name,
                           color: colour,
-                          customGroupId: name
+                          customGroupId: name,
+                          showInNavigator: true
                       }
                   ]
                 : [];
@@ -98,7 +99,8 @@ function Timeline({ data, onEventClick }) {
                       y,
                       name: `${namePrefix}${item?.[id]}`,
                       color: colour,
-                      customGroupId: name
+                      customGroupId: name,
+                      showInNavigator: true
                   }))
                 : [];
 
@@ -154,7 +156,8 @@ function Timeline({ data, onEventClick }) {
                                     y,
                                     name: biomarkerName,
                                     color: colour,
-                                    customGroupId: name
+                                    customGroupId: name,
+                                    showInNavigator: true
                                 }
                               : null;
                       })
@@ -169,7 +172,8 @@ function Timeline({ data, onEventClick }) {
                           y,
                           name: `${namePrefix}${subItem?.[id]}`,
                           color: colour,
-                          customGroupId: name
+                          customGroupId: name,
+                          showInNavigator: true
                       }))
                     : []
             ) || [];
@@ -185,7 +189,8 @@ function Timeline({ data, onEventClick }) {
                                     y,
                                     name: `${namePrefix}${subItem2?.[id]}`,
                                     color: colour,
-                                    customGroupId: name
+                                    customGroupId: name,
+                                    showInNavigator: true
                                 }))
                               : []
                       )
@@ -572,6 +577,7 @@ function Timeline({ data, onEventClick }) {
                         }
                     },
                     cursor: 'pointer',
+                    showInNavigator: true,
                     events: {
                         click(event) {
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;
