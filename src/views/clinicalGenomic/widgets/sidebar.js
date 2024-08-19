@@ -431,12 +431,7 @@ function Sidebar() {
         const locations = readerContext?.programs?.map((loc) => loc.location.name);
 
         if (locations) {
-            const selectedNodes = locations.reduce((acc, loc) => {
-                acc[loc] = true;
-                return acc;
-            }, {});
-
-            setSelectedNodes(selectedNodes);
+            setSelectedNodes(locations);
         }
 
         setSelectedCohorts([readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id)).flat(1) || []]);
