@@ -239,6 +239,7 @@ function Summary() {
                     dataVis=""
                     height="400px; auto"
                     loading={diagnosisAgeCount === undefined}
+                    orderAlphabetically
                     chartType="bar"
                     dropDown={false}
                 />
