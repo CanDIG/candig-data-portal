@@ -96,8 +96,15 @@ function ClinicalPatientView() {
                     </div>
                 ))}
             </StyledTopLevelBox>
-            <div style={{ width: '100%', height: '68vh' }}>
-                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
+            <div style={{ width: '100%' }}>
+                <DataGrid
+                    sx={{ minHeight: '30vh', maxHeight: '68vh' }}
+                    rows={rows}
+                    columns={columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    hideFooterSelectedRowCount
+                />
             </div>
             {dateOfBirth && (
                 <TimelineContainer>
