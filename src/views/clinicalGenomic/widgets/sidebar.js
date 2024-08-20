@@ -428,13 +428,9 @@ function Sidebar() {
 
     function resetButton() {
         // Reset state variables for checkboxes and dropdowns
-        const locations = readerContext?.programs?.map((loc) => loc.location.name);
+        setSelectedNodes({});
+        setSelectedCohorts({});
 
-        if (locations) {
-            setSelectedNodes(locations);
-        }
-
-        setSelectedCohorts([readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id)).flat(1) || []]);
         // Genomic
         setSelectedGenes('');
         setSelectedChromosomes('');
