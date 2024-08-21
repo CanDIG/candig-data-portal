@@ -16,12 +16,12 @@ const formatHeader = (dateResolution) =>
         const value = Math.floor(this.value);
 
         if (dateResolution === 'Month') {
-            const monthsSinceStart = value % 12;
-            return `${monthsSinceStart} Month(s)`;
+            const monthsSinceStart = (value % 12) + 1;
+            return `${monthsSinceStart}M`;
         }
         if (dateResolution === 'Year') {
             const yearsSinceStart = Math.floor(value / 12);
-            return `${yearsSinceStart} Year(s) Old`;
+            return `${yearsSinceStart}Y`;
         }
         return `Age Unknown`;
     };
@@ -65,14 +65,15 @@ function Timeline({ data, onEventClick }) {
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
     const theme = useTheme();
     useEffect(() => {
-        const birthDate = data?.date_of_birth?.month_interval ?? 0;
+        let dob = data?.date_of_birth?.month_interval ?? 0;
+        dob += data?.date_of_birth?.day_interval ? (data.date_of_birth.day_interval % 32) / 32 : 0;
 
         const formatDate = (date) => {
             if (date?.month_interval !== undefined) {
                 if (date?.day_interval) {
-                    return date.month_interval + date.day_interval / 32 - birthDate;
+                    return date.month_interval + (date.day_interval % 32) / 32 - dob;
                 }
-                return date.month_interval - birthDate;
+                return date.month_interval - dob;
             }
             return '';
         };
@@ -85,7 +86,8 @@ function Timeline({ data, onEventClick }) {
                           y,
                           name,
                           color: colour,
-                          customGroupId: name
+                          customGroupId: name,
+                          showInNavigator: true
                       }
                   ]
                 : [];
@@ -97,26 +99,69 @@ function Timeline({ data, onEventClick }) {
                       y,
                       name: `${namePrefix}${item?.[id]}`,
                       color: colour,
-                      customGroupId: name
+                      customGroupId: name,
+                      showInNavigator: true
                   }))
                 : [];
 
-        const generateSeriesDataBiomarker = (data, namePrefix, y, colour, date, name) =>
+        const generateSeriesDataBiomarker = (data, namePrefix, y, colour, date, name, fullData) =>
             Array.isArray(data)
-                ? data.map((item) => {
-                      const id =
-                          item?.submitter_treatment_id ||
-                          item?.submitter_primary_diagnosis_id ||
-                          item?.submitter_follow_up_id ||
-                          item?.submitter_specimen_id;
-                      return {
-                          x: formatDate(item?.[date]),
-                          y,
-                          name: `${namePrefix}${typeof id !== 'undefined' ? id : 'No Linked Event'}`,
-                          color: colour,
-                          customGroupId: name
-                      };
-                  })
+                ? data
+                      .map((item) => {
+                          // Determine the biomarker linked ID
+                          const id =
+                              item?.submitter_treatment_id ||
+                              item?.submitter_primary_diagnosis_id ||
+                              item?.submitter_follow_up_id ||
+                              item?.submitter_specimen_id;
+
+                          const biomarkerDate = item?.[date];
+
+                          // Determine the linked object date if biomarkerDate is not available
+                          let linkedObjectDate;
+                          if (biomarkerDate === null) {
+                              linkedObjectDate = fullData.primary_diagnoses.find(
+                                  (diagnosis) => diagnosis.submitter_primary_diagnosis_id === item.submitter_primary_diagnosis_id
+                              )?.date_of_diagnosis;
+                          }
+
+                          // Determine the biomarker name
+                          let dateLabel = '';
+
+                          if (!id) {
+                              if (biomarkerDate || linkedObjectDate) {
+                                  const dateObject = biomarkerDate || linkedObjectDate;
+                                  if (dateObject.day_interval) {
+                                      const ageInDays = dateObject.day_interval;
+                                      const years = Math.floor(ageInDays / 365);
+                                      const remainingDays = ageInDays % 365;
+                                      const months = Math.floor(remainingDays / 30);
+                                      const days = remainingDays % 30;
+
+                                      dateLabel = `${years}y ${months}m ${days}d`;
+                                  } else if (dateObject.month_interval) {
+                                      const ageInMonths = dateObject.month_interval;
+                                      const years = Math.floor(ageInMonths / 12);
+                                      const remainingMonths = ageInMonths % 12;
+                                      dateLabel = `${years}y ${remainingMonths}m`;
+                                  }
+                              }
+                          }
+
+                          const biomarkerName = `${namePrefix}${id || ''} Biomarker ${id ? '' : `${dateLabel} since diagnosis`}`;
+                          // Return the series data pointy
+                          return biomarkerDate
+                              ? {
+                                    x: formatDate(biomarkerDate),
+                                    y,
+                                    name: biomarkerName,
+                                    color: colour,
+                                    customGroupId: name,
+                                    showInNavigator: true
+                                }
+                              : null;
+                      })
+                      .filter((item) => item !== null)
                 : [];
 
         const generateSeriesDataSpecimen = (data, path, namePrefix, y, colour, date, name, id) =>
@@ -127,7 +172,8 @@ function Timeline({ data, onEventClick }) {
                           y,
                           name: `${namePrefix}${subItem?.[id]}`,
                           color: colour,
-                          customGroupId: name
+                          customGroupId: name,
+                          showInNavigator: true
                       }))
                     : []
             ) || [];
@@ -143,14 +189,14 @@ function Timeline({ data, onEventClick }) {
                                     y,
                                     name: `${namePrefix}${subItem2?.[id]}`,
                                     color: colour,
-                                    customGroupId: name
+                                    customGroupId: name,
+                                    showInNavigator: true
                                 }))
                               : []
                       )
                     : []
             ) || [];
 
-        const dob = data?.date_of_birth?.month_interval;
         const dateOfBirthSeries = generateSeriesDataSingle(data?.date_of_birth, 'Date of Birth', 0, theme.palette.primary.light, dob);
         const dateOfDeathSeries = generateSeriesDataSingle(data?.date_of_death, 'Age at Death', 0, theme.palette.primary.main, dob);
         const dateAliveAfterLostToFollowupSeries = generateSeriesDataSingle(
@@ -193,7 +239,8 @@ function Timeline({ data, onEventClick }) {
             2,
             theme.palette.secondary.dark,
             'test_date',
-            'biomarkers'
+            'biomarkers',
+            data
         );
         const followupSeries1 = generateSeriesDataSpecimen(
             data?.primary_diagnoses,
@@ -530,6 +577,7 @@ function Timeline({ data, onEventClick }) {
                         }
                     },
                     cursor: 'pointer',
+                    showInNavigator: true,
                     events: {
                         click(event) {
                             const seriesID = event.point.series.userOptions.data[0].customGroupId;

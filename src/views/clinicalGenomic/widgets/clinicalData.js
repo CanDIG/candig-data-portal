@@ -160,7 +160,7 @@ function ClinicalView() {
             <Typography pb={1} variant="h4">
                 Clinical Data
             </Typography>
-            <div style={{ height: 510, width: '100%' }}>
+            <div style={{ height: 680, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}

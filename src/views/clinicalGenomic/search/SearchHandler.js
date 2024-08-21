@@ -22,7 +22,7 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         lastPromise = trackPromise(
-            fetchFederation('v2/discovery/sidebar_list', 'katsu')
+            fetchFederation('v3/discovery/sidebar_list', 'katsu')
                 .then((data) => {
                     writer((old) => ({ ...old, sidebar: data }));
                 })
@@ -30,7 +30,7 @@ function SearchHandler({ setLoading }) {
                 .then((data) => {
                     writer((old) => ({ ...old, federation: data }));
                 })
-                .then(() => fetchFederation('v2/authorized/programs', 'katsu'))
+                .then(() => fetchFederation('v3/authorized/programs', 'katsu'))
                 .then((data) => {
                     writer((old) => ({ ...old, programs: data }));
                 })
@@ -165,7 +165,7 @@ function SearchHandler({ setLoading }) {
         }
         setLoading(true);
 
-        const url = `v2/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
+        const url = `v3/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu')
                 .then((data) => {
