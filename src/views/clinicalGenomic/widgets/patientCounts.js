@@ -27,22 +27,33 @@ function PatientCounts() {
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
     const programs = context?.programs;
+    const discoveryCounts = context?.counts?.patients_per_cohort;
+    const clinicalCounts = context?.clinical;
 
     // Generate the map of site->cohort->numbers
     let siteData = [];
     if (Array.isArray(sites)) {
         siteData = sites.map((entry) => {
-            const counts = context?.counts?.patients_per_cohort?.[entry.location.name] || {};
+            const counts = discoveryCounts?.[entry.location.name] || {};
+            const realCounts = clinicalCounts?.[entry.location.name]?.summary?.patients_per_cohort || {};
             let unlockedPrograms = [];
+            // Fill up the programs using the summary counts
             if (Array.isArray(programs)) {
                 unlockedPrograms = programs
                     .filter((search) => entry.location.name === search.location.name)?.[0]
                     ?.results?.items?.map((program) => program.program_id);
             }
 
+            const finalCounts = {};
+            Object.keys(counts).forEach((program) => {
+                finalCounts[program] = program in realCounts ? realCounts[program] : counts[program];
+            });
+
+            // Where possible, also use the real counts
+
             return {
                 location: entry.location.name,
-                counts,
+                counts: finalCounts,
                 totals: entry?.results || {},
                 unlockedPrograms
             };
