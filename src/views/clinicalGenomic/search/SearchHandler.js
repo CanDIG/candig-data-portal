@@ -85,7 +85,7 @@ function SearchHandler({ setLoading }) {
                     }
 
                     const discoveryCounts = {
-                        diagnosis_age_count: CollateSummary(data, 'age_at_diagnosis'),
+                        age_at_diagnosis: CollateSummary(data, 'age_at_diagnosis'),
                         treatment_type_count: CollateSummary(data, 'treatment_type_count'),
                         primary_site_count: CollateSummary(data, 'primary_site_count'),
                         patients_per_cohort: {}
