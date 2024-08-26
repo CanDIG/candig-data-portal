@@ -23,24 +23,51 @@ import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
 
 function DataVisualization() {
     // Hooks
-    const resultsContext = useSearchResultsReaderContext().counts;
+    const resultsContext = useSearchResultsReaderContext();
+    const counts = resultsContext.counts;
+    const clinical = resultsContext.clinical;
     // Plan for context below see current dataVis for expected shape
-    // const dataVis = resultsContext || {};
-    const handleCensoring = (dataObj) => {
+    // const dataVis = counts || {};
+    const isCensored = (datum) => typeof datum === 'string' && datum.startsWith('<');
+    const handleCensoring = (dataKey, transformer = (site, input) => input, isObject = false) => {
+        const dataObj = counts?.[dataKey];
         if (dataObj === null || typeof dataObj === 'undefined') {
             return {};
         }
 
         let hasCensoredData = false;
         const newDataObj = {};
+        // Copy over the data into a new object, substituting 0 instead of any censored data
         Object.keys(dataObj).forEach((key) => {
-            if (typeof dataObj[key] === 'string' && dataObj[key].startsWith('<')) {
+            newDataObj[key] = 0;
+            if (isCensored(dataObj[key])) {
                 newDataObj[key] = 0;
                 hasCensoredData = true;
             } else {
                 newDataObj[key] = dataObj[key];
             }
         });
+
+        // If clinical data hasn't returned yet, exit here
+        if (!clinical) {
+            return newDataObj;
+        }
+
+        // Check the clinical results to see if we can fill in any censored data with real ones
+        Object.entries(clinical).forEach(([siteName, site]) => {
+            Object.keys(site.summary?.[dataKey]).forEach((key) => {
+                if (isObject) {
+                    Object.keys(site.summary[dataKey]).forEach((innerKey) => {
+                        if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
+                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey][innerKey];
+                        }
+                    });
+                } else if (isCensored(dataObj[transformer(siteName, key)])) {
+                    newDataObj[transformer(site, key)] += site.summary[dataKey][key];
+                }
+            });
+        });
+
         if (hasCensoredData) {
             newDataObj[HAS_CENSORED_DATA_MARKER] = true;
         }
@@ -48,10 +75,10 @@ function DataVisualization() {
     };
 
     const dataVis = {
-        patients_per_cohort: handleCensoring(resultsContext?.patients_per_cohort) || {},
-        diagnosis_age_count: handleCensoring(resultsContext?.diagnosis_age_count) || {},
-        treatment_type_count: handleCensoring(resultsContext?.treatment_type_count) || {},
-        primary_site_count: handleCensoring(resultsContext?.primary_site_count) || {}
+        patients_per_cohort: handleCensoring('patients_per_cohort', (site, _) => site, true) || {},
+        diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
+        treatment_type_count: handleCensoring('treatment_type_count') || {},
+        primary_site_count: handleCensoring('primary_site_count') || {}
     };
     const theme = useTheme();
 
