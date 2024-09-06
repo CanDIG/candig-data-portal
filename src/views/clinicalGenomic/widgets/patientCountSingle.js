@@ -6,6 +6,8 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PropTypes from 'prop-types';
+import { SITE } from 'store/constant';
+import siteLogo from 'assets/images/users/siteLogo.png';
 
 const PREFIX = 'PatientCountSingle';
 
@@ -85,12 +87,15 @@ function PatientCountSingle(props) {
     const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
     const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
     const numCohorts = Object.values(counts.totals)?.length || 0;
-
+    console.log(SITE, site);
     return (
         <StyledBox pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
                 <Grid item xs={2}>
-                    <CardHeader avatar={<Avatar>{site.slice(0, 1).toUpperCase()}</Avatar>} title={<b>{site}</b>} />
+                    <CardHeader
+                        avatar={<Avatar src={SITE === site ? siteLogo : ''}>{SITE === site ? '' : site.slice(0, 1).toUpperCase()}</Avatar>}
+                        title={<b>{site}</b>}
+                    />
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>

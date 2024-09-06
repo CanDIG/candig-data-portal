@@ -26,9 +26,7 @@ import { SITE } from 'store/constant';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons-react';
-import User1 from 'assets/images/users/user-round.svg';
-import BCGSC from 'assets/images/users/bcgsc.svg';
-import UHN from 'assets/images/users/UHN.svg';
+import siteLogo from 'assets/images/users/siteLogo.png';
 
 const PREFIX = 'ProfileSection';
 
@@ -211,17 +209,6 @@ function ProfileSection() {
             });
     }, []);
 
-    const setSite = () => {
-        switch (SITE) {
-            case 'BCGSC':
-                return BCGSC;
-            case 'UHN':
-                return UHN;
-            default:
-                return User1;
-        }
-    };
-
     return (
         <>
             <ChipRoot
@@ -229,7 +216,7 @@ function ProfileSection() {
                 className={classes.profileChip}
                 icon={
                     <Avatar
-                        src={setSite()}
+                        src={siteLogo}
                         className={classes.headerAvatar}
                         aria-controls={open ? 'menu-list-grow' : undefined}
                         aria-haspopup="true"
@@ -285,7 +272,7 @@ function ProfileSection() {
                                             </Grid>
                                             <Grid item xs={4} className={classes.flex}>
                                                 <Avatar
-                                                    src={setSite()}
+                                                    src={siteLogo}
                                                     className={classes.smallAvatar}
                                                     aria-controls={open ? 'menu-list-grow' : undefined}
                                                     aria-haspopup="true"
