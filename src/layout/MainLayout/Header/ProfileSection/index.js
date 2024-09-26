@@ -11,13 +11,13 @@ import {
     Divider,
     Grid,
     List,
+    ListItemButton,
     ListItemIcon,
     ListItemText,
     Paper,
     Popper,
     Typography
 } from '@mui/material';
-import ListItemButton from '@mui/material/ListItemButton';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -27,6 +27,7 @@ import { SITE } from 'store/constant';
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons-react';
 import siteLogo from 'assets/images/users/siteLogo.png';
+import APITokenButton from './apiTokenbutton';
 
 const PREFIX = 'ProfileSection';
 
@@ -171,8 +172,6 @@ function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [selectedIndex] = useState(1);
-
     const [open, setOpen] = useState(false);
 
     const [username, setUsername] = useState('');
@@ -282,10 +281,10 @@ function ProfileSection() {
                                         </Grid>
                                         <Divider />
                                         <List component="nav" className={classes.navContainer}>
+                                            <APITokenButton classes={classes} customization={customization} />
                                             <ListItemButton
                                                 className={classes.listItem}
                                                 sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                selected={selectedIndex === 4}
                                                 to="/auth/logout"
                                             >
                                                 <ListItemIcon>
