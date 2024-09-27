@@ -111,7 +111,7 @@ function APITokenButton(props) {
                         </Alert>
                     </Tooltip>
                     <Typography variant="body2" sx={{ marginLeft: '49px' }}>
-                        Click to copy (valid until {getTimeout(token)})
+                        Click to copy (token valid until {getTimeout(token)})
                     </Typography>
                     <Typography variant="body2" className={classes.errorText} sx={{ marginLeft: '49px' }}>
                         Keep this token secure, do not share it with anybody!
