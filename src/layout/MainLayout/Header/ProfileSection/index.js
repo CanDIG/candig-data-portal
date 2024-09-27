@@ -49,7 +49,8 @@ const classes = {
     loggedInAs: `${PREFIX}-loggedInAs`,
     usernamePadding: `${PREFIX}-usernamePadding`,
     username: `${PREFIX}-username`,
-    smallAvatar: `${PREFIX}-smallAvatar`
+    smallAvatar: `${PREFIX}-smallAvatar`,
+    errorText: `${PREFIX}-errorText`
 };
 
 const ChipRoot = styled(Chip)(({ theme }) => ({
@@ -163,6 +164,10 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
         ...theme.typography.mediumAvatar,
         marginLeft: 'auto',
         marginRight: 0
+    },
+
+    [`& .${classes.errorText}`]: {
+        color: theme.palette.error.main
     }
 }));
 

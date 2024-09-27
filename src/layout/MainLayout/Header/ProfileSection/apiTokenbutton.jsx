@@ -6,9 +6,26 @@ import PasswordIcon from '@mui/icons-material/Password';
 
 import { fetchRefreshToken } from 'store/api';
 
+// JWT decoder taken from here: https://stackoverflow.com/a/38552302/2148998
+// Then ran through prettier a bunch
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+        window
+            .atob(base64)
+            .split('')
+            .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+            .join('')
+    );
+
+    return JSON.parse(jsonPayload);
+}
+
 function APITokenButton(props) {
     const { classes, customization } = props;
     const [token, setToken] = useState(undefined);
+    const [tokenHidden, setTokenHidden] = useState(false);
     const [error, setError] = useState(undefined);
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
@@ -19,6 +36,7 @@ function APITokenButton(props) {
                 setError(data.error);
             } else {
                 setToken(data.token);
+                setTokenHidden(false);
             }
         });
     };
@@ -48,6 +66,7 @@ function APITokenButton(props) {
 
     const copyToken = () => {
         try {
+            setTokenHidden(true);
             if (navigator.clipboard) {
                 navigator.clipboard
                     .writeText(token)
@@ -62,6 +81,8 @@ function APITokenButton(props) {
             console.error('Error copying token:', err);
         }
     };
+
+    const getTimeout = (token) => new Date(parseJwt(token).exp * 1000).toTimeString();
 
     return (
         <>
@@ -86,11 +107,14 @@ function APITokenButton(props) {
                         disableTouchListener
                     >
                         <Alert severity="success" onClick={copyToken}>
-                            {token}
+                            {tokenHidden ? token.replaceAll(/./g, '*') : token}
                         </Alert>
                     </Tooltip>
                     <Typography variant="body2" sx={{ marginLeft: '49px' }}>
-                        Click to copy
+                        Click to copy (valid until {getTimeout(token)})
+                    </Typography>
+                    <Typography variant="body2" className={classes.errorText} sx={{ marginLeft: '49px' }}>
+                        Keep this token secure, do not share it with anybody!
                     </Typography>
                 </>
             ) : (
