@@ -185,6 +185,7 @@ function Summary() {
         fetchData('/diagnosis_age_count');
         fetchGenomic();
         fetchClinical();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
