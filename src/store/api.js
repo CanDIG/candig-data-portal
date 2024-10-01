@@ -330,3 +330,12 @@ export function fetchClinicalCompleteness() {
         return retVal;
     });
 }
+
+export function fetchRefreshToken() {
+    return fetch(`${INGEST_URL}/get-token`)
+        .then((response) => response.json())
+        .catch((error) => {
+            console.log('Error:', error);
+            return error;
+        });
+}
