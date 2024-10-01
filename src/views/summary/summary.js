@@ -135,7 +135,6 @@ function Summary() {
         setLoading((old) => {
             const newObj = { ...old };
             newObj[endpoint] = false;
-            console.log(newObj);
             return newObj;
         });
     }
