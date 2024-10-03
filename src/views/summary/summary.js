@@ -18,7 +18,16 @@ import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContex
 
 function Summary() {
     const theme = useTheme();
-    const [isLoading, setLoading] = useState({});
+    const [isLoading, setLoading] = useState({
+        '/individual_count': true,
+        '/primary_site_count': true,
+        '/cohort_count': true,
+        '/patients_per_cohort': true,
+        '/treatment_type_count': true,
+        '/diagnosis_age_count': true,
+        clinical: true,
+        genomic: true
+    });
 
     const [provinceCounter, setProvinceCount] = useState(0);
     const [individualCount, setIndividualCount] = useState(undefined);
