@@ -4,7 +4,7 @@ import { Box, ButtonBase } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { useTheme } from '@mui/system';
 import config from 'config';
-// import MOHLogo from '../../../assets/images/MOH/MOHCCN_Logo_EN.png';
+import MOHLogo from '../../../assets/images/MOH/MOHCCN_Logo_EN.png';
 import CanDIGLogo from '../../../assets/images/logo-notext.png';
 import { IconBrandGithub, IconWorld, IconMail, IconCopyright } from '@tabler/icons-react';
 
@@ -277,9 +277,9 @@ function Footer(props) {
                         </div>
                     </div>
                 </div>
-                {/* <a href="https://www.marathonofhopecancercentres.ca/" target="_blank" rel="noreferrer">
+                <a href="https://www.marathonofhopecancercentres.ca/" target="_blank" rel="noreferrer">
                     <img src={MOHLogo} alt="MOH logo hyperlink" style={{ position: 'relative', top: '-1em', width: '6.5em' }} />
-                </a> */}
+                </a>
             </ResponsiveFundingContainer>
         </ResponsiveFooterContainer>
     );
