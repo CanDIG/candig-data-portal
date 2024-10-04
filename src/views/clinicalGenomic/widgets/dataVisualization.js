@@ -19,17 +19,66 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
+import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
 
 function DataVisualization() {
     // Hooks
-    const resultsContext = useSearchResultsReaderContext().counts;
+    const resultsContext = useSearchResultsReaderContext();
+    const counts = resultsContext.counts;
+    const clinical = resultsContext.clinical;
     // Plan for context below see current dataVis for expected shape
-    // const dataVis = resultsContext || {};
+    // const dataVis = counts || {};
+    const isCensored = (datum) => typeof datum === 'string' && datum.startsWith('<');
+    const handleCensoring = (dataKey, transformer = (site, input) => input, isObject = false) => {
+        const dataObj = counts?.[dataKey];
+        if (dataObj === null || typeof dataObj === 'undefined') {
+            return {};
+        }
+
+        let hasCensoredData = false;
+        const newDataObj = {};
+        // Copy over the data into a new object, substituting 0 instead of any censored data
+        Object.keys(dataObj).forEach((key) => {
+            newDataObj[key] = 0;
+            if (isCensored(dataObj[key])) {
+                newDataObj[key] = 0;
+                hasCensoredData = true;
+            } else {
+                newDataObj[key] = dataObj[key];
+            }
+        });
+
+        // If clinical data hasn't returned yet, exit here
+        if (!clinical) {
+            return newDataObj;
+        }
+
+        // Check the clinical results to see if we can fill in any censored data with real ones
+        Object.entries(clinical).forEach(([siteName, site]) => {
+            Object.keys(site.summary?.[dataKey]).forEach((key) => {
+                if (isObject) {
+                    Object.keys(site.summary[dataKey]).forEach((innerKey) => {
+                        if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
+                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey][innerKey];
+                        }
+                    });
+                } else if (isCensored(dataObj[transformer(siteName, key)])) {
+                    newDataObj[transformer(site, key)] += site.summary[dataKey][key];
+                }
+            });
+        });
+
+        if (hasCensoredData) {
+            newDataObj[HAS_CENSORED_DATA_MARKER] = true;
+        }
+        return newDataObj;
+    };
+
     const dataVis = {
-        patients_per_cohort: resultsContext?.patients_per_cohort || {},
-        diagnosis_age_count: resultsContext?.diagnosis_age_count || {},
-        treatment_type_count: resultsContext?.treatment_type_count || {},
-        cancer_type_count: resultsContext?.cancer_type_count || {}
+        patients_per_cohort: handleCensoring('patients_per_cohort', (site, _) => site, true) || {},
+        diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
+        treatment_type_count: handleCensoring('treatment_type_count') || {},
+        primary_site_count: handleCensoring('primary_site_count') || {}
     };
     const theme = useTheme();
 
@@ -178,6 +227,7 @@ function DataVisualization() {
                     trimByDefault={dataVisTrim[index]}
                     onChangeDataVisChartType={(newType) => setDataVisChartTypeSingle(index, newType)}
                     onChangeDataVisData={(newData) => setDataVisDataTypeSingle(index, newData)}
+                    loading={dataVis[item] === undefined}
                 />
             </Grid>
         ));
@@ -203,16 +253,10 @@ function DataVisualization() {
                 color="primary"
                 size="large"
                 sx={{
-                    background: 'white',
-                    border: 1,
-                    borderRadius: '100%',
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: theme.shadows[8],
                     position: 'absolute',
                     zIndex: '1000',
-                    padding: '0.5em',
-                    right: -15,
-                    top: -25
+                    right: -5,
+                    top: -5
                 }}
                 onClick={() => setEdit(!edit)}
             >
@@ -229,18 +273,16 @@ function DataVisualization() {
             {edit && (
                 <IconButton
                     color="primary"
-                    size="large"
+                    size="small"
                     sx={{
-                        background: 'white',
-                        border: 1,
-                        borderRadius: '100%',
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: theme.shadows[8],
                         position: 'absolute',
                         zIndex: '1000',
-                        padding: '0.5em',
-                        right: 50,
-                        top: -25
+                        right: 40,
+                        top: 5,
+                        borderRadius: '100%',
+                        border: 1,
+                        borderColor: theme.palette.primary.main,
+                        padding: '0.01em'
                     }}
                     onClick={() => handleToggleDialog()}
                 >

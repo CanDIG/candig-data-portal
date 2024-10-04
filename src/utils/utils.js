@@ -18,6 +18,54 @@ export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => o
     return count;
 }
 
+export const HAS_CENSORED_DATA_MARKER = '__HAS_CENSORED_DATA';
+
+// Invert an array looking like:
+// [{_count: "<5", program_id: "TEST_2"}, { ... }]
+// into { TEST_2: 0, ... }
+export function invertkatsu(array) {
+    const retVal = {};
+    array.forEach((item) => {
+        const countKey = Object.keys(item).find((key) => key.endsWith('_count'));
+        const nameKey = Object.keys(item).find((key) => !key.endsWith('_count'));
+        if (item[countKey].startsWith('<')) {
+            retVal[item[nameKey]] = 0;
+            retVal[HAS_CENSORED_DATA_MARKER] = true;
+        } else {
+            retVal[item[nameKey]] = parseInt(item[countKey], 10);
+        }
+    });
+    return retVal;
+}
+
+export function aggregateKatsuObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
+    const count = { ...aggregateObj };
+    stat.forEach((element) => {
+        // Unroll Katsu's arrays into count objects
+        // From Katsu: [{ primary_site_count: "<5", primary_site_name: "Thyroid Gland" }, ...]
+        // To: "Thyroid Gland": 0
+        const typeName = Object.keys(element).find((name) => !name.endsWith('_count'));
+        const countName = Object.keys(element).find((name) => name.endsWith('_count'));
+        if (!countName || !typeName) {
+            console.log(`Could not parse object:`);
+            console.log(element);
+            return;
+        }
+
+        const toAdd = aggregator(element, countName);
+        if (element[typeName] in count) {
+            count[element[typeName]] += toAdd.startsWith('<') ? 0 : parseInt(toAdd, 10);
+        } else {
+            count[element[typeName]] = toAdd.startsWith('<') ? 0 : parseInt(toAdd, 10);
+        }
+
+        if (toAdd.startsWith('<')) {
+            count[HAS_CENSORED_DATA_MARKER] = true;
+        }
+    });
+    return count;
+}
+
 /* Object Aggregation for Stack Bar chart
  * @param {object} stat: The object to aggregate
  * @param {object} Object: The object to aggregate into

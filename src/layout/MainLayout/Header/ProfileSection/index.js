@@ -11,16 +11,13 @@ import {
     Divider,
     Grid,
     List,
+    ListItemButton,
     ListItemIcon,
     ListItemText,
     Paper,
     Popper,
     Typography
 } from '@mui/material';
-import ListItemButton from '@mui/material/ListItemButton';
-
-// third-party
-import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -29,9 +26,8 @@ import { SITE } from 'store/constant';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons-react';
-import User1 from 'assets/images/users/user-round.svg';
-import BCGSC from 'assets/images/users/bcgsc.svg';
-import UHN from 'assets/images/users/UHN.svg';
+import siteLogo from 'assets/images/users/siteLogo.png';
+import APITokenButton from './apiTokenbutton';
 
 const PREFIX = 'ProfileSection';
 
@@ -50,7 +46,11 @@ const classes = {
     name: `${PREFIX}-name`,
     ScrollHeight: `${PREFIX}-ScrollHeight`,
     badgeWarning: `${PREFIX}-badgeWarning`,
-    usernamePadding: `${PREFIX}-usernamePadding`
+    loggedInAs: `${PREFIX}-loggedInAs`,
+    usernamePadding: `${PREFIX}-usernamePadding`,
+    username: `${PREFIX}-username`,
+    smallAvatar: `${PREFIX}-smallAvatar`,
+    errorText: `${PREFIX}-errorText`
 };
 
 const ChipRoot = styled(Chip)(({ theme }) => ({
@@ -90,6 +90,7 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
         minWidth: '300px',
         backgroundColor: theme.palette.background.paper,
         borderRadius: '10px',
+        overflow: 'hidden',
         [theme.breakpoints.down('md')]: {
             minWidth: '100%'
         }
@@ -138,7 +139,7 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
     [`& .${classes.ScrollHeight}`]: {
         height: '100%',
         maxHeight: 'calc(100vh - 250px)',
-        overflowX: 'hidden'
+        overflow: 'hidden'
     },
 
     [`& .${classes.badgeWarning}`]: {
@@ -148,6 +149,25 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
 
     [`& .${classes.usernamePadding}`]: {
         paddingBottom: '1em'
+    },
+
+    [`& .${classes.loggedInAs}`]: {
+        fontSize: 18
+    },
+
+    [`& .${classes.username}`]: {
+        fontSize: 16
+    },
+
+    [`& .${classes.smallAvatar}`]: {
+        cursor: 'pointer',
+        ...theme.typography.mediumAvatar,
+        marginLeft: 'auto',
+        marginRight: 0
+    },
+
+    [`& .${classes.errorText}`]: {
+        color: theme.palette.error.main
     }
 }));
 
@@ -157,42 +177,41 @@ function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
-    const [selectedIndex] = useState(1);
-
     const [open, setOpen] = useState(false);
 
-    const anchorRef = React.useRef(null);
+    const [username, setUsername] = useState('');
+
+    const anchorEl = React.useRef(null);
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
     };
     const handleClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+        if (anchorEl?.current?.contains(event.target)) {
             return;
         }
 
         setOpen(false);
     };
 
-    const prevOpen = React.useRef(open);
+    // Grab the user key for the logged in user
     useEffect(() => {
-        if (prevOpen.current === true && open === false) {
-            anchorRef.current.focus();
-        }
-
-        prevOpen.current = open;
-    }, [open]);
-
-    const setSite = () => {
-        switch (SITE) {
-            case 'BCGSC':
-                return BCGSC;
-            case 'UHN':
-                return UHN;
-            default:
-                return User1;
-        }
-    };
+        fetch(`/query/whoami`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                console.log(`whoami could not determine logged in user: ${response}`);
+                throw new Error(`${response}`);
+            })
+            .then((response) => {
+                setUsername(response?.key);
+            })
+            .catch((error) => {
+                console.log(`Whoami error: ${error}`);
+                return '';
+            });
+    }, []);
 
     return (
         <>
@@ -201,9 +220,8 @@ function ProfileSection() {
                 className={classes.profileChip}
                 icon={
                     <Avatar
-                        src={setSite()}
+                        src={siteLogo}
                         className={classes.headerAvatar}
-                        ref={anchorRef}
                         aria-controls={open ? 'menu-list-grow' : undefined}
                         aria-haspopup="true"
                         color="inherit"
@@ -211,16 +229,16 @@ function ProfileSection() {
                 }
                 label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
                 variant="outlined"
-                ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
                 aria-haspopup="true"
                 onClick={handleToggle}
+                ref={anchorEl}
                 color="primary"
             />
             <PopperRoot
                 placement="bottom-end"
                 open={open}
-                anchorEl={anchorRef.current}
+                anchorEl={anchorEl.current}
                 role={undefined}
                 transition
                 className={classes.showOnTop}
@@ -241,34 +259,45 @@ function ProfileSection() {
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
                                     <CardContent className={classes.cardContent}>
-                                        <Grid container direction="column" spacing={0}>
-                                            <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Hello!</Typography>
-                                                {/* <Typography component="span" variant="h4" className={classes.name}>
-                                                    First Name Last Name
-                                                </Typography> */}
+                                        <Grid container direction="row" spacing={0}>
+                                            <Grid item xs={8} className={classes.flex}>
+                                                <Grid container direction="column" spacing={0}>
+                                                    <Grid item className={classes.flex}>
+                                                        <Typography variant="h4" className={classes.loggedInAs}>
+                                                            Logged in as:
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item className={classes.usernamePadding}>
+                                                        <Typography variant="body1" className={classes.username}>
+                                                            {username}, {SITE}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item className={classes.usernamePadding}>
-                                                <Typography variant="subtitle2">{SITE}</Typography>
+                                            <Grid item xs={4} className={classes.flex}>
+                                                <Avatar
+                                                    src={siteLogo}
+                                                    className={classes.smallAvatar}
+                                                    aria-controls={open ? 'menu-list-grow' : undefined}
+                                                    aria-haspopup="true"
+                                                    color="inherit"
+                                                />
                                             </Grid>
                                         </Grid>
                                         <Divider />
-                                        <PerfectScrollbar className={classes.ScrollHeight}>
-                                            <Divider />
-                                            <List component="nav" className={classes.navContainer}>
-                                                <ListItemButton
-                                                    className={classes.listItem}
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 4}
-                                                    to="/auth/logout"
-                                                >
-                                                    <ListItemIcon>
-                                                        <IconLogout stroke={1.5} size="1.3rem" />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
-                                                </ListItemButton>
-                                            </List>
-                                        </PerfectScrollbar>
+                                        <List component="nav" className={classes.navContainer}>
+                                            <APITokenButton classes={classes} customization={customization} />
+                                            <ListItemButton
+                                                className={classes.listItem}
+                                                sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                to="/auth/logout"
+                                            >
+                                                <ListItemIcon>
+                                                    <IconLogout stroke={1.5} size="1.3rem" />
+                                                </ListItemIcon>
+                                                <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                                            </ListItemButton>
+                                        </List>
                                     </CardContent>
                                 </MainCard>
                             </ClickAwayListener>

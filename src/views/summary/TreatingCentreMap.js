@@ -5,7 +5,7 @@ import HighchartsMap from 'highcharts/modules/map';
 import mapDataCanada from '@highcharts/map-collection/countries/ca/ca-all.geo.json';
 import PropTypes from 'prop-types';
 
-import { LoadingIndicator, usePromiseTracker, trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
+import { trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import MainCard from 'ui-component/cards/MainCard';
 
 // Initialize HighchartsMap
@@ -38,7 +38,10 @@ const initialState = {
                 }
             }
         }
-    ]
+    ],
+    exporting: {
+        enabled: false
+    }
 };
 
 function reducer(state, action) {
@@ -65,7 +68,6 @@ function reducer(state, action) {
     }
 }
 function TreatingCentreMap({ data }) {
-    const { promiseInProgress } = usePromiseTracker();
     const [chartOptions, dispatchChartOptions] = useReducer(reducer, initialState);
 
     useEffect(() => {
@@ -86,11 +88,7 @@ function TreatingCentreMap({ data }) {
 
     return (
         <MainCard>
-            {promiseInProgress ? (
-                <LoadingIndicator />
-            ) : (
-                <HighchartsReact options={chartOptions} highcharts={Highcharts} constructorType="mapChart" />
-            )}
+            <HighchartsReact options={chartOptions} highcharts={Highcharts} constructorType="mapChart" />
         </MainCard>
     );
 }

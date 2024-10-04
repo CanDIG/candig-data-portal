@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
@@ -10,9 +10,10 @@ import DataVisualization from './widgets/dataVisualization';
 import ClinicalData from './widgets/clinicalData';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
-import { COHORTS } from 'store/constant';
 import SearchHandler from './search/SearchHandler';
 import GenomicData from './widgets/genomicData';
+import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
+import AuthorizationSections from './widgets/authorizationSections';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -63,7 +64,22 @@ const Root = styled('div')(({ _ }) => ({
     }
 }));
 
+const StyledMainCard = styled(MainCard)((_) => ({
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    minHeight: '400px',
+    height: '100%',
+    overflow: 'hidden',
+    position: 'relative'
+}));
+
 const sections = [
+    {
+        id: 'cohorts summary',
+        header: 'Cohorts Summary',
+        component: <AuthorizationSections title="Cohorts Summary" />
+    },
     {
         id: 'counts',
         header: 'Patient Counts',
@@ -73,6 +89,11 @@ const sections = [
         id: 'visualization',
         header: 'Data Visualization',
         component: <DataVisualization />
+    },
+    {
+        id: 'authorized cohorts',
+        header: 'Authorized Cohorts',
+        component: <AuthorizationSections title="Authorized Cohorts" />
     },
     {
         id: 'clinical',
@@ -85,16 +106,17 @@ const sections = [
         component: <GenomicData />
     }
 ];
-
 function ClinicalGenomicSearch() {
     const customization = useSelector((state) => state.customization);
 
     const sidebarWriter = useSidebarWriterContext();
     const sidebarOpened = customization.opened;
 
+    const [isLoading, setLoading] = useState(true);
+
     // When we load, set the sidebar component
     useEffect(() => {
-        sidebarWriter(<Sidebar sites={['BCGSC', 'UHN']} cohorts={COHORTS} />);
+        sidebarWriter(<Sidebar />);
     }, [sidebarWriter]);
 
     return (
@@ -126,14 +148,25 @@ function ClinicalGenomicSearch() {
                 </Toolbar>
             </AppBar>
             {/* Empty div to make sure the header takes up space */}
-            <SearchHandler />
+            <SearchHandler setLoading={setLoading} />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
                 {sections.map((section) => (
                     <div key={section.id}>
                         <a id={section.id} className={classes.anchor} aria-hidden="true">
                             &nbsp;
                         </a>
-                        {section.component}
+                        {isLoading ? (
+                            <StyledMainCard
+                                key={section.id}
+                                border
+                                sx={{ borderRadius: customization.borderRadius * 0.25 }}
+                                contentClass={{ padding: '16px !important' }}
+                            >
+                                <SearchIndicator />
+                            </StyledMainCard>
+                        ) : (
+                            section.component
+                        )}
                         <div className={classes.spaceBetween} />
                     </div>
                 ))}

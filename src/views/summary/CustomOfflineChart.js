@@ -12,11 +12,14 @@ import { useSelector } from 'react-redux';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
+import highchartsAccessibility from 'highcharts/modules/accessibility';
 import { IconTrash } from '@tabler/icons-react';
 
 // Custon Components and constants
 import MainCard from 'ui-component/cards/MainCard';
 import { DataVisualizationChartInfo, validCharts, validStackedCharts } from 'store/constant';
+import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
+import config from 'config';
 
 window.Highcharts = Highcharts;
 
@@ -29,26 +32,25 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart(props) {
-    const {
-        chartType,
-        data,
-        index,
-        height,
-        dataVis,
-        dataObject,
-        dropDown,
-        onRemoveChart,
-        edit,
-        loading,
-        orderByFrequency,
-        orderAlphabetically,
-        cutoff,
-        grayscale,
-        trimByDefault,
-        onChangeDataVisChartType,
-        onChangeDataVisData
-    } = props;
+function CustomOfflineChart({
+    chartType,
+    data,
+    index,
+    height = '200px; auto',
+    dataVis,
+    dataObject,
+    dropDown,
+    onRemoveChart,
+    edit,
+    loading,
+    orderByFrequency,
+    orderAlphabetically,
+    cutoff,
+    grayscale,
+    trimByDefault,
+    onChangeDataVisChartType,
+    onChangeDataVisData
+}) {
     const theme = useTheme();
 
     // State management
@@ -59,6 +61,7 @@ function CustomOfflineChart(props) {
     const chartRef = createRef();
 
     NoDataToDisplay(Highcharts);
+    highchartsAccessibility(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -87,6 +90,89 @@ function CustomOfflineChart(props) {
 
     // Function to create charts bar, line, pie, stacked, etc.
     useEffect(() => {
+        // Determine whether or not there exists censored data in the object provided
+        function hasCensoredData(dataObj) {
+            function isObjectCensored(obj) {
+                if (dataObj[HAS_CENSORED_DATA_MARKER]) {
+                    return true;
+                }
+
+                const realKey = Object.keys(obj).find((thisName) => thisName.endsWith('_count'));
+                if (!realKey) {
+                    return false;
+                }
+                return obj[realKey].startsWith('<');
+            }
+            if (typeof dataObj === 'object') {
+                // We've already marked this object as having censored data
+                if (dataObj[HAS_CENSORED_DATA_MARKER]) {
+                    return true;
+                }
+
+                return Object.values(dataObj).some((datum) => {
+                    // datum is either going to be one of three things:
+                    // 1. an array of objects
+                    // 2. an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
+                    // 3. an object whose keys are cohorts and whose values are numbers
+                    // (Why the return value is formatted this way I have no idea)
+
+                    // Case 1: an array of objects
+                    if (Array.isArray(datum)) {
+                        return datum.some((obj) => isObjectCensored(obj));
+                    }
+
+                    if (typeof datum === 'object') {
+                        // Case 2: an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
+                        if (Object.values(datum).every((obj) => typeof obj === 'object')) {
+                            return isObjectCensored(datum);
+                        }
+
+                        // Case 3: an object whose keys are cohorts and whose values are numbers
+                        return Object.values(datum).some((val) => typeof val === 'string' && val.startsWith('<'));
+                    }
+
+                    if (typeof datum === 'number') {
+                        return false;
+                    }
+
+                    console.log(`Could not parse input to hasCensoredData: ${datum}`);
+                    return false;
+                });
+            }
+
+            if (Array.isArray(dataObj)) {
+                return dataObj.some((datum) => isObjectCensored(datum));
+            }
+
+            // Usually if the data is undefined we'll get here: return false
+            return false;
+        }
+        const isCensored = hasCensoredData(dataObject === '' ? dataVis[chartData] : dataObject);
+        let dataObjectToUse;
+        // Filter out anything with censored data
+        if (dataObject === '' ? typeof dataVis[chartData] !== 'undefined' : typeof dataObject !== 'undefined') {
+            const { [HAS_CENSORED_DATA_MARKER]: _, ...rest } = dataObject === '' ? dataVis[chartData] : dataObject;
+            dataObjectToUse = rest;
+
+            // Also filter out any undefined options in the data object
+            dataObjectToUse = Object.keys(dataObjectToUse)
+                .filter((key) => typeof dataObjectToUse[key] !== 'undefined')
+                .reduce((finalObj, key) => Object.assign(finalObj, { [key]: dataObjectToUse[key] }), {});
+        }
+        const censorshipCaption = isCensored
+            ? {
+                  align: 'left',
+                  verticalAlign: 'bottom',
+                  text: isCensored
+                      ? `<b>Attention</b>: Totals do not include counts of less than ${config.aggregateThreshold} from any node`
+                      : '',
+                  useHTML: true,
+                  style: {
+                      color: 'gray'
+                  }
+              }
+            : {};
+
         /* eslint-disable react/no-this-in-sfc */
         /* eslint-disable object-shorthand */
         function createChart() {
@@ -94,7 +180,7 @@ function CustomOfflineChart(props) {
                 // Stacked Bar Chart
                 const data = new Map();
                 let categories = [];
-                const thisData = dataObject === '' ? dataVis[chartData] : dataObject;
+                const thisData = dataObjectToUse;
 
                 Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
@@ -168,13 +254,14 @@ function CustomOfflineChart(props) {
                     series: stackSeries,
                     tooltip: {
                         pointFormat: '<b>{series.name}:</b> {point.y}'
-                    }
+                    },
+                    caption: censorshipCaption
                 });
             } else if (validCharts.includes(chart)) {
                 // Bar Chart
-                let entries = Object.keys((dataObject === '' ? dataVis[chartData] : dataObject) || []).map((key) => [
+                let entries = Object.keys(dataObjectToUse || []).map((key) => [
                     key,
-                    dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                    dataObjectToUse === '' ? dataVis[chartData][key] : dataObjectToUse[key]
                 ]);
 
                 // Order & truncate the categories by the data
@@ -223,12 +310,19 @@ function CustomOfflineChart(props) {
                             )}%) total ${this.series.yAxis.axisTitle.textStr.toLowerCase()}`;
                         }
                         /* eslint-enable func-names */
-                    }
+                    },
+                    exporting: {
+                        enabled: false
+                    },
+                    caption: censorshipCaption
                 });
             } else {
                 // Pie Chart
                 setChartOptions({
                     credits: {
+                        enabled: false
+                    },
+                    exporting: {
                         enabled: false
                     },
                     colors: [
@@ -264,12 +358,13 @@ function CustomOfflineChart(props) {
                     },
                     series: [
                         {
-                            data: Object.keys(dataObject === '' ? dataVis[chartData] : dataObject).map((key) => ({
+                            data: Object.keys(dataObjectToUse).map((key) => ({
                                 name: key,
-                                y: dataObject === '' ? dataVis[chartData][key] : dataObject[key]
+                                y: dataObjectToUse[key]
                             }))
                         }
-                    ]
+                    ],
+                    caption: censorshipCaption
                 });
             }
         }
@@ -339,7 +434,6 @@ function CustomOfflineChart(props) {
                         border: 1,
                         borderRadius: '100%',
                         borderColor: theme.palette.error.main,
-                        boxShadow: theme.shadows[8],
                         position: 'absolute',
                         zIndex: '1000',
                         padding: '0.10em',
@@ -453,10 +547,6 @@ CustomOfflineChart.propTypes = {
     trimByDefault: PropTypes.bool,
     onChangeDataVisChartType: PropTypes.func,
     onChangeDataVisData: PropTypes.func
-};
-
-CustomOfflineChart.defaultProps = {
-    height: '200px; auto'
 };
 
 export default CustomOfflineChart;

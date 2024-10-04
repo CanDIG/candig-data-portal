@@ -45,10 +45,21 @@ const SubHeaderTypography = styled(Typography)(({ theme, selected }) => ({
     paddingLeft: `1.5em`
 }));
 
-function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis }) {
+function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirstDiagnosis, forceSelection }) {
     const [initialHeader, setInitialHeader] = useState(true);
     const [expandedSections, setExpandedSections] = useState({});
     const [selected, setSelected] = useState('');
+
+    // If we're told to select a sidebar entry (e.g. by Timeline), do so
+    useEffect(() => {
+        if (forceSelection[1] != null) {
+            const categoryName = forceSelection[1][0];
+            const categoryDepth = forceSelection[1][1];
+            const categoryKey = categoryName + (categoryDepth > 0 ? `-${categoryDepth - 1}-${categoryDepth > 1 ? 1.5 : 0}` : '');
+            setSelected(categoryKey);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [forceSelection[0]]);
 
     const toggleSection = (key) => {
         setExpandedSections((prevExpanded) => ({
@@ -85,18 +96,19 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                     obj[key] !== null &&
                     obj[key] !== undefined &&
                     obj[key] !== '' &&
+                    !key.endsWith('_not_available') &&
                     (!(typeof obj[key] === 'object') || (typeof obj[key] === 'object' && 'month_interval' in obj[key]))
                 );
             });
 
-            let value = key;
+            let value = key.toLowerCase();
             if (key === 'date_of_diagnosis') {
                 value = `Age at Diagnosis`;
-            } else if (key.endsWith('_start_date')) {
+            } else if (key.endsWith('start_date') || key === 'test_date') {
                 value = `Diagnosis_to_${key}`;
                 startDate = key;
-            } else if (key.endsWith('_end_date')) {
-                value = key.split('_end_date')[0];
+            } else if (key.endsWith('end_date')) {
+                value = key.split('end_date')[0].replace(/_+$/, '');
                 value = `${value.trim()} Duration`;
                 endDate = key;
             } else if (key.startsWith('date_of_')) {
@@ -178,6 +190,11 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
                     row[column.field] = ageAtFirstDiagnosis + Math.floor(obj[column.field].month_interval / 12);
                 } else {
                     row[column.field] = Array.isArray(obj[column.field]) ? obj[column.field].join(', ') : obj[column.field]; // Add spaces to arrays
+                }
+
+                // The boolean in FIELD_not_available can override whatever the actual value is
+                if (obj[`${column.field}_not_available`]) {
+                    row[column.field] = 'Not available';
                 }
             });
 
@@ -333,7 +350,8 @@ PatientSidebar.propTypes = {
     setColumns: PropTypes.func.isRequired,
     setRows: PropTypes.func.isRequired,
     setTitle: PropTypes.func.isRequired,
-    ageAtFirstDiagnosis: PropTypes.number
+    ageAtFirstDiagnosis: PropTypes.number,
+    forceSelection: PropTypes.array
 };
 
 export default PatientSidebar;

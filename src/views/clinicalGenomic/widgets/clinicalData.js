@@ -4,68 +4,90 @@ import * as React from 'react';
 import { useTheme } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
-
+import Tooltip from '@mui/material/Tooltip';
+import { IconTableShare } from '@tabler/icons-react';
 // REDUX
 
 // project imports
-import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useSearchQueryWriterContext, useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 
 function ClinicalView() {
     const theme = useTheme();
-    const [paginationModel, setPaginationModel] = React.useState({
-        pageSize: 10,
-        page: 0
-    });
 
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const searchResults = useSearchResultsReaderContext().clinical;
     const writerContext = useSearchQueryWriterContext();
+    const queryReader = useSearchQueryReaderContext();
 
-    // Flatten the search results so that we are filling in the rows
-    let rows = [];
-    if (searchResults) {
-        rows =
-            Object.values(searchResults)
-                ?.map((results) => results.results)
-                ?.flat(1)
-                ?.map((patient, index) => {
-                    // Make sure each row has an ID and a deceased status
-                    patient.id = index;
-                    patient.deceased = !!patient.date_of_death;
-                    if (patient?.date_resolution === 'month') {
-                        if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
-                            const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;
-                            patient.date_of_death = Math.floor(ageInMonths / 12);
-                            patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
-                        } else if (patient?.date_of_birth?.month_interval && !patient?.date_of_death?.month_interval) {
-                            patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
-                        } else {
-                            delete patient.date_of_birth;
-                            delete patient.date_of_death;
-                        }
-                    } else if (patient?.date_resolution === 'day') {
-                        if (patient?.date_of_death?.day_interval && patient?.date_of_birth?.day_interval) {
-                            const ageInDays = patient.date_of_death.day_interval - patient.date_of_birth.day_interval;
-                            patient.date_of_death = Math.floor(ageInDays / 365);
-                            patient.date_of_birth = Math.floor(-patient.date_of_birth.day_interval / 365);
-                        } else if (patient?.date_of_birth?.day_interval && !patient?.date_of_death?.day_interval) {
-                            patient.date_of_birth = Math.floor(-patient.date_of_birth.day_interval / 365);
-                        } else {
-                            delete patient.date_of_birth;
-                            delete patient.date_of_death;
-                        }
-                    } else {
-                        delete patient.date_of_birth;
-                        delete patient.date_of_death;
-                    }
+    // Function to add location to each patient
+    function addLocationToPatients(searchResults) {
+        if (!searchResults) return;
 
-                    return patient;
-                }) || [];
+        Object.keys(searchResults).forEach((location) => {
+            if (searchResults[location]?.results) {
+                searchResults[location].results.forEach((patient) => {
+                    patient.location = location;
+                });
+            }
+        });
     }
 
+    // Function to calculate age based on intervals
+    function calculateAge(patient) {
+        if (patient?.date_resolution === 'month') {
+            if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
+                const ageInMonths = patient.date_of_death.month_interval - patient.date_of_birth.month_interval;
+                patient.date_of_death = Math.floor(ageInMonths / 12);
+                patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
+            } else if (patient?.date_of_birth?.month_interval && !patient?.date_of_death?.month_interval) {
+                patient.date_of_birth = Math.floor(-patient.date_of_birth.month_interval / 12);
+            } else {
+                delete patient.date_of_birth;
+                delete patient.date_of_death;
+            }
+        } else if (patient?.date_resolution === 'day') {
+            if (patient?.date_of_death?.day_interval && patient?.date_of_birth?.day_interval) {
+                const ageInDays = patient.date_of_death.day_interval - patient.date_of_birth.day_interval;
+                patient.date_of_death = Math.floor(ageInDays / 365);
+                patient.date_of_birth = Math.floor(-patient.date_of_birth.day_interval / 365);
+            } else if (patient?.date_of_birth?.day_interval && !patient?.date_of_death?.day_interval) {
+                patient.date_of_birth = Math.floor(-patient.date_of_birth.day_interval / 365);
+            } else {
+                delete patient.date_of_birth;
+                delete patient.date_of_death;
+            }
+        } else {
+            delete patient.date_of_birth;
+            delete patient.date_of_death;
+        }
+    }
+
+    // Function to process search results
+    function processSearchResults(searchResults) {
+        let rows = [];
+
+        if (searchResults) {
+            addLocationToPatients(searchResults);
+
+            rows = Object.values(searchResults)
+                .filter((location) => typeof location !== 'undefined')
+                .flatMap((locationData) => locationData.results)
+                .map((patient, index) => {
+                    patient.id = index;
+                    patient.deceased = !!patient.date_of_death;
+                    calculateAge(patient);
+                    return patient;
+                });
+        }
+
+        return rows;
+    }
+
+    const rows = processSearchResults(searchResults);
+
     const handleRowClick = (row) => {
-        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}`;
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}`;
         window.open(url, '_blank');
     };
 
@@ -76,7 +98,39 @@ function ClinicalView() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'submitter_donor_id', headerName: 'Donor ID', minWidth: 220, sortable: false },
+        {
+            field: 'submitter_donor_id',
+            headerName: 'Donor ID',
+            minWidth: 220,
+            sortable: false,
+            renderCell: (params) => (
+                <Tooltip title="Open Patient View" placement="right">
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            '&:hover': {
+                                color: theme.palette.primary.main
+                            }
+                        }}
+                    >
+                        <Box
+                            component="span"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                marginRight: '1em'
+                            }}
+                        >
+                            <IconTableShare stroke={1.5} size="1.3rem" />
+                        </Box>
+                        <Typography>{params.value}</Typography>
+                    </Box>
+                </Tooltip>
+            )
+        },
+        { field: 'location', headerName: 'Location', minWidth: 220, sortable: false },
+        { field: 'program_id', headerName: 'Program ID', minWidth: 220, sortable: false },
         { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
         { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
         { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false },
@@ -84,24 +138,29 @@ function ClinicalView() {
     ];
 
     const HandlePageChange = (newModel) => {
-        if (newModel.page !== paginationModel.page) {
+        if (newModel.page !== queryReader.query?.page) {
             writerContext((old) => ({ ...old, query: { ...old.query, page: newModel.page, page_size: newModel.pageSize } }));
         }
-        setPaginationModel(newModel);
     };
 
     const totalRows = searchResults
         ? Object.values(searchResults)
+              ?.filter((location) => typeof location !== 'undefined')
               ?.map((site) => site.count)
               .reduce((partial, a) => partial + a, 0)
         : 0;
 
+    const paginationModel = {
+        page: queryReader.query?.page || 0,
+        pageSize: queryReader.query?.pageSize || 10
+    };
+
     return (
-        <Box mr={2} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+        <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} variant="h4">
                 Clinical Data
             </Typography>
-            <div style={{ height: 510, width: '100%' }}>
+            <div style={{ height: 680, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}

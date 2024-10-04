@@ -9,7 +9,7 @@ import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
 import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
-import { aggregateObj, aggregateObjStack } from 'utils/utils';
+import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
@@ -18,17 +18,26 @@ import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContex
 
 function Summary() {
     const theme = useTheme();
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState({
+        '/individual_count': true,
+        '/primary_site_count': true,
+        '/cohort_count': true,
+        '/patients_per_cohort': true,
+        '/treatment_type_count': true,
+        '/diagnosis_age_count': true,
+        clinical: true,
+        genomic: true
+    });
 
     const [provinceCounter, setProvinceCount] = useState(0);
     const [individualCount, setIndividualCount] = useState(undefined);
-    const [cancerTypeCount, setCancerTypeCount] = useState(undefined);
+    const [primarySiteCount, setPrimarySiteCount] = useState(undefined);
     const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
     const [cohortCount, setCohortCount] = useState(undefined);
     const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
     const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
-    const [numClinicalComplete, setNumClinicalComplete] = useState({});
-    const [numGenomicComplete, setNumGenomicComplete] = useState({});
+    const [numClinicalComplete, setNumClinicalComplete] = useState(undefined);
+    const [numGenomicComplete, setNumGenomicComplete] = useState(undefined);
     const [connectionError, setConnectionError] = useState(0);
     const [sites, setSites] = useState(0);
     const [totalSites, setTotalSites] = useState(0);
@@ -68,7 +77,7 @@ function Summary() {
                             if (!(stat.location['province-code'] in candigDataSouceCollection)) {
                                 candigDataSouceCollection[stat.location['province-code']] = 0;
                             }
-                            candigDataSouceCollection[stat.location['province-code']] += stat.results.individual_count;
+                            candigDataSouceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
 
                             if (count === data.length) {
                                 setCanDigDataSource(candigDataSouceCollection);
@@ -81,17 +90,17 @@ function Summary() {
                         break;
                     case '/patients_per_cohort':
                         setPatientsPerCohort((oldPatientsPerCohort) =>
-                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => stat.results)
+                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => invertkatsu(stat.results))
                         );
                         break;
-                    case '/cancer_type_count':
-                        setCancerTypeCount((oldCancerTypeCount) => aggregateObj(stat.results, oldCancerTypeCount));
+                    case '/primary_site_count':
+                        setPrimarySiteCount((oldPrimarySiteCount) => aggregateKatsuObj(stat.results, oldPrimarySiteCount));
                         break;
                     case '/treatment_type_count':
-                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateObj(stat.results, oldTreatmentTypeCount));
+                        setTreatmentTypeCount((oldTreatmentTypeCount) => aggregateKatsuObj(stat.results, oldTreatmentTypeCount));
                         break;
                     case '/diagnosis_age_count':
-                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateObj(stat.results, oldDiagnosisAgeCount));
+                        setDiagnosisAgeCount((oldDiagnosisAgeCount) => aggregateKatsuObj(stat.results, oldDiagnosisAgeCount));
                         break;
                     default:
                         console.log(`Unknown endpoint: ${endpoint}`);
@@ -131,16 +140,32 @@ function Summary() {
         }
     }
 
-    function fetchClinical() {
-        fetchClinicalCompleteness().then((data) => {
-            setNumClinicalComplete(data.numClinicalComplete);
+    function finishEndpoint(endpoint) {
+        setLoading((old) => {
+            const newObj = { ...old };
+            newObj[endpoint] = false;
+            return newObj;
         });
     }
 
+    function fetchClinical() {
+        fetchClinicalCompleteness()
+            .then((data) => {
+                setNumClinicalComplete(data.numClinicalComplete);
+            })
+            .finally(() => {
+                finishEndpoint('clinical');
+            });
+    }
+
     function fetchGenomic() {
-        fetchGenomicCompleteness().then((numCompleteGenomic) => {
-            setNumGenomicComplete(numCompleteGenomic);
-        });
+        fetchGenomicCompleteness()
+            .then((numCompleteGenomic) => {
+                setNumGenomicComplete(numCompleteGenomic);
+            })
+            .finally(() => {
+                finishEndpoint('genomic');
+            });
     }
 
     useEffect(() => {
@@ -155,18 +180,21 @@ function Summary() {
                 .catch((error) => {
                     // pass
                     console.log('Error fetching data : ', error);
+                })
+                .finally(() => {
+                    finishEndpoint(endpoint);
                 });
         }
 
-        fetchData('/individual_count')
-            .then(() => fetchData('/cancer_type_count'))
-            .then(() => fetchData('/cohort_count'))
-            .then(() => fetchData('/patients_per_cohort'))
-            .then(() => fetchData('/treatment_type_count'))
-            .then(() => fetchData('/diagnosis_age_count'))
-            .then(() => fetchGenomic())
-            .then(() => fetchClinical())
-            .finally(() => setLoading(false));
+        fetchData('/individual_count');
+        fetchData('/primary_site_count');
+        fetchData('/cohort_count');
+        fetchData('/patients_per_cohort');
+        fetchData('/treatment_type_count');
+        fetchData('/diagnosis_age_count');
+        fetchGenomic();
+        fetchClinical();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -204,7 +232,7 @@ function Summary() {
             )}
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
-                    isLoading={isLoading}
+                    isLoading={isLoading['/individual_count']}
                     title="Number of Patients"
                     count={individualCount?.individual_count || 0}
                     primary
@@ -214,6 +242,7 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
+                    isLoading={isLoading['/individual_count']}
                     title="Cohorts"
                     count={cohortCount?.cohort_count || 0}
                     icon={<Hive fontSize="inherit" />}
@@ -222,7 +251,7 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
-                    isLoading={isLoading}
+                    isLoading={isLoading['/individual_count']}
                     title="Provinces"
                     count={provinceCounter || 0}
                     icon={<Public fontSize="inherit" />}
@@ -238,7 +267,8 @@ function Summary() {
                     dataObject={diagnosisAgeCount || {}}
                     dataVis=""
                     height="400px; auto"
-                    loading={diagnosisAgeCount === undefined}
+                    loading={isLoading['/diagnosis_age_count']}
+                    orderAlphabetically
                     chartType="bar"
                     dropDown={false}
                 />
@@ -250,20 +280,20 @@ function Summary() {
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
-                    loading={treatmentTypeCount === undefined}
+                    loading={isLoading['/treatment_type_count']}
                     orderByFrequency
                     cutoff={10}
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={cancerTypeCount || {}}
-                    data="cancer_type_count"
+                    dataObject={primarySiteCount || {}}
+                    data="primary_site_count"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={cancerTypeCount === undefined}
+                    loading={isLoading['/primary_site_count']}
                     orderByFrequency
                     cutoff={10}
                 />
@@ -276,7 +306,7 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={patientsPerCohort === undefined}
+                    loading={isLoading['/patients_per_cohort']}
                     orderByFrequency
                     cutoff={10}
                 />
@@ -289,7 +319,7 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={numClinicalComplete === undefined}
+                    loading={isLoading.clinical}
                     orderByFrequency
                     cutoff={10}
                 />
@@ -302,7 +332,7 @@ function Summary() {
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={numGenomicComplete === undefined}
+                    loading={isLoading.genomic}
                     orderByFrequency
                     cutoff={10}
                 />
