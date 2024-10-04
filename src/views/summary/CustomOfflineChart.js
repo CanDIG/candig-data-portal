@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
+import highchartsAccessibility from 'highcharts/modules/accessibility';
 import { IconTrash } from '@tabler/icons-react';
 
 // Custon Components and constants
@@ -31,26 +32,25 @@ window.Highcharts = Highcharts;
  * @param {array} dataObject
  */
 
-function CustomOfflineChart(props) {
-    const {
-        chartType,
-        data,
-        index,
-        height,
-        dataVis,
-        dataObject,
-        dropDown,
-        onRemoveChart,
-        edit,
-        loading,
-        orderByFrequency,
-        orderAlphabetically,
-        cutoff,
-        grayscale,
-        trimByDefault,
-        onChangeDataVisChartType,
-        onChangeDataVisData
-    } = props;
+function CustomOfflineChart({
+    chartType,
+    data,
+    index,
+    height = '200px; auto',
+    dataVis,
+    dataObject,
+    dropDown,
+    onRemoveChart,
+    edit,
+    loading,
+    orderByFrequency,
+    orderAlphabetically,
+    cutoff,
+    grayscale,
+    trimByDefault,
+    onChangeDataVisChartType,
+    onChangeDataVisData
+}) {
     const theme = useTheme();
 
     // State management
@@ -61,6 +61,7 @@ function CustomOfflineChart(props) {
     const chartRef = createRef();
 
     NoDataToDisplay(Highcharts);
+    highchartsAccessibility(Highcharts);
 
     const [chartOptions, setChartOptions] = useState({
         credits: {
@@ -128,6 +129,10 @@ function CustomOfflineChart(props) {
 
                         // Case 3: an object whose keys are cohorts and whose values are numbers
                         return Object.values(datum).some((val) => typeof val === 'string' && val.startsWith('<'));
+                    }
+
+                    if (typeof datum === 'number') {
+                        return false;
                     }
 
                     console.log(`Could not parse input to hasCensoredData: ${datum}`);
@@ -542,10 +547,6 @@ CustomOfflineChart.propTypes = {
     trimByDefault: PropTypes.bool,
     onChangeDataVisChartType: PropTypes.func,
     onChangeDataVisData: PropTypes.func
-};
-
-CustomOfflineChart.defaultProps = {
-    height: '200px; auto'
 };
 
 export default CustomOfflineChart;

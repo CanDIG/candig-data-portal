@@ -26,7 +26,7 @@ const classes = {
 // ===========================|| INDIVIDUALS - SMALL COUNT CARD ||=========================== //
 
 function SmallCountCard({ isLoading, title, count, icon, color }) {
-    const events = useSelector((state) => state);
+    const customization = useSelector((state) => state.customization);
 
     // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
     const Root = styled('div')(({ theme }) => ({
@@ -98,7 +98,7 @@ function SmallCountCard({ isLoading, title, count, icon, color }) {
             ) : (
                 <MainCard
                     border
-                    sx={{ borderRadius: events.customization.borderRadius * 0.25 }}
+                    sx={{ borderRadius: customization.borderRadius * 0.25 }}
                     className={classes.card}
                     contentClass={classes.content}
                 >
