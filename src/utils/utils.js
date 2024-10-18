@@ -217,11 +217,11 @@ export function handleTableSet(title, array, ageAtFirstDiagnosis) {
 
         return hasNonEmptyValue
             ? {
-                field: key,
-                headerName: formatKey(value),
-                flex: 1,
-                minWidth: 275
-            }
+                  field: key,
+                  headerName: formatKey(value),
+                  flex: 1,
+                  minWidth: 275
+              }
             : null;
     });
 
