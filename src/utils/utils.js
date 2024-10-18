@@ -9,10 +9,11 @@
 export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
     const count = { ...aggregateObj };
     Object.keys(stat).forEach((key) => {
+        const value = parseInt(aggregator(stat, key), 10);  // Ensure the value is a number
         if (key in count) {
-            count[key] += aggregator(stat, key);
+            count[key] += value;
         } else {
-            count[key] = aggregator(stat, key);
+            count[key] = value;
         }
     });
     return count;
@@ -216,11 +217,11 @@ export function handleTableSet(title, array, ageAtFirstDiagnosis) {
 
         return hasNonEmptyValue
             ? {
-                  field: key,
-                  headerName: formatKey(value),
-                  flex: 1,
-                  minWidth: 275
-              }
+                field: key,
+                headerName: formatKey(value),
+                flex: 1,
+                minWidth: 275
+            }
             : null;
     });
 
