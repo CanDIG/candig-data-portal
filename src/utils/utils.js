@@ -9,7 +9,7 @@
 export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
     const count = { ...aggregateObj };
     Object.keys(stat).forEach((key) => {
-        const value = parseInt(aggregator(stat, key), 10);  // Ensure the value is a number
+        const value = parseInt(aggregator(stat, key), 10);
         if (key in count) {
             count[key] += value;
         } else {
