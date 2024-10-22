@@ -127,12 +127,14 @@ function SearchHandler({ setLoading }) {
                     // Reorder the data, and fill out the patients per cohort
                     const clinicalData = {};
                     data.forEach((site) => {
-                        clinicalData[site.location.name] = site?.results;
+                        if ('results' in site) {
+                            clinicalData[site.location.name] = site?.results;
+                        }
                     });
 
                     const genomicData = data
                         .map((site) =>
-                            site.results.genomic?.map((caseData) => {
+                            site?.results?.genomic?.map((caseData) => {
                                 caseData.location = site.location;
                                 return caseData;
                             })
