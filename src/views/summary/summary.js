@@ -61,10 +61,8 @@ function Summary() {
             // data[0].location[1] = 'Ontario';
             // data[0].location[2] = 'ca-on';
 
-            let count = 0;
             data?.forEach((stat) => {
                 // Federation aggregate count of stats
-                count += 1;
                 if (!stat.results) {
                     // Something went wrong
                     return;
