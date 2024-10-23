@@ -79,9 +79,7 @@ function Summary() {
                             }
                             candigDataSouceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
 
-                            if (count === data.length) {
-                                setCanDigDataSource(candigDataSouceCollection);
-                            }
+                            setCanDigDataSource(candigDataSouceCollection);
                         }
 
                         break;
