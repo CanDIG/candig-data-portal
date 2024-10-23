@@ -464,7 +464,7 @@ function Sidebar() {
 
     // Parse out what we need:
     const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    const cohorts = readerContext?.federation?.map((loc) => loc.results.map((cohort) => cohort.program_id))?.flat(1) || [] || [];
+    const cohorts = readerContext?.federation?.map((loc) => loc.results?.map((cohort) => cohort.program_id) || [])?.flat(1) || [];
     const authorizedCohorts = readerContext?.programs?.flatMap((loc) => loc?.results?.items.map((cohort) => cohort.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
