@@ -9,10 +9,11 @@
 export function aggregateObj(stat, aggregateObj, aggregator = (object, key) => object[key]) {
     const count = { ...aggregateObj };
     Object.keys(stat).forEach((key) => {
+        const value = parseInt(aggregator(stat, key), 10);
         if (key in count) {
-            count[key] += aggregator(stat, key);
+            count[key] += value;
         } else {
-            count[key] = aggregator(stat, key);
+            count[key] = value;
         }
     });
     return count;
