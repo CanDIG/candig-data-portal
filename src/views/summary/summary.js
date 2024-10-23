@@ -53,7 +53,7 @@ function Summary() {
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
-        const candigDataSouceCollection = {};
+        const candigDataSourceCollection = {};
 
         if (data && Array.isArray(data)) {
             // Fake Server with same URL
@@ -72,12 +72,12 @@ function Summary() {
                     case '/individual_count':
                         setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
-                            if (!(stat.location['province-code'] in candigDataSouceCollection)) {
-                                candigDataSouceCollection[stat.location['province-code']] = 0;
+                            if (!(stat.location['province-code'] in candigDataSourceCollection)) {
+                                candigDataSourceCollection[stat.location['province-code']] = 0;
                             }
-                            candigDataSouceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
+                            candigDataSourceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
 
-                            setCanDigDataSource(candigDataSouceCollection);
+                            setCanDigDataSource(candigDataSourceCollection);
                         }
 
                         break;
