@@ -94,14 +94,16 @@ const NavItem = ({ item, level }) => {
     } */
 
     const itemHandler = (id) => {
-        reloginCheck().then((success) => {
-            if (success) {
-                navigate(item.url);
-            }
-        }).then(() => {
-            dispatch({ type: MENU_OPEN, id });
-            if (matchesSM) dispatch({ type: SET_MENU, opened: false });
-        });
+        reloginCheck()
+            .then((success) => {
+                if (success) {
+                    navigate(item.url);
+                }
+            })
+            .then(() => {
+                dispatch({ type: MENU_OPEN, id });
+                if (matchesSM) dispatch({ type: SET_MENU, opened: false });
+            });
     };
 
     // active menu item on page load
