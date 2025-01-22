@@ -5,13 +5,14 @@ export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
 
 export function fetchOrRelogin(...args) {
-    return fetch(...args).catch((error) => {
-        if (error.status === 403) {
+    return fetch(...args).then((response) => {
+        if (response.status === 401) {
             // The user's token has expired, and they need to refresh the page
-            window.location.replace('/auth/logout');
+            window.location.replace('/');
+            throw new Error("User's token has expired, they must refresh");
         } else {
-            // Wasn't a permission denied -- re-throw the error
-            throw error;
+            // Wasn't a permission denied -- continue processing
+            return response;
         }
     });
 }
@@ -132,12 +133,10 @@ export function ingestGenomicData(data, program_id) {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: data
-    })
-        .then((response) => response)
-        .catch((error) => {
-            console.log('Error:', error);
-            return error;
-        });
+    }).catch((error) => {
+        console.log('Error:', error);
+        return error;
+    });
 }
 
 /*
