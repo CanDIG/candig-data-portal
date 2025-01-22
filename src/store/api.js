@@ -4,6 +4,19 @@ export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
 
+export function reloginCheck() {
+    return fetch('/query/whoami').then((response) => {
+        if (response.status === 401) {
+            // The user's token has expired, and they need to refresh the page
+            window.location.replace('/');
+            throw new Error("User's token has expired, they must refresh");
+        } else {
+            // Wasn't a permission denied -- continue processing
+            return true;
+        }
+    });
+}
+
 export function fetchOrRelogin(...args) {
     return fetch(...args).then((response) => {
         if (response.status === 401) {
