@@ -312,6 +312,8 @@ StyledCheckboxList.propTypes = {
     onWrite: PropTypes.func,
     options: PropTypes.array,
     useAutoComplete: PropTypes.bool,
+    setSelectedPrograms: PropTypes.func,
+    selectedPrograms: PropTypes.object,
     setChecked: PropTypes.func,
     checked: PropTypes.object
 };
