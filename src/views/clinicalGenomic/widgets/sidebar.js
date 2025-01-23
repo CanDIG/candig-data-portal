@@ -121,8 +121,23 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { isExclusion, groupName, isFilterList, onWrite, options, authorizedPrograms, useAutoComplete, hide, checked, setChecked } =
-        props;
+    const {
+        isExclusion,
+        groupName,
+        isFilterList,
+        onWrite,
+        options,
+        authorizedPrograms,
+        useAutoComplete,
+        hide,
+        selectedPrograms,
+        setSelectedPrograms,
+        checked,
+        setChecked
+    } = props;
+
+    const context = useSearchResultsReaderContext();
+    const sites = context?.federation;
 
     if (hide) {
         return null;
@@ -149,10 +164,22 @@ function StyledCheckboxList(props) {
             });
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
-
                 // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
                 if (isFilterList) {
                     retVal.filter[groupName] = ids;
+                    if (groupName === 'node') {
+                        const programIds = sites
+                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
+                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
+                        retVal.query.exclude_programs = programIds.join('|');
+                        setSelectedPrograms((old) => {
+                            const newPrograms = { ...old };
+                            programIds.forEach((id) => {
+                                newPrograms[id] = true;
+                            });
+                            return newPrograms;
+                        });
+                    }
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
@@ -172,6 +199,23 @@ function StyledCheckboxList(props) {
                     const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
                     newList[groupName] = ids;
                     retVal.filter = newList;
+                    if (groupName === 'node') {
+                        const currentPrograms = { ...selectedPrograms };
+                        Object.keys(selectedPrograms).forEach((id) => {
+                            if (currentPrograms[id]) {
+                                delete currentPrograms[id];
+                            }
+                        });
+                        if (currentPrograms && Object.keys(currentPrograms).length > 0) {
+                            retVal.query.exclude_programs = Object.keys(currentPrograms)
+                                .filter((id) => currentPrograms[id])
+                                .join('|');
+                        } else {
+                            delete retVal.query.exclude_programs;
+                            retVal.query = {};
+                        }
+                        setSelectedPrograms(currentPrograms);
+                    }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
@@ -575,6 +619,8 @@ function Sidebar() {
                     groupName="node"
                     isFilterList
                     isExclusion
+                    selectedPrograms={selectedPrograms}
+                    setSelectedPrograms={setSelectedPrograms}
                     checked={selectedNodes}
                     setChecked={setSelectedNodes}
                 />
