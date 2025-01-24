@@ -154,6 +154,16 @@ function StyledCheckboxList(props) {
             ids = [ids];
         }
 
+        const cohortMap = {};
+        sites.forEach((site) => {
+            site.results.forEach((result) => {
+                if (!cohortMap[result.program_id]) {
+                    cohortMap[result.program_id] = new Set();
+                }
+                cohortMap[result.program_id].add(site.location.name);
+            });
+        });
+
         if (isExclusion ? !isChecked : isChecked) {
             setChecked((_) => {
                 const retVal = {};
@@ -171,10 +181,16 @@ function StyledCheckboxList(props) {
                         const programIds = sites
                             .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
                             .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
-                        retVal.query.exclude_programs = programIds.join('|');
+                        const validProgramIds = programIds.filter((programId) => {
+                            const associatedNodes = cohortMap[programId] || new Set();
+                            console.log('associatedNodes', associatedNodes);
+                            console.log('checked', checked);
+                            return Array.from(associatedNodes).every((node) => !(node in checked));
+                        });
+                        retVal.query.exclude_programs = validProgramIds.join('|');
                         setSelectedPrograms((old) => {
                             const newPrograms = { ...old };
-                            programIds.forEach((id) => {
+                            validProgramIds.forEach((id) => {
                                 newPrograms[id] = true;
                             });
                             return newPrograms;
