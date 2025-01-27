@@ -17,32 +17,42 @@ function AuthCheck(props) {
         reqNum: 0
     });
 
+    const setAuthCheckValue = (prop, value) => {
+        setAuthCheckState((old) => {
+            const retVal = { ...old };
+            retVal[prop] = value;
+            return retVal;
+        });
+    };
+
     // Fire off the authorization check
     useEffect(() => {
-        fetch(`${INGEST_URL}/user/me/authorize`)
+        setAuthCheckValue('loading', true);
+        fetch(`${INGEST_URL}/user/me`)
             .then((request) => {
                 if (request.ok) {
-                    return request.json();
+                    setAuthCheckValue('authorized', true);
+                    return undefined;
                 }
-                throw new Error(`${request.status}: ${request.statusText}`);
-            })
-            .then((data) => {
-                setAuthCheckState((old) => {
-                    const retVal = { ...old };
-                    retVal.pending = data.results === 'Pending';
-                    retVal.authorized = Array.isArray(data.results);
-                    return retVal;
-                });
+                setAuthCheckValue('authorized', false);
+
+                // Request not ok: double check to see if we're pending
+                return fetch(`${INGEST_URL}/user/pending/me`)
+                    .then((request) => {
+                        if (request.ok) {
+                            return request.text();
+                        }
+                        throw new Error(request.error);
+                    })
+                    .then((text) => {
+                        setAuthCheckValue('pending', text.trim() === 'true');
+                    });
             })
             .catch((error) => {
                 console.log(error);
             })
             .finally(() => {
-                setAuthCheckState((old) => {
-                    const retVal = { ...old };
-                    retVal.loading = false;
-                    return retVal;
-                });
+                setAuthCheckValue('loading', false);
             });
     }, [authCheckState.reqNum]);
 
