@@ -108,10 +108,10 @@ export const CLIN_METADATA = [
 /* End Fake Data */
 
 // Roles
-export const SITE = process.env.REACT_APP_SITE_LOCATION;
+export const SITE = import.meta.env.VITE_SITE_LOCATION;
 
 // API URL where the Dashboard get all the data
-export const BASE_URL = process.env.REACT_APP_CANDIG_SERVER;
+export const BASE_URL = import.meta.env.VITE_CANDIG_SERVER;
 
 // Clinical & Genomic Search Page
 export const DataVisualizationChartInfo = {

@@ -1,8 +1,8 @@
 // API Server constant
 /* eslint-disable camelcase */
-export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
-export const htsget = process.env.REACT_APP_HTSGET_SERVER;
-export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
+export const federation = `${import.meta.env.VITE_FEDERATION_API_SERVER}/v1`;
+export const htsget = import.meta.env.VITE_HTSGET_SERVER;
+export const INGEST_URL = import.meta.env.VITE_INGEST_SERVER;
 
 export function fetchOrRelogin(...args) {
     return fetch(...args).catch((error) => {
