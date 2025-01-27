@@ -183,8 +183,6 @@ function StyledCheckboxList(props) {
                             .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
                         const validProgramIds = programIds.filter((programId) => {
                             const associatedNodes = cohortMap[programId] || new Set();
-                            console.log('associatedNodes', associatedNodes);
-                            console.log('checked', checked);
                             return Array.from(associatedNodes).every((node) => !(node in checked));
                         });
                         retVal.query.exclude_programs = validProgramIds.join('|');
