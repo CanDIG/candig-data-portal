@@ -11,7 +11,7 @@ import themes from './themes';
 
 // project imports
 import NavigationScroll from './layout/NavigationScroll';
-import AuthCheck from 'views/pages/authentication/AuthCheck';
+import AuthCheck from './views/pages/authentication/AuthCheck';
 
 // ===========================|| APP ||=========================== //
 

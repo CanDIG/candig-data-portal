@@ -1,33 +1,33 @@
 import { lazy } from 'react';
 
 // project imports
-import MainLayout from 'layout/MainLayout';
-import Loadable from 'ui-component/Loadable';
+import MainLayout from './layout/MainLayout';
+import Loadable from './ui-component/Loadable';
 
 // import project config
-import config from 'config';
+import config from './config';
 
 // import basename
 const { basename } = config;
 
 // Summary routing
-const Summary = Loadable(lazy(() => import('views/summary/summary')));
+const Summary = Loadable(lazy(() => import('./views/summary/summary')));
 
 // Clinical & Genomic Search
-const ClinicalGenomicSearch = Loadable(lazy(() => import('views/clinicalGenomic/clinicalGenomicSearch')));
-const ClinicalPatientView = Loadable(lazy(() => import('views/clinicalGenomic/clinicalPatientView')));
+const ClinicalGenomicSearch = Loadable(lazy(() => import('./views/clinicalGenomic/clinicalGenomicSearch')));
+const ClinicalPatientView = Loadable(lazy(() => import('./views/clinicalGenomic/clinicalPatientView')));
 
 // Ingest Portal
-const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
+const IngestPortal = Loadable(lazy(() => import('./views/ingest/ingest')));
 
 // Ingest Portal
-// const IngestPortal = Loadable(lazy(() => import('views/ingest/ingest')));
+// const IngestPortal = Loadable(lazy(() => import('./views/ingest/ingest')));
 
 // Completeness
-const CompletenessStats = Loadable(lazy(() => import('views/completeness/completeness')));
+const CompletenessStats = Loadable(lazy(() => import('./views/completeness/completeness')));
 
 // Error Pages
-const ErrorNotFoundPage = Loadable(lazy(() => import('views/errorPages/ErrorNotFoundPage')));
+const ErrorNotFoundPage = Loadable(lazy(() => import('./views/errorPages/ErrorNotFoundPage')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 
