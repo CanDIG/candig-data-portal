@@ -25,4 +25,6 @@ RUN npm install
 
 RUN touch initial_setup
 
+EXPOSE 5273
+
 ENTRYPOINT ["bash", "entrypoint.sh"]
