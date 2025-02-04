@@ -154,7 +154,7 @@ function MainLayout() {
                 </main>
 
                 {/* FOOTER */}
-            {/* <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} /> */}
+                {/* <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} /> */}
             </SidebarProvider>
         </Root>
     );
