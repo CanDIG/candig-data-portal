@@ -6,8 +6,8 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PropTypes from 'prop-types';
-import { SITE } from '../../store/constant';
-import siteLogo from '../../assets/images/users/siteLogo.png';
+import { SITE } from '../../../store/constant';
+import siteLogo from '../../../assets/images/users/siteLogo.png';
 
 const PREFIX = 'PatientCountSingle';
 

@@ -16,7 +16,7 @@ import highchartsAccessibility from 'highcharts/modules/accessibility';
 import { IconTrash } from '@tabler/icons-react';
 
 // Custon Components and constants
-import MainCard from '../ui-component/cards/MainCard';
+import MainCard from '../../ui-component/cards/MainCard';
 import { DataVisualizationChartInfo, validCharts, validStackedCharts } from '../../store/constant';
 import { HAS_CENSORED_DATA_MARKER } from '../../utils/utils';
 import config from '../../config';

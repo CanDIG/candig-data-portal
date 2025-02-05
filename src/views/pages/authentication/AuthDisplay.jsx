@@ -7,10 +7,10 @@ import { IconShieldLock } from '@tabler/icons-react';
 import PropTypes from 'prop-types';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
+import MainCard from '../../../ui-component/cards/MainCard';
 import { useAuthContext } from './AuthContext';
 import { Button, Typography } from '@mui/material';
-import config from 'config';
+import config from '../../../config';
 
 // assets
 const PREFIX = 'AuthDisplay';

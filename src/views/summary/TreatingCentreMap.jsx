@@ -5,8 +5,8 @@ import HighchartsMap from 'highcharts/modules/map';
 import mapDataCanada from '@highcharts/map-collection/countries/ca/ca-all.geo.json';
 import PropTypes from 'prop-types';
 
-import { trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
-import MainCard from 'ui-component/cards/MainCard';
+import { trackPromise } from '../../ui-component/LoadingIndicator/LoadingIndicator';
+import MainCard from '../../ui-component/cards/MainCard';
 
 // Initialize HighchartsMap
 HighchartsMap(Highcharts);

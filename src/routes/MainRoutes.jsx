@@ -5,7 +5,7 @@ import MainLayout from '../layout/MainLayout';
 import Loadable from '../ui-component/Loadable';
 
 // import project config
-import config from '/config';
+import config from '../config';
 
 // import basename
 const { basename } = config;

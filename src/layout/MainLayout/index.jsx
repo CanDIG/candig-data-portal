@@ -15,7 +15,7 @@ import Breadcrumbs from '../../ui-component/extended/Breadcrumbs';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import navigation from '../menu-items/index';
+import navigation from '../../menu-items';
 import { drawerWidth } from '../../store/constant';
 import { SET_MENU } from '../../store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';

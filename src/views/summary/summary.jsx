@@ -3,18 +3,18 @@ import { useState, useEffect } from 'react';
 // mui
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/system/useTheme';
-import SmallCountCard from '../../../ui-component/cards/SmallCountCard';
-import CustomOfflineChart from '../../../views/summary/CustomOfflineChart';
-import TreatingCentreMap from '../../../views/summary/TreatingCentreMap';
+import SmallCountCard from '../../ui-component/cards/SmallCountCard';
+import CustomOfflineChart from '../../views/summary/CustomOfflineChart';
+import TreatingCentreMap from '../../views/summary/TreatingCentreMap';
 
 // project imports
-import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from '../../../store/api';
-import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from '../../../utils/utils';
+import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from '../../store/api';
+import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from '../../utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
-import { useSidebarWriterContext } from '../../../layout/MainLayout/Sidebar/SidebarContext';
+import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 
 function Summary() {
     const theme = useTheme();

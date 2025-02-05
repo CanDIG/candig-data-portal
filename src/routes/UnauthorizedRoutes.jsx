@@ -2,17 +2,17 @@ import { lazy } from 'react';
 import { useRoutes } from 'react-router-dom';
 
 // project imports
-import MainLayout from 'layout/MainLayout';
-import Loadable from 'ui-component/Loadable';
+import MainLayout from '../layout/MainLayout';
+import Loadable from '../ui-component/Loadable';
 
 // import project config
-import config from 'config';
+import config from '../config';
 
 // import basename
 const { basename } = config;
 
 // Unauthorized page
-const AuthDisplay = Loadable(lazy(() => import('views/pages/authentication/AuthDisplay')));
+const AuthDisplay = Loadable(lazy(() => import('../views/pages/authentication/AuthDisplay')));
 
 // ===========================|| MAIN ROUTING ||=========================== //
 

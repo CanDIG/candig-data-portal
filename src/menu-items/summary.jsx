@@ -2,7 +2,7 @@
 import { IconLayoutDashboard } from '@tabler/icons-react';
 
 // import project config
-import config from 'config';
+import config from '../config';
 
 // constant
 const { basename } = config;
