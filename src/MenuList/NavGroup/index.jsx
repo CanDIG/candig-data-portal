@@ -9,7 +9,7 @@ import { Divider, List, Typography } from '@mui/material';
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
-import { MENU_OPEN } from 'store/actions';
+import { MENU_OPEN } from '../../store/actions';
 
 const PREFIX = 'NavGroup';
 

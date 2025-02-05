@@ -14,12 +14,12 @@ import Button from '@mui/material/Button';
 import { IconEdit, IconX, IconPlus } from '@tabler/icons-react';
 
 // Custom Components and context
-import CustomOfflineChart, { VALID_CHART_TYPES, VISUALIZATION_LOCAL_STORAGE_KEY } from 'views/summary/CustomOfflineChart';
+import CustomOfflineChart, { VALID_CHART_TYPES, VISUALIZATION_LOCAL_STORAGE_KEY } from '../../../views/summary/CustomOfflineChart';
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Constants
-import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
-import { HAS_CENSORED_DATA_MARKER } from 'utils/utils';
+import { validStackedCharts, DataVisualizationChartInfo } from '../../../store/constant';
+import { HAS_CENSORED_DATA_MARKER } from '../../../utils/utils';
 
 const DEFAULT_CHART_DEFINITIONS = [
     {

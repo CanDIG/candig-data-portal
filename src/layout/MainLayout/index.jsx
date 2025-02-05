@@ -11,13 +11,13 @@ import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 
 // project imports
-import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
+import Breadcrumbs from '../../ui-component/extended/Breadcrumbs';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import navigation from 'menu-items';
-import { drawerWidth } from 'store/constant';
-import { SET_MENU } from 'store/actions';
+import navigation from '../menu-items/index';
+import { drawerWidth } from '../../store/constant';
+import { SET_MENU } from '../../store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';
 
 // assets

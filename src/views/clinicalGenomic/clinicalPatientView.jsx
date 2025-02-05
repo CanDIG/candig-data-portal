@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Alert from '@mui/material/Alert';
 import { useSelector } from 'react-redux';
 
-import MainCard from 'ui-component/cards/MainCard';
+import MainCard from '../../ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';

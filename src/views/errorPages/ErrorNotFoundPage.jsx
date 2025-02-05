@@ -3,11 +3,11 @@ import { Grid, Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
-import Error4040 from 'assets/images/ErrorPages/Error404-0.svg';
-import Error4041 from 'assets/images/ErrorPages/Error404-1.svg';
-import Error4042 from 'assets/images/ErrorPages/Error404-2.svg';
-import Error4043 from 'assets/images/ErrorPages/Error404-3.svg';
+import MainCard from '../../ui-component/cards/MainCard';
+import Error4040 from '../../assets/images/ErrorPages/Error404-0.svg';
+import Error4041 from '../../assets/images/ErrorPages/Error404-1.svg';
+import Error4042 from '../../assets/images/ErrorPages/Error404-2.svg';
+import Error4043 from '../../assets/images/ErrorPages/Error404-3.svg';
 
 function ErrorNotFoundPage() {
     const errorImages = [Error4040, Error4041, Error4042, Error4043];

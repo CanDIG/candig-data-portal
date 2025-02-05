@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react';
 // import { useTheme, makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/system/useTheme';
-import SmallCountCard from 'ui-component/cards/SmallCountCard';
-import CustomOfflineChart from 'views/summary/CustomOfflineChart';
+import SmallCountCard from '../../ui-component/cards/SmallCountCard';
+import CustomOfflineChart from '../../views/summary/CustomOfflineChart';
 
 // project imports
-import { fetchClinicalCompleteness, fetchGenomicCompleteness } from 'store/api';
+import { fetchClinicalCompleteness, fetchGenomicCompleteness } from '../../store/api';
 
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
 
 // Test data
-import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
+import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
 
 function Completeness() {

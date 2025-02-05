@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import { ButtonBase } from '@mui/material';
 
 // project imports
-import config from 'config';
-import Logo from 'ui-component/Logo';
-import { MENU_OPEN } from 'store/actions';
+import config from '../../../config';
+import Logo from '../../../ui-component/Logo';
+import { MENU_OPEN } from '../../../store/actions';
 
 // ===========================|| MAIN LOGO ||=========================== //
 

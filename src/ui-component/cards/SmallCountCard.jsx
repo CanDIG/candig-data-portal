@@ -9,8 +9,8 @@ import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from
 import { useSelector } from 'react-redux';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
-import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
+import MainCard from '/MainCard';
+import TotalIncomeCard from '/Skeleton/TotalIncomeCard';
 
 const PREFIX = 'SmallCountCard';
 

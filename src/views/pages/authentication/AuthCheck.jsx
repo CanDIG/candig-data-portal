@@ -2,9 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 // project imports
-import { INGEST_URL } from './store/api';
+import { INGEST_URL } from '/store/api';
 import { UseUnauthorizedRoutes } from './routes/UnauthorizedRoutes';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '/AuthContext';
 
 // assets
 

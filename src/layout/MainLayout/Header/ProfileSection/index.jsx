@@ -20,13 +20,13 @@ import {
 } from '@mui/material';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
-import Transitions from 'ui-component/extended/Transitions';
-import { SITE } from 'store/constant';
+import MainCard from '../../../../ui-component/cards/MainCard';
+import Transitions from '../../../../ui-component/extended/Transitions';
+import { SITE } from '../../../../store/constant';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons-react';
-import siteLogo from 'assets/images/users/siteLogo.png';
+import siteLogo from '../../../../assets/images/users/siteLogo.png';
 import APITokenButton from './apiTokenbutton';
 
 const PREFIX = 'ProfileSection';

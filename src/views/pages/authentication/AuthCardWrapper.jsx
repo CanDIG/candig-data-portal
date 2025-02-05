@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
 // project import
-import MainCard from 'ui-component/cards/MainCard';
+import MainCard from '../../ui-component/cards/MainCard';
 
 const PREFIX = 'AuthCardWrapper';
 

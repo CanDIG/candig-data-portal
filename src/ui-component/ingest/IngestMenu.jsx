@@ -2,11 +2,11 @@ import { styled } from '@mui/material/styles';
 import { Alert, Box, CircularProgress, Grid, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import IngestTabPage from 'ui-component/ingest/IngestTabPage';
-import ClinicalIngest from 'ui-component/ingest/ClinicalIngest';
-import GenomicIngest from 'ui-component/ingest/GenomicIngest';
-import PersistentFile from 'ui-component/PersistentFile';
-import { ingestClinicalData, ingestGenomicData } from 'store/api';
+import IngestTabPage from '/IngestTabPage';
+import ClinicalIngest from '/ClinicalIngest';
+import GenomicIngest from '/GenomicIngest';
+import PersistentFile from '../PersistentFile';
+import { ingestClinicalData, ingestGenomicData } from '../../store/api';
 
 const PREFIX = 'IngestMenu';
 

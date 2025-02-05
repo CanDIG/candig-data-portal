@@ -1,4 +1,4 @@
-import IngestMenu from 'ui-component/ingest/IngestMenu';
+import IngestMenu from '../../ui-component/ingest/IngestMenu';
 import { styled } from '@mui/material/styles';
 import { Grid } from '@mui/material';
 

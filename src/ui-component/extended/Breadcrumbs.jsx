@@ -8,8 +8,8 @@ import { Card, CardContent, Divider, Grid, Typography } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
 // project imports
-import config from 'config';
-import { gridSpacing } from 'store/constant';
+import config from '../../config';
+import { gridSpacing } from '../../store/constant';
 
 // assets
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';

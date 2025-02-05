@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Box, ButtonBase } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { useTheme } from '@mui/system';
-import config from 'config';
+import config from '../../config';
 import MOHLogo from '../../../assets/images/MOH/1_MOHCCN_Primary_FullColor_ENG.png';
 import CanDIGLogo from '../../../assets/images/logo-notext.png';
 import { IconBrandGithub, IconWorld, IconMail, IconCopyright } from '@tabler/icons-react';
