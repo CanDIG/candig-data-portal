@@ -593,7 +593,7 @@ function Sidebar() {
     };
 
     // Parse out what we need:
-    const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
+    const sites = readerContext?.federation?.map((loc) => loc.location.name) || [];
     const programs = readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || [];
     const authorizedPrograms = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((program) => program.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
