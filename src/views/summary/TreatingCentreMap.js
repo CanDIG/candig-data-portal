@@ -12,7 +12,7 @@ import MainCard from 'ui-component/cards/MainCard';
 HighchartsMap(Highcharts);
 const initialState = {
     title: {
-        text: 'CanDIG Data Source'
+        text: 'Data Source'
     },
     credits: {
         enabled: false
