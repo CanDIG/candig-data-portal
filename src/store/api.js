@@ -30,15 +30,18 @@ export function fetchOrRelogin(...args) {
     });
 }
 
-export function fetchFederationStat(endpoint) {
+/*
+Generic querying for federation
+*/
+export function fetchFederation(path, service, payload) {
     return fetchOrRelogin(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: `v3/discovery/overview${endpoint}`,
-            payload: {},
-            service: 'katsu'
+            path,
+            payload: payload || {},
+            service
         })
     })
         .then((response) => {
@@ -53,26 +56,23 @@ export function fetchFederationStat(endpoint) {
         });
 }
 
-/*
-Generic querying for federation
-*/
-export function fetchFederation(path, service) {
-    return fetchOrRelogin(`${federation}/fanout`, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            method: 'GET',
-            path,
-            payload: {},
-            service
-        })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return [];
-        })
+/**
+ * Fetch federated sub-services by querying the Query microservice.
+ *
+ * @param {string} targetPath - The specific path within the target service to request data from
+ * @param {string} [targetService='katsu'] - The target service being queried (default: 'katsu')
+ * @param {string} [endpoint='discovery] - The endpoint used for the federation request (default: 'discovery')
+ * @param {string} [service='query'] - The service handling the request (default: 'query')
+ * @returns {Promise<Object|string>} A promise that resolves to the response data or 'error' if the request fails
+ */
+export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'discovery', service = 'query') {
+    const payload = {
+        targetService,
+        targetPath
+    };
+
+    return fetchFederation(endpoint, service, payload)
+        .then((data) => data)
         .catch((error) => {
             console.log(`Error: ${error}`);
             return 'error';
