@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Alert, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
 import PasswordIcon from '@mui/icons-material/Password';
 
-import { fetchRefreshToken } from '../../../../store/api';
+import { fetchRefreshToken } from 'store/api';
 
 // JWT decoder taken from here: https://stackoverflow.com/a/38552302/2148998
 // Then ran through prettier a bunch

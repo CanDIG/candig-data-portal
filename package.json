@@ -50,11 +50,10 @@
         "yup": "^1.3.3"
     },
     "scripts": {
-        "start": "vite",
-        "build": "tsc -b vite build",
-        "test": "vitest test",
-        "lint": "eslint .",
-        "serve": "vite preview"
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
     },
     "eslintConfig": {
         "extends": [
@@ -90,10 +89,9 @@
         "eslint-plugin-react": "^7.33.2",
         "eslint-plugin-react-hooks": "^4.6.0",
         "prettier": "^3.1.1",
+        "react-scripts": "^5.0.1",
         "sass": "^1.69.7",
-        "webpack-cli": "^5.1.4",
-        "@vitejs/plugin-react": "^4.3.4",
-        "vite": "^6.0.11"
+        "webpack-cli": "^5.1.4"
     },
     "overrides": {
         "nth-check": "2.1.1",

@@ -24,9 +24,9 @@ npm install
 
 The file `.env.development` is where you specify API Servers and site-specific variables.
 
--   `VITE_KATSU_API_SERVER`: Path to the Katsu API.
--   `VITE_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
--   `VITE_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
+-   `REACT_APP_KATSU_API_SERVER`: Path to the Katsu API.
+-   `REACT_APP_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
+-   `REACT_APP_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
 -   `GENERATE_SOURCEMAP`: Removes map fodlers from build when set to false
 
 After this you can start the application by running **npm start**
@@ -55,7 +55,7 @@ To create a production build, use yarn build.
 
 You would need to specify the variables required in `.env.production`, see the section above on what values are required for which variables.
 
-One thing worth noting is that the `VITE_BASE_NAME` variable only affects the routes of the app. The static assets are still served from root.
+One thing worth noting is that the `REACT_APP_BASE_NAME` variable only affects the routes of the app. The static assets are still served from root.
 
 As an example, if you would like the app's static assets to be served at `/v2/data-portal`, you would need to specify this line at `package.json`.
 
