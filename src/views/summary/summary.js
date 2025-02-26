@@ -8,7 +8,7 @@ import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
-import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
+import { fetchClinicalCompleteness, fetchFederatedSubServices, fetchGenomicCompleteness } from 'store/api';
 import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
@@ -166,7 +166,7 @@ function Summary() {
 
     useEffect(() => {
         function fetchData(endpoint) {
-            return fetchFederationStat(endpoint)
+            return fetchFederatedSubServices(`v3/discovery/overview${endpoint}`)
                 .then((data) => {
                     federationStatCount(data, endpoint);
                     if (endpoint === '/individual_count') {
@@ -174,20 +174,20 @@ function Summary() {
                     }
                 })
                 .catch((error) => {
-                    // pass
-                    console.log('Error fetching data : ', error);
+                    console.log('Error fetching data:', error);
                 })
                 .finally(() => {
                     finishEndpoint(endpoint);
                 });
         }
-
-        fetchData('/individual_count');
-        fetchData('/primary_site_count');
-        fetchData('/program_count');
-        fetchData('/patients_per_program');
-        fetchData('/treatment_type_count');
-        fetchData('/diagnosis_age_count');
+        [
+            '/individual_count',
+            '/primary_site_count',
+            '/program_count',
+            '/patients_per_program',
+            '/treatment_type_count',
+            '/diagnosis_age_count'
+        ].forEach(fetchData);
         fetchGenomic();
         fetchClinical();
         // eslint-disable-next-line react-hooks/exhaustive-deps
