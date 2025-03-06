@@ -15,6 +15,7 @@ import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
+import config from 'config';
 
 function Summary() {
     const theme = useTheme();
@@ -202,7 +203,7 @@ function Summary() {
                             <SmallCountCard
                                 title="Nodes"
                                 count={`${sites}/${totalSites}`}
-                                icon={<CheckCircleOutline fontSize="inherit" />}
+                                icon={config.isDHDP ? null : <CheckCircleOutline fontSize="inherit" />}
                                 color={theme.palette.secondary.main}
                             />
                         </Grid>
@@ -210,7 +211,7 @@ function Summary() {
                             <SmallCountCard
                                 title="Connection Error"
                                 count={`${connectionError}/${totalSites}`}
-                                icon={<WarningAmber fontSize="inherit" />}
+                                icon={config.isDHDP ? null : <WarningAmber fontSize="inherit" />}
                                 color={theme.palette.error.main}
                             />
                         </Grid>
@@ -221,7 +222,7 @@ function Summary() {
                     <SmallCountCard
                         title="Nodes"
                         count={sites}
-                        icon={<CheckCircleOutline fontSize="inherit" />}
+                        icon={config.isDHDP ? null : <CheckCircleOutline fontSize="inherit" />}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
@@ -229,10 +230,10 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading['/individual_count']}
-                    title="Number of Patients"
+                    title={config.isDHDP ? 'Patients' : 'Number of Patients'}
                     count={individualCount?.individual_count || 0}
                     primary
-                    icon={<Person fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
                 />
             </Grid>
@@ -241,7 +242,7 @@ function Summary() {
                     isLoading={isLoading['/individual_count']}
                     title="Programs"
                     count={programCount?.program_count || 0}
-                    icon={<Hive fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
             </Grid>
@@ -250,7 +251,7 @@ function Summary() {
                     isLoading={isLoading['/individual_count']}
                     title="Provinces"
                     count={provinceCounter || 0}
-                    icon={<Public fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Public fontSize="inherit" />}
                     color={theme.palette.tertiary.main}
                 />
             </Grid>

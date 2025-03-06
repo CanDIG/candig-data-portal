@@ -7,7 +7,8 @@ const config = {
     aggregateThreshold: process.env.REACT_APP_AGGREGATE_COUNT_THRESHOLD,
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
-    supportEmail: process.env.REACT_APP_SUPPORT_EMAIL
+    supportEmail: process.env.REACT_APP_SUPPORT_EMAIL,
+    isDHDP: true
 };
 
 export default config;
