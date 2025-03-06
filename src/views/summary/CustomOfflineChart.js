@@ -294,10 +294,40 @@ function CustomOfflineChart({
                     title: {
                         text: DataVisualizationChartInfo[chartData]?.title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis }, allowDecimals: false },
-                    colors: [theme.palette.primary.dark],
-                    series: [{ data, colorByPoint: true, showInLegend: false }],
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData]?.xAxis,
+                            style: { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 }
+                        },
+                        categories,
+                        allowDecimals: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData]?.yAxis,
+                            style: { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 }
+                        },
+                        allowDecimals: false
+                    },
+                    colors: ['#00879D'],
+                    series: [
+                        {
+                            data,
+                            dataLabels: config.isDHDP
+                                ? {
+                                      enabled: true,
+                                      inside: true,
+                                      style: {
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 8,
+                                          textOutline: false
+                                      }
+                                  }
+                                : {},
+                            colorByPoint: true,
+                            showInLegend: false
+                        }
+                    ],
                     tooltip: {
                         useHTML: true,
                         // Anonymous functions don't appear to work with highcharts for some reason?

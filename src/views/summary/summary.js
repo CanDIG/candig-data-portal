@@ -54,7 +54,21 @@ function Summary() {
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
-        const candigDataSourceCollection = {};
+        const candigDataSourceCollection = {
+            'ca-bc': 0,
+            'ca-on': 0,
+            'ca-nu': 0,
+            'ca-nt': 0,
+            'ca-ab': 0,
+            'ca-nl': 0,
+            'ca-sk': 0,
+            'ca-mb': 0,
+            'ca-qc': 0,
+            'ca-nb': 0,
+            'ca-ns': 0,
+            'ca-pe': 0,
+            'ca-yt': 0
+        };
 
         if (data && Array.isArray(data)) {
             // Fake Server with same URL
@@ -73,7 +87,10 @@ function Summary() {
                     case '/individual_count':
                         setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
-                            if (!(stat.location['province-code'] in candigDataSourceCollection)) {
+                            if (
+                                !(stat.location['province-code'] in candigDataSourceCollection) ||
+                                candigDataSourceCollection[stat.location['province-code']] == null
+                            ) {
                                 candigDataSourceCollection[stat.location['province-code']] = 0;
                             }
                             candigDataSourceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
