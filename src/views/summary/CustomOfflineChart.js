@@ -87,8 +87,12 @@ function CustomOfflineChart({
             theme.palette.tertiary[800]
         ],
         title: {
+            align: config.isDHDP ? 'left' : undefined,
             style: {
-                fontWeight: 'normal'
+                fontFamily: config.isDHDP ? 'Montserrat' : undefined,
+                fontSize: config.isDHDP ? 14 : undefined,
+                fontWeight: config.isDHDP ? 'bold' : 'normal',
+                color: config.isDHDP ? theme.palette.primary.dark : undefined
             }
         }
     });
@@ -242,10 +246,7 @@ function CustomOfflineChart({
                         height
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title,
-                        style: {
-                            fontWeight: 'normal'
-                        }
+                        text: DataVisualizationChartInfo[chartData].title
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories, allowDecimals: false },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
@@ -291,10 +292,7 @@ function CustomOfflineChart({
                         type: chart
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData]?.title,
-                        style: {
-                            fontWeight: 'normal'
-                        }
+                        text: DataVisualizationChartInfo[chartData]?.title
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories, allowDecimals: false },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis }, allowDecimals: false },
@@ -351,10 +349,7 @@ function CustomOfflineChart({
                         plotShadow: false
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title,
-                        style: {
-                            fontWeight: 'normal'
-                        }
+                        text: DataVisualizationChartInfo[chartData].title
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, allowDecimals: false },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },

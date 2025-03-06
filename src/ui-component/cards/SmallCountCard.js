@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
+import config from 'config';
 
 const PREFIX = 'SmallCountCard';
 
@@ -77,7 +78,8 @@ function SmallCountCard({ isLoading, title, count, icon, color }) {
         },
 
         [`& .${classes.primary}`]: {
-            color: color ? 'black' : '#fff'
+            // eslint-disable-next-line no-nested-ternary
+            color: config.isDHDP ? theme.palette.primary.dark : color ? 'black' : '#fff'
         },
 
         [`& .${classes.secondary}`]: {
@@ -111,23 +113,38 @@ function SmallCountCard({ isLoading, title, count, icon, color }) {
                                     </Avatar>
                                 </ListItemAvatar>
                             )}
-                            <ListItemText
-                                className={classes.padding}
-                                sx={{
-                                    mt: 0.45,
-                                    mb: 0.45
-                                }}
-                                primary={
-                                    <Typography variant="h4" className={classes.primary}>
-                                        {count}
-                                    </Typography>
-                                }
-                                secondary={
-                                    <Typography variant="subtitle2" className={classes.secondary}>
-                                        {title}
-                                    </Typography>
-                                }
-                            />
+                            {config.isDHDP ? (
+                                <ListItemText
+                                    className={classes.padding}
+                                    sx={{
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={
+                                        <Typography variant="h4" className={classes.primary}>
+                                            {count} {title}
+                                        </Typography>
+                                    }
+                                />
+                            ) : (
+                                <ListItemText
+                                    className={classes.padding}
+                                    sx={{
+                                        mt: 0.45,
+                                        mb: 0.45
+                                    }}
+                                    primary={
+                                        <Typography variant="h4" className={classes.primary}>
+                                            {count}
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="subtitle2" className={classes.secondary}>
+                                            {title}
+                                        </Typography>
+                                    }
+                                />
+                            )}
                         </ListItem>
                     </List>
                 </MainCard>

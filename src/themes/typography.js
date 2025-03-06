@@ -4,7 +4,7 @@
  */
 export default function themeTypography(theme) {
     return {
-        fontFamily: theme.customization.fontFamily,
+        fontFamily: 'Montserrat', // theme.customization.fontFamily,
         h6: {
             fontWeight: 500,
             color: theme.heading,
