@@ -31,7 +31,7 @@ const initialState = {
     },
     negativeColor: config.isDHDP ? '#B0DAE1' : undefined,
     nullColor: config.isDHDP ? '#B0DAE1' : undefined,
-    nullInteraction: true,
+    nullInteraction: false,
     series: [
         {
             type: 'map',
