@@ -16,6 +16,7 @@ import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 // assets
 import MainCard from 'ui-component/cards/MainCard';
 import { useTheme } from '@mui/system';
+import config from 'config';
 
 HighchartsAccessibility(Highcharts);
 
@@ -144,14 +145,14 @@ function FieldLevelCompletenessGraph(props) {
             plotBorderWidth: null,
             plotShadow: false
         },
-        colors: [theme.palette.primary.main],
+        colors: [config.isDHDP ? '#00879D' : theme.palette.primary.main],
         plotOptions: {
             bar: {
                 dataLabels: {
                     align: 'center',
                     color: theme.palette.primary.light,
                     enabled: true,
-                    format: '{y}%',
+                    format: config.isDHDP ? '{y}' : '{y}%',
                     inside: true,
                     style: {
                         textOutline: 'none'

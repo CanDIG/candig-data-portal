@@ -24,6 +24,7 @@ import PropTypes from 'prop-types';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import config from 'config';
 
 const PREFIX = 'Sidebar';
 
@@ -35,9 +36,10 @@ const classes = {
     hidden: `${PREFIX}-hidden`,
     button: `${PREFIX}-button`,
     lockIcon: `${PREFIX}-lockIcon`,
-    lockContainer: `${PREFIX}-lockContainer`
+    lockContainer: `${PREFIX}-lockContainer`,
+    inputDHDP: `${PREFIX}-inputDHDP`,
+    checkboxLabelDHDP: `${PREFIX}-checkboxLabelDHDP`
 };
-
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
 const Root = styled('div')(({ theme }) => ({
     [`& .${classes.tab}`]: {
@@ -77,6 +79,25 @@ const Root = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    [`& .${classes.inputDHDP}`]: {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                backgroundColor: 'rgba(217, 237, 240, 0.2)',
+                borderWidth: 1,
+                borderColor: '#D9E3E5'
+            },
+            '&.Mui-focused fieldset': {
+                backgroundColor: 'rgba(217, 237, 240, 0.5)',
+                borderWidth: 2,
+                borderColor: '#00879D'
+            }
+        }
+    },
+    [`& .${classes.checkboxLabelDHDP}`]: {
+        textTransform: 'capitalize',
+        fontSize: 12,
+        color: theme.palette.primary.main
     }
 }));
 
@@ -93,9 +114,10 @@ function SidebarGroup(props) {
                 <FormLabel
                     sx={{
                         color: theme.palette.primary.main,
-                        background: theme.palette.primary.light,
+                        background: config.isDHDP ? '#E6F3F5' : theme.palette.primary.light,
                         fontWeight: 'bold',
-                        paddingLeft: '1em'
+                        paddingLeft: '1em',
+                        fontSize: config.isDHDP ? 12 : 14
                     }}
                 >
                     {name}
@@ -264,7 +286,7 @@ function StyledCheckboxList(props) {
                     {option}
                 </li>
             )}
-            renderInput={(params) => <TextField {...params} label={groupName} />}
+            renderInput={(params) => <TextField {...params} className={classes.inputDHDP} label={groupName} />}
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
             }
@@ -279,7 +301,7 @@ function StyledCheckboxList(props) {
         options?.map((option) => (
             <FormControlLabel
                 label={
-                    <div className={classes.lockContainer}>
+                    <div className={classes.lockContainer + (config.isDHDP ? ` ${classes.checkboxLabelDHDP}` : '')}>
                         {option}
                         {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
                             <Tooltip title="Unauthorized Program" placement="right">
@@ -309,7 +331,7 @@ function StyledCheckboxList(props) {
                     />
                 }
                 key={option}
-                className={classes.checkboxLabel}
+                className={config.isDHDP ? classes.checkboxLabelDHDP : classes.checkboxLabel}
             />
         ))
     );
@@ -615,18 +637,36 @@ function Sidebar() {
 
     return (
         <Root>
-            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
-                <Tab className={classes.tab} value="All" label="All" />
-                <Tab className={classes.tab} value="Clinical" label="Clinical" />
-                <Tab className={classes.tab} value="Genomic" label="Genomic" />
-            </Tabs>
+            {config.isDHDP ? (
+                // eslint-disable-next-line react/jsx-no-useless-fragment
+                <></>
+            ) : (
+                <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
+                    <Tab className={classes.tab} value="All" label="All" />
+                    <Tab className={classes.tab} value="Clinical" label="Clinical" />
+                    <Tab className={classes.tab} value="Genomic" label="Genomic" />
+                </Tabs>
+            )}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Button className={classes.button} onClick={() => resetButton()}>
-                    Reset
-                </Button>
-                <Button className={classes.button} onClick={triggerSearch}>
-                    Search
-                </Button>
+                {config.isDHDP ? (
+                    <>
+                        <Button className={classes.button} onClick={triggerSearch}>
+                            Search
+                        </Button>
+                        <Button className={classes.button} onClick={() => resetButton()}>
+                            Reset
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button className={classes.button} onClick={() => resetButton()}>
+                            Reset
+                        </Button>
+                        <Button className={classes.button} onClick={triggerSearch}>
+                            Search
+                        </Button>
+                    </>
+                )}
             </div>
             <SidebarGroup name="Node">
                 <StyledCheckboxList
@@ -688,7 +728,7 @@ function Sidebar() {
                     setChecked={setSelectedPrimarySite}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
+            <SidebarGroup name={config.isDHDP ? 'Drug Therapy Names' : 'Systemic Therapy Drug Names'} hide={hideClinical}>
                 <StyledCheckboxList
                     options={systemicTherapyDrugNames}
                     onWrite={writerContext}

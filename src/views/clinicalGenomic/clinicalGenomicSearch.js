@@ -15,6 +15,7 @@ import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';
+import config from 'config';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -97,7 +98,7 @@ const sections = [
     {
         id: 'Programs summary',
         header: undefined,
-        component: <AuthorizationSections title="All Programs" />
+        component: config.isDHDP ? ' ' : <AuthorizationSections title="All Programs" />
     },
     {
         id: 'counts',
@@ -112,7 +113,7 @@ const sections = [
     {
         id: 'authorized programs',
         header: undefined,
-        component: <AuthorizationSections title="Authorized Programs" />
+        component: config.isDHDP ? ' ' : <AuthorizationSections title="Authorized Programs" />
     },
     {
         id: 'clinical',
@@ -141,34 +142,39 @@ function ClinicalGenomicSearch() {
     return (
         <Root>
             {/* Top bar */}
-            <AppBar
-                component="nav"
-                className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
-            >
-                <Toolbar className={classes.toolbar}>
-                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        Federated Search
-                    </Typography>
-                    {sections
-                        .map((section) =>
-                            section.header !== undefined ? (
-                                <Button
-                                    onClick={() => {
-                                        window.location.href = `#${section.id}`;
-                                    }}
-                                    sx={{ my: 2, display: 'block' }}
-                                    key={section.id}
-                                    className={classes.navigationLink}
-                                    variant="text"
-                                >
-                                    {section.header}
-                                </Button>
-                            ) : undefined
-                        )
-                        .filter((obj) => obj !== undefined)}
-                </Toolbar>
+            {config.isDHDP ? (
+                // eslint-disable-next-line react/jsx-no-useless-fragment
                 <SearchExplainer />
-            </AppBar>
+            ) : (
+                <AppBar
+                    component="nav"
+                    className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
+                >
+                    <Toolbar className={classes.toolbar}>
+                        <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                            Federated Search
+                        </Typography>
+                        {sections
+                            .map((section) =>
+                                section.header !== undefined ? (
+                                    <Button
+                                        onClick={() => {
+                                            window.location.href = `#${section.id}`;
+                                        }}
+                                        sx={{ my: 2, display: 'block' }}
+                                        key={section.id}
+                                        className={classes.navigationLink}
+                                        variant="text"
+                                    >
+                                        {section.header}
+                                    </Button>
+                                ) : undefined
+                            )
+                            .filter((obj) => obj !== undefined)}
+                    </Toolbar>
+                    <SearchExplainer />
+                </AppBar>
+            )}
             {/* Empty div to make sure the header takes up space */}
             <div className={classes.headerSpacing} />
             <SearchHandler setLoading={setLoading} />

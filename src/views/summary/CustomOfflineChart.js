@@ -318,6 +318,7 @@ function CustomOfflineChart({
                                       enabled: true,
                                       inside: true,
                                       style: {
+                                          color: '#FFFFFF',
                                           fontFamily: 'Montserrat',
                                           fontSize: 8,
                                           textOutline: false

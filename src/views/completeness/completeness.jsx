@@ -16,6 +16,7 @@ import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
 // Test data
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
+import config from 'config';
 
 function Completeness() {
     const theme = useTheme();
@@ -23,6 +24,7 @@ function Completeness() {
     const [numNodes, setNumNodes] = useState(0);
     const [numErrorNodes, setNumErrorNodes] = useState(0);
     const [numDonors, setNumDonors] = useState(0);
+    const [numPrograms, setNumPrograms] = useState(0);
     const [numCompleteDonors, setNumCompleteDonors] = useState(0);
     const [numProvinces, setNumProvinces] = useState(0);
     const [numClinicalComplete, setNumClinicalComplete] = useState(0);
@@ -41,6 +43,7 @@ function Completeness() {
             setNumNodes(data.numNodes);
             setNumErrorNodes(data.numErrorNodes);
             setNumDonors(data.numDonors);
+            setNumPrograms(data.uniquePrograms.size);
             setNumCompleteDonors(data.numCompleteDonors);
             setNumClinicalComplete(data.numClinicalComplete);
             setClinicalComplete(data.data);
@@ -92,7 +95,7 @@ function Completeness() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading}
-                    title="Number of Patients"
+                    title={config.isDHDP ? 'Patients' : 'Number of Patients'}
                     count={numDonors || 0}
                     primary
                     icon={<Person fontSize="inherit" />}
@@ -102,8 +105,8 @@ function Completeness() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading}
-                    title="Number of Patients With Complete Data"
-                    count={numCompleteDonors || 0}
+                    title={config.isDHDP ? 'Total Programs' : 'Number of Patients With Complete Data'}
+                    count={(config.isDHDP ? numPrograms : numCompleteDonors) || 0}
                     primary
                     icon={<Person fontSize="inherit" />}
                     color={theme.palette.secondary.main}
