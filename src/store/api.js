@@ -180,6 +180,7 @@ export function fetchClinicalCompleteness() {
         // Step 1: Determine the number of provinces
         const provinces = data.map((site) => site?.location?.province);
         const uniqueProvinces = [...new Set(provinces)];
+        const uniquePrograms = new Set();
         const retVal = {};
         retVal.numProvinces = uniqueProvinces.length;
 
@@ -193,6 +194,7 @@ export function fetchClinicalCompleteness() {
             totalSites += 1;
             totalErroredSites += site.status === 200 ? 0 : 1;
             site?.results?.programs?.forEach((program) => {
+                uniquePrograms.add(program.program_id);
                 if (program?.metadata?.summary_cases) {
                     totalCases += program.metadata.summary_cases.total_cases;
                     completeCases += program.metadata.summary_cases.complete_cases;
@@ -208,6 +210,7 @@ export function fetchClinicalCompleteness() {
         retVal.numDonors = totalCases;
         retVal.numCompleteDonors = completeCases;
         retVal.numClinicalComplete = completeClinical;
+        retVal.uniquePrograms = uniquePrograms;
         retVal.data = data;
         return retVal;
     });
