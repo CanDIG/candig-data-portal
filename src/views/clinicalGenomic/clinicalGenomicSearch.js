@@ -143,7 +143,6 @@ function ClinicalGenomicSearch() {
         <Root>
             {/* Top bar */}
             {config.isDHDP ? (
-                // eslint-disable-next-line react/jsx-no-useless-fragment
                 <SearchExplainer />
             ) : (
                 <AppBar

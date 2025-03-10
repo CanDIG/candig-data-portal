@@ -12,6 +12,7 @@ import MenuList from '../../../MenuList';
 // assets
 import { IconMenu2 } from '@tabler/icons-react';
 import { useSidebarReaderContext } from '../Sidebar/SidebarContext';
+import config from 'config';
 
 // style constant
 const PREFIX = 'MainLayoutHeader';
@@ -55,18 +56,23 @@ function Header({ handleLeftDrawerToggle }) {
         <>
             {/* logo & toggler button */}
             <StyledBox sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <div className={classes.boxContainer}>
-                    <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
-                        <LogoSection />
-                    </Box>
-                    {sidebar && (
-                        <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
-                            <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
-                                <IconMenu2 stroke={1.5} size="1.3rem" />
-                            </Avatar>
-                        </ButtonBase>
-                    )}
-                </div>
+                {config.isDHDP ? (
+                    // eslint-disable-next-line react/jsx-no-useless-fragment
+                    <></>
+                ) : (
+                    <div className={classes.boxContainer}>
+                        <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
+                            <LogoSection />
+                        </Box>
+                        {sidebar && (
+                            <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                                <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
+                                    <IconMenu2 stroke={1.5} size="1.3rem" />
+                                </Avatar>
+                            </ButtonBase>
+                        )}
+                    </div>
+                )}
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
                 </Box>
@@ -78,7 +84,12 @@ function Header({ handleLeftDrawerToggle }) {
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
-            {/* <ProfileSection /> */}
+            {config.isDHDP ? (
+                // eslint-disable-next-line react/jsx-no-useless-fragment
+                <></>
+            ) : (
+                <ProfileSection />
+            )}
         </>
     );
 }
