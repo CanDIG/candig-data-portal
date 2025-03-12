@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Grid, Toolbar, Typography } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
@@ -57,7 +57,7 @@ const Root = styled('div')(({ _ }) => ({
     },
 
     [`& .${classes.headerSpacing}`]: {
-        height: 70
+        height: config.isDHDP ? 0 : 70
     },
 
     [`& .${classes.anchor}`]: {
@@ -139,42 +139,8 @@ function ClinicalGenomicSearch() {
         sidebarWriter(<Sidebar />);
     }, [sidebarWriter]);
 
-    return (
-        <Root>
-            {/* Top bar */}
-            {config.isDHDP ? (
-                <SearchExplainer />
-            ) : (
-                <AppBar
-                    component="nav"
-                    className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
-                >
-                    <Toolbar className={classes.toolbar}>
-                        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                            Federated Search
-                        </Typography>
-                        {sections
-                            .map((section) =>
-                                section.header !== undefined ? (
-                                    <Button
-                                        onClick={() => {
-                                            window.location.href = `#${section.id}`;
-                                        }}
-                                        sx={{ my: 2, display: 'block' }}
-                                        key={section.id}
-                                        className={classes.navigationLink}
-                                        variant="text"
-                                    >
-                                        {section.header}
-                                    </Button>
-                                ) : undefined
-                            )
-                            .filter((obj) => obj !== undefined)}
-                    </Toolbar>
-                    <SearchExplainer />
-                </AppBar>
-            )}
-            {/* Empty div to make sure the header takes up space */}
+    const mainArea = (
+        <>
             <div className={classes.headerSpacing} />
             <SearchHandler setLoading={setLoading} />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
@@ -199,6 +165,62 @@ function ClinicalGenomicSearch() {
                     </div>
                 ))}
             </MainCard>
+        </>
+    );
+
+    return (
+        <Root>
+            {config.isDHDP ? (
+                <Grid container spacing={2}>
+                    <Grid item xs={2}>
+                        <MainCard
+                            sx={{
+                                position: 'relative',
+                                borderRadius: customization.borderRadius * 0.25,
+                                marginTop: '2.5em'
+                            }}
+                        >
+                            <Sidebar />
+                        </MainCard>
+                    </Grid>
+                    <Grid item xs={10}>
+                        <SearchExplainer />
+                        {mainArea}
+                    </Grid>
+                </Grid>
+            ) : (
+                <>
+                    <AppBar
+                        component="nav"
+                        className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
+                    >
+                        <Toolbar className={classes.toolbar}>
+                            <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                                Federated Search
+                            </Typography>
+                            {sections
+                                .map((section) =>
+                                    section.header !== undefined ? (
+                                        <Button
+                                            onClick={() => {
+                                                window.location.href = `#${section.id}`;
+                                            }}
+                                            sx={{ my: 2, display: 'block' }}
+                                            key={section.id}
+                                            className={classes.navigationLink}
+                                            variant="text"
+                                        >
+                                            {section.header}
+                                        </Button>
+                                    ) : undefined
+                                )
+                                .filter((obj) => obj !== undefined)}
+                        </Toolbar>
+                        <SearchExplainer />
+                    </AppBar>
+                    {mainArea}
+                </>
+            )}
         </Root>
     );
 }

@@ -24,12 +24,13 @@ const PREFIX = 'FieldLevelCompletenessGraph';
 const classes = {
     titleBar: `${PREFIX}-titleBar`,
     title: `${PREFIX}-title`,
+    dhdpTitle: `${PREFIX}-dhdpTitle`,
     titleBox: `${PREFIX}-titleBox`,
     siteSelection: `${PREFIX}-siteSelection`,
     spacer: `${PREFIX}-spacer`
 };
 
-const Root = styled(Box)(({ _ }) => ({
+const Root = styled(Box)(({ theme }) => ({
     [`& .${classes.titleBar}`]: {
         display: 'flex',
         alignItems: 'center'
@@ -39,11 +40,22 @@ const Root = styled(Box)(({ _ }) => ({
         display: 'inline-flex',
         marginLeft: 'auto'
     },
+    [`& .${classes.dhdpTitle}`]: {
+        flex: 2,
+        display: 'flex',
+        flexDirection: 'row',
+        marginLeft: 'auto',
+        color: theme.palette.primary.main,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: 'Montserrat'
+    },
     [`& .${classes.title}`]: {
         flex: 2,
         display: 'inline-flex',
         flexDirection: 'row-reverse',
         marginLeft: 'auto',
+        color: undefined,
         fontSize: '1.4em',
         fontWeight: 'normal',
         fontFamily: 'Helvetica, Arial, sans-serif' // Taken from HighCharts
@@ -168,7 +180,7 @@ function FieldLevelCompletenessGraph(props) {
                     const identifier = this.value.toString().split('/');
                     const field = identifier.slice(1).join('/').replaceAll('_', ' ');
                     let title = identifier[0][0].toUpperCase() + identifier[0].slice(1).toLowerCase();
-                    return `<b>${title}:</b> <span style="text-transform:uppercase">${field}</span>`;
+                    return config.isDHDP ? `<span style="text-transform:capitalize">${title}: ${field}</span>` : `<b>${title}:</b> <span style="text-transform:uppercase">${field}</span>`;
                 }
                 /* eslint-enable */
             },
@@ -198,7 +210,7 @@ function FieldLevelCompletenessGraph(props) {
         <Root sx={{ position: 'relative' }}>
             <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25, height: '440px; auto' }}>
                 <div className={classes.titleBar}>
-                    <Typography className={classes.title}>{title}</Typography>
+                    <Typography className={config.isDHDP ? classes.dhdpTitle : classes.title}>{title}</Typography>
                     <div className={classes.spacer} />
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>

@@ -152,7 +152,11 @@ function Completeness() {
                 <MainCard>(Percentage complete graph)</MainCard>
             </Grid> */}
             <Grid item xs={12} sm={12} md={6} lg={6}>
-                <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} title="Field Level" />
+                <FieldLevelCompletenessGraph
+                    data={clinicalComplete}
+                    loading={clinicalComplete.length === 0}
+                    title={config.isDHDP ? 'Field Level Data' : 'Field Level'}
+                />
             </Grid>
         </Grid>
     );
