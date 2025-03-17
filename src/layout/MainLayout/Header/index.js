@@ -58,7 +58,13 @@ function Header({ handleLeftDrawerToggle }) {
             <StyledBox sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 {config.isDHDP ? (
                     // eslint-disable-next-line react/jsx-no-useless-fragment
-                    <></>
+                    sidebar && (
+                        <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                            <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
+                                <IconMenu2 stroke={1.5} size="1.3rem" />
+                            </Avatar>
+                        </ButtonBase>
+                    )
                 ) : (
                     <div className={classes.boxContainer}>
                         <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
