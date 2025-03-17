@@ -13,7 +13,8 @@ import config from 'config';
 HighchartsMap(Highcharts);
 const initialState = {
     title: {
-        text: 'Data Source'
+        text: 'Data Source',
+        align: config.isDHDP ? 'left' : undefined
     },
     credits: {
         enabled: false

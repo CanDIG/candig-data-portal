@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
-import { AppBar, Button, Grid, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
@@ -171,23 +171,7 @@ function ClinicalGenomicSearch() {
     return (
         <Root>
             {config.isDHDP ? (
-                <Grid container spacing={2}>
-                    <Grid item xs={2}>
-                        <MainCard
-                            sx={{
-                                position: 'relative',
-                                borderRadius: customization.borderRadius * 0.25,
-                                marginTop: '2.5em'
-                            }}
-                        >
-                            <Sidebar />
-                        </MainCard>
-                    </Grid>
-                    <Grid item xs={10}>
-                        <SearchExplainer />
-                        {mainArea}
-                    </Grid>
-                </Grid>
+                mainArea
             ) : (
                 <>
                     <AppBar

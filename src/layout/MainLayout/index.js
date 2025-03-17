@@ -104,7 +104,7 @@ function MainLayout() {
 
     // Handle left drawer
     const [sidebarContent, setSidebarContent] = useState(null);
-    const leftDrawerOpened = useSelector((state) => state.customization.opened) && !!sidebarContent && !config.isDHDP;
+    const leftDrawerOpened = useSelector((state) => state.customization.opened) && !!sidebarContent;
     const dispatch = useDispatch();
     const handleLeftDrawerToggle = () => {
         dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
@@ -158,7 +158,7 @@ function MainLayout() {
                 <CssBaseline />
                 {config.isDHDP ? (
                     // eslint-disable-next-line react/jsx-no-useless-fragment
-                    <></>
+                    sidebar
                 ) : (
                     <>
                         {header}
