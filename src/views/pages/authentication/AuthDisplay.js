@@ -1,88 +1,97 @@
 import { MutatingDots } from 'react-loader-spinner';
 
-// mui
+// MUI Imports
 import { styled } from '@mui/material/styles';
+import { Button, Typography } from '@mui/material';
 import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTone';
-import { IconShieldLock } from '@tabler/icons-react';
-import PropTypes from 'prop-types';
 
-// project imports
+// Project Imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useAuthContext } from './AuthContext';
-import { Button, Typography } from '@mui/material';
 import config from 'config';
 
-// assets
+// Assets
+import CanDIGLogo from 'assets/images/icons/canDIGLogo.png';
+import PropTypes from 'prop-types';
+
 const PREFIX = 'AuthDisplay';
 
 const classes = {
-    mainCard: `${PREFIX}-maincard`,
-    mainContainer: `${PREFIX}-maincontainer`,
-    iconwrapper: `${PREFIX}-iconwrapper`,
-    icon: `${PREFIX}-icon`,
-    yellow: `${PREFIX}-yellow`,
-    centered: `${PREFIX}-centered`,
+    root: `${PREFIX}-root`,
+    mainCard: `${PREFIX}-mainCard`,
+    iconWrapper: `${PREFIX}-iconWrapper`,
+    spacer: `${PREFIX}-spacer`,
     header: `${PREFIX}-header`,
     footer: `${PREFIX}-footer`,
-    spacer: `${PREFIX}-spacer`
+    icon: `${PREFIX}-icon`,
+    logo: `${PREFIX}-logo`,
+    welcomeText: `${PREFIX}-welcomeText`,
+    boldText: `${PREFIX}-boldText`,
+    primaryText: `${PREFIX}-primaryText`,
+    secondaryText: `${PREFIX}-secondaryText`
 };
 
-const Root = styled('div')(({ theme }) => ({
-    [`& .${classes.mainContainer}`]: {
+const StyledDiv = styled('div')(({ theme }) => ({
+    [`&.${classes.root}`]: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 'calc(100vh - 88px)'
     },
-
     [`& .${classes.mainCard}`]: {
         width: '80%',
         boxShadow: theme.shadows[8]
     },
-
-    [`& .${classes.iconwrapper}`]: {
+    [`& .${classes.iconWrapper}`]: {
         backgroundColor: '#EBEBEB',
         width: 'calc(100% + 24px)',
         marginLeft: -12,
         marginRight: -12,
         textAlign: 'center'
     },
-
-    [`& .${classes.icon}`]: {
-        width: 200,
-        height: 200,
-        color: '#7A0C0C'
+    [`& .${classes.spacer}`]: {
+        height: 50
     },
-
-    [`& .${classes.yellow}`]: {
+    [`& .${classes.header}`]: {
+        height: '8em'
+    },
+    [`& .${classes.footer}`]: {
+        height: '8em'
+    },
+    [`& .${classes.icon}`]: {
         width: 200,
         height: 200,
         color: '#F09934'
     },
-
-    [`& .${classes.centered}`]: {
-        textAlign: 'center'
+    [`& .${classes.logo}`]: {
+        width: 150,
+        marginTop: '2em',
+        marginBottom: '2em'
     },
-
-    [`& .${classes.spacer}`]: {
-        height: 50
+    [`& .${classes.welcomeText}`]: {
+        fontFamily: 'Catamaran, sans-serif',
+        fontWeight: 'light',
+        fontSize: '3rem',
+        textAlign: 'center',
+        marginBottom: '3rem'
     },
-
-    [`& .${classes.header}`]: {
-        height: '8em'
+    [`& .${classes.boldText}`]: {
+        fontWeight: 'bold'
     },
-
-    [`& .${classes.footer}`]: {
-        height: '8em'
+    [`& .${classes.primaryText}`]: {
+        color: theme.palette.primary.main
+    },
+    [`& .${classes.secondaryText}`]: {
+        color: theme.palette.secondary.main
     }
 }));
 
-function AlertCard(props) {
-    const { icon, messageArea, button } = props;
+function AlertCard({ header, icon, messageArea, button }) {
     return (
-        <div className={classes.centered}>
+        <div style={{ textAlign: 'center' }}>
             <div className={classes.header} />
-            <div className={classes.iconwrapper}>{icon}</div>
+            {header}
+            <div className={classes.iconWrapper}>{icon}</div>
             <div className={classes.spacer} />
             {messageArea}
             <div className={classes.spacer} />
@@ -93,6 +102,7 @@ function AlertCard(props) {
 }
 
 AlertCard.propTypes = {
+    header: PropTypes.node,
     icon: PropTypes.node,
     messageArea: PropTypes.node,
     button: PropTypes.node
@@ -123,13 +133,15 @@ function AuthDisplay() {
     } else if (authStatus.pending) {
         content = (
             <AlertCard
-                icon={<HourglassBottomTwoToneIcon className={`${classes.icon} ${classes.yellow}`} />}
+                icon={<HourglassBottomTwoToneIcon className={classes.icon} />}
                 messageArea={
                     <>
-                        <Typography variant="h2">
-                            You are not authorized to access this site and your authorization request is still pending.
+                        <Typography variant="h2" sx={{ fontWeight: 'light' }}>
+                            Your access request is still pending.
                         </Typography>
-                        <Typography variant="h2">Please contact {config.supportEmail ?? 'your site admin'} for details</Typography>
+                        <Typography variant="h2" sx={{ fontWeight: 'light' }}>
+                            Please contact your support team {config.supportEmail ?? 'or your site admin'} for details
+                        </Typography>
                     </>
                 }
                 button={
@@ -146,9 +158,21 @@ function AuthDisplay() {
     } else {
         content = (
             <AlertCard
-                icon={<IconShieldLock className={classes.icon} />}
+                header={
+                    <Typography variant="h1" className={classes.welcomeText}>
+                        Welcome to{' '}
+                        <span className={classes.boldText}>
+                            <span className={classes.primaryText}> Can</span>
+                            <span className={classes.secondaryText}>DIG</span>
+                        </span>
+                        <span>!</span>
+                    </Typography>
+                }
+                icon={<img src={CanDIGLogo} alt="CanDIG Logo" className={classes.logo} />}
                 messageArea={
-                    <Typography variant="h2">Sorry, you are not authorized to access this site. Please request access.</Typography>
+                    <Typography variant="h2" sx={{ fontWeight: 'light' }}>
+                        To access the service, please press the request access button below.
+                    </Typography>
                 }
                 button={
                     <Button variant="contained" onClick={requestAccess}>
@@ -160,11 +184,9 @@ function AuthDisplay() {
     }
 
     return (
-        <Root>
-            <div className={classes.mainContainer}>
-                <MainCard className={classes.mainCard}>{content}</MainCard>
-            </div>
-        </Root>
+        <StyledDiv className={classes.root}>
+            <MainCard className={classes.mainCard}>{content}</MainCard>
+        </StyledDiv>
     );
 }
 
