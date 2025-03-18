@@ -139,7 +139,11 @@ function ClinicalView() {
 
     const HandlePageChange = (newModel) => {
         if (newModel.page !== queryReader.query?.page) {
-            writerContext((old) => ({ ...old, query: { ...old.query, page: newModel.page, page_size: newModel.pageSize } }));
+            writerContext((old) => ({
+                ...old,
+                query: { ...old.query, page: newModel.page, page_size: newModel.pageSize },
+                reqNum: old.reqNum + 1
+            }));
         }
     };
 

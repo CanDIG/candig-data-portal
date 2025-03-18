@@ -1,8 +1,8 @@
 /* eslint-disable */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 // mui
 import { styled } from '@mui/material/styles';
@@ -13,6 +13,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { MENU_OPEN, SET_MENU } from 'store/actions';
 
 // assets
+import { reloginCheck } from 'store/api';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 const PREFIX = 'NavItem';
@@ -65,6 +66,7 @@ const NavItem = ({ item, level }) => {
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
     const matchesSM = useMediaQuery((theme) => theme.breakpoints.down('lg'));
+    const navigate = useNavigate();
 
     const Icon = item.icon;
     const itemIcon = item.icon ? (
@@ -86,14 +88,22 @@ const NavItem = ({ item, level }) => {
         itemTarget = '_blank';
     }
 
-    let listItemProps = { component: React.forwardRef((props, ref) => <Link underline="hover" ref={ref} {...props} to={item.url} />) };
-    if (item.external) {
+    let listItemProps = { component: React.forwardRef((props, ref) => <button underline="hover" ref={ref} {...props} />) };
+    /* if (item.external) {
         listItemProps = { component: 'a', href: item.url };
-    }
+    } */
 
     const itemHandler = (id) => {
-        dispatch({ type: MENU_OPEN, id });
-        if (matchesSM) dispatch({ type: SET_MENU, opened: false });
+        reloginCheck()
+            .then((success) => {
+                if (success) {
+                    navigate(item.url);
+                }
+            })
+            .then(() => {
+                dispatch({ type: MENU_OPEN, id });
+                if (matchesSM) dispatch({ type: SET_MENU, opened: false });
+            });
     };
 
     // active menu item on page load

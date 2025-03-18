@@ -1,12 +1,9 @@
 ARG alpine_version
-ARG katsu_api_target_url
 
 FROM node:21.7.0-alpine${alpine_version} as build
 
 LABEL Maintainer="CanDIG Project"
 LABEL "candigv2"="candig-data-portal"
-
-ENV TYK_KATSU_API_TARGET=$katsu_api_target_url
 
 RUN apk update && apk add gettext
 

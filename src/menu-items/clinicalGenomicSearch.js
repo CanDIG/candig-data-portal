@@ -19,7 +19,7 @@ const clinicalGenomicSearch = {
     type: 'group',
     children: [
         {
-            id: 'Clinical & Genomic Search',
+            id: 'clinicalGenomicSearch',
             title: 'Clinical & Genomic Search',
             type: 'item',
             url: `${basename}/clinicalGenomicSearch `,

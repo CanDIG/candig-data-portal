@@ -27,15 +27,15 @@ function PatientCounts() {
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
     const programs = context?.programs;
-    const discoveryCounts = context?.counts?.patients_per_cohort;
+    const discoveryCounts = context?.counts?.patients_per_program;
     const clinicalCounts = context?.clinical;
 
-    // Generate the map of site->cohort->numbers
+    // Generate the map of site->program->numbers
     let siteData = [];
     if (Array.isArray(sites)) {
         siteData = sites.map((entry) => {
             const counts = discoveryCounts?.[entry.location.name] || {};
-            const realCounts = clinicalCounts?.[entry.location.name]?.summary?.patients_per_cohort || {};
+            const realCounts = clinicalCounts?.[entry.location.name]?.summary?.patients_per_program || {};
             let unlockedPrograms = [];
             // Fill up the programs using the summary counts
             if (Array.isArray(programs)) {
@@ -80,7 +80,7 @@ function PatientCounts() {
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" className={`${PREFIX}-header`}>
-                            Total Cohorts
+                            Total Programs
                         </Typography>
                     </Grid>
                     <Grid item xs={1} ml="auto" className={`${PREFIX}-button`}>

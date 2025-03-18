@@ -79,15 +79,7 @@ const Root = styled('div')(({ theme, leftDrawerOpened }) => ({
         }),
         marginLeft: 0,
         borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        [theme.breakpoints.down('lg')]: {
-            marginLeft: '20px'
-            // marginLeft: -(drawerWidth - 20)
-        },
-        [theme.breakpoints.down('md')]: {
-            marginLeft: '20px'
-            // marginLeft: -(drawerWidth - 10)
-        }
+        borderBottomRightRadius: 0
     },
     [`& .${classes.footer}`]: {
         backgroundColor: theme.palette.background.default,
@@ -105,7 +97,7 @@ const Root = styled('div')(({ theme, leftDrawerOpened }) => ({
 
 function MainLayout() {
     const theme = useTheme();
-    const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
+    const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
 
     // Handle left drawer
     const [sidebarContent, setSidebarContent] = useState(null);

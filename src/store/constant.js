@@ -37,7 +37,7 @@ export const primarySiteCount = {
     'Tonsil C09': 50
 };
 
-export const cohortByNode = {
+export const programByNode = {
     BCGSC: {
         POG: 50
     },
@@ -84,7 +84,7 @@ export const fullClinicalData = {
 
 export const PRIMARY_SITES = ['Breast', 'Trachea', 'Panceas'];
 
-export const COHORTS = ['POG', 'Inspire', 'Biocan', 'Biodiva', 'Compass', 'Palms', 'IO-Alines'];
+export const PROGRAMS = ['POG', 'Inspire', 'Biocan', 'Biodiva', 'Compass', 'Palms', 'IO-Alines'];
 
 export const CLIN_METADATA = [
     'patients',
@@ -135,8 +135,8 @@ export const DataVisualizationChartInfo = {
         xAxis: 'Primary Site',
         yAxis: 'Number of Primary Sites'
     },
-    patients_per_cohort: {
-        title: 'Distribution of Cohort by Node',
+    patients_per_program: {
+        title: 'Distribution of Program by Node',
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     },
@@ -152,7 +152,7 @@ export const DataVisualizationChartInfo = {
     }
 };
 export const validCharts = ['bar', 'line', 'scatter', 'column'];
-export const validStackedCharts = ['patients_per_cohort', 'full_clinical_data', 'full_genomic_data'];
+export const validStackedCharts = ['patients_per_program', 'full_clinical_data', 'full_genomic_data'];
 
 // Highcharts Map requires a specific set of codes for provinces
 // and territories, as represented by hcProvCodes below.

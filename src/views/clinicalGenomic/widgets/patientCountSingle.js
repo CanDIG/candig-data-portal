@@ -66,18 +66,18 @@ function PatientCountSingle(props) {
 
     const SumCensoredTotals = (countsArray) =>
         countsArray.reduce(
-            (partialSum, cohortTotal) => {
-                if (typeof cohortTotal === 'object') {
-                    if (cohortTotal.patients_count.startsWith('<')) {
-                        return [partialSum[0], partialSum[1] + parseInt(cohortTotal.patients_count.substring(1), 10)];
+            (partialSum, programTotal) => {
+                if (typeof programTotal === 'object') {
+                    if (programTotal.patients_count.startsWith('<')) {
+                        return [partialSum[0], partialSum[1] + parseInt(programTotal.patients_count.substring(1), 10)];
                     }
-                    const toAdd = parseInt(cohortTotal.patients_count, 10);
+                    const toAdd = parseInt(programTotal.patients_count, 10);
                     return [partialSum[0] + toAdd, partialSum[1] + toAdd];
                 }
-                if (typeof cohortTotal === 'string' && cohortTotal.startsWith('<')) {
-                    return [partialSum[0], partialSum[1] + parseInt(cohortTotal.substring(1), 10)];
+                if (typeof programTotal === 'string' && programTotal.startsWith('<')) {
+                    return [partialSum[0], partialSum[1] + parseInt(programTotal.substring(1), 10)];
                 }
-                return [partialSum[0] + parseInt(cohortTotal, 10), partialSum[1] + parseInt(cohortTotal, 10)];
+                return [partialSum[0] + parseInt(programTotal, 10), partialSum[1] + parseInt(programTotal, 10)];
             },
             [0, 0]
         );
@@ -86,8 +86,7 @@ function PatientCountSingle(props) {
 
     const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
     const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
-    const numCohorts = Object.values(counts.totals)?.length || 0;
-    console.log(SITE, site);
+    const numPrograms = Object.values(counts.totals)?.length || 0;
     return (
         <StyledBox pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
@@ -112,12 +111,12 @@ function PatientCountSingle(props) {
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
                     <Typography align="center" className={classes.patientEntry}>
-                        {numCohorts}
+                        {numPrograms}
                     </Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item className={classes.button} pr={-2}>
-                    {numCohorts > 1 ? (
+                    {numPrograms > 1 ? (
                         <Button
                             onClick={(_) => setExpanded((old) => !old)}
                             variant="contained"
@@ -135,23 +134,23 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded
-                ? counts.totals.map((cohort) => {
-                      const locked = !counts.unlockedPrograms?.some((programID) => programID === cohort.program_id);
+                ? counts.totals.map((program) => {
+                      const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
                       return (
                           <Grid
                               container
                               justifyContent="center"
                               alignItems="center"
                               spacing={2}
-                              key={cohort.program_id}
+                              key={program.program_id}
                               className={classes.container}
                           >
                               <Grid item xs={2}>
                                   <Typography variant="h5" align="center" className={classes.patientEntry}>
                                       <b className={classes.patientEntry}>
-                                          {cohort.program_id}
+                                          {program.program_id}
                                           {locked && (
-                                              <Tooltip title="Unauthorized Cohort" placement="right">
+                                              <Tooltip title="Unauthorized Program" placement="right">
                                                   <LockOutlinedIcon className={classes.lockIcon} />
                                               </Tooltip>
                                           )}
@@ -161,13 +160,13 @@ function PatientCountSingle(props) {
                               <Divider flexItem orientation="vertical" className={classes.divider} />
                               <Grid item xs={2}>
                                   <Typography align="center" className={classes.patientEntry}>
-                                      {counts.counts?.[cohort.program_id] || 0}
+                                      {counts.counts?.[program.program_id] || 0}
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />
                               <Grid item xs={2}>
                                   <Typography align="center" className={classes.patientEntry}>
-                                      {cohort.patients_count || 0}
+                                      {program.patients_count || 0}
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />

@@ -45,7 +45,7 @@ const Root = styled('div')({
 function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
     // setTab should be a function that sets the tab to the genomic ingest page
 
-    const [authorizedCohorts, setAuthorizedCohorts] = useState([]);
+    const [authorizedPrograms, setAuthorizedPrograms] = useState([]);
 
     useEffect(() => {
         function fetchPrograms() {
@@ -56,13 +56,13 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
                         const fields = [];
                         Object.keys(programs).forEach((program) => {
                             const field = [
-                                makeField('Cohort', program),
+                                makeField('Program', program),
                                 makeField('Clinical Patients', programs[program].toString()),
                                 makeField('Read Access', 'Unknown')
                             ];
                             fields.push(field);
                         });
-                        setAuthorizedCohorts(fields);
+                        setAuthorizedPrograms(fields);
                     });
                 })
                 .catch((error) => console.log(error));
@@ -75,11 +75,11 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
             <Grid container direction="column" spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
-                        <b>Your authorized cohorts</b>
+                        <b>Your authorized programs</b>
                     </Typography>
-                    {authorizedCohorts.length > 0 ? (
+                    {authorizedPrograms.length > 0 ? (
                         <Grid direction="row" spacing={3} container>
-                            {authorizedCohorts.map((fields, index) => (
+                            {authorizedPrograms.map((fields, index) => (
                                 <Grid item xs={5} key={index}>
                                     <DataRow rowWidth="100%" itemSize="0.9em" fields={fields} />
                                 </Grid>
@@ -87,14 +87,14 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
                         </Grid>
                     ) : (
                         <Typography align="left" className={classes.bodyText}>
-                            No cohorts found.
+                            No Programs found.
                         </Typography>
                     )}
                 </Grid>
                 <Grid item sx={{ width: '100%' }}>
                     <div>
                         <Typography align="left" className={classes.titleText}>
-                            <b>Choose a cohort for validation</b>
+                            <b>Choose a program for validation</b>
                         </Typography>
                         <Grid container sx={{ marginTop: '0.5em', marginLeft: '1em' }} direction="row" alignItems="center" spacing={2}>
                             <Grid item>
@@ -121,7 +121,7 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
                             rowWidth="100%"
                             itemSize="0.9em"
                             fields={[
-                                makeField('Cohort', clinicalData.donors[0].program_id),
+                                makeField('Program', clinicalData.donors[0].program_id),
                                 makeField('Clinical Patients', clinicalData.donors.length),
                                 makeField('Read Access', '1')
                             ]}

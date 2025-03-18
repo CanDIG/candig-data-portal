@@ -23,6 +23,11 @@ import config from 'config';
 
 window.Highcharts = Highcharts;
 
+// Used to ensure that we are not passed an invalid chart type
+export const VALID_CHART_TYPES = ['bar', 'line', 'column', 'scatter', 'pie'];
+// Defined here in order to prevent a circular dependancy
+export const VISUALIZATION_LOCAL_STORAGE_KEY = 'chartDefinitions';
+
 /*
  * Component for offline chart
  * @param {string} chartType
@@ -113,7 +118,7 @@ function CustomOfflineChart({
                     // datum is either going to be one of three things:
                     // 1. an array of objects
                     // 2. an object which whose keys are indexes and whose values are objects with <var>_count and <var>_name
-                    // 3. an object whose keys are cohorts and whose values are numbers
+                    // 3. an object whose keys are programs and whose values are numbers
                     // (Why the return value is formatted this way I have no idea)
 
                     // Case 1: an array of objects
@@ -127,7 +132,7 @@ function CustomOfflineChart({
                             return isObjectCensored(datum);
                         }
 
-                        // Case 3: an object whose keys are cohorts and whose values are numbers
+                        // Case 3: an object whose keys are programs and whose values are numbers
                         return Object.values(datum).some((val) => typeof val === 'string' && val.startsWith('<'));
                     }
 
@@ -184,11 +189,11 @@ function CustomOfflineChart({
 
                 Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
-                    Object.keys(thisData[key]).forEach((cohort) => {
-                        if (!data.has(cohort)) {
-                            data.set(cohort, new Array(Object.keys(thisData).length).fill(0));
+                    Object.keys(thisData[key]).forEach((program) => {
+                        if (!data.has(program)) {
+                            data.set(program, new Array(Object.keys(thisData).length).fill(0));
                         }
-                        data.get(cohort).splice(i, 1, thisData[key][cohort]);
+                        data.get(program).splice(i, 1, thisData[key][program]);
                     });
 
                     // Order & truncate the categories by the data
@@ -379,6 +384,7 @@ function CustomOfflineChart({
         dataObject,
         grayscale,
         height,
+        index,
         orderAlphabetically,
         orderByFrequency,
         theme.palette.grey,
@@ -387,25 +393,11 @@ function CustomOfflineChart({
         theme.palette.tertiary
     ]);
 
-    function setLocalStorageDataVisChart(event) {
+    function setLocalStorageDataVis(event, key) {
         // Set LocalStorage for Data Visualization Chart Type
-        const dataVisChart = JSON.parse(localStorage.getItem('dataVisChartType'));
-        dataVisChart[index] = event.target.value;
-        localStorage.setItem('dataVisChartType', JSON.stringify(dataVisChart), { expires: 365 });
-    }
-
-    function setLocalStorageDataVisData(event) {
-        // Set LocalStorage for Data Visualization Data
-        const dataVisData = JSON.parse(localStorage.getItem('dataVisData'));
-        dataVisData[index] = event.target.value;
-        localStorage.setItem('dataVisData', JSON.stringify(dataVisData), { expires: 365 });
-    }
-
-    function setLocalStorageDataVisTrim(value) {
-        // Set LocalStorage for Data Visualization Trim status
-        const dataVisTrim = JSON.parse(localStorage.getItem('dataVisTrim'));
-        dataVisTrim[index] = value;
-        localStorage.setItem('dataVisTrim', JSON.stringify(dataVisTrim), { expires: 365 });
+        const dataVisChart = JSON.parse(localStorage.getItem(VISUALIZATION_LOCAL_STORAGE_KEY));
+        dataVisChart[index][key] = event.target.value;
+        localStorage.setItem(VISUALIZATION_LOCAL_STORAGE_KEY, JSON.stringify(dataVisChart), { expires: 365 });
     }
 
     /* eslint-disable jsx-a11y/no-onchange */
@@ -459,7 +451,7 @@ function CustomOfflineChart({
                                     onChange={(event) => {
                                         setChartData(event.target.value);
                                         onChangeDataVisData(event.target.value);
-                                        setLocalStorageDataVisData(event);
+                                        setLocalStorageDataVis(event, 'data');
                                     }}
                                 >
                                     {Object.keys(dataVis).map((key) => (
@@ -481,7 +473,7 @@ function CustomOfflineChart({
                                         onChange={(event) => {
                                             setChart(event.target.value);
                                             onChangeDataVisChartType(event.target.value);
-                                            setLocalStorageDataVisChart(event);
+                                            setLocalStorageDataVis(event, 'chartType');
                                         }}
                                     >
                                         <option value="bar">Stacked Bar</option>
@@ -497,7 +489,7 @@ function CustomOfflineChart({
                                         onChange={(event) => {
                                             setChart(event.target.value);
                                             onChangeDataVisChartType(event.target.value);
-                                            setLocalStorageDataVisChart(event);
+                                            setLocalStorageDataVis(event, 'chartType');
                                         }}
                                     >
                                         <option value="bar">Bar</option>
@@ -514,7 +506,7 @@ function CustomOfflineChart({
                                         type="checkbox"
                                         id="trim"
                                         onChange={() => {
-                                            setLocalStorageDataVisTrim(!trim);
+                                            setLocalStorageDataVis(!trim, 'trim');
                                             setTrim((old) => !old);
                                         }}
                                         checked={trim}

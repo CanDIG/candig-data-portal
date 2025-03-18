@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
+    Chip,
     Checkbox,
     FormControl,
     FormControlLabel,
@@ -64,7 +65,7 @@ const Root = styled('div')(({ theme }) => ({
         borderRadius: '25px',
         border: `1px solid ${theme.palette.primary.main}`,
         height: '1.5em',
-        width: '90%',
+        width: '45%',
         boxShadow: `0px 2px 4px rgba(0, 0, 0, 0.2)`
     },
     [`& .${classes.lockIcon}`]: {
@@ -120,7 +121,23 @@ SidebarGroup.propTypes = {
 };
 
 function StyledCheckboxList(props) {
-    const { isExclusion, groupName, isFilterList, onWrite, options, authorizedCohorts, useAutoComplete, hide, checked, setChecked } = props;
+    const {
+        isExclusion,
+        groupName,
+        isFilterList,
+        onWrite,
+        options,
+        authorizedPrograms,
+        useAutoComplete,
+        hide,
+        selectedPrograms,
+        setSelectedPrograms,
+        checked,
+        setChecked
+    } = props;
+
+    const context = useSearchResultsReaderContext();
+    const sites = context?.federation;
 
     if (hide) {
         return null;
@@ -137,6 +154,16 @@ function StyledCheckboxList(props) {
             ids = [ids];
         }
 
+        const cohortMap = {};
+        sites.forEach((site) => {
+            site.results.forEach((result) => {
+                if (!cohortMap[result.program_id]) {
+                    cohortMap[result.program_id] = new Set();
+                }
+                cohortMap[result.program_id].add(site.location.name);
+            });
+        });
+
         if (isExclusion ? !isChecked : isChecked) {
             setChecked((_) => {
                 const retVal = {};
@@ -147,10 +174,26 @@ function StyledCheckboxList(props) {
             });
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
-
                 // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
                 if (isFilterList) {
                     retVal.filter[groupName] = ids;
+                    if (groupName === 'node') {
+                        const programIds = sites
+                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
+                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
+                        const validProgramIds = programIds.filter((programId) => {
+                            const associatedNodes = cohortMap[programId] || new Set();
+                            return Array.from(associatedNodes).every((node) => !(node in checked));
+                        });
+                        retVal.query.exclude_programs = validProgramIds.join('|');
+                        setSelectedPrograms((old) => {
+                            const newPrograms = { ...old };
+                            validProgramIds.forEach((id) => {
+                                newPrograms[id] = true;
+                            });
+                            return newPrograms;
+                        });
+                    }
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
@@ -170,6 +213,23 @@ function StyledCheckboxList(props) {
                     const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
                     newList[groupName] = ids;
                     retVal.filter = newList;
+                    if (groupName === 'node') {
+                        const currentPrograms = { ...selectedPrograms };
+                        Object.keys(selectedPrograms).forEach((id) => {
+                            if (currentPrograms[id]) {
+                                delete currentPrograms[id];
+                            }
+                        });
+                        if (currentPrograms && Object.keys(currentPrograms).length > 0) {
+                            retVal.query.exclude_programs = Object.keys(currentPrograms)
+                                .filter((id) => currentPrograms[id])
+                                .join('|');
+                        } else {
+                            delete retVal.query.exclude_programs;
+                            retVal.query = {};
+                        }
+                        setSelectedPrograms(currentPrograms);
+                    }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
@@ -193,7 +253,7 @@ function StyledCheckboxList(props) {
             options={options}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
-                <li {...props} value={option}>
+                <li {...props} key={option}>
                     <Checkbox
                         icon={icon}
                         checkedIcon={checkedIcon}
@@ -205,6 +265,9 @@ function StyledCheckboxList(props) {
                 </li>
             )}
             renderInput={(params) => <TextField {...params} label={groupName} />}
+            renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
+            }
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason) => {
@@ -218,8 +281,8 @@ function StyledCheckboxList(props) {
                 label={
                     <div className={classes.lockContainer}>
                         {option}
-                        {groupName === 'exclude_cohorts' && authorizedCohorts && !authorizedCohorts.includes(option) && (
-                            <Tooltip title="Unauthorized Cohort" placement="right">
+                        {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                            <Tooltip title="Unauthorized Program" placement="right">
                                 <LockOutlinedIcon className={classes.lockIcon} />
                             </Tooltip>
                         )}
@@ -255,7 +318,7 @@ function StyledCheckboxList(props) {
 StyledCheckboxList.propTypes = {
     isExclusion: PropTypes.bool,
     groupName: PropTypes.string,
-    authorizedCohorts: PropTypes.array,
+    authorizedPrograms: PropTypes.array,
     hide: PropTypes.bool,
     isDonorList: PropTypes.bool,
     isFilterList: PropTypes.bool,
@@ -263,6 +326,8 @@ StyledCheckboxList.propTypes = {
     onWrite: PropTypes.func,
     options: PropTypes.array,
     useAutoComplete: PropTypes.bool,
+    setSelectedPrograms: PropTypes.func,
+    selectedPrograms: PropTypes.object,
     setChecked: PropTypes.func,
     checked: PropTypes.object
 };
@@ -414,20 +479,85 @@ function Sidebar() {
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
-    const [selectedCohorts, setSelectedCohorts] = useState({});
+    const [selectedPrograms, setSelectedPrograms] = useState({});
     const [selectedTreatment, setSelectedTreatment] = useState({});
     const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
     const [selectedSystemicTherapy, setSelectedSystemicTherapy] = useState({});
 
     // On our first load, remove all query parameters
     useEffect(() => {
-        writerContext(() => ({}));
+        writerContext(() => ({ reqNum: 0 }));
     }, [writerContext]);
+
+    // Certain webpage components can cause the sidebar to clear a particular entry (e.g. the search explanation)
+    useEffect(() => {
+        if (readerContext.clear === 'nodes') {
+            setSelectedNodes({});
+            writerContext((old) => ({
+                ...old,
+                filter: {
+                    ...old.filter,
+                    node: [readerContext?.programs?.map((loc) => loc.location.name) || []]
+                },
+                reqNum: old.reqNum + 1
+            }));
+        } else if (readerContext.clear === 'programs') {
+            setSelectedPrograms({});
+            writerContext((old) => ({
+                ...old,
+                filter: {
+                    ...old.filter,
+                    exclude_programs: [
+                        readerContext?.programs?.map((loc) => loc?.results?.items?.map((program) => program.program_id)).flat(1) || []
+                    ]
+                },
+                reqNum: old.reqNum + 1
+            }));
+        } else if (readerContext.clear === 'gene' || readerContext.clear === 'chrom' || readerContext.clear === 'assembly') {
+            setSelectedGenes('');
+            setSelectedChromosomes('');
+            setStartPos('0');
+            setEndPos('0');
+            writerContext((old) => {
+                const retVal = { ...old, reqNum: old.reqNum + 1 };
+                delete retVal.query.chrom;
+                delete retVal.query.gene;
+                delete retVal.query.assembly;
+                return retVal;
+            });
+        } else if (readerContext.clear === 'treatment') {
+            setSelectedTreatment({});
+            writerContext((old) => {
+                const retVal = { ...old, reqNum: old.reqNum + 1 };
+                delete retVal.query.treatment;
+                return retVal;
+            });
+        } else if (readerContext.clear === 'primary_site') {
+            setSelectedPrimarySite({});
+            writerContext((old) => {
+                const retVal = { ...old, reqNum: old.reqNum + 1 };
+                delete retVal.query.primary_site;
+                return retVal;
+            });
+        } else if (readerContext.clear === 'drug_name') {
+            setSelectedSystemicTherapy({});
+            writerContext((old) => {
+                const retVal = { ...old, reqNum: old.reqNum + 1 };
+                delete retVal.query.drug_name;
+                return retVal;
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [readerContext.clear]);
+
+    const triggerSearch = () => {
+        writerContext((old) => ({ ...old, reqNum: 'reqNum' in old ? old.reqNum + 1 : 0 }));
+    };
 
     function resetButton() {
         // Reset state variables for checkboxes and dropdowns
         setSelectedNodes({});
-        setSelectedCohorts({});
+        setSelectedPrograms({});
 
         // Genomic
         setSelectedGenes('');
@@ -440,14 +570,14 @@ function Sidebar() {
         setSelectedPrimarySite({});
         setSelectedSystemicTherapy({});
 
-        // Set context writer to include only nodes and cohorts
+        // Set context writer to include only nodes and programs
         writerContext({
-            // Set nodes and cohorts in the filter
+            // Set nodes and programs in the filter
             filter: {
                 node: [readerContext?.programs?.map((loc) => loc.location.name) || []], // Set your default nodes
-                exclude_cohorts: [
-                    readerContext?.programs?.map((loc) => loc?.results?.items?.map((cohort) => cohort.program_id)).flat(1) || []
-                ], // Set cohorts to empty array or whichever default value you want
+                exclude_programs: [
+                    readerContext?.programs?.map((loc) => loc?.results?.items?.map((program) => program.program_id)).flat(1) || []
+                ], // Set programs to empty array or whichever default value you want
                 query: {}
             }
         });
@@ -463,9 +593,9 @@ function Sidebar() {
     };
 
     // Parse out what we need:
-    const sites = readerContext?.programs?.map((loc) => loc.location.name) || [];
-    const cohorts = readerContext?.federation?.map((loc) => loc.results?.map((cohort) => cohort.program_id) || [])?.flat(1) || [];
-    const authorizedCohorts = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((cohort) => cohort.program_id)) || [];
+    const sites = readerContext?.federation?.map((loc) => loc.location.name) || [];
+    const programs = readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || [];
+    const authorizedPrograms = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((program) => program.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const systemicTherapyDrugNames = ExtractSidebarElements('drug_names');
@@ -492,7 +622,10 @@ function Sidebar() {
             </Tabs>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button className={classes.button} onClick={() => resetButton()}>
-                    Reset Filters
+                    Reset
+                </Button>
+                <Button className={classes.button} onClick={triggerSearch}>
+                    Search
                 </Button>
             </div>
             <SidebarGroup name="Node">
@@ -502,19 +635,21 @@ function Sidebar() {
                     groupName="node"
                     isFilterList
                     isExclusion
+                    selectedPrograms={selectedPrograms}
+                    setSelectedPrograms={setSelectedPrograms}
                     checked={selectedNodes}
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Cohort">
+            <SidebarGroup name="Program">
                 <StyledCheckboxList
-                    options={cohorts}
-                    authorizedCohorts={authorizedCohorts}
+                    options={programs}
+                    authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
-                    groupName="exclude_cohorts"
+                    groupName="exclude_programs"
                     isExclusion
-                    checked={selectedCohorts}
-                    setChecked={setSelectedCohorts}
+                    checked={selectedPrograms}
+                    setChecked={setSelectedPrograms}
                 />
             </SidebarGroup>
             <GenomicsGroup

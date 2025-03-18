@@ -59,7 +59,7 @@ const Root = styled(Box)(({ _ }) => ({
 
 function FieldLevelCompletenessGraph(props) {
     const { data, loading, title } = props;
-    const [filter, setFilter] = useState('All cohorts');
+    const [filter, setFilter] = useState('All programs');
     const theme = useTheme();
     const chartRef = createRef();
     const events = useSelector((state) => state);
@@ -78,24 +78,24 @@ function FieldLevelCompletenessGraph(props) {
 
     // TODO: Filter fields here
     const fields = {};
-    const allCohorts = ['All cohorts'];
+    const allPrograms = ['All programs'];
     if (data) {
         Object.values(data).forEach((site) => {
-            const cohorts = site.results?.programs;
-            if (!cohorts) {
+            const programs = site.results?.programs;
+            if (!programs) {
                 return;
             }
 
             // Convert each one into a singular field
             // Category -> Field name -> { missing & total }
-            cohorts.forEach((cohort) => {
-                const concatName = `${site.location.name} - ${cohort.program_id}`;
-                allCohorts.push(concatName);
-                if (concatName !== filter && filter !== 'All cohorts') {
+            programs.forEach((program) => {
+                const concatName = `${site.location.name} - ${program.program_id}`;
+                allPrograms.push(concatName);
+                if (concatName !== filter && filter !== 'All programs') {
                     return;
                 }
 
-                const theseFields = cohort?.metadata?.required_but_missing;
+                const theseFields = program?.metadata?.required_but_missing;
                 Object.keys(theseFields).forEach((fieldCategory) => {
                     Object.keys(theseFields[fieldCategory]).forEach((fieldName) => {
                         const concatenatedName = `${fieldCategory}/${fieldName}`;
@@ -130,6 +130,11 @@ function FieldLevelCompletenessGraph(props) {
             enabled: false
         },
         chart: {
+            zooming: {
+                mouseWheel: {
+                    enabled: true
+                }
+            },
             height: '360px; auto',
             type: 'bar',
             plotBackgroundColor: null,
@@ -196,9 +201,9 @@ function FieldLevelCompletenessGraph(props) {
                     <div className={classes.spacer} />
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>
-                            {allCohorts.map((cohort) => (
-                                <MenuItem value={cohort} key={cohort}>
-                                    {cohort}
+                            {allPrograms.map((program) => (
+                                <MenuItem value={program} key={program}>
+                                    {program}
                                 </MenuItem>
                             ))}
                         </Select>

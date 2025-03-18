@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, query } from 'store/api';
+import { fetchFederation, query, fetchFederatedSubServices } from 'store/api';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -22,11 +22,11 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         lastPromise = trackPromise(
-            fetchFederation('v3/discovery/sidebar_list', 'katsu')
+            fetchFederatedSubServices(`v3/discovery/sidebar_list`)
                 .then((data) => {
                     writer((old) => ({ ...old, sidebar: data }));
                 })
-                .then(() => fetchFederationStat('/patients_per_cohort'))
+                .then(() => fetchFederatedSubServices('v3/discovery/overview/patients_per_program'))
                 .then((data) => {
                     writer((old) => ({ ...old, federation: data }));
                 })
@@ -88,10 +88,10 @@ function SearchHandler({ setLoading }) {
                         age_at_diagnosis: CollateSummary(data, 'age_at_diagnosis'),
                         treatment_type_count: CollateSummary(data, 'treatment_type_count'),
                         primary_site_count: CollateSummary(data, 'primary_site_count'),
-                        patients_per_cohort: {}
+                        patients_per_program: {}
                     };
                     data.forEach((site) => {
-                        discoveryCounts.patients_per_cohort[site.location.name] = site.results?.patients_per_cohort;
+                        discoveryCounts.patients_per_program[site.location.name] = site.results?.patients_per_program;
                     });
 
                     writer((old) => ({ ...old, counts: discoveryCounts }));
@@ -110,9 +110,9 @@ function SearchHandler({ setLoading }) {
         }
 
         summaryFetchAbort.current = newAbort;
-    }, [JSON.stringify(queryNoPageSize), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic), JSON.stringify(reader.filter)]);
+    }, [reader.reqNum]);
 
-    // Query 2: when the search query changes, re-query the server
+    // Query 3: when the search query changes, re-query the server
     useEffect(() => {
         // First, we abort any currently-running search promises
         clinicalFetchAbort.current.abort('New request started');
@@ -124,7 +124,7 @@ function SearchHandler({ setLoading }) {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
                     }
-                    // Reorder the data, and fill out the patients per cohort
+                    // Reorder the data, and fill out the patients per program
                     const clinicalData = {};
                     data.forEach((site) => {
                         if ('results' in site) {
@@ -158,16 +158,16 @@ function SearchHandler({ setLoading }) {
         }
 
         clinicalFetchAbort.current = newAbort;
-    }, [JSON.stringify(reader.query), JSON.stringify(reader.donorLists), JSON.stringify(reader.genomic), JSON.stringify(reader.filter)]);
+    }, [reader.reqNum]);
 
     // Query 3: when the selected donor changes, re-query the server
     useEffect(() => {
-        if (!reader.donorID || !reader.cohort) {
+        if (!reader.donorID || !reader.program) {
             return;
         }
         setLoading(true);
 
-        const url = `v3/authorized/donor_with_clinical_data/program/${reader.cohort}/donor/${reader.donorID}`;
+        const url = `v3/authorized/donor_with_clinical_data/program/${reader.program}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu')
                 .then((data) => {

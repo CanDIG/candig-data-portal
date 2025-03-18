@@ -11,6 +11,7 @@ import themes from './themes';
 
 // project imports
 import NavigationScroll from './layout/NavigationScroll';
+import AuthCheck from 'views/pages/authentication/AuthCheck';
 
 // ===========================|| APP ||=========================== //
 
@@ -22,7 +23,9 @@ function App() {
             <StyledEngineProvider injectFirst>
                 <CssBaseline />
                 <NavigationScroll>
-                    <Routes />
+                    <AuthCheck>
+                        <Routes />
+                    </AuthCheck>
                 </NavigationScroll>
             </StyledEngineProvider>
         </ThemeProvider>

@@ -8,7 +8,7 @@ import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
-import { fetchClinicalCompleteness, fetchFederationStat, fetchGenomicCompleteness } from 'store/api';
+import { fetchClinicalCompleteness, fetchFederatedSubServices, fetchGenomicCompleteness } from 'store/api';
 import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
@@ -21,8 +21,8 @@ function Summary() {
     const [isLoading, setLoading] = useState({
         '/individual_count': true,
         '/primary_site_count': true,
-        '/cohort_count': true,
-        '/patients_per_cohort': true,
+        '/program_count': true,
+        '/patients_per_program': true,
         '/treatment_type_count': true,
         '/diagnosis_age_count': true,
         clinical: true,
@@ -33,8 +33,8 @@ function Summary() {
     const [individualCount, setIndividualCount] = useState(undefined);
     const [primarySiteCount, setPrimarySiteCount] = useState(undefined);
     const [treatmentTypeCount, setTreatmentTypeCount] = useState(undefined);
-    const [cohortCount, setCohortCount] = useState(undefined);
-    const [patientsPerCohort, setPatientsPerCohort] = useState(undefined);
+    const [programCount, setProgramCount] = useState(undefined);
+    const [patientsPerProgram, setPatientsPerProgram] = useState(undefined);
     const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
     const [numClinicalComplete, setNumClinicalComplete] = useState(undefined);
     const [numGenomicComplete, setNumGenomicComplete] = useState(undefined);
@@ -81,12 +81,12 @@ function Summary() {
                         }
 
                         break;
-                    case '/cohort_count':
-                        setCohortCount((oldCohortCount) => aggregateObj(stat.results, oldCohortCount));
+                    case '/program_count':
+                        setProgramCount((oldProgramCount) => aggregateObj(stat.results, oldProgramCount));
                         break;
-                    case '/patients_per_cohort':
-                        setPatientsPerCohort((oldPatientsPerCohort) =>
-                            aggregateObjStack(stat, oldPatientsPerCohort, (stat, _) => invertkatsu(stat.results))
+                    case '/patients_per_program':
+                        setPatientsPerProgram((oldPatientsPerProgram) =>
+                            aggregateObjStack(stat, oldPatientsPerProgram, (stat, _) => invertkatsu(stat.results))
                         );
                         break;
                     case '/primary_site_count':
@@ -166,7 +166,7 @@ function Summary() {
 
     useEffect(() => {
         function fetchData(endpoint) {
-            return fetchFederationStat(endpoint)
+            return fetchFederatedSubServices(`v3/discovery/overview${endpoint}`)
                 .then((data) => {
                     federationStatCount(data, endpoint);
                     if (endpoint === '/individual_count') {
@@ -174,20 +174,20 @@ function Summary() {
                     }
                 })
                 .catch((error) => {
-                    // pass
-                    console.log('Error fetching data : ', error);
+                    console.log('Error fetching data:', error);
                 })
                 .finally(() => {
                     finishEndpoint(endpoint);
                 });
         }
-
-        fetchData('/individual_count');
-        fetchData('/primary_site_count');
-        fetchData('/cohort_count');
-        fetchData('/patients_per_cohort');
-        fetchData('/treatment_type_count');
-        fetchData('/diagnosis_age_count');
+        [
+            '/individual_count',
+            '/primary_site_count',
+            '/program_count',
+            '/patients_per_program',
+            '/treatment_type_count',
+            '/diagnosis_age_count'
+        ].forEach(fetchData);
         fetchGenomic();
         fetchClinical();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,8 +239,8 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading['/individual_count']}
-                    title="Cohorts"
-                    count={cohortCount?.cohort_count || 0}
+                    title="Programs"
+                    count={programCount?.program_count || 0}
                     icon={<Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
@@ -296,13 +296,13 @@ function Summary() {
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
-                    dataObject={patientsPerCohort || {}}
-                    data="patients_per_cohort"
+                    dataObject={patientsPerProgram || {}}
+                    data="patients_per_program"
                     dataVis=""
                     chartType="bar"
                     height="400px; auto"
                     dropDown={false}
-                    loading={isLoading['/patients_per_cohort']}
+                    loading={isLoading['/patients_per_program']}
                     orderByFrequency
                     cutoff={10}
                 />

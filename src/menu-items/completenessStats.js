@@ -19,7 +19,7 @@ const completenessStats = {
     type: 'group',
     children: [
         {
-            id: 'Completeness Stats',
+            id: 'completeness',
             title: 'Completeness Stats',
             type: 'item',
             url: `${basename}/completeness `,

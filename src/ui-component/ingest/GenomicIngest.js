@@ -41,8 +41,8 @@ const Root = styled('div')({
 function GenomicIngest({ beginIngest, fileUpload, clinicalData, genomicData }) {
     const [ingestButtonEnabled, setIngestButtonEnabled] = useState(false);
 
-    const cohort = [
-        makeField('Cohort', clinicalData.donors[0].program_id),
+    const program = [
+        makeField('Program', clinicalData.donors[0].program_id),
         makeField('Clinical Patients', clinicalData.donors.length),
         makeField('Read Access', '1')
     ];
@@ -54,9 +54,9 @@ function GenomicIngest({ beginIngest, fileUpload, clinicalData, genomicData }) {
             <Grid container direction="column" sx={{ flexGrow: 1 }} spacing={4}>
                 <Grid item>
                     <Typography align="left" className={classes.titleText}>
-                        <b>Cohort for ingestion</b>
+                        <b>Program for ingestion</b>
                     </Typography>
-                    <DataRow rowWidth="100%" itemSize="0.9em" fields={cohort} />
+                    <DataRow rowWidth="100%" itemSize="0.9em" fields={program} />
                 </Grid>
                 <Grid item width="100%">
                     <Typography align="left" className={classes.titleText}>

@@ -6,7 +6,8 @@ const config = {
     candigVersion: process.env.REACT_APP_CANDIG_VERSION,
     aggregateThreshold: process.env.REACT_APP_AGGREGATE_COUNT_THRESHOLD,
     fontFamily: `'Roboto', sans-serif`,
-    borderRadius: 12
+    borderRadius: 12,
+    supportEmail: process.env.REACT_APP_SUPPORT_EMAIL
 };
 
 export default config;

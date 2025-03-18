@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 // mui
 import { styled } from '@mui/material/styles';
@@ -7,6 +9,7 @@ import { Divider, List, Typography } from '@mui/material';
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
+import { MENU_OPEN } from 'store/actions';
 
 const PREFIX = 'NavGroup';
 
@@ -35,6 +38,15 @@ const DividerRoot = styled(Divider)(({ theme }) => ({
 // ===========================|| SIDEBAR MENU LIST GROUP ||=========================== //
 
 function NavGroup({ item }) {
+    // Determine our path for the NavItems on page load
+    const dispatch = useDispatch();
+    useEffect(() => {
+        // Note that '/' is an alias of /summary
+        const id = window.location.pathname === '/' ? 'summary' : window.location.pathname.slice(1);
+        dispatch({ type: MENU_OPEN, id });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // menu list collapse & items
     const items = item.children.map((menu) => {
         switch (menu.type) {
