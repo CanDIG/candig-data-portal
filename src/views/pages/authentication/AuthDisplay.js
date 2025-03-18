@@ -11,7 +11,7 @@ import { useAuthContext } from './AuthContext';
 import config from 'config';
 
 // Assets
-import CanDIGLogo from 'assets/images/icons/canDIGLogo.png'; // Updated to use PNG
+import CanDIGLogo from 'assets/images/icons/canDIGLogo.png';
 import PropTypes from 'prop-types';
 
 const PREFIX = 'AuthDisplay';
