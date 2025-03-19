@@ -10,6 +10,7 @@ import { IconTableShare } from '@tabler/icons-react';
 
 // project imports
 import { useSearchQueryWriterContext, useSearchResultsReaderContext, useSearchQueryReaderContext } from '../SearchResultsContext';
+import config from 'config';
 
 function ClinicalView() {
     const theme = useTheme();
@@ -162,7 +163,7 @@ function ClinicalView() {
 
     return (
         <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
-            <Typography pb={1} variant="h4">
+            <Typography pb={1} sx={{ color: config.isDHDP ? theme.palette.primary.main : 'black' }} variant="h4">
                 Clinical Data
             </Typography>
             <div style={{ height: 680, width: '100%' }}>

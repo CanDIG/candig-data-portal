@@ -5,9 +5,12 @@ import { styled } from '@mui/material/styles';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PropTypes from 'prop-types';
 import { SITE } from 'store/constant';
 import siteLogo from 'assets/images/users/siteLogo.png';
+import config from 'config';
 
 const PREFIX = 'PatientCountSingle';
 
@@ -16,6 +19,7 @@ const classes = {
     lockIcon: `${PREFIX}-lockIcon`,
     container: `${PREFIX}-container`,
     siteName: `${PREFIX}-siteName`,
+    programName: `${PREFIX}-programName`,
     locked: `${PREFIX}-locked`,
     button: `${PREFIX}-button`,
     divider: `${PREFIX}-divider`
@@ -24,8 +28,14 @@ const classes = {
 const StyledBox = styled(Box)(({ theme }) => ({
     [`& .${classes.patientEntry}`]: {
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+        alignItems: config.isDHDP ? 'left' : 'center',
+        justifyContent: config.isDHDP ? 'left' : 'center',
+        color: config.isDHDP ? theme.palette.primary.main : 'black',
+        fontWeight: config.isDHDP ? 'bold' : 'normal'
+    },
+
+    [`& .${classes.programName}`]: {
+        fontWeight: 'normal'
     },
 
     [`& .${classes.lockIcon}`]: {
@@ -35,11 +45,18 @@ const StyledBox = styled(Box)(({ theme }) => ({
     },
 
     [`& .${classes.container}`]: {
-        height: 80
+        height: 80,
+        marginLeft: '0px',
+        marginTop: '0px'
+    },
+
+    [`& .${classes.container}:nth-child(even)`]: {
+        backgroundColor: 'rgba(230, 243, 245, 0.50)'
     },
 
     [`& .${classes.siteName}`]: {
-        width: 120
+        color: config.isDHDP ? theme.palette.primary.main : 'black',
+        fontWeight: 'bold'
     },
 
     [`& .${classes.locked}`]: {
@@ -48,7 +65,8 @@ const StyledBox = styled(Box)(({ theme }) => ({
 
     [`& .${classes.button}`]: {
         float: 'right',
-        marginLeft: 'auto'
+        marginLeft: 'auto',
+        marginRight: '16px'
     },
 
     [`& .${classes.divider}`]: {
@@ -87,47 +105,43 @@ function PatientCountSingle(props) {
     const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
     const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
     const numPrograms = Object.values(counts.totals)?.length || 0;
+    const unfoldIcon = config.isDHDP ? <KeyboardArrowUpIcon /> : <UnfoldLessIcon />;
+    const foldIcon = config.isDHDP ? <KeyboardArrowDownIcon /> : <UnfoldMoreIcon />;
     return (
         <StyledBox pr={2} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: 'primary.main' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={2} className={classes.container}>
                 <Grid item xs={2}>
                     <CardHeader
                         avatar={<Avatar src={SITE === site ? siteLogo : ''}>{SITE === site ? '' : site.slice(0, 1).toUpperCase()}</Avatar>}
-                        title={<b>{site}</b>}
+                        title={<div className={classes.siteName}>{site}</div>}
                     />
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
-                    <Typography align="center" className={classes.patientEntry}>
-                        {PrintCensoredCounts(patientsInSearch)}
-                    </Typography>
+                    <Typography className={classes.patientEntry}>{PrintCensoredCounts(patientsInSearch)}</Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
-                    <Typography align="center" className={classes.patientEntry}>
-                        {PrintCensoredCounts(totalPatients)}
-                    </Typography>
+                    <Typography className={classes.patientEntry}>{PrintCensoredCounts(totalPatients)}</Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
-                    <Typography align="center" className={classes.patientEntry}>
-                        {numPrograms}
-                    </Typography>
+                    <Typography className={classes.patientEntry}>{numPrograms}</Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item className={classes.button} pr={-2}>
                     {numPrograms > 1 ? (
                         <Button
                             onClick={(_) => setExpanded((old) => !old)}
-                            variant="contained"
+                            variant={config.isDHDP ? 'text' : 'contained'}
                             sx={{
                                 borderRadius: 100,
-                                border: `solid 1px ${theme.palette.primary.main}`,
+                                border: config.isDHDP ? undefined : `solid 1px ${theme.palette.primary.main}`,
                                 backgroundColor: 'white',
                                 color: theme.palette.primary.main
                             }}
                         >
-                            {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
+                            {expanded ? unfoldIcon : foldIcon}
                         </Button>
                     ) : null}
                 </Grid>
@@ -136,6 +150,11 @@ function PatientCountSingle(props) {
             {expanded
                 ? counts.totals.map((program) => {
                       const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
+                      const lockedTooltip = locked && (
+                          <Tooltip title="Unauthorized Program" placement="right">
+                              <LockOutlinedIcon className={classes.lockIcon} />
+                          </Tooltip>
+                      );
                       return (
                           <Grid
                               container
@@ -146,15 +165,9 @@ function PatientCountSingle(props) {
                               className={classes.container}
                           >
                               <Grid item xs={2}>
-                                  <Typography variant="h5" align="center" className={classes.patientEntry}>
-                                      <b className={classes.patientEntry}>
-                                          {program.program_id}
-                                          {locked && (
-                                              <Tooltip title="Unauthorized Program" placement="right">
-                                                  <LockOutlinedIcon className={classes.lockIcon} />
-                                              </Tooltip>
-                                          )}
-                                      </b>
+                                  <Typography variant="h5" align="center" className={`${classes.patientEntry} ${classes.programName}`}>
+                                      {program.program_id}
+                                      {lockedTooltip}
                                   </Typography>
                               </Grid>
                               <Divider flexItem orientation="vertical" className={classes.divider} />

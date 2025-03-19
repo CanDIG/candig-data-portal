@@ -16,7 +16,7 @@ const initialState = {
         text: 'Data Source',
         align: config.isDHDP ? 'left' : undefined,
         style: {
-            color: config.isDHDP ? '##00434F' : undefined,
+            color: config.isDHDP ? '#00434F' : undefined,
             fontFamily: config.isDHDP ? 'Montserrat' : undefined,
             fontSize: config.isDHDP ? 14 : undefined,
             fontWeight: config.isDHDP ? 'bold' : 'normal'

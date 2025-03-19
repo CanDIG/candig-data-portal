@@ -1,15 +1,11 @@
 // assets
-import { IconReportSearch } from '@tabler/icons-react';
+import { IconSearch, IconReportSearch } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
 
 // constant
 const { basename } = config;
-
-const icons = {
-    IconReportSearch
-};
 
 // ===========================|| Clinical MENU ITEMS ||=========================== //
 
@@ -23,7 +19,7 @@ const clinicalGenomicSearch = {
             title: 'Clinical & Genomic Search',
             type: 'item',
             url: `${basename}/clinicalGenomicSearch `,
-            icon: icons.IconReportSearch,
+            icon: config.isDHDP ? IconSearch : IconReportSearch,
             breadcrumbs: false
         }
     ]
