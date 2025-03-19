@@ -1,15 +1,11 @@
 // assets
-import { IconLayoutDashboard } from '@tabler/icons-react';
+import { IconClipboardText, IconLayoutDashboard } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
 
 // constant
 const { basename } = config;
-
-const icons = {
-    IconLayoutDashboard
-};
 
 // ===========================|| Clinical MENU ITEMS ||=========================== //
 
@@ -23,7 +19,7 @@ const summary = {
             title: 'Summary',
             type: 'item',
             url: `${basename}/summary`,
-            icon: icons.IconLayoutDashboard,
+            icon: config.isDHDP ? IconClipboardText : IconLayoutDashboard,
             breadcrumbs: false
         }
     ]
