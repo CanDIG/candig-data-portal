@@ -33,8 +33,8 @@ export function fetchOrRelogin(...args) {
 /*
 Generic querying for federation
 */
-export function fetchFederation(path, service, payload) {
-    return fetchOrRelogin(`${federation}/fanout`, {
+export function fetchFederation(path, service, payload = {}, fetchMethod = fetchOrRelogin) {
+    return fetchMethod(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
