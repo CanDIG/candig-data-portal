@@ -30,7 +30,8 @@ function SearchHandler({ setLoading }) {
                 .then((data) => {
                     writer((old) => ({ ...old, federation: data }));
                 })
-                .then(() => fetchFederation('v3/authorized/programs', 'katsu'))
+                // NB: fetch instead of fetchWithRelogin because Katsu is misbehaving
+                .then(() => fetchFederation('v3/authorized/programs', 'katsu', {}, fetch))
                 .then((data) => {
                     writer((old) => ({ ...old, programs: data }));
                 })
