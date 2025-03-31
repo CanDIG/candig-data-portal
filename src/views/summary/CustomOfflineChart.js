@@ -68,6 +68,9 @@ function CustomOfflineChart({
     NoDataToDisplay(Highcharts);
     highchartsAccessibility(Highcharts);
 
+    const titleLabelStyle = config.isDHDP ? { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 } : {};
+    const axisLabelStyle = config.isDHDP ? { color: '#58595B', fontFamily: 'Montserrat', fontSize: '0.8em' } : {};
+
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -248,8 +251,27 @@ function CustomOfflineChart({
                     title: {
                         text: DataVisualizationChartInfo[chartData].title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].xAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        categories,
+                        allowDecimals: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].yAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        allowDecimals: false
+                    },
                     colors: stackedTheme,
                     plotOptions: {
                         series: {
@@ -297,7 +319,10 @@ function CustomOfflineChart({
                     xAxis: {
                         title: {
                             text: DataVisualizationChartInfo[chartData]?.xAxis,
-                            style: { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 }
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
                         },
                         categories,
                         allowDecimals: false
@@ -305,7 +330,10 @@ function CustomOfflineChart({
                     yAxis: {
                         title: {
                             text: DataVisualizationChartInfo[chartData]?.yAxis,
-                            style: { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 }
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
                         },
                         allowDecimals: false
                     },
@@ -382,8 +410,26 @@ function CustomOfflineChart({
                     title: {
                         text: DataVisualizationChartInfo[chartData].title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].xAxis,
+                            style: titleLabelStyle
+                        },
+                        allowDecimals: false,
+                        labels: {
+                            style: axisLabelStyle
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].yAxis,
+                            style: titleLabelStyle
+                        },
+                        allowDecimals: false,
+                        labels: {
+                            style: axisLabelStyle
+                        }
+                    },
                     tooltip: {
                         pointFormat: '<b>{point.name}:</b> {point.y}'
                     },
