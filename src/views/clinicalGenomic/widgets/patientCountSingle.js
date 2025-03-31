@@ -71,8 +71,8 @@ const StyledBox = styled(Box)(({ theme }) => ({
 
     [`& .${classes.divider}`]: {
         borderColor: theme.palette.primary.main,
-        marginTop: 20,
-        marginBottom: 4
+        marginTop: config.isDHDP ? 0 : 20,
+        marginBottom: config.isDHDP ? 0 : 4
     }
 }));
 
@@ -118,7 +118,7 @@ function PatientCountSingle(props) {
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
-                    <Typography className={classes.patientEntry}>{PrintCensoredCounts(patientsInSearch)}</Typography>
+                    <Typography className={classes.patientEntrclinicaly}>{PrintCensoredCounts(patientsInSearch)}</Typography>
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
                 <Grid item xs={2}>
