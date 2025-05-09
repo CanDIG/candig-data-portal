@@ -290,7 +290,11 @@ function Summary() {
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6}>
-                <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} title="Field Level Completeness" />
+                <FieldLevelCompletenessGraph
+                    data={clinicalComplete}
+                    loading={clinicalComplete.length === 0}
+                    title="Field Level Completeness"
+                />
             </Grid>
         </Grid>
     );
