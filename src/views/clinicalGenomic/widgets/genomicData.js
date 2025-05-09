@@ -32,11 +32,11 @@ function GenomicData() {
                     // Make sure each row has an ID
                     const retVal = { ...patient };
                     retVal.id = index;
-                    retVal.genotypeLabel = patient.genotype.value;
-                    if (patient.genotype.secondaryAlleleIds) {
-                        retVal.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
-                    }
-                    retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
+                    // retVal.genotypeLabel = patient.genotype.value;
+                    // if (patient.genotype.secondaryAlleleIds) {
+                    //     retVal.genotypeLabel += ` (${patient.genotype.secondaryAlleleIds[0]})`;
+                    // }
+                    // retVal.zygosityLabel = patient.genotype.zygosity?.label || '';
                     retVal.location = patient.location.name;
 
                     // TODO: Fix the below with the actual normal ID
@@ -56,11 +56,9 @@ function GenomicData() {
         { field: 'location', headerName: 'Node', minWidth: 120, sortable: false, filterable: false },
         { field: 'donor_id', headerName: 'Donor ID', minWidth: 150, sortable: false, filterable: false },
         { field: 'program_id', headerName: 'Program ID', minWidth: 150, sortable: false, filterable: false },
-        { field: 'position', headerName: 'Position', minWidth: 150, sortable: false, filterable: false },
+        { field: 'variant_count', headerName: 'Estimated Variants', minWidth: 150, sortable: false, filterable: false },
         { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200, sortable: false, filterable: false },
-        { field: 'submitter_specimen_id', headerName: 'Sample Registration ID', minWidth: 300, sortable: false, filterable: false },
-        { field: 'genotypeLabel', headerName: 'Genotype', minWidth: 300, sortable: false, filterable: false },
-        { field: 'zygosityLabel', headerName: 'Zygosity', minWidth: 200, sortable: false, filterable: false }
+        { field: 'submitter_sample_id', headerName: 'Sample Registration ID', minWidth: 300, sortable: false, filterable: false }
     ];
 
     const queryParams = query?.gene || query?.chrom;
