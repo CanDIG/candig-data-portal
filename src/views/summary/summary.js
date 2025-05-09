@@ -8,13 +8,14 @@ import CustomOfflineChart from 'views/summary/CustomOfflineChart';
 import TreatingCentreMap from 'views/summary/TreatingCentreMap';
 
 // project imports
-import { fetchClinicalCompleteness, fetchFederatedSubServices, fetchGenomicCompleteness } from 'store/api';
+import { fetchClinicalCompleteness, fetchFederatedSubServices } from 'store/api';
 import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from 'utils/utils';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
+import FieldLevelCompletenessGraph from '../completeness/fieldLevelCompletenessGraph';
 
 function Summary() {
     const theme = useTheme();
@@ -36,8 +37,8 @@ function Summary() {
     const [programCount, setProgramCount] = useState(undefined);
     const [patientsPerProgram, setPatientsPerProgram] = useState(undefined);
     const [diagnosisAgeCount, setDiagnosisAgeCount] = useState(undefined);
-    const [numClinicalComplete, setNumClinicalComplete] = useState(undefined);
-    const [numGenomicComplete, setNumGenomicComplete] = useState(undefined);
+    const [clinicalComplete, setClinicalComplete] = useState([]);
+
     const [connectionError, setConnectionError] = useState(0);
     const [sites, setSites] = useState(0);
     const [totalSites, setTotalSites] = useState(0);
@@ -144,26 +145,6 @@ function Summary() {
         });
     }
 
-    function fetchClinical() {
-        fetchClinicalCompleteness()
-            .then((data) => {
-                setNumClinicalComplete(data.numClinicalComplete);
-            })
-            .finally(() => {
-                finishEndpoint('clinical');
-            });
-    }
-
-    function fetchGenomic() {
-        fetchGenomicCompleteness()
-            .then((numCompleteGenomic) => {
-                setNumGenomicComplete(numCompleteGenomic);
-            })
-            .finally(() => {
-                finishEndpoint('genomic');
-            });
-    }
-
     useEffect(() => {
         function fetchData(endpoint) {
             return fetchFederatedSubServices(`v3/discovery/overview${endpoint}`)
@@ -188,8 +169,9 @@ function Summary() {
             '/treatment_type_count',
             '/diagnosis_age_count'
         ].forEach(fetchData);
-        fetchGenomic();
-        fetchClinical();
+        fetchClinicalCompleteness().then((data) => {
+            setClinicalComplete(data.data);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -307,30 +289,11 @@ function Summary() {
                     cutoff={10}
                 />
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    dataObject={numClinicalComplete || {}}
-                    data="full_clinical_data"
-                    dataVis=""
-                    chartType="bar"
-                    height="400px; auto"
-                    dropDown={false}
-                    loading={isLoading.clinical}
-                    orderByFrequency
-                    cutoff={10}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    dataObject={numGenomicComplete || {}}
-                    data="full_genomic_data"
-                    dataVis=""
-                    chartType="bar"
-                    height="400px; auto"
-                    dropDown={false}
-                    loading={isLoading.genomic}
-                    orderByFrequency
-                    cutoff={10}
+            <Grid item xs={12} sm={12} md={6} lg={6}>
+                <FieldLevelCompletenessGraph
+                    data={clinicalComplete}
+                    loading={clinicalComplete.length === 0}
+                    title="Field Level Completeness"
                 />
             </Grid>
         </Grid>

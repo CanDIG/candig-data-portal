@@ -43,7 +43,7 @@ const Root = styled(Box)(({ _ }) => ({
         display: 'inline-flex',
         flexDirection: 'row-reverse',
         marginLeft: 'auto',
-        fontSize: '1.4em',
+        fontSize: '1.3em',
         fontWeight: 'normal',
         fontFamily: 'Helvetica, Arial, sans-serif' // Taken from HighCharts
     },
@@ -199,8 +199,17 @@ function FieldLevelCompletenessGraph(props) {
                 <div className={classes.titleBar}>
                     <Typography className={classes.title}>{title}</Typography>
                     <div className={classes.spacer} />
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>
+                    <FormControl sx={{ m: 1, p: 0, minWidth: 120 }} size="small">
+                        <Select
+                            value={filter}
+                            onChange={(event) => setFilter(event.target.value)}
+                            className={classes.siteSelection}
+                            sx={{
+                                '& .MuiSelect-select': {
+                                    padding: '4px 8px !important'
+                                }
+                            }}
+                        >
                             {allPrograms.map((program) => (
                                 <MenuItem value={program} key={program}>
                                     {program}
