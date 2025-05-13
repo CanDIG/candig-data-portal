@@ -53,12 +53,12 @@ function GenomicData() {
 
     // JSON on bottom now const screenWidth = desktopResolution ? '48%' : '100%';
     const columns = [
-        { field: 'location', headerName: 'Node', minWidth: 120, sortable: false, filterable: false },
-        { field: 'donor_id', headerName: 'Donor ID', minWidth: 150, sortable: false, filterable: false },
-        { field: 'program_id', headerName: 'Program ID', minWidth: 150, sortable: false, filterable: false },
-        { field: 'variant_count', headerName: 'Estimated Variants', minWidth: 150, sortable: false, filterable: false },
-        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200, sortable: false, filterable: false },
-        { field: 'submitter_sample_id', headerName: 'Sample Registration ID', minWidth: 300, sortable: false, filterable: false }
+        { field: 'donor_id', headerName: 'Donor ID', minWidth: 220, flex: 1, sortable: false, filterable: false },
+        { field: 'location', headerName: 'Location', minWidth: 150, flex: 1, sortable: false, filterable: false },
+        { field: 'program_id', headerName: 'Program ID', minWidth: 170, flex: 1, sortable: false, filterable: false },
+        { field: 'variant_count', headerName: 'Estimated Variants', minWidth: 150, flex: 1, sortable: false, filterable: false },
+        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal', minWidth: 200, flex: 1, sortable: false, filterable: false },
+        { field: 'submitter_sample_id', headerName: 'Sample Registration ID', minWidth: 300, flex: 1, sortable: false, filterable: false }
     ];
 
     const queryParams = query?.gene || query?.chrom;
