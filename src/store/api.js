@@ -7,7 +7,6 @@ export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
 export function reloginCheck() {
     return fetch('/portal/favicon.ico')
         .then((response) => {
-            console.log(`Relogin check performed. Statuz: ${response.status}`);
             if (response.status === 401) {
                 // The user's token has expired, and they need to refresh the page
                 window.location.reload();
