@@ -5,29 +5,40 @@ export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
 
 export function reloginCheck() {
-    return fetch('/query/whoami').then((response) => {
-        if (response.status === 401) {
-            // The user's token has expired, and they need to refresh the page
-            window.location.replace('/');
-            throw new Error("User's token has expired, they must refresh");
-        } else {
-            // Wasn't a permission denied -- continue processing
-            return true;
-        }
-    });
+    return fetch('/portal/favicon.ico')
+        .then((response) => {
+            console.log(`Relogin check performed. Statuz: ${response.status}`);
+            if (response.status === 401) {
+                // The user's token has expired, and they need to refresh the page
+                window.location.reload();
+                throw new Error("User's token has expired, they must refresh");
+            } else {
+                // Wasn't a permission denied -- continue processing
+                return true;
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            window.location.reload();
+        });
 }
 
 export function fetchOrRelogin(...args) {
-    return fetch(...args).then((response) => {
-        if (response.status === 401) {
-            // The user's token has expired, and they need to refresh the page
-            window.location.replace('/');
-            throw new Error("User's token has expired, they must refresh");
-        } else {
-            // Wasn't a permission denied -- continue processing
-            return response;
-        }
-    });
+    return fetch(...args)
+        .then((response) => {
+            if (response.status === 401) {
+                // The user's token has expired, and they need to refresh the page
+                window.location.reload();
+                throw new Error("User's token has expired, they must refresh");
+            } else {
+                // Wasn't a permission denied -- continue processing
+                return response;
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            window.location.reload();
+        });
 }
 
 /*
