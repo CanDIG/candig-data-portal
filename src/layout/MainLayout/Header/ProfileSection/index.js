@@ -23,6 +23,7 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import { SITE } from 'store/constant';
+import config from 'config';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons-react';

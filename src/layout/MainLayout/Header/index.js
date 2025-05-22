@@ -86,14 +86,34 @@ function Header({ handleLeftDrawerToggle }) {
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
             <StyledGrow className={classes.grow} />
+                {config.isDHDP ? (
+                    <>
+                        {/* header search */}
+                        {/* <SearchSection theme="light" />  Currently not needed */}
+                        <StyledGrow className={classes.grow} />
 
-            {/* notification & profile */}
-            {/* <NotificationSection /> */}
+                        {/* notification & profile */}
+                        {/* <NotificationSection /> */}
+                        <ProfileSection />
+                    </>
+                ) : (
+                    // eslint-disable-next-line react/jsx-no-useless-fragment
+                    <></>
+                )}
+            </StyledGrow>
             {config.isDHDP ? (
                 // eslint-disable-next-line react/jsx-no-useless-fragment
                 <></>
             ) : (
-                <ProfileSection />
+                <>
+                    {/* header search */}
+                    {/* <SearchSection theme="light" />  Currently not needed */}
+                    <StyledGrow className={classes.grow} />
+
+                    {/* notification & profile */}
+                    {/* <NotificationSection /> */}
+                    <ProfileSection />
+                </>
             )}
         </>
     );
