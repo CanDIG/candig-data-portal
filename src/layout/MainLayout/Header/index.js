@@ -82,19 +82,34 @@ function Header({ handleLeftDrawerToggle }) {
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
                 </Box>
-            </StyledBox>
-            {/* header search */}
-            {/* <SearchSection theme="light" />  Currently not needed */}
-            <StyledGrow className={classes.grow} />
-            <StyledGrow className={classes.grow} />
+                {config.isDHDP ? (
+                    <>
+                        {/* header search */}
+                        {/* <SearchSection theme="light" />  Currently not needed */}
+                        <StyledGrow className={classes.grow} />
 
-            {/* notification & profile */}
-            {/* <NotificationSection /> */}
+                        {/* notification & profile */}
+                        {/* <NotificationSection /> */}
+                        <ProfileSection />
+                    </>
+                ) : (
+                    // eslint-disable-next-line react/jsx-no-useless-fragment
+                    <></>
+                )}
+            </StyledBox>
             {config.isDHDP ? (
                 // eslint-disable-next-line react/jsx-no-useless-fragment
                 <></>
             ) : (
-                <ProfileSection />
+                <>
+                    {/* header search */}
+                    {/* <SearchSection theme="light" />  Currently not needed */}
+                    <StyledGrow className={classes.grow} />
+
+                    {/* notification & profile */}
+                    {/* <NotificationSection /> */}
+                    <ProfileSection />
+                </>
             )}
         </>
     );
