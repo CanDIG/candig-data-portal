@@ -9,12 +9,15 @@ import PropTypes from 'prop-types';
 
 // project imports
 import Highcharts from 'highcharts/highstock';
+import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // assets
 import MainCard from 'ui-component/cards/MainCard';
 import { useTheme } from '@mui/system';
+
+HighchartsAccessibility(Highcharts);
 
 window.Highcharts = Highcharts;
 
@@ -62,7 +65,7 @@ function FieldLevelCompletenessGraph(props) {
     const [filter, setFilter] = useState('All programs');
     const theme = useTheme();
     const chartRef = createRef();
-    const events = useSelector((state) => state);
+    const customization = useSelector((state) => state.customization);
 
     NoDataToDisplay(Highcharts);
 
@@ -195,7 +198,7 @@ function FieldLevelCompletenessGraph(props) {
     // Determine what we can do with the data
     return (
         <Root sx={{ position: 'relative' }}>
-            <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25, height: '440px; auto' }}>
+            <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, height: '440px; auto' }}>
                 <div className={classes.titleBar}>
                     <Typography className={classes.title}>{title}</Typography>
                     <div className={classes.spacer} />
