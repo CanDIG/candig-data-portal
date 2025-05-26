@@ -89,7 +89,7 @@ function PatientCounts() {
                 </Grid>
             </Box>
             {/* Individual counts */}
-            {siteData.map((site) => (
+            {siteData?.map((site) => (
                 <React.Fragment key={site.location}>
                     <PatientCountSingle site={site.location} counts={site} />
                     <Box className={`${PREFIX}-spacing`} />

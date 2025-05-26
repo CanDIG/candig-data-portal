@@ -23,21 +23,16 @@ export function reloginCheck() {
 }
 
 export function fetchOrRelogin(...args) {
-    return fetch(...args)
-        .then((response) => {
-            if (response.status === 401) {
-                // The user's token has expired, and they need to refresh the page
-                window.location.reload();
-                throw new Error("User's token has expired, they must refresh");
-            } else {
-                // Wasn't a permission denied -- continue processing
-                return response;
-            }
-        })
-        .catch((error) => {
-            console.log(error);
+    return fetch(...args).then((response) => {
+        if (response.status === 401) {
+            // The user's token has expired, and they need to refresh the page
             window.location.reload();
-        });
+            throw new Error("User's token has expired, they must refresh");
+        } else {
+            // Wasn't a permission denied -- continue processing
+            return response;
+        }
+    });
 }
 
 /*
@@ -188,7 +183,7 @@ export function fetchGenomicCompleteness() {
 export function fetchClinicalCompleteness() {
     return fetchFederation('discovery/programs', 'query').then((data) => {
         // Step 1: Determine the number of provinces
-        const provinces = data.map((site) => site?.location?.province);
+        const provinces = data?.map((site) => site?.location?.province);
         const uniqueProvinces = [...new Set(provinces)];
         const retVal = {};
         retVal.numProvinces = uniqueProvinces.length;
