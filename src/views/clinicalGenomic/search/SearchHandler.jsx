@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederationStat, fetchFederation, query } from '../../../store/api';
+import { fetchFederation, query, fetchFederatedSubServices } from '../../../store/api';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -22,15 +22,16 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         lastPromise = trackPromise(
-            fetchFederation('v3/discovery/sidebar_list', 'katsu')
+            fetchFederatedSubServices(`v3/discovery/sidebar_list`)
                 .then((data) => {
                     writer((old) => ({ ...old, sidebar: data }));
                 })
-                .then(() => fetchFederationStat('/patients_per_program'))
+                .then(() => fetchFederatedSubServices('v3/discovery/overview/patients_per_program'))
                 .then((data) => {
                     writer((old) => ({ ...old, federation: data }));
                 })
-                .then(() => fetchFederation('v3/authorized/programs', 'katsu'))
+                // NB: fetch instead of fetchWithRelogin because Katsu is misbehaving
+                .then(() => fetchFederation('v3/authorized/programs', 'katsu', {}, fetch))
                 .then((data) => {
                     writer((old) => ({ ...old, programs: data }));
                 })

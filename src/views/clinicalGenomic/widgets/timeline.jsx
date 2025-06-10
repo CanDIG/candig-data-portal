@@ -94,7 +94,7 @@ function Timeline({ data, onEventClick }) {
 
         const generateSeriesDataPrimaryDiagnosis = (data, namePrefix, y, colour, date, name, id) =>
             Array.isArray(data)
-                ? data.map((item) => ({
+                ? data?.map((item) => ({
                       x: formatDate(item?.[date]),
                       y,
                       name: `${namePrefix}${item?.[id]}`,

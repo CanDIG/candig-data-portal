@@ -61,6 +61,7 @@ function ClinicalView() {
             delete patient.date_of_birth;
             delete patient.date_of_death;
         }
+        return patient;
     }
 
     // Function to process search results
@@ -76,8 +77,7 @@ function ClinicalView() {
                 .map((patient, index) => {
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
-                    calculateAge(patient);
-                    return patient;
+                    return calculateAge({ ...patient });
                 });
         }
 
@@ -101,7 +101,8 @@ function ClinicalView() {
         {
             field: 'submitter_donor_id',
             headerName: 'Donor ID',
-            minWidth: 220,
+            minWidth: 250,
+            flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <Tooltip title="Open Patient View" placement="right">
@@ -129,12 +130,12 @@ function ClinicalView() {
                 </Tooltip>
             )
         },
-        { field: 'location', headerName: 'Location', minWidth: 220, sortable: false },
-        { field: 'program_id', headerName: 'Program ID', minWidth: 220, sortable: false },
-        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, sortable: false },
-        { field: 'deceased', headerName: 'Deceased', minWidth: 170, sortable: false },
-        { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 200, sortable: false },
-        { field: 'date_of_death', headerName: 'Age at Death', minWidth: 220, sortable: false }
+        { field: 'location', headerName: 'Location', minWidth: 125, flex: 1, sortable: false },
+        { field: 'program_id', headerName: 'Program ID', minWidth: 170, flex: 1, sortable: false },
+        { field: 'sex_at_birth', headerName: 'Sex At Birth', minWidth: 170, flex: 1, sortable: false },
+        { field: 'deceased', headerName: 'Deceased', minWidth: 170, flex: 1, sortable: false },
+        { field: 'date_of_birth', headerName: 'Age at First Diagnosis', minWidth: 170, flex: 1, sortable: false },
+        { field: 'date_of_death', headerName: 'Age at Death', minWidth: 170, flex: 1, sortable: false }
     ];
 
     const HandlePageChange = (newModel) => {

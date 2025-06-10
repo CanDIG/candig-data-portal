@@ -9,12 +9,15 @@ import PropTypes from 'prop-types';
 
 // project imports
 import Highcharts from 'highcharts/highstock';
+import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // assets
 import MainCard from '../../ui-component/cards/MainCard';
 import { useTheme } from '@mui/system';
+
+HighchartsAccessibility(Highcharts);
 
 window.Highcharts = Highcharts;
 
@@ -43,7 +46,7 @@ const Root = styled(Box)(({ _ }) => ({
         display: 'inline-flex',
         flexDirection: 'row-reverse',
         marginLeft: 'auto',
-        fontSize: '1.4em',
+        fontSize: '1.3em',
         fontWeight: 'normal',
         fontFamily: 'Helvetica, Arial, sans-serif' // Taken from HighCharts
     },
@@ -62,7 +65,7 @@ function FieldLevelCompletenessGraph(props) {
     const [filter, setFilter] = useState('All programs');
     const theme = useTheme();
     const chartRef = createRef();
-    const events = useSelector((state) => state);
+    const customization = useSelector((state) => state.customization);
 
     NoDataToDisplay(Highcharts);
 
@@ -195,12 +198,21 @@ function FieldLevelCompletenessGraph(props) {
     // Determine what we can do with the data
     return (
         <Root sx={{ position: 'relative' }}>
-            <MainCard sx={{ borderRadius: events.customization.borderRadius * 0.25, height: '440px; auto' }}>
+            <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, height: '440px; auto' }}>
                 <div className={classes.titleBar}>
                     <Typography className={classes.title}>{title}</Typography>
                     <div className={classes.spacer} />
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <Select value={filter} onChange={(event) => setFilter(event.target.value)} className={classes.siteSelection}>
+                    <FormControl sx={{ m: 1, p: 0, minWidth: 120 }} size="small">
+                        <Select
+                            value={filter}
+                            onChange={(event) => setFilter(event.target.value)}
+                            className={classes.siteSelection}
+                            sx={{
+                                '& .MuiSelect-select': {
+                                    padding: '4px 8px !important'
+                                }
+                            }}
+                        >
                             {allPrograms.map((program) => (
                                 <MenuItem value={program} key={program}>
                                     {program}

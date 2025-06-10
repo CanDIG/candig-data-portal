@@ -5,23 +5,28 @@ export const htsget = import.meta.env.VITE_HTSGET_SERVER;
 export const INGEST_URL = import.meta.env.VITE_INGEST_SERVER;
 
 export function reloginCheck() {
-    return fetch('/query/whoami').then((response) => {
-        if (response.status === 401) {
-            // The user's token has expired, and they need to refresh the page
-            window.location.replace('/');
-            throw new Error("User's token has expired, they must refresh");
-        } else {
-            // Wasn't a permission denied -- continue processing
-            return true;
-        }
-    });
+    return fetch('/portal/favicon.ico')
+        .then((response) => {
+            if (response.status === 401) {
+                // The user's token has expired, and they need to refresh the page
+                window.location.reload();
+                throw new Error("User's token has expired, they must refresh");
+            } else {
+                // Wasn't a permission denied -- continue processing
+                return true;
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            window.location.reload();
+        });
 }
 
 export function fetchOrRelogin(...args) {
     return fetch(...args).then((response) => {
         if (response.status === 401) {
             // The user's token has expired, and they need to refresh the page
-            window.location.replace('/');
+            window.location.reload();
             throw new Error("User's token has expired, they must refresh");
         } else {
             // Wasn't a permission denied -- continue processing
@@ -30,15 +35,18 @@ export function fetchOrRelogin(...args) {
     });
 }
 
-export function fetchFederationStat(endpoint) {
-    return fetchOrRelogin(`${federation}/fanout`, {
+/*
+Generic querying for federation
+*/
+export function fetchFederation(path, service, payload = {}, fetchMethod = fetchOrRelogin) {
+    return fetchMethod(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             method: 'GET',
-            path: `v3/discovery/overview${endpoint}`,
-            payload: {},
-            service: 'katsu'
+            path,
+            payload: payload || {},
+            service
         })
     })
         .then((response) => {
@@ -53,26 +61,23 @@ export function fetchFederationStat(endpoint) {
         });
 }
 
-/*
-Generic querying for federation
-*/
-export function fetchFederation(path, service) {
-    return fetchOrRelogin(`${federation}/fanout`, {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            method: 'GET',
-            path,
-            payload: {},
-            service
-        })
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            return [];
-        })
+/**
+ * Fetch federated sub-services by querying the Query microservice.
+ *
+ * @param {string} targetPath - The specific path within the target service to request data from
+ * @param {string} [targetService='katsu'] - The target service being queried (default: 'katsu')
+ * @param {string} [endpoint='discovery] - The endpoint used for the federation request (default: 'discovery')
+ * @param {string} [service='query'] - The service handling the request (default: 'query')
+ * @returns {Promise<Object|string>} A promise that resolves to the response data or 'error' if the request fails
+ */
+export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'discovery', service = 'query') {
+    const payload = {
+        targetService,
+        targetPath
+    };
+
+    return fetchFederation(endpoint, service, payload)
+        .then((data) => data)
         .catch((error) => {
             console.log(`Error: ${error}`);
             return 'error';
@@ -178,7 +183,7 @@ export function fetchGenomicCompleteness() {
 export function fetchClinicalCompleteness() {
     return fetchFederation('discovery/programs', 'query').then((data) => {
         // Step 1: Determine the number of provinces
-        const provinces = data.map((site) => site?.location?.province);
+        const provinces = data?.map((site) => site?.location?.province);
         const uniqueProvinces = [...new Set(provinces)];
         const retVal = {};
         retVal.numProvinces = uniqueProvinces.length;

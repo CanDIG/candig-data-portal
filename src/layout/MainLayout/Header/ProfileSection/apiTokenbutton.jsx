@@ -35,7 +35,7 @@ function APITokenButton(props) {
             if ('error' in data) {
                 setError(data.error);
             } else {
-                setToken(data.token);
+                setToken(data.token.split('|')[0]);
                 setTokenHidden(false);
             }
         });
