@@ -77,7 +77,7 @@ function ClinicalView() {
                 .map((patient, index) => {
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
-                    return calculateAge({...patient});
+                    return calculateAge({ ...patient });
                 });
         }
 
