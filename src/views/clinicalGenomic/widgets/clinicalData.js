@@ -61,6 +61,7 @@ function ClinicalView() {
             delete patient.date_of_birth;
             delete patient.date_of_death;
         }
+        return patient;
     }
 
     // Function to process search results
@@ -76,8 +77,7 @@ function ClinicalView() {
                 .map((patient, index) => {
                     patient.id = index;
                     patient.deceased = !!patient.date_of_death;
-                    calculateAge(patient);
-                    return patient;
+                    return calculateAge({ ...patient });
                 });
         }
 
