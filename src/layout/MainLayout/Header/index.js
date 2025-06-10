@@ -74,7 +74,6 @@ function Header({ handleLeftDrawerToggle }) {
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
             <StyledGrow className={classes.grow} />
-            <StyledGrow className={classes.grow} />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
