@@ -237,8 +237,11 @@ function StyledCheckboxList(props) {
                     retVal.filter = newList;
                     if (groupName === 'node') {
                         const currentPrograms = { ...selectedPrograms };
+                        const programIds = sites
+                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
+                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
                         Object.keys(selectedPrograms).forEach((id) => {
-                            if (currentPrograms[id]) {
+                            if (currentPrograms[id] && !programIds.includes(id)) {
                                 delete currentPrograms[id];
                             }
                         });
