@@ -8,11 +8,10 @@ import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTo
 // project imports
 import MainCard from '../../../ui-component/cards/MainCard';
 import { useAuthContext } from './AuthContext';
-import { Button, Typography } from '@mui/material';
 import config from '../../../config';
 
 // Assets
-import CanDIGLogo from 'assets/images/icons/canDIGLogo.png';
+import CanDIGLogo from '../../../assets/images/icons/canDIGLogo.png';
 import PropTypes from 'prop-types';
 
 const PREFIX = 'AuthDisplay';

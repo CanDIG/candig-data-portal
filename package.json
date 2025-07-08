@@ -51,8 +51,7 @@
     },
     "scripts": {
         "start": "vite",
-        "build": "tsc -b vite build",
-        "test": "vitest test",
+        "build": "vite build",
         "lint": "eslint .",
         "serve": "vite preview"
     },

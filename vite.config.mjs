@@ -6,6 +6,7 @@ export default defineConfig(() => {
         base: '/',
         plugins: [react()],
         server: {
+            hmr: false,
             watch: {
                 usePolling: true
             },

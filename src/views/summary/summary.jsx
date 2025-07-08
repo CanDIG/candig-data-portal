@@ -15,7 +15,7 @@ import { fetchClinicalCompleteness, fetchFederatedSubServices } from '../../stor
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
 
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
-import FieldLevelCompletenessGraph from '../../../completeness/fieldLevelCompletenessGraph';
+import FieldLevelCompletenessGraph from '../completeness/fieldLevelCompletenessGraph';
 
 function Summary() {
     const theme = useTheme();
