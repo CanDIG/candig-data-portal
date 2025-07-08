@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { makeField, DataRow } from 'ui-component/DataRow';
+import { makeField, DataRow } from '../DataRow';
 import { useEffect, useState } from 'react';
 
 const PREFIX = 'GenomicIngest';

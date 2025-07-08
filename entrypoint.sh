@@ -9,6 +9,8 @@ if [[ -f "initial_setup" ]]; then
     rm initial_setup
 fi
 
-npx vite
+# npx vite
+npx vite build
+npx vite preview
 # npm start
 # npm run build

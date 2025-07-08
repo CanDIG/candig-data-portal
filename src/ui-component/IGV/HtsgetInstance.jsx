@@ -2,7 +2,7 @@
 import { useRef, useEffect } from 'react';
 
 import igv from '@candig/igv/dist/igv.esm';
-import { htsget } from 'store/api';
+import { htsget } from '../../store/api';
 
 function HtsgetInstance(BamIdList, VcfIdList) {
     /** *
