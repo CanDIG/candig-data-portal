@@ -264,7 +264,7 @@ function StyledCheckboxList(props) {
                     {option}
                 </li>
             )}
-            renderInput={(params) => <TextField {...params} label={groupName} />}
+            renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
             }
@@ -628,11 +628,12 @@ function Sidebar() {
                     Search
                 </Button>
             </div>
-            <SidebarGroup name="Node">
+            <SidebarGroup name="Nodes">
                 <StyledCheckboxList
                     options={sites}
                     onWrite={writerContext}
                     groupName="node"
+                    useAutoComplete={sites.length >= 5}
                     isFilterList
                     isExclusion
                     selectedPrograms={selectedPrograms}
@@ -641,12 +642,13 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Program">
+            <SidebarGroup name="Programs">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
                     groupName="exclude_programs"
+                    useAutoComplete={programs.length >= 5}
                     isExclusion
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
@@ -666,7 +668,7 @@ function Sidebar() {
                 setStartPos={setStartPos}
                 setEndPos={setEndPos}
             />
-            <SidebarGroup name="Treatment" hide={hideClinical}>
+            <SidebarGroup name="Treatments" hide={hideClinical}>
                 <StyledCheckboxList
                     options={treatmentTypes}
                     onWrite={writerContext}
@@ -677,7 +679,7 @@ function Sidebar() {
                     setChecked={setSelectedTreatment}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Site" hide={hideClinical}>
+            <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
                 <StyledCheckboxList
                     options={tumourPrimarySites}
                     onWrite={writerContext}
