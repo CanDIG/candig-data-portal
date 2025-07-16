@@ -298,3 +298,7 @@ export function handleTableSet(title, array, ageAtFirstDiagnosis) {
     const titleClick = formatKey(title);
     return { rowsClick, titleClick, reorderedColumns };
 }
+
+export function isCensored(datum) {
+    return typeof datum === 'string' && datum.startsWith('<');
+}
