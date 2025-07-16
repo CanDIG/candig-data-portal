@@ -155,8 +155,8 @@ function StyledCheckboxList(props) {
         }
 
         const cohortMap = {};
-        sites.forEach((site) => {
-            site.results.forEach((result) => {
+        sites?.forEach((site) => {
+            site?.results?.forEach((result) => {
                 if (!cohortMap[result.program_id]) {
                     cohortMap[result.program_id] = new Set();
                 }
