@@ -61,7 +61,7 @@ function SearchHandler({ setLoading }) {
         const CollateSummary = (data, statName) => {
             const summaryStat = {};
             data.forEach((site) => {
-                const thisStat = site.results?.[statName];
+                const thisStat = site?.results?.[statName];
                 if (!thisStat) {
                     return;
                 }
@@ -92,7 +92,7 @@ function SearchHandler({ setLoading }) {
                         patients_per_program: {}
                     };
                     data.forEach((site) => {
-                        discoveryCounts.patients_per_program[site.location.name] = site.results?.patients_per_program;
+                        discoveryCounts.patients_per_program[site.location.name] = site?.results?.patients_per_program;
                     });
 
                     writer((old) => ({ ...old, counts: discoveryCounts }));
