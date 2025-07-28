@@ -15,6 +15,7 @@ import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';
+import MatchingPatients from './widgets/matchingPatients';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -113,6 +114,11 @@ const sections = [
         id: 'authorized programs',
         header: undefined,
         component: <AuthorizationSections title="Authorized Programs" />
+    },
+    {
+        id: 'Matching Patients',
+        header: 'Matching Patients',
+        component: <MatchingPatients />
     },
     {
         id: 'clinical',

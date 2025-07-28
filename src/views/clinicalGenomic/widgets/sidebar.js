@@ -348,11 +348,15 @@ function GenomicsGroup(props) {
         setSelectedChromosomes,
         setSelectedGenes,
         setStartPos,
-        setEndPos
+        setEndPos,
+        selectedGenomicDataTypes,
+        setGenomicDataTypes
     } = props;
 
     const [selectedGenome, _setSelectedGenome] = useState('hg38');
     const [_timeout, setNewTimeout] = useState(null);
+
+    const writerContext = useSearchQueryWriterContext();
 
     if (hide) {
         return null;
@@ -390,19 +394,6 @@ function GenomicsGroup(props) {
 
     return (
         <>
-            {/* <SidebarGroup name="Reference Genome">
-                <RadioGroup onChange={(event) => HandleChange(event.target.value, setSelectedGenome)} value={selectedGenome}>
-                    {referenceGenomes.map((genome) => (
-                        <FormControlLabel
-                            label={genome}
-                            control={<Radio className={classes.checkbox} />}
-                            key={genome}
-                            value={genome}
-                            className={classes.checkboxLabel}
-                        />
-                    ))}
-                </RadioGroup>
-            </SidebarGroup> */}
             <SidebarGroup name="Gene Search">
                 {selectedChromosomes && <Typography sx={{ paddingTop: '0.5em' }}>(Disabled during position search)</Typography>}
                 <Autocomplete
@@ -446,6 +437,16 @@ function GenomicsGroup(props) {
                     disabled={!!selectedGenes}
                 />
             </SidebarGroup>
+            <SidebarGroup name="Genomic Data Types">
+                <StyledCheckboxList
+                    options={['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']}
+                    onWrite={writerContext}
+                    groupName="genomicDataTypes"
+                    isFilterList
+                    checked={selectedGenomicDataTypes}
+                    setChecked={setGenomicDataTypes}
+                />
+            </SidebarGroup>
         </>
     );
 }
@@ -462,7 +463,9 @@ GenomicsGroup.propTypes = {
     selectedGenes: PropTypes.string,
     setSelectedGenes: PropTypes.func,
     selectedChromosomes: PropTypes.string,
-    setSelectedChromosomes: PropTypes.func
+    setSelectedChromosomes: PropTypes.func,
+    selectedGenomicDataTypes: PropTypes.string,
+    setGenomicDataTypes: PropTypes.func
 };
 
 function Sidebar() {
@@ -476,6 +479,7 @@ function Sidebar() {
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState('0');
     const [endPos, setEndPos] = useState('0');
+    const [selectedGenomicDataTypes, setGenomicDataTypes] = useState(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
@@ -518,6 +522,7 @@ function Sidebar() {
             setSelectedChromosomes('');
             setStartPos('0');
             setEndPos('0');
+            setGenomicDataTypes(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
             writerContext((old) => {
                 const retVal = { ...old, reqNum: old.reqNum + 1 };
                 delete retVal.query.chrom;
@@ -564,6 +569,7 @@ function Sidebar() {
         setSelectedChromosomes('');
         setStartPos('0');
         setEndPos('0');
+        setGenomicDataTypes(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
 
         // Clinical
         setSelectedTreatment({});
@@ -667,6 +673,8 @@ function Sidebar() {
                 setSelectedGenes={setSelectedGenes}
                 setStartPos={setStartPos}
                 setEndPos={setEndPos}
+                setGenomicDataTypes={setGenomicDataTypes}
+                selectedGenomicDataTypes={selectedGenomicDataTypes}
             />
             <SidebarGroup name="Treatments" hide={hideClinical}>
                 <StyledCheckboxList
