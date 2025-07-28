@@ -154,7 +154,23 @@ function MatchingPatientsView() {
             sortable: false,
             renderCell: (params) => (
                 <Tooltip title="Open Patient View" placement="right">
-                    {/* ... */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            '&:hover': {
+                                color: theme.palette.primary.main
+                            }
+                        }}
+                    >
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', marginRight: '1em' }}>
+                            <IconTableShare stroke={1.5} size="1.3rem" />
+                        </Box>
+                        <Typography noWrap>{params.value}</Typography>
+                    </Box>
                 </Tooltip>
             )
         },
@@ -204,23 +220,23 @@ function MatchingPatientsView() {
         pageSize: queryReader.query?.pageSize || 10
     };
 
-    let headingText = 'Matching Patients';
+    const headingText = 'Matching Patients:';
+    let headingTextResults = '';
 
-    if (!hasValidQuery && !hasClinicalResults) {
-        headingText = 'Matching Patients: Please use the sidebar to start a search';
-    } else if (rows.length === 0) {
-        headingText = 'No matching patients found. Try adjusting your filters.';
+    if ((!searchResultsGenomic || searchResultsGenomic.length === 0) && (!hasClinicalResults || totalRows === 0)) {
+        headingTextResults = ' No matching patients found. Try adjusting your filters.';
     } else if (!hasValidQuery) {
-        headingText = 'Matching Patients: Genomic results require a query for gene or position';
+        headingTextResults = ' Genomic results require a query for gene or position';
     } else {
-        headingText = `Matching Patients: ${queryParams || ''}`;
+        headingTextResults = ` Genomic results for ${queryParams || ''}`;
     }
 
     return (
         <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
-            <Typography pb={1} variant="h4">
-                {headingText}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={2} pb={1}>
+                <Typography variant="h4">{headingText}</Typography>
+                <Typography variant="subtitle1">{headingTextResults}</Typography>
+            </Box>
             <div style={{ height: 680, width: '100%' }}>
                 <DataGrid
                     rows={rows}
