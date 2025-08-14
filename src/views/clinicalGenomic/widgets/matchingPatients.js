@@ -12,7 +12,6 @@ import { useSearchQueryWriterContext, useSearchResultsReaderContext, useSearchQu
 
 function MatchingPatientsView() {
     const theme = useTheme();
-
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResultsClinical = useSearchResultsReaderContext().clinical;
@@ -21,23 +20,9 @@ function MatchingPatientsView() {
     const queryReader = useSearchQueryReaderContext();
     const query = queryReader.query || {};
 
-    // Process genomic data
-    let genomicRows = [];
-    if (searchResultsGenomic) {
-        genomicRows = searchResultsGenomic
-            .filter((patient) => patient && patient.donor_id)
-            .map((patient, index) => ({
-                ...patient,
-                id: `genomic-${index}`,
-                submitter_donor_id: patient.donor_id,
-                location: patient.location?.name
-            }));
-    }
-
-    // Function to add location to each clinical patient
+    // Helpers: location, calculate age
     function addLocationToPatients(searchResultsClinical) {
         if (!searchResultsClinical) return;
-
         Object.keys(searchResultsClinical).forEach((location) => {
             if (searchResultsClinical[location]?.results) {
                 searchResultsClinical[location].results.forEach((patient) => {
@@ -47,7 +32,6 @@ function MatchingPatientsView() {
         });
     }
 
-    // Calculate age from date intervals
     function calculateAge(patient) {
         if (patient?.date_resolution === 'month') {
             if (patient?.date_of_birth?.month_interval && patient?.date_of_death?.month_interval) {
@@ -80,6 +64,18 @@ function MatchingPatientsView() {
         return patient;
     }
 
+    // Process genomic data
+    let genomicRows = [];
+    if (searchResultsGenomic) {
+        genomicRows = searchResultsGenomic
+            .filter((patient) => patient && patient.donor_id)
+            .map((patient) => ({
+                ...patient,
+                submitter_donor_id: patient.donor_id,
+                location: patient.location?.name
+            }));
+    }
+
     // Process clinical data
     let clinicalRows = [];
     if (searchResultsClinical) {
@@ -88,36 +84,40 @@ function MatchingPatientsView() {
         clinicalRows = Object.values(searchResultsClinical)
             .flatMap((locationData) => locationData.results || [])
             .filter((p) => p && p.submitter_donor_id)
-            .map((patient, index) => {
-                patient.id = `clinical-${index}`;
+            .map((patient) => {
                 patient.deceased = !!patient.date_of_death;
                 return calculateAge({ ...patient });
             });
     }
 
-    // Merge and deduplicate by submitter_donor_id
-    const mergedMap = new Map();
-    [...genomicRows, ...clinicalRows].forEach((patient) => {
-        const id = patient.submitter_donor_id;
-        if (!mergedMap.has(id)) {
-            mergedMap.set(id, patient);
-        } else {
-            mergedMap.set(id, { ...mergedMap.get(id), ...patient }); // merge fields
-        }
-    });
+    // Merge clinical into genomic (keeping multiple genomic rows per donor_id + submitter_sample_id)
+    let mergedRows = [];
 
-    const rows = Array.from(mergedMap.values());
+    if (genomicRows.length > 0) {
+        mergedRows = genomicRows.map((g) => {
+            const matchingClinical = clinicalRows.find((c) => c.submitter_donor_id === g.submitter_donor_id);
+            return {
+                ...matchingClinical,
+                ...g
+            };
+        });
+    } else {
+        // If no genomic data, just use clinical rows
+        mergedRows = clinicalRows;
+    }
 
+    const rows = mergedRows;
+
+    // Patient Info Page click handler
     const handleRowClick = (row) => {
-        console.log('Row clicked:', row);
         const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
         window.open(url, '_blank');
     };
 
-    // Responsive logic
+    // Responsive
     React.useEffect(() => {
         window.addEventListener('resize', () => setdesktopResolution(window.innerWidth > 1200));
-    }, [desktopResolution, setdesktopResolution]);
+    }, [desktopResolution]);
 
     const hasClinicalResults = React.useMemo(
         () => searchResultsClinical && Object.values(searchResultsClinical).some((location) => location?.results?.length > 0),
@@ -126,8 +126,8 @@ function MatchingPatientsView() {
     const hasValidQuery = React.useMemo(() => (query?.assembly && query?.chrom) || query?.gene, [query]);
     const queryParams = query?.gene || query?.chrom;
 
-    // Define dynamic columns
-    const clinicalOnlyFields = [
+    // Column definitions
+    const clinicalFields = [
         ['location', 'Location', 75],
         ['program_id', 'Program ID', 150],
         ['sex_at_birth', 'Sex At Birth', 115],
@@ -136,11 +136,15 @@ function MatchingPatientsView() {
         ['date_of_death', 'Age at Death', 100]
     ];
 
-    const genomicOnlyFields = [
+    const genomicFields = [
         ['variant_count', 'Estimated Variants', 150],
         ['tumour_normal_designation', 'Tumour/Normal', 125],
         ['submitter_sample_id', 'Sample Registration ID', 175]
     ];
+
+    const hasGenomicData = rows.some(
+        (row) => row.variant_count != null || row.tumour_normal_designation != null || row.submitter_sample_id != null
+    );
 
     const columns = [
         {
@@ -171,18 +175,16 @@ function MatchingPatientsView() {
                 </Tooltip>
             )
         },
-        ...(hasClinicalResults
-            ? clinicalOnlyFields.map(([field, headerName, minWidth]) => ({
-                  field,
-                  headerName,
-                  minWidth,
-                  flex: 1,
-                  sortable: false,
-                  filterable: false
-              }))
-            : []),
-        ...(searchResultsGenomic?.length > 0 && hasValidQuery
-            ? genomicOnlyFields.map(([field, headerName, minWidth]) => ({
+        ...clinicalFields.map(([field, headerName, minWidth]) => ({
+            field,
+            headerName,
+            minWidth,
+            flex: 1,
+            sortable: false,
+            filterable: false
+        })),
+        ...(hasGenomicData
+            ? genomicFields.map(([field, headerName, minWidth]) => ({
                   field,
                   headerName,
                   minWidth,
@@ -193,6 +195,7 @@ function MatchingPatientsView() {
             : [])
     ];
 
+    // Pagination
     const HandlePageChange = (newModel) => {
         if (newModel.page !== query.page) {
             writerContext((old) => ({
@@ -208,6 +211,7 @@ function MatchingPatientsView() {
         pageSize: query.pageSize || 10
     };
 
+    // Heading
     const headingText = 'Matching Patients:';
     let headingTextResults = '';
 
@@ -220,14 +224,24 @@ function MatchingPatientsView() {
     }
 
     return (
-        <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
+        <Box
+            mr={1}
+            ml={1}
+            p={1}
+            sx={{
+                border: 1,
+                borderRadius: 2,
+                boxShadow: 2,
+                borderColor: theme.palette.primary[200] + 75
+            }}
+        >
             <Box display="flex" alignItems="center" gap={1} pb={1}>
                 <Typography variant="h4">{headingText}</Typography>
                 <Typography variant="subtitle1">{headingTextResults}</Typography>
             </Box>
             <div style={{ height: 680, width: '100%' }}>
                 <DataGrid
-                    getRowId={(row) => row.submitter_donor_id}
+                    getRowId={(row) => row.submitter_donor_id + (row.submitter_sample_id || '')}
                     rows={rows}
                     columns={columns}
                     rowCount={rows.length}

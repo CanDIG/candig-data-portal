@@ -132,7 +132,6 @@ function SearchHandler({ setLoading }) {
                             clinicalData[site.location.name] = site?.results;
                         }
                     });
-
                     const genomicData = data
                         .map((site) =>
                             site?.results?.genomic?.map((caseData) => {
@@ -141,7 +140,7 @@ function SearchHandler({ setLoading }) {
                             })
                         )
                         .flat(1);
-
+                    console.log('Genomic Data:', genomicData);
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
                 })
                 .catch((error) => {
