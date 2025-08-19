@@ -183,7 +183,9 @@ function FieldLevelCompletenessGraph(props) {
                     const identifier = this.value.toString().split('/');
                     const field = identifier.slice(1).join('/').replaceAll('_', ' ');
                     let title = identifier[0][0].toUpperCase() + identifier[0].slice(1).toLowerCase();
-                    return config.isDHDP ? `<span style="text-transform:capitalize">${title}: ${field}</span>` : `<b>${title}:</b> <span style="text-transform:uppercase">${field}</span>`;
+                    return config.isDHDP
+                        ? `<span style="text-transform:capitalize">${title}: ${field}</span>`
+                        : `<b>${title}:</b> <span style="text-transform:uppercase">${field}</span>`;
                 }
                 /* eslint-enable */
             },
