@@ -82,14 +82,14 @@ function Header({ handleLeftDrawerToggle }) {
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
                 </Box>
+                <StyledGrow className={classes.grow} />
+                <ProfileSection />
             </StyledBox>
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
-            <StyledGrow className={classes.grow} />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
-            <ProfileSection />
         </>
     );
 }
