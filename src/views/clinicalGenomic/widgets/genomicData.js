@@ -18,7 +18,10 @@ function GenomicData() {
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
 
     const searchResults = useSearchResultsReaderContext().genomic;
+    const countsResults = useSearchResultsReaderContext().counts;
     const query = useSearchQueryReaderContext().query;
+
+    const hasResults = countsResults?.patients_per_program && Object.values(countsResults?.patients_per_program).some((val) => val > 0);
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
@@ -65,13 +68,35 @@ function GenomicData() {
     const queryParams = query?.gene || query?.chrom;
     const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene;
 
+    let message = '';
+    if (!hasValidQuery) {
+        message = 'Perform a gene or coordinate search to view genomic variant data.';
+    } else if (hasResults) {
+        message = 'You do not have authorization to view Donor-level genomic data results from your search.';
+    } else {
+        message = 'No results';
+    }
+    // Were there any results at all?
+    const noRowsOverlay = () => (
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{message}</div>
+    );
+
     return (
         <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} sx={{ color: config.isDHDP ? theme.palette.primary.main : 'black' }} variant="h4">
                 {hasValidQuery ? `Genomic Variants: ${queryParams}` : 'Genomic Variants: Please query from the sidebar to populate'}
             </Typography>
             <div style={{ height: 510, width: '100%' }}>
-                <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} hideFooterSelectedRowCount />
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    hideFooterSelectedRowCount
+                    slots={{
+                        noRowsOverlay
+                    }}
+                />
             </div>
         </Box>
     );
