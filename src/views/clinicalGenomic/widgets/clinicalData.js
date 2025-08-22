@@ -22,7 +22,9 @@ function ClinicalView() {
     const writerContext = useSearchQueryWriterContext();
     const queryReader = useSearchQueryReaderContext();
 
-    const hasResults = countsResults?.patients_per_program && Object.values(countsResults?.patients_per_program).some((val) => val > 0);
+    const hasResults =
+        countsResults?.patients_per_program &&
+        Object.values(countsResults?.patients_per_program).some((site) => Object.values(site).some((val) => val > 0));
 
     // Function to add location to each patient
     function addLocationToPatients(searchResults) {
