@@ -12,6 +12,7 @@ import config from 'config';
 
 // Assets
 import CanDIGLogo from 'assets/images/icons/canDIGLogo.png';
+import DHDPLogo from 'assets/images/dhdp-full-horizontal.svg';
 import PropTypes from 'prop-types';
 
 const PREFIX = 'AuthDisplay';
@@ -64,7 +65,7 @@ const StyledDiv = styled('div')(({ theme }) => ({
         color: '#F09934'
     },
     [`& .${classes.logo}`]: {
-        width: 150,
+        height: 150,
         marginTop: '2em',
         marginBottom: '2em'
     },
@@ -160,15 +161,27 @@ function AuthDisplay() {
             <AlertCard
                 header={
                     <Typography variant="h1" className={classes.welcomeText}>
-                        Welcome to{' '}
-                        <span className={classes.boldText}>
-                            <span className={classes.primaryText}> Can</span>
-                            <span className={classes.secondaryText}>DIG</span>
-                        </span>
-                        <span>!</span>
+                        Welcome to&nbsp;
+                        {config.isDHDP ? (
+                            <span className={classes.boldText}>the DHDP discovery portal</span>
+                        ) : (
+                            <>
+                                <span className={classes.boldText}>
+                                    <span className={classes.primaryText}> Can</span>
+                                    <span className={classes.secondaryText}>DIG</span>
+                                </span>
+                                <span>!</span>
+                            </>
+                        )}
                     </Typography>
                 }
-                icon={<img src={CanDIGLogo} alt="CanDIG Logo" className={classes.logo} />}
+                icon={
+                    <img
+                        src={config.isDHDP ? DHDPLogo : CanDIGLogo}
+                        alt={`${config.isDHDP ? 'DHDP' : 'CanDIG'} Logo`}
+                        className={classes.logo}
+                    />
+                }
                 messageArea={
                     <Typography variant="h2" sx={{ fontWeight: 'light' }}>
                         To access the service, please press the request access button below.

@@ -21,7 +21,9 @@ function GenomicData() {
     const countsResults = useSearchResultsReaderContext().counts;
     const query = useSearchQueryReaderContext().query;
 
-    const hasResults = countsResults?.patients_per_program && Object.values(countsResults?.patients_per_program).some((val) => val > 0);
+    const hasResults =
+        countsResults?.patients_per_program &&
+        Object.values(countsResults?.patients_per_program).some((site) => Object.values(site).some((val) => val > 0));
 
     // Flatten the search results so that we are filling in the rows
     let rows = [];
