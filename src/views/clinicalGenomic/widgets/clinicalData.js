@@ -18,8 +18,11 @@ function ClinicalView() {
     // Mobile
     const [desktopResolution, setdesktopResolution] = React.useState(window.innerWidth > 1200);
     const searchResults = useSearchResultsReaderContext().clinical;
+    const countsResults = useSearchResultsReaderContext().counts;
     const writerContext = useSearchQueryWriterContext();
     const queryReader = useSearchQueryReaderContext();
+
+    const hasResults = countsResults?.patients_per_program && Object.values(countsResults?.patients_per_program).some((val) => val > 0);
 
     // Function to add location to each patient
     function addLocationToPatients(searchResults) {
@@ -161,6 +164,13 @@ function ClinicalView() {
         pageSize: queryReader.query?.pageSize || 10
     };
 
+    // Were there any results at all?
+    const noRowsOverlay = () => (
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {hasResults ? 'You do not have authorization to view Donor-level clinical data results from your search.' : 'No results'}
+        </div>
+    );
+
     return (
         <Box mr={1} ml={1} p={1} sx={{ border: 1, borderRadius: 2, boxShadow: 2, borderColor: theme.palette.primary[200] + 75 }}>
             <Typography pb={1} sx={{ color: config.isDHDP ? theme.palette.primary.main : 'black' }} variant="h4">
@@ -176,6 +186,9 @@ function ClinicalView() {
                     paginationModel={paginationModel}
                     onPaginationModelChange={HandlePageChange}
                     paginationMode="server"
+                    slots={{
+                        noRowsOverlay
+                    }}
                     hideFooterSelectedRowCount
                 />
             </div>
