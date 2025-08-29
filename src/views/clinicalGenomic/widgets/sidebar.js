@@ -147,7 +147,7 @@ function StyledCheckboxList(props) {
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
     const HandleChange = (ids, isChecked) => {
-        // Remove duplicates
+        // Normalize ids to array of unique values
         if (Array.isArray(ids)) {
             ids = Array.from(new Set(ids?.flat(1)));
         } else {
@@ -165,6 +165,7 @@ function StyledCheckboxList(props) {
         });
 
         if (isExclusion ? !isChecked : isChecked) {
+            // set local checked state (object shape)
             setChecked((_) => {
                 const retVal = {};
                 ids.forEach((id) => {
@@ -172,15 +173,20 @@ function StyledCheckboxList(props) {
                 });
                 return retVal;
             });
+
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
                 // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
+
                 if (isFilterList) {
+                    // keep filter entry
                     retVal.filter[groupName] = ids;
+
+                    // special-case node handling from original code
                     if (groupName === 'node') {
                         const programIds = sites
-                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
-                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
+                            .filter((item) => ids.includes(item.location.name))
+                            .flatMap((item) => item.results.map((result) => result.program_id));
                         const validProgramIds = programIds.filter((programId) => {
                             const associatedNodes = cohortMap[programId] || new Set();
                             return Array.from(associatedNodes).every((node) => !(node in checked));
@@ -194,12 +200,18 @@ function StyledCheckboxList(props) {
                             return newPrograms;
                         });
                     }
+
+                    // special-case: if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
+                    if (groupName === 'genomicDataTypes') {
+                        retVal.query.genomicDataTypes = ids.join('|');
+                    }
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
                 return retVal;
             });
         } else {
+            // unchecked path: still set local checked state to the set of ids (object keyed)
             setChecked((_) => {
                 const retVal = {};
                 ids.forEach((id) => {
@@ -213,6 +225,7 @@ function StyledCheckboxList(props) {
                     const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
                     newList[groupName] = ids;
                     retVal.filter = newList;
+
                     if (groupName === 'node') {
                         const currentPrograms = { ...selectedPrograms };
                         Object.keys(selectedPrograms).forEach((id) => {
@@ -230,6 +243,11 @@ function StyledCheckboxList(props) {
                         }
                         setSelectedPrograms(currentPrograms);
                     }
+
+                    // special-case: if this filter is genomicDataTypes, also update query string
+                    if (groupName === 'genomicDataTypes') {
+                        retVal.query.genomicDataTypes = ids.join('|');
+                    }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
@@ -243,7 +261,8 @@ function StyledCheckboxList(props) {
         }
     };
 
-    const checkedList = Object.keys(checked);
+    // checked may be an object (preferred) or an array - normalize for value
+    const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
 
     return useAutoComplete ? (
         <Autocomplete
@@ -329,12 +348,10 @@ StyledCheckboxList.propTypes = {
     setSelectedPrograms: PropTypes.func,
     selectedPrograms: PropTypes.object,
     setChecked: PropTypes.func,
-    checked: PropTypes.object
+    checked: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
 };
 
 // A group of genomics data
-// Keeping this separate from the rest as it's all somewhat self-contained
-// NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
     const {
         chromosomes,
@@ -362,6 +379,32 @@ function GenomicsGroup(props) {
         return null;
     }
 
+    // helper: convert the UI checked shape (object or array) into the pipe-delimited string expected by backend
+    const formatGenomicDataTypes = (gdt) => {
+        if (!gdt) return '';
+        if (Array.isArray(gdt)) {
+            return gdt.join('|');
+        }
+        if (typeof gdt === 'object') {
+            return Object.keys(gdt).filter((k) => gdt[k]).join('|');
+        }
+        return String(gdt);
+    };
+
+    // Whenever the checked object changes, update writerContext.query.genomicDataTypes
+    useEffect(() => {
+        const formatted = formatGenomicDataTypes(selectedGenomicDataTypes);
+        writerContext((old) => ({
+            ...old,
+            query: {
+                ...old.query,
+                // use undefined if empty so it doesn't appear in query params
+                genomicDataTypes: formatted || undefined
+            }
+        }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedGenomicDataTypes]);
+
     const HandleChange = (value, changer, toChange) => {
         setNewTimeout((oldTimeout) => {
             if (oldTimeout != null) {
@@ -375,6 +418,7 @@ function GenomicsGroup(props) {
                     start: startPos,
                     end: endPos,
                     assembly: selectedGenome,
+                    genomicDataTypes: selectedGenomicDataTypes,
                     [toChange]: value
                 };
 
@@ -384,7 +428,9 @@ function GenomicsGroup(props) {
                         ...old.query,
                         chrom: newQuery.referenceName ? `chr${newQuery.referenceName}:${newQuery.start}-${newQuery.end}` : undefined,
                         gene: newQuery.gene || undefined,
-                        assembly: newQuery.assembly
+                        assembly: newQuery.assembly,
+                        // format object/array → pipe-delimited string
+                        genomicDataTypes: formatGenomicDataTypes(newQuery.genomicDataTypes)
                     }
                 }));
             }, 1000);
@@ -445,6 +491,7 @@ function GenomicsGroup(props) {
                     isFilterList
                     checked={selectedGenomicDataTypes}
                     setChecked={setGenomicDataTypes}
+                    useAutoComplete
                 />
             </SidebarGroup>
         </>
@@ -464,7 +511,7 @@ GenomicsGroup.propTypes = {
     setSelectedGenes: PropTypes.func,
     selectedChromosomes: PropTypes.string,
     setSelectedChromosomes: PropTypes.func,
-    selectedGenomicDataTypes: PropTypes.string,
+    selectedGenomicDataTypes: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     setGenomicDataTypes: PropTypes.func
 };
 
@@ -474,12 +521,16 @@ function Sidebar() {
     const writerContext = useSearchQueryWriterContext();
 
     // Genomic data
-    // const referenceGenomes = ['hg38'];
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState('0');
     const [endPos, setEndPos] = useState('0');
-    const [selectedGenomicDataTypes, setGenomicDataTypes] = useState(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
+    // **Use object with per-option true/false** so StyledCheckboxList works correctly
+    const [selectedGenomicDataTypes, setGenomicDataTypes] = useState({
+        'Variants': true,
+        'Transcriptomes (WTS)': true,
+        'Reads (WGS)': true
+    });
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
@@ -522,12 +573,18 @@ function Sidebar() {
             setSelectedChromosomes('');
             setStartPos('0');
             setEndPos('0');
-            setGenomicDataTypes(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
+            // reset to object shape
+            setGenomicDataTypes({
+                'Variants': true,
+                'Transcriptomes (WTS)': true,
+                'Reads (WGS)': true
+            });
             writerContext((old) => {
                 const retVal = { ...old, reqNum: old.reqNum + 1 };
                 delete retVal.query.chrom;
                 delete retVal.query.gene;
                 delete retVal.query.assembly;
+                delete retVal.query.genomicDataTypes;
                 return retVal;
             });
         } else if (readerContext.clear === 'treatment') {
@@ -569,7 +626,11 @@ function Sidebar() {
         setSelectedChromosomes('');
         setStartPos('0');
         setEndPos('0');
-        setGenomicDataTypes(['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']);
+        setGenomicDataTypes({
+            'Variants': true,
+            'Transcriptomes (WTS)': true,
+            'Reads (WGS)': true
+        });
 
         // Clinical
         setSelectedTreatment({});
@@ -580,17 +641,16 @@ function Sidebar() {
         writerContext({
             // Set nodes and programs in the filter
             filter: {
-                node: [readerContext?.programs?.map((loc) => loc.location.name) || []], // Set your default nodes
+                node: [readerContext?.programs?.map((loc) => loc.location.name) || []],
                 exclude_programs: [
                     readerContext?.programs?.map((loc) => loc?.results?.items?.map((program) => program.program_id)).flat(1) || []
-                ], // Set programs to empty array or whichever default value you want
+                ],
                 query: {}
             }
         });
     }
 
     // Fill up a list of options from the results of a Katsu query
-    // This includes treatment types within the dataset, etc.
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
 

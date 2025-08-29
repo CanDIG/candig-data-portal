@@ -20,6 +20,8 @@ function MatchingPatientsView() {
     const queryReader = useSearchQueryReaderContext();
     const query = queryReader.query || {};
 
+    console.log(searchResultsGenomic);
+
     // Helpers: location, calculate age
     function addLocationToPatients(searchResultsClinical) {
         if (!searchResultsClinical) return;
@@ -72,7 +74,11 @@ function MatchingPatientsView() {
             .map((patient) => ({
                 ...patient,
                 submitter_donor_id: patient.donor_id,
-                location: patient.location?.name
+                location: patient.location?.name,
+                genomes: (patient.genomes || []).join(', '),
+                transcriptomes: (patient.transcriptomes || []).join(', '),
+                reads: (patient.reads || []).join(', '),
+                variants: (patient.variants || []).join(', ')
             }));
     }
 
@@ -125,7 +131,7 @@ function MatchingPatientsView() {
     );
     const hasValidQuery = React.useMemo(() => (query?.assembly && query?.chrom) || query?.gene, [query]);
     const queryParams = query?.gene || query?.chrom;
-
+    console.log('Genomic Responses:', searchResultsGenomic);
     // Column definitions
     const clinicalFields = [
         ['location', 'Location', 75],
@@ -139,11 +145,16 @@ function MatchingPatientsView() {
     const genomicFields = [
         ['variant_count', 'Estimated Variants', 150],
         ['tumour_normal_designation', 'Tumour/Normal', 125],
-        ['submitter_sample_id', 'Sample Registration ID', 175]
+        ['submitter_sample_id', 'Sample Registration ID', 175],
+        ['genomes', 'Genomes', 250],
+        ['variants', 'Variants', 250],
+        ['transcriptomes', 'Transcriptomes', 250],
+        ['reads', 'Reads', 250]
     ];
 
     const hasGenomicData = rows.some(
-        (row) => row.variant_count != null || row.tumour_normal_designation != null || row.submitter_sample_id != null
+        (row) =>
+            row.variant_count != null || row.tumour_normal_designation != null || row.submitter_sample_id != null || row.genomes?.length > 0
     );
 
     const columns = [

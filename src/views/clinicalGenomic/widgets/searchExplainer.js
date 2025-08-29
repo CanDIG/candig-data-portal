@@ -37,6 +37,7 @@ function SearchExplainer() {
     if (query !== undefined) {
         const ignoredKeys = ['page', 'page_size']; // These are never included in the explanation
         Object.keys(query).forEach((key) => {
+            console.log('query result', query);
             if (key !== undefined && query[key] !== undefined && !ignoredKeys.includes(key)) {
                 const onDelete = () => {
                     writer((old) => ({ ...old, clear: key }));

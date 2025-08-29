@@ -30,6 +30,8 @@ function PatientCounts() {
     const discoveryCounts = context?.counts?.patients_per_program;
     const clinicalCounts = context?.clinical;
 
+    console.log('Patient Counts context', context);
+
     // Generate the map of site->program->numbers
     let siteData = [];
     if (Array.isArray(sites)) {
