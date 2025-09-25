@@ -81,12 +81,12 @@ function DataVisualization() {
             Object.keys(site.summary?.[dataKey]).forEach((key) => {
                 if (isObject) {
                     Object.keys(site.summary[dataKey]).forEach((innerKey) => {
-                        if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
-                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey][innerKey];
+                        if (isCensored(dataObj[transformer(siteName, key)]?.[innerKey])) {
+                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey]?.[innerKey];
                         }
                     });
                 } else if (isCensored(dataObj[transformer(siteName, key)])) {
-                    newDataObj[transformer(site, key)] += site.summary[dataKey][key];
+                    newDataObj[transformer(site, key)] += site.summary[dataKey]?.[key] || 0;
                 }
             });
         });
