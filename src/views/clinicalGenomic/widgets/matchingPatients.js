@@ -18,7 +18,7 @@ function MatchingPatientsView() {
     const searchResultsGenomic = useSearchResultsReaderContext().genomic;
     const writerContext = useSearchQueryWriterContext();
     const queryReader = useSearchQueryReaderContext();
-    const query = queryReader.query || {};
+    const query = React.useMemo(() => queryReader.query || {}, [queryReader.query]);
 
     // Helpers: location, calculate age
     function addLocationToPatients(searchResultsClinical) {
@@ -127,10 +127,7 @@ function MatchingPatientsView() {
         () => searchResultsClinical && Object.values(searchResultsClinical).some((location) => location?.results?.length > 0),
         [searchResultsClinical]
     );
-    const hasValidQuery = React.useMemo(
-        () => (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.trim().length > 0,
-        [query]
-    );
+    const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.trim().length > 0;
 
     // Column definitions
     const clinicalFields = [
