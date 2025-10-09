@@ -201,7 +201,7 @@ function StyledCheckboxList(props) {
                         });
                     }
 
-                    // special-case: if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
+                    // if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
                     if (groupName === 'genomic_data_types') {
                         retVal.query.genomic_data_types = ids.join('|');
                     }
@@ -211,7 +211,6 @@ function StyledCheckboxList(props) {
                 return retVal;
             });
         } else {
-            // unchecked path: still set local checked state to the set of ids (object keyed)
             setChecked((_) => {
                 const retVal = {};
                 ids.forEach((id) => {
@@ -244,7 +243,7 @@ function StyledCheckboxList(props) {
                         setSelectedPrograms(currentPrograms);
                     }
 
-                    // special-case: if this filter is genomicDataTypes, also update query string
+                    // if this filter is genomicDataTypes, also update query string
                     if (groupName === 'genomic_data_types') {
                         retVal.query.genomic_data_types = ids.join('|');
                     }
@@ -261,7 +260,6 @@ function StyledCheckboxList(props) {
         }
     };
 
-    // checked may be an object (preferred) or an array - normalize for value
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
 
     return useAutoComplete ? (
