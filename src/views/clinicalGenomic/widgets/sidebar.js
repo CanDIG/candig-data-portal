@@ -202,8 +202,8 @@ function StyledCheckboxList(props) {
                     }
 
                     // special-case: if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
-                    if (groupName === 'genomicDataTypes') {
-                        retVal.query.genomicDataTypes = ids.join('|');
+                    if (groupName === 'genomic_data_types') {
+                        retVal.query.genomic_data_types = ids.join('|');
                     }
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
@@ -245,8 +245,8 @@ function StyledCheckboxList(props) {
                     }
 
                     // special-case: if this filter is genomicDataTypes, also update query string
-                    if (groupName === 'genomicDataTypes') {
-                        retVal.query.genomicDataTypes = ids.join('|');
+                    if (groupName === 'genomic_data_types') {
+                        retVal.query.genomic_data_types = ids.join('|');
                     }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
@@ -375,10 +375,6 @@ function GenomicsGroup(props) {
 
     const writerContext = useSearchQueryWriterContext();
 
-    if (hide) {
-        return null;
-    }
-
     // helper: convert the UI checked shape (object or array) into the pipe-delimited string expected by backend
     const formatGenomicDataTypes = (gdt) => {
         if (!gdt) return '';
@@ -386,7 +382,9 @@ function GenomicsGroup(props) {
             return gdt.join('|');
         }
         if (typeof gdt === 'object') {
-            return Object.keys(gdt).filter((k) => gdt[k]).join('|');
+            return Object.keys(gdt)
+                .filter((k) => gdt[k])
+                .join('|');
         }
         return String(gdt);
     };
@@ -399,11 +397,15 @@ function GenomicsGroup(props) {
             query: {
                 ...old.query,
                 // use undefined if empty so it doesn't appear in query params
-                genomicDataTypes: formatted || undefined
+                genomic_data_types: formatted || undefined
             }
         }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedGenomicDataTypes]);
+
+    if (hide) {
+        return null;
+    }
 
     const HandleChange = (value, changer, toChange) => {
         setNewTimeout((oldTimeout) => {
@@ -418,7 +420,7 @@ function GenomicsGroup(props) {
                     start: startPos,
                     end: endPos,
                     assembly: selectedGenome,
-                    genomicDataTypes: selectedGenomicDataTypes,
+                    genomic_data_types: formatGenomicDataTypes(selectedGenomicDataTypes),
                     [toChange]: value
                 };
 
@@ -430,7 +432,7 @@ function GenomicsGroup(props) {
                         gene: newQuery.gene || undefined,
                         assembly: newQuery.assembly,
                         // format object/array → pipe-delimited string
-                        genomicDataTypes: formatGenomicDataTypes(newQuery.genomicDataTypes)
+                        genomic_data_types: formatGenomicDataTypes(newQuery.genomic_data_types)
                     }
                 }));
             }, 1000);
@@ -487,11 +489,10 @@ function GenomicsGroup(props) {
                 <StyledCheckboxList
                     options={['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']}
                     onWrite={writerContext}
-                    groupName="genomicDataTypes"
+                    groupName="genomic_data_types"
                     isFilterList
                     checked={selectedGenomicDataTypes}
                     setChecked={setGenomicDataTypes}
-                    useAutoComplete
                 />
             </SidebarGroup>
         </>
@@ -525,9 +526,8 @@ function Sidebar() {
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState('0');
     const [endPos, setEndPos] = useState('0');
-    // **Use object with per-option true/false** so StyledCheckboxList works correctly
     const [selectedGenomicDataTypes, setGenomicDataTypes] = useState({
-        'Variants': true,
+        Variants: true,
         'Transcriptomes (WTS)': true,
         'Reads (WGS)': true
     });
@@ -568,23 +568,28 @@ function Sidebar() {
                 },
                 reqNum: old.reqNum + 1
             }));
-        } else if (readerContext.clear === 'gene' || readerContext.clear === 'chrom' || readerContext.clear === 'assembly') {
+        } else if (
+            readerContext.clear === 'gene' ||
+            readerContext.clear === 'chrom' ||
+            readerContext.clear === 'assembly' ||
+            readerContext.genomic_data_type === 'genomic_data_types'
+        ) {
             setSelectedGenes('');
             setSelectedChromosomes('');
             setStartPos('0');
             setEndPos('0');
             // reset to object shape
             setGenomicDataTypes({
-                'Variants': true,
-                'Transcriptomes (WTS)': true,
-                'Reads (WGS)': true
+                Variants: false,
+                'Transcriptomes (WTS)': false,
+                'Reads (WGS)': false
             });
             writerContext((old) => {
                 const retVal = { ...old, reqNum: old.reqNum + 1 };
                 delete retVal.query.chrom;
                 delete retVal.query.gene;
                 delete retVal.query.assembly;
-                delete retVal.query.genomicDataTypes;
+                delete retVal.query.genomic_data_types;
                 return retVal;
             });
         } else if (readerContext.clear === 'treatment') {
@@ -627,9 +632,9 @@ function Sidebar() {
         setStartPos('0');
         setEndPos('0');
         setGenomicDataTypes({
-            'Variants': true,
-            'Transcriptomes (WTS)': true,
-            'Reads (WGS)': true
+            Variants: false,
+            'Transcriptomes (WTS)': false,
+            'Reads (WGS)': false
         });
 
         // Clinical

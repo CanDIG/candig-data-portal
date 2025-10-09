@@ -20,8 +20,6 @@ function MatchingPatientsView() {
     const queryReader = useSearchQueryReaderContext();
     const query = queryReader.query || {};
 
-    console.log(searchResultsGenomic);
-
     // Helpers: location, calculate age
     function addLocationToPatients(searchResultsClinical) {
         if (!searchResultsClinical) return;
@@ -129,9 +127,11 @@ function MatchingPatientsView() {
         () => searchResultsClinical && Object.values(searchResultsClinical).some((location) => location?.results?.length > 0),
         [searchResultsClinical]
     );
-    const hasValidQuery = React.useMemo(() => (query?.assembly && query?.chrom) || query?.gene, [query]);
-    const queryParams = query?.gene || query?.chrom;
-    console.log('Genomic Responses:', searchResultsGenomic);
+    const hasValidQuery = React.useMemo(
+        () => (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.trim().length > 0,
+        [query]
+    );
+    const queryParams = query?.gene || query?.chrom || query?.genomic;
     // Column definitions
     const clinicalFields = [
         ['location', 'Location', 75],
@@ -229,9 +229,9 @@ function MatchingPatientsView() {
     if (!searchResultsGenomic && !hasClinicalResults) {
         headingTextResults = 'No matching patients found. Try adjusting your filters.';
     } else if (!hasValidQuery) {
-        headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene or position';
+        headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
     } else {
-        headingTextResults = `Results include clinical matches and genomic matches for ${queryParams || ''}`;
+        headingTextResults = `Results for search matches for ${queryParams || ''}`;
     }
 
     return (

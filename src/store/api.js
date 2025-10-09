@@ -95,7 +95,6 @@ export function query(parameters, abort, path = 'query') {
     const payload = {
         ...parameters
     };
-
     return fetchOrRelogin(`${federation}/fanout`, {
         method: 'post',
         signal: abort,

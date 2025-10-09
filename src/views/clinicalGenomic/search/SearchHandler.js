@@ -6,8 +6,11 @@ import { trackPromise } from 'react-promise-tracker';
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederation, query, fetchFederatedSubServices } from 'store/api';
 
+// NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
+// However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
 /* eslint-disable react-hooks/exhaustive-deps */
 
+// This handles transforming queries in the SearchResultsContext to actual search queries
 function SearchHandler({ setLoading }) {
     const reader = useSearchQueryReaderContext();
     const writer = useSearchResultsWriterContext();
@@ -23,6 +26,7 @@ function SearchHandler({ setLoading }) {
                 .then((data) => writer((old) => ({ ...old, sidebar: data })))
                 .then(() => fetchFederatedSubServices('v3/discovery/overview/patients_per_program'))
                 .then((data) => writer((old) => ({ ...old, federation: data })))
+                // NB: fetch instead of fetchWithRelogin because Katsu is misbehaving
                 .then(() => fetchFederation('v3/authorized/programs', 'katsu', {}, fetch))
                 .then((data) => writer((old) => ({ ...old, programs: data })))
                 .then(() => fetch('/genomics/htsget/v1/genes'))
@@ -61,9 +65,9 @@ function SearchHandler({ setLoading }) {
         if ('page' in queryNoPageSize) delete queryNoPageSize.page;
         if ('page_size' in queryNoPageSize) delete queryNoPageSize.page_size;
 
-        // **Add genomicDataTypes if it exists**
-        if (reader.query?.genomicDataTypes) {
-            queryNoPageSize.genomicDataTypes = reader.query.genomicDataTypes;
+        // **Add genomic_data_types if it exists**
+        if (reader.query?.genomic_data_types) {
+            queryNoPageSize.genomic_data_types = reader.query.genomic_data_types;
         }
 
         setLoading(true);
@@ -87,6 +91,7 @@ function SearchHandler({ setLoading }) {
                     writer((old) => ({ ...old, counts: discoveryCounts }));
                 })
                 .catch((error) => {
+                    // Ignore abort errors
                     if (error !== 'New request started') {
                         console.log(error.message);
                     }
@@ -103,6 +108,7 @@ function SearchHandler({ setLoading }) {
 
     // Query 3: when the search query changes, re-query the server
     useEffect(() => {
+        // First, we abort any currently-running search promises
         clinicalFetchAbort.current.abort('New request started');
         const newAbort = new AbortController();
 
@@ -112,15 +118,14 @@ function SearchHandler({ setLoading }) {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
                     }
+                    // Reorder the data, and fill out the patients per program
                     const clinicalData = {};
                     data.forEach((site) => {
                         if ('results' in site) clinicalData[site.location.name] = site?.results;
                     });
-                    console.log(data);
                     const genomicData = data
                         .map((site) =>
                             site?.results?.genomic?.map((caseData) => {
-                                console.log('Case Data before location:', caseData);
                                 caseData.location = site.location;
                                 return caseData;
                             })
@@ -130,6 +135,7 @@ function SearchHandler({ setLoading }) {
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
                 })
                 .catch((error) => {
+                    // Ignore abort errors
                     if (error !== 'New request started') console.log(error.message);
                 })
                 .finally(() => setLoading(false));
@@ -158,7 +164,8 @@ function SearchHandler({ setLoading }) {
             'donor'
         );
     }, [JSON.stringify(reader.donorID)]);
-
+    // We don't really implement a graphical component
+    // NB: This might be a good reason to have this be a function call instead of what it currently is.
     return null;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
