@@ -131,7 +131,7 @@ function MatchingPatientsView() {
         () => (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.trim().length > 0,
         [query]
     );
-    const queryParams = query?.gene || query?.chrom || query?.genomic;
+
     // Column definitions
     const clinicalFields = [
         ['location', 'Location', 75],
@@ -231,7 +231,7 @@ function MatchingPatientsView() {
     } else if (!hasValidQuery) {
         headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
     } else {
-        headingTextResults = `Results for search matches for ${queryParams || ''}`;
+        headingTextResults = `Clinical and Genomic results`;
     }
 
     return (
