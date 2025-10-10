@@ -489,9 +489,7 @@ function GenomicsGroup(props) {
                     onWrite={writerContext}
                     groupName="genomic_data_types"
                     isFilterList
-                    checked={Object.fromEntries(
-                        Object.entries(selectedGenomicDataTypes).filter(([_, isChecked]) => isChecked)
-                    )}
+                    checked={Object.fromEntries(Object.entries(selectedGenomicDataTypes).filter(([_, isChecked]) => isChecked))}
                     setChecked={setGenomicDataTypes}
                 />
             </SidebarGroup>
