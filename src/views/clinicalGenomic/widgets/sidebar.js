@@ -489,7 +489,9 @@ function GenomicsGroup(props) {
                     onWrite={writerContext}
                     groupName="genomic_data_types"
                     isFilterList
-                    checked={selectedGenomicDataTypes}
+                    checked={Object.fromEntries(
+                        Object.entries(selectedGenomicDataTypes).filter(([_, isChecked]) => isChecked)
+                    )}
                     setChecked={setGenomicDataTypes}
                 />
             </SidebarGroup>
@@ -525,9 +527,9 @@ function Sidebar() {
     const [startPos, setStartPos] = useState('0');
     const [endPos, setEndPos] = useState('0');
     const [selectedGenomicDataTypes, setGenomicDataTypes] = useState({
-        Variants: true,
-        'Transcriptomes (WTS)': true,
-        'Reads (WGS)': true
+        Variants: false,
+        'Transcriptomes (WTS)': false,
+        'Reads (WGS)': false
     });
 
     // Clinical Data
