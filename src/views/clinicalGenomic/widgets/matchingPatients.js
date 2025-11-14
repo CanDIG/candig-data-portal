@@ -114,6 +114,10 @@ function MatchingPatientsView() {
 
     // Patient Info Page click handler
     const handleRowClick = (row) => {
+        if (!row?.submitter_donor_id) {
+            console.warn('Row data not loaded yet:', row);
+            return;
+        }
         const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
         window.open(url, '_blank');
     };
@@ -256,7 +260,8 @@ function MatchingPatientsView() {
             </Box>
             <div style={{ height: 680, width: '100%' }}>
                 <DataGrid
-                    getRowId={(row) => row.submitter_donor_id + (row.submitter_sample_id || '')}
+                    getRowId={(row) => `${row.submitter_donor_id}_${row.submitter_sample_id || ''}`}
+                    key={rows.length}
                     rows={rows}
                     columns={columns}
                     rowCount={totalRows}
