@@ -114,16 +114,7 @@ function MatchingPatientsView() {
 
     // Patient Info Page click handler
     const handleRowClick = (row) => {
-        // Find all rows for the same donor
-        const donorSamples = rows
-            .filter((r) => r.submitter_donor_id === row.submitter_donor_id)
-            .map((r) => r.submitter_sample_id)
-            .filter(Boolean); // remove null/undefined
-
-        // Join sample IDs into a comma-separated
-        const allSamples = donorSamples.join('|');
-        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleIds=${allSamples}`;
-        
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
         window.open(url, '_blank');
     };
 
