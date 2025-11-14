@@ -252,12 +252,11 @@ function MatchingPatientsView() {
                     getRowId={(row) => row.submitter_donor_id + (row.submitter_sample_id || '')}
                     rows={rows}
                     columns={columns}
-                    rowCount={rows.length}
                     pageSizeOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
                     paginationModel={paginationModel}
                     onPaginationModelChange={HandlePageChange}
-                    paginationMode="server"
+                    paginationMode="client"
                     hideFooterSelectedRowCount
                 />
             </div>
