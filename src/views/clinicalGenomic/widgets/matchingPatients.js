@@ -206,13 +206,11 @@ function MatchingPatientsView() {
     // Pagination
     const HandlePageChange = (newModel) => {
         if (newModel.page !== query.page) {
-            writerContext((old) => {
-                console.log('Old state in writerContext:', old);
-                return {
+            writerContext((old) => ({
                 ...old,
                 query: { ...old.query, page: newModel.page, page_size: newModel.pageSize },
                 reqNum: old.reqNum + 1
-            }});
+            }));
         }
     };
 
@@ -240,8 +238,6 @@ function MatchingPatientsView() {
               .reduce((partial, a) => partial + a, 0)
         : 0;
 
-    console.log('searchResultsClinical', searchResultsClinical);
-    console.log('rows', rows);
     return (
         <Box
             mr={1}
