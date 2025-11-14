@@ -208,6 +208,8 @@ function StyledCheckboxList(props) {
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else {
@@ -591,6 +593,8 @@ function Sidebar() {
                 delete retVal.query.gene;
                 delete retVal.query.assembly;
                 delete retVal.query.genomic_data_types;
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else if (readerContext.clear === 'treatment') {
