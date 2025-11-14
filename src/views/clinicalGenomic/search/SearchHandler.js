@@ -134,7 +134,7 @@ function SearchHandler({ setLoading }) {
                             })
                         )
                         .flat(1);
-                    console.log('Genomic Data:', genomicData);
+                    // console.log('Genomic Data:', genomicData);
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
                 })
                 .catch((error) => {
