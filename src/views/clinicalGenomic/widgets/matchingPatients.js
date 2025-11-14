@@ -114,7 +114,16 @@ function MatchingPatientsView() {
 
     // Patient Info Page click handler
     const handleRowClick = (row) => {
-        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
+        // Find all rows for the same donor
+        const donorSamples = rows
+            .filter((r) => r.submitter_donor_id === row.submitter_donor_id)
+            .map((r) => r.submitter_sample_id)
+            .filter(Boolean); // remove null/undefined
+
+        // Join sample IDs into a comma-separated
+        const allSamples = donorSamples.join('|');
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleIds=${allSamples}`;
+        
         window.open(url, '_blank');
     };
 
@@ -231,6 +240,13 @@ function MatchingPatientsView() {
         headingTextResults = `Clinical and Genomic results`;
     }
 
+    const totalRows = searchResultsClinical
+        ? Object.values(searchResultsClinical)
+              ?.filter((location) => typeof location !== 'undefined')
+              ?.map((site) => site.count)
+              .reduce((partial, a) => partial + a, 0)
+        : 0;
+
     return (
         <Box
             mr={1}
@@ -252,6 +268,7 @@ function MatchingPatientsView() {
                     getRowId={(row) => row.submitter_donor_id + (row.submitter_sample_id || '')}
                     rows={rows}
                     columns={columns}
+                    rowCount={totalRows}
                     pageSizeOptions={[10]}
                     onRowClick={(rowData) => handleRowClick(rowData.row)}
                     paginationModel={paginationModel}
