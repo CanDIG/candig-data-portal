@@ -5,6 +5,7 @@ import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
 import { fetchFederation, query, fetchFederatedSubServices } from 'store/api';
+import { isCensored } from 'utils/utils';
 
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -50,8 +51,10 @@ function SearchHandler({ setLoading }) {
                 if (!thisStat) return;
 
                 Object.keys(thisStat).forEach((key) => {
-                    if (key in summaryStat) {
-                        summaryStat[key] += thisStat[key];
+                    if (key in summaryStat && !isCensored(summaryStat[key])) {
+                        if (!isCensored(thisStat[key])) {
+                            summaryStat[key] += thisStat[key];
+                        }
                     } else {
                         summaryStat[key] = thisStat[key];
                     }
@@ -131,7 +134,7 @@ function SearchHandler({ setLoading }) {
                             })
                         )
                         .flat(1);
-                    console.log('Genomic Data:', genomicData);
+                    // console.log('Genomic Data:', genomicData);
                     writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
                 })
                 .catch((error) => {

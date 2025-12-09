@@ -208,6 +208,8 @@ function StyledCheckboxList(props) {
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else {
@@ -227,8 +229,11 @@ function StyledCheckboxList(props) {
 
                     if (groupName === 'node') {
                         const currentPrograms = { ...selectedPrograms };
+                        const programIds = sites
+                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
+                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
                         Object.keys(selectedPrograms).forEach((id) => {
-                            if (currentPrograms[id]) {
+                            if (currentPrograms[id] && !programIds.includes(id)) {
                                 delete currentPrograms[id];
                             }
                         });
@@ -588,6 +593,8 @@ function Sidebar() {
                 delete retVal.query.gene;
                 delete retVal.query.assembly;
                 delete retVal.query.genomic_data_types;
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else if (readerContext.clear === 'treatment') {
