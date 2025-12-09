@@ -70,11 +70,10 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
  * @param {string} [service='query'] - The service handling the request (default: 'query')
  * @returns {Promise<Object|string>} A promise that resolves to the response data or 'error' if the request fails
  */
-export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'discovery', service = 'query', params= null) {
+export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'discovery', service = 'query') {
     const payload = {
         targetService,
-        targetPath,
-        ...(params ? {params} : {})
+        targetPath
     };
 
     return fetchFederation(endpoint, service, payload)

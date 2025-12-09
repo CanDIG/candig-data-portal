@@ -9,7 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
-import { fetchFederatedSubServices } from 'store/api';
+import { query } from 'store/api';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -39,8 +39,12 @@ function ClinicalPatientView() {
     const [submitterDonorId, setSubmitterDonorId] = useState('');
     const [genomicRows, setGenomicRows] = useState([]);
     const [genomicColumns] = useState([
+        { field: 'program_id', headerName: 'Program ID', flex: 1 },
+        { field: 'submitter_sample_id', headerName: 'Sample ID', flex: 1 },
         { field: 'experiment_id', headerName: 'Experiment ID', flex: 1 },
+        { field: 'variant_count', headerName: 'Variant Count', flex: 1 },
         { field: 'genomes', headerName: 'Genomes', flex: 1 },
+        { field: 'tumour_normal_designation', headerName: 'Tumour/Normal Designation', flex: 1, minWidth: 250 },
         { field: 'variants', headerName: 'Variants', flex: 1 },
         { field: 'reads', headerName: 'Reads', flex: 1 },
         { field: 'transcriptomes', headerName: 'Transcriptomes', flex: 1 }
@@ -78,22 +82,35 @@ function ClinicalPatientView() {
         setLocation(initiallocation || '');
         setSubmitterDonorId(submitterDonorId || '');
 
-        fetchFederatedSubServices('', 'htsget', 'genomicsPatientInfoPage', 'query', submitterDonorId).then((response) => {
-            console.log('Fetched genomics for single patient:', response);
-            const flattenedRows = response.flatMap((site, siteIndex) =>
-                (site.results || []).map((result, idx) => ({
-                    id: `${siteIndex}-${idx}`,
-                    submitter_sample_id: result.submitter_sample_id,
-                    experiment_id: result.experiment_id,
-                    genomes: result.genomes.join(', '),
-                    variants: result.variants.join(', '),
-                    reads: result.reads.length,
-                    transcriptomes: result.transcriptomes.length
-                }))
-            );
+        if (!submitterDonorId) return;
 
+        query({
+            donors: submitterDonorId,
+            genomic_data_types: 'any',
+        }).then((response) => {
+            let allGenomics = [];
+
+            response.forEach((siteResponse) => {
+                if (siteResponse?.results?.genomic) {
+                    allGenomics = allGenomics.concat(siteResponse.results.genomic);
+                }
+            });
+
+            const flattenedRows = allGenomics.map((row, idx) => ({
+                id: idx,
+                submitter_sample_id: row.submitter_sample_id,
+                program_id: row.program_id,
+                variant_count: row.variants_count || 0,
+                tumour_normal_designation: row.tumour_normal_designation || 'NA',
+                experiment_id: row.genomes.join(', ') || 'NA',
+                genomes: row.genomes.join(', ') || 'NA',
+                variants: row.variants.join(', ') || 'NA',
+                reads: row.reads.join(', ') || 'NA',
+                transcriptomes: row.transcriptomes.join(', ') || 'NA',
+            }));
             setGenomicRows(flattenedRows);
-        }, []);
+
+        });
     }, []);
 
     return (
@@ -144,7 +161,7 @@ function ClinicalPatientView() {
 
                     <div style={{ width: '100%' }}>
                         <DataGrid
-                            sx={{ minHeight: '25vh' }}
+                            sx={{ minHeight: '20vh', marginBottom: '2em' }}
                             rows={genomicRows}
                             columns={genomicColumns}
                             pageSize={5}
