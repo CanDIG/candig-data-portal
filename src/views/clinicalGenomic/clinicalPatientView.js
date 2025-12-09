@@ -9,6 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
+import { fetchFederatedSubServices } from 'store/api';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -35,6 +36,16 @@ function ClinicalPatientView() {
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
     const [location, setLocation] = useState('');
+    const [submitterDonorId, setSubmitterDonorId] = useState('');
+    const [genomicRows, setGenomicRows] = useState([]);
+    const [genomicColumns] = useState([
+        { field: 'experiment_id', headerName: 'Experiment ID', flex: 1 },
+        { field: 'genomes', headerName: 'Genomes', flex: 1 },
+        { field: 'variants', headerName: 'Variants', flex: 1 },
+        { field: 'reads', headerName: 'Reads', flex: 1 },
+        { field: 'transcriptomes', headerName: 'Transcriptomes', flex: 1 }
+    ]);
+    
     // When the following is changed, the folders of the clinical sidebar should also change (once per change)
     const [forceSelection, setForceSelection] = useState([0, null]);
     const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(
@@ -60,10 +71,29 @@ function ClinicalPatientView() {
         const initialPatientId = urlParams.get('patientId');
         const intitalProgramId = urlParams.get('programId');
         const initiallocation = urlParams.get('location');
+        const submitterDonorId= urlParams.get('submitterDonorId');
 
         setPatientId(initialPatientId || '');
         setProgramId(intitalProgramId || '');
         setLocation(initiallocation || '');
+        setSubmitterDonorId(submitterDonorId || '');
+
+        fetchFederatedSubServices('', 'htsget', 'genomicsPatientInfoPage', 'query', submitterDonorId).then((response) => {
+            console.log('Fetched genomics for single patient:', response);
+            const flattenedRows = response.flatMap((site, siteIndex) =>
+                (site.results || []).map((result, idx) => ({
+                    id: `${siteIndex}-${idx}`,
+                    submitter_sample_id: result.submitter_sample_id,
+                    experiment_id: result.experiment_id,
+                    genomes: result.genomes.join(', '),
+                    variants: result.variants.join(', '),
+                    reads: result.reads.length,
+                    transcriptomes: result.transcriptomes.length
+                }))
+            );
+
+            setGenomicRows(flattenedRows);
+        }, []);
     }, []);
 
     return (
@@ -106,6 +136,24 @@ function ClinicalPatientView() {
                     hideFooterSelectedRowCount
                 />
             </div>
+            {genomicRows.length > 0 && (
+                <>
+                    <Typography pb={1} variant="h5" sx={{ mt: 3 }}>
+                        Genomic Data
+                    </Typography>
+
+                    <div style={{ width: '100%' }}>
+                        <DataGrid
+                            sx={{ minHeight: '25vh' }}
+                            rows={genomicRows}
+                            columns={genomicColumns}
+                            pageSize={5}
+                            rowsPerPageOptions={[5, 10]}
+                            disableRowSelectionOnClick
+                        />
+                    </div>
+                </>
+            )}
             {dateOfBirth && (
                 <TimelineContainer>
                     <Timeline data={data} onEventClick={handleEventClick} />
