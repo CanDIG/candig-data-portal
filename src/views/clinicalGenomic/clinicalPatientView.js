@@ -36,7 +36,6 @@ function ClinicalPatientView() {
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
     const [location, setLocation] = useState('');
-    const [submitterDonorId, setSubmitterDonorId] = useState('');
     const [genomicRows, setGenomicRows] = useState([]);
     const [genomicColumns] = useState([
         { field: 'program_id', headerName: 'Program ID', flex: 1 },
@@ -76,26 +75,22 @@ function ClinicalPatientView() {
         const intitalProgramId = urlParams.get('programId');
         const initiallocation = urlParams.get('location');
         const submitterDonorId= urlParams.get('submitterDonorId');
-
         setPatientId(initialPatientId || '');
         setProgramId(intitalProgramId || '');
         setLocation(initiallocation || '');
-        setSubmitterDonorId(submitterDonorId || '');
 
         if (!submitterDonorId) return;
 
         query({
             donors: submitterDonorId,
-            genomic_data_types: 'any',
+            genomic_data_types: 'any'
         }).then((response) => {
             let allGenomics = [];
-
             response.forEach((siteResponse) => {
                 if (siteResponse?.results?.genomic) {
                     allGenomics = allGenomics.concat(siteResponse.results.genomic);
                 }
             });
-
             const flattenedRows = allGenomics.map((row, idx) => ({
                 id: idx,
                 submitter_sample_id: row.submitter_sample_id,
@@ -106,10 +101,9 @@ function ClinicalPatientView() {
                 genomes: row.genomes.join(', ') || 'NA',
                 variants: row.variants.join(', ') || 'NA',
                 reads: row.reads.join(', ') || 'NA',
-                transcriptomes: row.transcriptomes.join(', ') || 'NA',
+                transcriptomes: row.transcriptomes.join(', ') || 'NA'
             }));
             setGenomicRows(flattenedRows);
-
         });
     }, []);
 
