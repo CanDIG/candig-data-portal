@@ -48,7 +48,6 @@ function ClinicalPatientView() {
         { field: 'reads', headerName: 'Reads', flex: 1 },
         { field: 'transcriptomes', headerName: 'Transcriptomes', flex: 1 }
     ]);
-    
     // When the following is changed, the folders of the clinical sidebar should also change (once per change)
     const [forceSelection, setForceSelection] = useState([0, null]);
     const { data, rows, columns, title, topLevel, setRows, setColumns, setTitle } = useClinicalPatientData(
@@ -74,7 +73,7 @@ function ClinicalPatientView() {
         const initialPatientId = urlParams.get('patientId');
         const intitalProgramId = urlParams.get('programId');
         const initiallocation = urlParams.get('location');
-        const submitterDonorId= urlParams.get('submitterDonorId');
+        const submitterDonorId = urlParams.get('submitterDonorId');
         setPatientId(initialPatientId || '');
         setProgramId(intitalProgramId || '');
         setLocation(initiallocation || '');
