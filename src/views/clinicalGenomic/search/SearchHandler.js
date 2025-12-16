@@ -4,14 +4,34 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederation, query, fetchFederatedSubServices } from 'store/api';
+import { fetchFederation, queryBeacon, fetchBeaconFilteringTerms } from 'store/api';
 import { isCensored } from 'utils/utils';
 
+// The old function to collate summary statistics from multiple sites together
+// Needs to be reworked to the new beacon format
+const CollateSummary = (data, statName) => {
+    const summaryStat = {};
+    data.forEach((site) => {
+        const thisStat = site?.results?.[statName];
+        if (!thisStat) return;
+
+        Object.keys(thisStat).forEach((key) => {
+            if (key in summaryStat && !isCensored(summaryStat[key])) {
+                if (!isCensored(thisStat[key])) {
+                    summaryStat[key] += thisStat[key];
+                }
+            } else {
+                summaryStat[key] = thisStat[key];
+            }
+        });
+    });
+    return summaryStat;
+};
+
+// This handles transforming queries in the SearchResultsContext to actual search queries
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
 /* eslint-disable react-hooks/exhaustive-deps */
-
-// This handles transforming queries in the SearchResultsContext to actual search queries
 function SearchHandler({ setLoading }) {
     const reader = useSearchQueryReaderContext();
     const writer = useSearchResultsWriterContext();
@@ -23,7 +43,9 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         lastPromise = trackPromise(
-            fetchFederatedSubServices(`v3/discovery/sidebar_list`)
+            fetchBeaconFilteringTerms().then((data) => writer((old) => ({ ...old, filters: data }))),
+            'federation'
+            /* fetchFederatedSubServices(`v3/discovery/sidebar_list`)
                 .then((data) => writer((old) => ({ ...old, sidebar: data })))
                 .then(() => fetchFederatedSubServices('v3/discovery/overview/patients_per_program'))
                 .then((data) => writer((old) => ({ ...old, federation: data })))
@@ -33,40 +55,15 @@ function SearchHandler({ setLoading }) {
                 .then(() => fetch('/genomics/htsget/v1/genes'))
                 .then((response) => (response.ok ? response.json() : console.log(response)))
                 .then((data) => writer((old) => ({ ...old, genes: data?.results })))
-                .finally(() => setLoading(false)),
-            'federation'
+                .finally(() => setLoading(false)), */
         );
     }, []);
 
-    // Query 2: when the search query changes (but not the page number), re-query the discovery stats
+    /* // Query 2: when the search query changes including just the page number, re-query
     useEffect(() => {
         // First, abort any currently-running search promises
         summaryFetchAbort.current.abort('New request started');
         const newAbort = new AbortController();
-
-        const CollateSummary = (data, statName) => {
-            const summaryStat = {};
-            data.forEach((site) => {
-                const thisStat = site?.results?.[statName];
-                if (!thisStat) return;
-
-                Object.keys(thisStat).forEach((key) => {
-                    if (key in summaryStat && !isCensored(summaryStat[key])) {
-                        if (!isCensored(thisStat[key])) {
-                            summaryStat[key] += thisStat[key];
-                        }
-                    } else {
-                        summaryStat[key] = thisStat[key];
-                    }
-                });
-            });
-            return summaryStat;
-        };
-
-        // Prepare query excluding pagination
-        const { ...queryNoPageSize } = reader.query || {};
-        if ('page' in queryNoPageSize) delete queryNoPageSize.page;
-        if ('page_size' in queryNoPageSize) delete queryNoPageSize.page_size;
 
         // **Add genomic_data_types if it exists**
         if (reader.query?.genomic_data_types) {
@@ -74,8 +71,8 @@ function SearchHandler({ setLoading }) {
         }
 
         setLoading(true);
-        const discoveryPromise = () =>
-            query(queryNoPageSize, newAbort.signal, 'discovery/query')
+        const discoveryPromise = () => new Promise(() => {});
+        query(queryNoPageSize, newAbort.signal, 'discovery/query')
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
@@ -107,7 +104,7 @@ function SearchHandler({ setLoading }) {
         }
 
         summaryFetchAbort.current = newAbort;
-    }, [reader.reqNum]);
+    }, [reader.reqNum]); */
 
     // Query 3: when the search query changes, re-query the server
     useEffect(() => {
@@ -116,26 +113,9 @@ function SearchHandler({ setLoading }) {
         const newAbort = new AbortController();
 
         const donorQueryPromise = () =>
-            query(reader.query, newAbort.signal)
+            queryBeacon(reader.query, newAbort.signal)
                 .then((data) => {
-                    if (reader.filter?.node) {
-                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
-                    }
-                    // Reorder the data, and fill out the patients per program
-                    const clinicalData = {};
-                    data.forEach((site) => {
-                        if ('results' in site) clinicalData[site.location.name] = site?.results;
-                    });
-                    const genomicData = data
-                        .map((site) =>
-                            site?.results?.genomic?.map((caseData) => {
-                                caseData.location = site.location;
-                                return caseData;
-                            })
-                        )
-                        .flat(1);
-                    // console.log('Genomic Data:', genomicData);
-                    writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+                    console.log(data);
                 })
                 .catch((error) => {
                     // Ignore abort errors
@@ -143,6 +123,28 @@ function SearchHandler({ setLoading }) {
                 })
                 .finally(() => setLoading(false));
 
+        /* Old code:
+            query(reader.query, newAbort.signal)
+            .then((data) => {
+                if (reader.filter?.node) {
+                    data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                }
+                // Reorder the data, and fill out the patients per program
+                const clinicalData = {};
+                data.forEach((site) => {
+                    if ('results' in site) clinicalData[site.location.name] = site?.results;
+                });
+                const genomicData = data
+                    .map((site) =>
+                        site?.results?.genomic?.map((caseData) => {
+                            caseData.location = site.location;
+                            return caseData;
+                        })
+                    )
+                    .flat(1);
+                // console.log('Genomic Data:', genomicData);
+                writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+            }) */
         if (lastPromise === null) {
             lastPromise = donorQueryPromise();
         } else {
@@ -157,7 +159,7 @@ function SearchHandler({ setLoading }) {
         if (!reader.donorID || !reader.program) return;
         setLoading(true);
 
-        const url = `v3/authorized/donor_with_clinical_data/program/${reader.program}/donor/${reader.donorID}`;
+        /* const url = `v3/authorized/donor_with_clinical_data/program/${reader.program}/donor/${reader.donorID}`;
         trackPromise(
             fetchFederation(url, 'katsu')
                 .then((data) => {
@@ -165,7 +167,7 @@ function SearchHandler({ setLoading }) {
                 })
                 .finally(() => setLoading(false)),
             'donor'
-        );
+        ); */
     }, [JSON.stringify(reader.donorID)]);
     // We don't really implement a graphical component
     // NB: This might be a good reason to have this be a function call instead of what it currently is.

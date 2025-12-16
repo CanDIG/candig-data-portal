@@ -1,5 +1,5 @@
 import clinicalGenomicSearch from './clinicalGenomicSearch';
-import summary from './summary';
+// import summary from './summary';
 import completenessStats from './completenessStats';
 // import ingest from './ingest';
 
@@ -10,7 +10,7 @@ import completenessStats from './completenessStats';
 // ===========================|| MENU ITEMS ||=========================== //
 
 const menuItems = {
-    items: [summary, clinicalGenomicSearch, completenessStats /* , ingest, pages, utilities, other */]
+    items: [clinicalGenomicSearch, completenessStats /* summary, ingest, pages, utilities, other */]
 };
 
 export default menuItems;

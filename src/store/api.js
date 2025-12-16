@@ -38,16 +38,21 @@ export function fetchOrRelogin(...args) {
 /*
 Generic querying for federation
 */
-export function fetchFederation(path, service, payload = {}, fetchMethod = fetchOrRelogin) {
+export function fetchFederation(path, service, abort = null, payload = {}, fetchMethod = fetchOrRelogin, method = 'GET') {
+    const requestbody = {
+        method,
+        path,
+        payload: payload || {},
+        service
+    };
+    if (abort != null) {
+        requestbody.signal = abort;
+    }
+
     return fetchMethod(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            method: 'GET',
-            path,
-            payload: payload || {},
-            service
-        })
+        body: JSON.stringify(requestbody)
     })
         .then((response) => {
             if (response.ok) {
@@ -227,4 +232,64 @@ export function fetchRefreshToken() {
             console.log('Error:', error);
             return error;
         });
+}
+
+/*
+ * CanDIG-API filtering_terms:
+ */
+export function fetchBeaconFilteringTerms() {
+    return fetchFederation('v1/beacon/datasets/filtering_terms', 'candig-api').then((data) => {
+        // We need to merge the results from each response
+        const allTerms = new Set();
+        data.forEach((site) => {
+            site?.results?.response?.filteringTerms?.forEach((item) => allTerms.add(item.id));
+        });
+        return allTerms;
+    });
+}
+
+// params.filters should be a list of objects
+// e.g. [{ "id": "SNOMED:33821000087103" }]
+export function queryBeacon(params, abort) {
+    // Transform the parameters into something that it'll understand
+    const params_filters = [];
+    // Grab out the page and page number
+    const page = params?.page;
+    const page_size = params?.page_size;
+
+    const NON_FILTER_PARAMS = ['page', 'page_size'];
+    const NON_ID_FILTERS = [];
+
+    if (typeof params !== 'undefined' && params !== null) {
+        Object.keys(params).forEach((param) => {
+            if (NON_FILTER_PARAMS.includes(param)) {
+                return;
+            }
+
+            const new_param = {};
+
+            if (!NON_ID_FILTERS.includes(param)) {
+                new_param.id = params[param];
+                // } else {
+                // Non-ID filters need to be applied as well -- how should I approach this?
+            }
+            params_filters.push(new_param);
+        });
+    }
+
+    // Construct the payload
+    const payload = {
+        meta: { apiVersion: 'v2.0.0' },
+        query: {
+            requestedGranularity: 'record',
+            filters: params_filters, // [{ "id": "SNOMED:33821000087103" }]
+            pagination: {
+                page,
+                pageSize: page_size
+                // "skip": ?
+            }
+        }
+    };
+
+    return fetchFederation('v1/beacon/persons', 'candig-api', abort, payload, fetchOrRelogin, 'POST');
 }
