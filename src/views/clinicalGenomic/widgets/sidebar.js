@@ -277,7 +277,7 @@ function StyledCheckboxList(props) {
             options={options}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
-                <li {...props} key={option} >
+                <li {...props} key={option}>
                     <div
                         style={{
                             display: 'flex',
@@ -306,21 +306,19 @@ function StyledCheckboxList(props) {
                             }}
                         >
                             {option}
-                            {groupName === 'exclude_programs' &&
-                                authorizedPrograms &&
-                                !authorizedPrograms.includes(option) && (
-                                    <Tooltip title="Unauthorized Program" placement="right">
-                                        <LockOutlinedIcon
-                                            sx={{
-                                                color: 'primary.main',
-                                                fontSize: '1.1rem',
-                                                verticalAlign: 'text-bottom',
-                                                position: 'relative',
-                                                top: '3px'
-                                            }}
-                                        />
-                                    </Tooltip>
-                                )}
+                            {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                <Tooltip title="Unauthorized Program" placement="right">
+                                    <LockOutlinedIcon
+                                        sx={{
+                                            color: 'primary.main',
+                                            fontSize: '1.1rem',
+                                            verticalAlign: 'text-bottom',
+                                            position: 'relative',
+                                            top: '3px'
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
                         </span>
                     </div>
                 </li>
@@ -763,7 +761,7 @@ function Sidebar() {
                     authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
                     groupName="exclude_programs"
-                    useAutoComplete={programs.length >= 2}
+                    useAutoComplete={programs.length >= 5}
                     isExclusion
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
