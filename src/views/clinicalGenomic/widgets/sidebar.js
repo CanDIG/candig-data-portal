@@ -76,7 +76,9 @@ const Root = styled('div')(({ theme }) => ({
     [`& .${classes.lockContainer}`]: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'flex-start',
+        gap: '4px',
+        width: '100%'
     }
 }));
 
@@ -275,15 +277,52 @@ function StyledCheckboxList(props) {
             options={options}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
-                <li {...props} key={option}>
-                    <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={isExclusion ? !selected : selected}
-                        value={option}
-                    />
-                    {option}
+                <li {...props} key={option} >
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            sx={{
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                marginRight: 1
+                            }}
+                            checked={isExclusion ? !selected : selected}
+                            value={option}
+                        />
+
+                        <span
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'baseline',
+                                gap: '4px',
+                                lineHeight: 1.2
+                            }}
+                        >
+                            {option}
+                            {groupName === 'exclude_programs' &&
+                                authorizedPrograms &&
+                                !authorizedPrograms.includes(option) && (
+                                    <Tooltip title="Unauthorized Program" placement="right">
+                                        <LockOutlinedIcon
+                                            sx={{
+                                                color: 'primary.main',
+                                                fontSize: '1.1rem',
+                                                verticalAlign: 'text-bottom',
+                                                position: 'relative',
+                                                top: '3px'
+                                            }}
+                                        />
+                                    </Tooltip>
+                                )}
+                        </span>
+                    </div>
                 </li>
             )}
             renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
@@ -724,7 +763,7 @@ function Sidebar() {
                     authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
                     groupName="exclude_programs"
-                    useAutoComplete={programs.length >= 5}
+                    useAutoComplete={programs.length >= 2}
                     isExclusion
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
