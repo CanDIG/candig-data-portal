@@ -147,15 +147,18 @@ function Footer(props) {
 
     function copyEmail(email) {
         try {
-            if (navigator.clipboard) {
-                navigator.clipboard
-                    .writeText(email)
+            if (!navigator.clipboard) {
+                const copyFn = navigator.clipboard?.writeText
+                    ? () => navigator.clipboard.writeText(email)
+                    : () => fallbackCopyTextToClipboard(email);
+
+                copyFn()
                     .then(() => {
-                        handleTooltipOpen();
+                        setOpen(false);
+                        setTimeout(() => setOpen(true), 10);
+                        setTimeout(() => setOpen(false), 2000);
                     })
-                    .catch(() => {
-                        fallbackCopyTextToClipboard(email);
-                    });
+                    .catch(() => fallbackCopyTextToClipboard(email));
             } else {
                 fallbackCopyTextToClipboard(email);
             }
@@ -222,34 +225,30 @@ function Footer(props) {
                             onClick={() => copyEmail('info@distributedgenomics.ca')}
                             onMouseOver={() => {
                                 document.body.style.cursor = 'pointer';
-                                return null;
                             }}
                             onMouseOut={() => {
                                 document.body.style.cursor = 'default';
-                                return null;
                             }}
                         >
                             <Tooltip
                                 title="Email Copied!"
                                 placement="right"
                                 style={{ ...linkFrame, cursor: 'pointer' }}
-                                PopperProps={{
-                                    disablePortal: true
-                                }}
-                                onClose={handleTooltipClose}
+                                PopperProps={{ disablePortal: true }}
                                 open={open}
+                                onClose={handleTooltipClose}
                                 disableFocusListener
                                 disableHoverListener
                                 disableTouchListener
                             >
-                                <>
+                                <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                     <IconMail
                                         stroke={1.5}
                                         size="1.3rem"
                                         style={{ color: theme.palette.primary.main, marginRight: '0.5em' }}
                                     />
                                     <span style={linkText}>info@distributedgenomics.ca</span>
-                                </>
+                                </Box>
                             </Tooltip>
                         </ButtonBase>
                     </HelpContainer>
