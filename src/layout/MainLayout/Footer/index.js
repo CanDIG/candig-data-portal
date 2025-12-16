@@ -158,9 +158,9 @@ function Footer(props) {
                         setTimeout(() => setOpen(true), 10);
                         setTimeout(() => setOpen(false), 2000);
                     })
-                    .catch(() => fallbackCopyTextToClipboard(email));
-            } else {
-                fallbackCopyTextToClipboard(email);
+                    .catch(() => {
+                        fallbackCopyTextToClipboard(email);
+                    });
             }
         } catch (err) {
             console.error('Error copying email:', err);
