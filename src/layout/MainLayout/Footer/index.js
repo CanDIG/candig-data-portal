@@ -233,7 +233,6 @@ function Footer(props) {
                             <Tooltip
                                 title="Email Copied!"
                                 placement="right"
-                                style={{ ...linkFrame, cursor: 'pointer' }}
                                 PopperProps={{ disablePortal: true }}
                                 open={open}
                                 onClose={handleTooltipClose}
