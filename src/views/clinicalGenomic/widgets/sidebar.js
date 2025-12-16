@@ -76,9 +76,7 @@ const Root = styled('div')(({ theme }) => ({
     [`& .${classes.lockContainer}`]: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        gap: '4px',
-        width: '100%'
+        justifyContent: 'center'
     }
 }));
 
