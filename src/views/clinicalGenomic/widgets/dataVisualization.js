@@ -28,7 +28,7 @@ const DEFAULT_CHART_DEFINITIONS = [
         trim: false
     },
     {
-        data: 'diagnosis_age_count',
+        data: 'drug_type_count',
         chartType: 'bar',
         trim: false
     },
@@ -75,7 +75,7 @@ function DataVisualization() {
             return newDataObj;
         }
 
-        // Check the clinical results to see if we can fill in any censored data with real ones
+        /* // Check the clinical results to see if we can fill in any censored data with real ones
         Object.entries(clinical).forEach(([siteName, site]) => {
             Object.keys(site.summary?.[dataKey]).forEach((key) => {
                 if (isObject) {
@@ -92,7 +92,7 @@ function DataVisualization() {
 
         if (hasCensoredData) {
             newDataObj[HAS_CENSORED_DATA_MARKER] = true;
-        }
+        } */
         return newDataObj;
     };
 
@@ -109,7 +109,8 @@ function DataVisualization() {
 
     const dataVis = {
         patients_per_program: handleCensoring('patients_per_program', (site, _) => site, true) || {},
-        diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
+        // diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
+        drug_type_count: handleCensoring('drug_type_count') || {},
         treatment_type_count: handleCensoring('treatment_type_count') || {},
         primary_site_count: handleCensoring('primary_site_count') || {}
     };

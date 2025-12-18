@@ -125,6 +125,11 @@ export const DataVisualizationChartInfo = {
         xAxis: 'Age Range',
         yAxis: 'Number of Patients'
     },
+    drug_type_count: {
+        title: 'Drug Exposure Distribution',
+        xAxis: 'Drug Type',
+        yAxis: 'Number of Exposures With Drug'
+    },
     treatment_type_count: {
         title: 'Treatment Type Distribution',
         xAxis: 'Treatment Type',

@@ -28,6 +28,33 @@ const CollateSummary = (data, statName) => {
     return summaryStat;
 };
 
+// Format incoming clinical data from Beacon into a form that the frontend expects
+// Is this actually the best way to go forwards? Or should I just be rewriting the frontend components
+function FormatClinicalData(data) {
+    // data: Object (site) => { exists, resultsCount, resultsHandover, setType, results:
+    // _     [{dataset_id, diseases, ethnicity, id, interventionsOrProcedures, location, measures, sex, treatments}]
+    // }
+    // return format: Object (site) => { count, genomic: [], results:
+    // _     [{cause_of_death, date_alive_after_lost_to_followup, date_of_birth, date_of_death, date_resolution,
+    // _       deceased, gender, is_deceased, location, lost_to_followup_after_clinical_event_identifier,
+    // _       lost_to_followup_reason, program_id, sex_at_birth, submitter_donor_id}]
+    // }
+    const retVal = {
+        count: data.resultsCount,
+        results: data.results.map((donor) => ({
+            program_id: donor.dataset_id,
+            submitter_donor_id: donor.id,
+            sex_at_birth: donor.sex?.label,
+            num_exposures: donor.exposures?.length || 0,
+            num_interventions: donor.interventionsOrProcedures?.length || 0,
+            num_measures: donor.measures?.length || 0,
+            num_treatments: donor.treatments?.length || 0
+        }))
+    };
+
+    return retVal;
+}
+
 // This handles transforming queries in the SearchResultsContext to actual search queries
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -115,7 +142,69 @@ function SearchHandler({ setLoading }) {
         const donorQueryPromise = () =>
             queryBeacon(reader.query, newAbort.signal)
                 .then((data) => {
-                    console.log(data);
+                    if (reader.filter?.node) {
+                        data = data.filter((site) => !reader.filter.node.includes(site.location.name));
+                    }
+
+                    // Reorder the data, and fill out the patients per program
+                    const clinicalData = {};
+                    const DISCOVERY_FIELDS = ['primary_site_count', 'treatment_type_count', 'age_at_diagnosis', 'drug_type_count'];
+                    const discoveryCounts = { patients_per_program: {} }; // Note: patients_per_program handled differently
+                    DISCOVERY_FIELDS.forEach((field) => {
+                        discoveryCounts[field] = {};
+                    });
+
+                    data.forEach((site) => {
+                        if ('results' in site) {
+                            // Grab the clinical data
+                            const resultSets = site?.results?.response?.resultSets;
+                            if (resultSets.length > 1) {
+                                console.warn("More than one result set found, need to figure out what's going on");
+                                clinicalData[site.location.name] = FormatClinicalData(resultSets[0]);
+                            } else if (resultSets.length > 0) {
+                                clinicalData[site.location.name] = FormatClinicalData(resultSets[0]);
+                            }
+
+                            // Grab the discovery data as well
+                            DISCOVERY_FIELDS.forEach((field) => {
+                                if (typeof site?.results?.info?.[field] === 'undefined') {
+                                    return;
+                                }
+
+                                Object.keys(site.results?.info?.[field]).forEach((datum) => {
+                                    if (datum in discoveryCounts[field]) {
+                                        discoveryCounts[field][datum] += site.results.info[field][datum];
+                                    } else {
+                                        discoveryCounts[field][datum] = site.results.info[field][datum];
+                                    }
+                                });
+                            });
+
+                            console.log(clinicalData);
+                            // patients_per_program is added verbatim, instead of being collated together
+                            if (typeof site?.results?.info?.patients_per_program !== 'undefined') {
+                                discoveryCounts.patients_per_program[site.location.name] = site.results.info.patients_per_program;
+                            }
+                        }
+                    });
+                    const genomicData = data
+                        .map((site) =>
+                            site?.results?.genomic?.map((caseData) => {
+                                caseData.location = site.location;
+                                return caseData;
+                            })
+                        )
+                        .flat(1);
+
+                    writer((old) => ({
+                        ...old,
+                        clinical: clinicalData,
+                        genomic: genomicData,
+                        counts: discoveryCounts,
+                        // federation: discoveryCounts.patients_per_program,
+                        loading: false
+                    }));
+                    // console.log(data);
                 })
                 .catch((error) => {
                     // Ignore abort errors
