@@ -69,7 +69,14 @@ function FormatClinicalData(data) {
 // I should instead use the below function to massage incoming data from the Beacon search
 // into a format that the frontend understands
 function FormatFederationData(data) {
-    return data;
+    return data.map((site) => {
+        const newResults = Object.keys(site?.results?.info?.patients_per_program).map((program) => ({
+            patients_count: site?.results?.info?.patients_per_program[program],
+            program_id: program
+        }))
+
+        return { ...site, results: newResults };
+    });
 }
 
 function FormatSidebarData(data) {
@@ -78,7 +85,7 @@ function FormatSidebarData(data) {
             treatment_types: Object.keys(site?.results?.info?.treatment_type_count || {}),
             tumour_primary_sites: Object.keys(site?.results?.info?.primary_site_count || {}),
             drug_names: Object.keys(site?.results?.info?.drug_type_count || {})
-        }
+        };
 
         return { ...site, results: newResults };
     });
@@ -102,11 +109,13 @@ function SearchHandler({ setLoading }) {
             fetchBeaconFilteringTerms()
                 .then((data) => writer((old) => ({ ...old, filters: data })))
                 .then(() => queryBeacon({ page_size: 1 }))
-                .then((data) => writer((old) => ({
-                    ...old,
-                    federation: FormatFederationData(data),
-                    sidebar: FormatSidebarData(data)
-                })))
+                .then((data) =>
+                    writer((old) => ({
+                        ...old,
+                        federation: FormatFederationData(data),
+                        sidebar: FormatSidebarData(data)
+                    }))
+                )
                 .finally(() => setLoading(false)),
             'federation'
             /* fetchFederatedSubServices(`v3/discovery/sidebar_list`)
