@@ -64,7 +64,7 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
                     // Filter patientData to create topLevel data excluding arrays, objects, and empty values
                     const filteredData = filterNestedObject(patientData);
 
-                    if (filteredData?.date_of_birth) {
+                    /* if (filteredData?.date_of_birth) {
                         if (filteredData.date_of_birth.day_interval) {
                             // Logic for 'day' resolution
                             if (filteredData?.date_of_death?.day_interval && filteredData?.date_of_birth?.day_interval) {
@@ -111,7 +111,8 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
                         const remainingMonths = ageInMonths % 12;
                         filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
                         delete filteredData.date_alive_after_lost_to_followup;
-                    }
+                    } */
+                    console.log(filteredData);
 
                     setTopLevel(filteredData);
                     setData(patientData);
@@ -123,7 +124,7 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
                             setColumns={setColumns}
                             setTitle={setTitle}
                             forceSelection={forceSelection}
-                            ageAtFirstDiagnosis={filteredData.age_at_first_diagnosis}
+                            ageAtFirstDiagnosis={filteredData.age_at_diagnosis}
                         />
                     );
                 }

@@ -3,6 +3,7 @@
 export const federation = `${process.env.REACT_APP_FEDERATION_API_SERVER}/v1`;
 export const htsget = process.env.REACT_APP_HTSGET_SERVER;
 export const INGEST_URL = process.env.REACT_APP_INGEST_SERVER;
+export const API_URL = process.env.REACT_APP_API_SERVER;
 
 export function reloginCheck() {
     return fetch('/portal/favicon.ico')
@@ -250,7 +251,7 @@ export function fetchBeaconFilteringTerms() {
 
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
-export function queryBeacon(params, abort) {
+export function queryBeacon(params, abort = null) {
     // Transform the parameters into something that it'll understand
     const params_filters = [];
     // Grab out the page and page number

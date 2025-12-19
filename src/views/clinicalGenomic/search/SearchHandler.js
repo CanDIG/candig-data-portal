@@ -28,6 +28,13 @@ const CollateSummary = (data, statName) => {
     return summaryStat;
 };
 
+function ParseISO8601Year(text) {
+    if (typeof text !== 'string') return undefined;
+    const regex = /(\d+)Y/.exec(text);
+    if (!regex) return undefined;
+    return regex[1];
+}
+
 // Format incoming clinical data from Beacon into a form that the frontend expects
 // Is this actually the best way to go forwards? Or should I just be rewriting the frontend components
 function FormatClinicalData(data) {
@@ -39,6 +46,7 @@ function FormatClinicalData(data) {
     // _       deceased, gender, is_deceased, location, lost_to_followup_after_clinical_event_identifier,
     // _       lost_to_followup_reason, program_id, sex_at_birth, submitter_donor_id}]
     // }
+
     const retVal = {
         count: data.resultsCount,
         results: data.results.map((donor) => ({
@@ -48,11 +56,32 @@ function FormatClinicalData(data) {
             num_exposures: donor.exposures?.length || 0,
             num_interventions: donor.interventionsOrProcedures?.length || 0,
             num_measures: donor.measures?.length || 0,
+            // Need to figure out how to get the _first_ age of onset
+            age_at_diagnosis: ParseISO8601Year(donor.diseases?.[0]?.ageOfOnset?.iso8601duration) || undefined,
             num_treatments: donor.treatments?.length || 0
         }))
     };
 
     return retVal;
+}
+
+// TODO: Currently I've gotten the patients counts working by editing patientCounts
+// I should instead use the below function to massage incoming data from the Beacon search
+// into a format that the frontend understands
+function FormatFederationData(data) {
+    return data;
+}
+
+function FormatSidebarData(data) {
+    return data.map((site) => {
+        const newResults = {
+            treatment_types: Object.keys(site?.results?.info?.treatment_type_count || {}),
+            tumour_primary_sites: Object.keys(site?.results?.info?.primary_site_count || {}),
+            drug_names: Object.keys(site?.results?.info?.drug_type_count || {})
+        }
+
+        return { ...site, results: newResults };
+    });
 }
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
@@ -70,7 +99,15 @@ function SearchHandler({ setLoading }) {
     useEffect(() => {
         setLoading(true);
         lastPromise = trackPromise(
-            fetchBeaconFilteringTerms().then((data) => writer((old) => ({ ...old, filters: data }))),
+            fetchBeaconFilteringTerms()
+                .then((data) => writer((old) => ({ ...old, filters: data })))
+                .then(() => queryBeacon({ page_size: 1 }))
+                .then((data) => writer((old) => ({
+                    ...old,
+                    federation: FormatFederationData(data),
+                    sidebar: FormatSidebarData(data)
+                })))
+                .finally(() => setLoading(false)),
             'federation'
             /* fetchFederatedSubServices(`v3/discovery/sidebar_list`)
                 .then((data) => writer((old) => ({ ...old, sidebar: data })))
@@ -180,7 +217,6 @@ function SearchHandler({ setLoading }) {
                                 });
                             });
 
-                            console.log(clinicalData);
                             // patients_per_program is added verbatim, instead of being collated together
                             if (typeof site?.results?.info?.patients_per_program !== 'undefined') {
                                 discoveryCounts.patients_per_program[site.location.name] = site.results.info.patients_per_program;

@@ -34,7 +34,7 @@ function PatientCounts() {
     let siteData = [];
     if (Array.isArray(sites)) {
         siteData = sites.map((entry) => {
-            const counts = discoveryCounts?.[entry.location.name] || {};
+            /* const counts = discoveryCounts?.[entry.location.name] || {};
             const realCounts = clinicalCounts?.[entry.location.name]?.summary?.patients_per_program || {};
             let unlockedPrograms = [];
             // Fill up the programs using the summary counts
@@ -49,13 +49,18 @@ function PatientCounts() {
                 finalCounts[program] = program in realCounts ? realCounts[program] : counts[program];
             });
 
-            // Where possible, also use the real counts
+            // Where possible, also use the real counts */
+
+            const totalCounts = Object.keys(entry?.results?.info?.patients_per_program).map((program) => ({
+                patients_count: entry?.results?.info?.patients_per_program[program],
+                program_id: program
+            }));
 
             return {
                 location: entry.location.name,
-                counts: finalCounts,
-                totals: entry?.results || {},
-                unlockedPrograms
+                counts: entry?.results?.info?.patients_per_program, // finalCounts,
+                totals: totalCounts, // entry?.results || {},
+                unlockedPrograms: [] // unlockedPrograms
             };
         });
     }

@@ -109,7 +109,7 @@ function DataVisualization() {
 
     const dataVis = {
         patients_per_program: handleCensoring('patients_per_program', (site, _) => site, true) || {},
-        // diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
+        diagnosis_age_count: handleCensoring('age_at_diagnosis', (_, age) => age.replace(/ Years$/, '')) || {},
         drug_type_count: handleCensoring('drug_type_count') || {},
         treatment_type_count: handleCensoring('treatment_type_count') || {},
         primary_site_count: handleCensoring('primary_site_count') || {}

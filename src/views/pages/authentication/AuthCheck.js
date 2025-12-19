@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 // project imports
-import { INGEST_URL } from 'store/api';
+import { API_URL } from 'store/api';
 import { UseUnauthorizedRoutes } from 'routes/UnauthorizedRoutes';
 import { AuthContext } from './AuthContext';
 
@@ -28,7 +28,7 @@ function AuthCheck(props) {
     // Fire off the authorization check
     useEffect(() => {
         setAuthCheckValue('loading', true);
-        fetch(`${INGEST_URL}/user/me`)
+        fetch(`${API_URL}/v1/authz/user/me`)
             .then((request) => {
                 if (request.ok) {
                     return request.json();
@@ -43,7 +43,7 @@ function AuthCheck(props) {
                 setAuthCheckValue('authorized', false);
 
                 // Request not ok: double check to see if we're pending
-                return fetch(`${INGEST_URL}/user/pending/me`)
+                return fetch(`${API_URL}/v1/authz/user/pending/me`)
                     .then((request) => {
                         if (request.ok) {
                             return request.text();

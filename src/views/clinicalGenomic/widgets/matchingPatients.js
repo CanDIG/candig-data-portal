@@ -139,12 +139,12 @@ function MatchingPatientsView() {
         ['program_id', 'Program ID', 150],
         ['sex_at_birth', 'Sex At Birth', 115],
         ['deceased', 'Deceased', 115],
-        // ['date_of_birth', 'Age at First Diagnosis', 160],
+        ['age_at_diagnosis', 'Age at First Diagnosis', 160]
         // ['date_of_death', 'Age at Death', 100]
-        ['num_exposures', 'Number of exposures', 160],
-        ['num_interventions', 'Number of interventions', 160],
-        ['num_measures', 'Number of measures', 160],
-        ['num_treatments', 'Number of treatments', 160]
+        // ['num_exposures', 'Number of exposures', 160],
+        // ['num_interventions', 'Number of interventions', 160],
+        // ['num_measures', 'Number of measures', 160],
+        // ['num_treatments', 'Number of treatments', 160]
     ];
 
     const genomicFields = [
