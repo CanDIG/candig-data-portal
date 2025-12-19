@@ -65,15 +65,12 @@ function FormatClinicalData(data) {
     return retVal;
 }
 
-// TODO: Currently I've gotten the patients counts working by editing patientCounts
-// I should instead use the below function to massage incoming data from the Beacon search
-// into a format that the frontend understands
 function FormatFederationData(data) {
     return data.map((site) => {
         const newResults = Object.keys(site?.results?.info?.patients_per_program).map((program) => ({
             patients_count: site?.results?.info?.patients_per_program[program],
             program_id: program
-        }))
+        }));
 
         return { ...site, results: newResults };
     });
