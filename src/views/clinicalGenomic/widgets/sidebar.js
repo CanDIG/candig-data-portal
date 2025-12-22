@@ -670,7 +670,7 @@ function Sidebar() {
 
     // Parse out what we need:
     const sites = readerContext?.federation?.map((loc) => loc.location.name) || [];
-    const programs = readerContext?.federation?.map((loc) => Object.keys(loc.results?.patients_per_program) || [])?.flat(1) || [];
+    const programs = readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || [];
     const authorizedPrograms = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((program) => program.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
@@ -686,16 +686,16 @@ function Sidebar() {
     chromosomes.push('');
     genes?.push('');
 
-    const hideGenomic = selectedtab !== 'All' && selectedtab !== 'Genomic';
+    const hideGenomic = true; // selectedtab !== 'All' && selectedtab !== 'Genomic';
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
         <Root>
-            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
+            {/* <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
-            </Tabs>
+            </Tabs> */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button className={classes.button} onClick={() => resetButton()}>
                     Reset

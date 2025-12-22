@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { trackPromise } from 'react-promise-tracker';
@@ -77,15 +77,38 @@ function FormatFederationData(data) {
 }
 
 function FormatSidebarData(data) {
+    const RemoveNulls = (items) => items.filter((term) => term !== 'No value' && term !== 'No matching concept');
+
     return data.map((site) => {
         const newResults = {
-            treatment_types: Object.keys(site?.results?.info?.treatment_type_count || {}),
-            tumour_primary_sites: Object.keys(site?.results?.info?.primary_site_count || {}),
-            drug_names: Object.keys(site?.results?.info?.drug_type_count || {})
+            treatment_types: RemoveNulls(Object.keys(site?.results?.info?.treatment_type_count || {})),
+            tumour_primary_sites: RemoveNulls(Object.keys(site?.results?.info?.primary_site_count || {})),
+            drug_names: RemoveNulls(Object.keys(site?.results?.info?.drug_type_count || {}))
         };
 
         return { ...site, results: newResults };
     });
+}
+
+function FormatFilteringTerms(data) {
+    // We need to merge the results from each response
+    const allTerms = new Set();
+    data.forEach((site) => {
+        site?.results?.response?.filteringTerms?.forEach((item) => allTerms.add(item.id));
+    });
+    return allTerms;
+}
+
+function FormatFilters(data) {
+    const retVal = {};
+    data.forEach((site) => {
+        if (typeof site?.results?.response?.filteringTerms !== 'undefined') {
+            site.results.response.filteringTerms.forEach((term) => {
+                retVal[term.label] = term.id;
+            });
+        }
+    });
+    return retVal;
 }
 
 // This handles transforming queries in the SearchResultsContext to actual search queries
@@ -97,6 +120,7 @@ function SearchHandler({ setLoading }) {
     const writer = useSearchResultsWriterContext();
     const summaryFetchAbort = useRef(new AbortController());
     const clinicalFetchAbort = useRef(new AbortController());
+    const [filters, setFilters] = useState({});
 
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
@@ -104,7 +128,10 @@ function SearchHandler({ setLoading }) {
         setLoading(true);
         lastPromise = trackPromise(
             fetchBeaconFilteringTerms()
-                .then((data) => writer((old) => ({ ...old, filters: data })))
+                .then((data) => {
+                    writer((old) => ({ ...old, filters: FormatFilteringTerms(data) }));
+                    setFilters((_) => FormatFilters(data));
+                })
                 .then(() => queryBeacon({ page_size: 1 }))
                 .then((data) =>
                     writer((old) => ({
@@ -182,8 +209,9 @@ function SearchHandler({ setLoading }) {
         clinicalFetchAbort.current.abort('New request started');
         const newAbort = new AbortController();
 
+        // TODO: incoming filters need to be converted to their internal IDs (which we have from the filtering_terms call earlier)
         const donorQueryPromise = () =>
-            queryBeacon(reader.query, newAbort.signal)
+            queryBeacon(reader.query, filters, newAbort.signal)
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
@@ -224,6 +252,7 @@ function SearchHandler({ setLoading }) {
                             });
 
                             // patients_per_program is added verbatim, instead of being collated together
+                            // TODO: The results need to be reformatted to the old style (see FormatFederationData)
                             if (typeof site?.results?.info?.patients_per_program !== 'undefined') {
                                 discoveryCounts.patients_per_program[site.location.name] = site.results.info.patients_per_program;
                             }

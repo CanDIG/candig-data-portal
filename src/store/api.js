@@ -239,24 +239,17 @@ export function fetchRefreshToken() {
  * CanDIG-API filtering_terms:
  */
 export function fetchBeaconFilteringTerms() {
-    return fetchFederation('v1/beacon/datasets/filtering_terms', 'candig-api').then((data) => {
-        // We need to merge the results from each response
-        const allTerms = new Set();
-        data.forEach((site) => {
-            site?.results?.response?.filteringTerms?.forEach((item) => allTerms.add(item.id));
-        });
-        return allTerms;
-    });
+    return fetchFederation('v1/beacon/datasets/filtering_terms', 'candig-api');
 }
 
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
-export function queryBeacon(params, abort = null) {
+export function queryBeacon(params, filter_mapping, abort = null) {
     // Transform the parameters into something that it'll understand
     const params_filters = [];
     // Grab out the page and page number
-    const page = params?.page;
-    const page_size = params?.page_size;
+    const page = undefined; // params?.page;
+    const page_size = undefined; // params?.page_size;
 
     const NON_FILTER_PARAMS = ['page', 'page_size'];
     const NON_ID_FILTERS = [];
@@ -270,7 +263,7 @@ export function queryBeacon(params, abort = null) {
             const new_param = {};
 
             if (!NON_ID_FILTERS.includes(param)) {
-                new_param.id = params[param];
+                new_param.id = filter_mapping[params[param]];
                 // } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
             }
