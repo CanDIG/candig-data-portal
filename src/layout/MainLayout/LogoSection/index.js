@@ -15,7 +15,12 @@ function LogoSection() {
     const dispatch = useDispatch();
 
     return (
-        <ButtonBase disableRipple component={Link} to={config.defaultPath} onClick={() => dispatch({ type: MENU_OPEN, id: 'summary' })}>
+        <ButtonBase
+            disableRipple
+            component={Link}
+            to={config.defaultPath}
+            onClick={() => dispatch({ type: MENU_OPEN, id: 'clinicalGenomicSearch' })}
+        >
             <Logo />
         </ButtonBase>
     );
