@@ -43,7 +43,7 @@ function ClinicalPatientView() {
         location,
         forceSelection
     );
-    const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
+    const ageAtFirstDiagnosis = topLevel.age_at_diagnosis;
     const dateOfBirth = data?.date_of_birth;
 
     const handleEventClick = (category, array) => {

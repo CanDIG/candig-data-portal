@@ -196,7 +196,7 @@ function ProfileSection() {
 
     // Grab the user key for the logged in user
     useEffect(() => {
-        fetch(`/query/whoami`)
+        fetch(`/candig-api/v1/whoami`)
             .then((response) => {
                 if (response.ok) {
                     return response.json();

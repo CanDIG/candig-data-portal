@@ -50,7 +50,6 @@ function PatientCounts() {
             });
 
             // Where possible, also use the real counts
-
             return {
                 location: entry.location.name,
                 counts: finalCounts,

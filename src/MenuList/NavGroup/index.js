@@ -42,7 +42,7 @@ function NavGroup({ item }) {
     const dispatch = useDispatch();
     useEffect(() => {
         // Note that '/' is an alias of /summary
-        const id = window.location.pathname === '/' ? 'summary' : window.location.pathname.slice(1);
+        const id = window.location.pathname === '/' ? 'clinicalGenomicSearch' : window.location.pathname.slice(1);
         dispatch({ type: MENU_OPEN, id });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

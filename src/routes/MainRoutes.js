@@ -37,11 +37,11 @@ const MainRoutes = {
     children: [
         {
             path: `/`,
-            element: <Summary />
+            element: <ClinicalGenomicSearch />
         },
         {
             path: `${basename}/`,
-            element: <Summary />
+            element: <ClinicalGenomicSearch />
         },
         {
             path: `${basename}/summary`,

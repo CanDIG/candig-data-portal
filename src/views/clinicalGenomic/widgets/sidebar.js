@@ -686,16 +686,16 @@ function Sidebar() {
     chromosomes.push('');
     genes?.push('');
 
-    const hideGenomic = selectedtab !== 'All' && selectedtab !== 'Genomic';
+    const hideGenomic = true; // selectedtab !== 'All' && selectedtab !== 'Genomic';
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
         <Root>
-            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
+            {/* <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
-            </Tabs>
+            </Tabs> */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button className={classes.button} onClick={() => resetButton()}>
                     Reset

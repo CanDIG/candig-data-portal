@@ -68,7 +68,7 @@ function PatientCountSingle(props) {
         countsArray.reduce(
             (partialSum, programTotal) => {
                 if (typeof programTotal === 'object') {
-                    if (programTotal.patients_count.startsWith('<')) {
+                    if (typeof programTotal.patients_count === 'string' && programTotal.patients_count.startsWith('<')) {
                         return [partialSum[0], partialSum[1] + parseInt(programTotal.patients_count.substring(1), 10)];
                     }
                     const toAdd = parseInt(programTotal.patients_count, 10);
