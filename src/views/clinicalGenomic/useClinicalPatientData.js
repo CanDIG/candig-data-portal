@@ -112,7 +112,6 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
                         filteredData.time_from_diagnosis_to_last_followup = `${years}y ${remainingMonths}m`;
                         delete filteredData.date_alive_after_lost_to_followup;
                     } */
-                    console.log(filteredData);
 
                     setTopLevel(filteredData);
                     setData(patientData);

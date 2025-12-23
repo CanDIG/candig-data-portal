@@ -84,7 +84,6 @@ function PatientCountSingle(props) {
 
     const PrintCensoredCounts = (totals) => (totals[0] === totals[1] ? totals[0] : `${totals[0]}-${totals[1]}`);
 
-    console.log(counts.totals);
     const totalPatients = SumCensoredTotals(Object.values(counts.totals)) || [0, 0];
     const patientsInSearch = SumCensoredTotals(Object.values(counts.counts)) || [0, 0];
     const numPrograms = Object.values(counts.totals)?.length || 0;
