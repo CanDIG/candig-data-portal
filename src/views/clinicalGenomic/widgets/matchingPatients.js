@@ -118,7 +118,7 @@ function MatchingPatientsView() {
             console.warn('Row data not loaded yet:', row);
             return;
         }
-        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
+        const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterDonorId=${row.submitter_donor_id}`;
         window.open(url, '_blank');
     };
 
