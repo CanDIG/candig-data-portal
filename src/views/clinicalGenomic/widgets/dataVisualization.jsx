@@ -19,7 +19,7 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from '../../../store/constant';
-import { HAS_CENSORED_DATA_MARKER } from '../../../utils/utils';
+import { isCensored, HAS_CENSORED_DATA_MARKER } from '../../../utils/utils';
 
 const DEFAULT_CHART_DEFINITIONS = [
     {
@@ -51,7 +51,6 @@ function DataVisualization() {
     const clinical = resultsContext.clinical;
     // Plan for context below see current dataVis for expected shape
     // const dataVis = counts || {};
-    const isCensored = (datum) => typeof datum === 'string' && datum.startsWith('<');
     const handleCensoring = (dataKey, transformer = (site, input) => input, isObject = false) => {
         const dataObj = counts?.[dataKey];
         if (dataObj === null || typeof dataObj === 'undefined') {

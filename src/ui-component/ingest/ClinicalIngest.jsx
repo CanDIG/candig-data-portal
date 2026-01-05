@@ -52,7 +52,7 @@ function ClinicalIngest({ setTab, fileUpload, clinicalData }) {
             return fetchFederation('v3/discovery/donors/', 'katsu')
                 .then((result) => {
                     result.forEach((site) => {
-                        const programs = site.results.discovery_donor;
+                        const programs = site?.results?.discovery_donor || {};
                         const fields = [];
                         Object.keys(programs).forEach((program) => {
                             const field = [

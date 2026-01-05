@@ -147,7 +147,7 @@ function StyledCheckboxList(props) {
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
     const HandleChange = (ids, isChecked) => {
-        // Remove duplicates
+        // Normalize ids to array of unique values
         if (Array.isArray(ids)) {
             ids = Array.from(new Set(ids?.flat(1)));
         } else {
@@ -155,8 +155,8 @@ function StyledCheckboxList(props) {
         }
 
         const cohortMap = {};
-        sites.forEach((site) => {
-            site.results.forEach((result) => {
+        sites?.forEach((site) => {
+            site?.results?.forEach((result) => {
                 if (!cohortMap[result.program_id]) {
                     cohortMap[result.program_id] = new Set();
                 }
@@ -165,6 +165,7 @@ function StyledCheckboxList(props) {
         });
 
         if (isExclusion ? !isChecked : isChecked) {
+            // set local checked state (object shape)
             setChecked((_) => {
                 const retVal = {};
                 ids.forEach((id) => {
@@ -172,15 +173,20 @@ function StyledCheckboxList(props) {
                 });
                 return retVal;
             });
+
             onWrite((old) => {
                 const retVal = { donorLists: {}, filter: {}, query: {}, ...old };
                 // The following appends ourselves to the write context under 'query': {group: [|-delimited-list]} or 'donorList': {group: [|-delimited-list]}
+
                 if (isFilterList) {
+                    // keep filter entry
                     retVal.filter[groupName] = ids;
+
+                    // special-case node handling from original code
                     if (groupName === 'node') {
                         const programIds = sites
-                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
-                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
+                            .filter((item) => ids.includes(item.location.name))
+                            .flatMap((item) => item.results.map((result) => result.program_id));
                         const validProgramIds = programIds.filter((programId) => {
                             const associatedNodes = cohortMap[programId] || new Set();
                             return Array.from(associatedNodes).every((node) => !(node in checked));
@@ -194,9 +200,16 @@ function StyledCheckboxList(props) {
                             return newPrograms;
                         });
                     }
+
+                    // if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
+                    if (groupName === 'genomic_data_types') {
+                        retVal.query.genomic_data_types = ids.join('|');
+                    }
                 } else if (ids.length > 0) {
                     retVal.query[groupName] = ids.join('|');
                 }
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else {
@@ -213,10 +226,14 @@ function StyledCheckboxList(props) {
                     const newList = Object.fromEntries(Object.entries(retVal.filter).filter(([name, _]) => name !== groupName));
                     newList[groupName] = ids;
                     retVal.filter = newList;
+
                     if (groupName === 'node') {
                         const currentPrograms = { ...selectedPrograms };
+                        const programIds = sites
+                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
+                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
                         Object.keys(selectedPrograms).forEach((id) => {
-                            if (currentPrograms[id]) {
+                            if (currentPrograms[id] && !programIds.includes(id)) {
                                 delete currentPrograms[id];
                             }
                         });
@@ -229,6 +246,11 @@ function StyledCheckboxList(props) {
                             retVal.query = {};
                         }
                         setSelectedPrograms(currentPrograms);
+                    }
+
+                    // if this filter is genomicDataTypes, also update query string
+                    if (groupName === 'genomic_data_types') {
+                        retVal.query.genomic_data_types = ids.join('|');
                     }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
@@ -243,7 +265,7 @@ function StyledCheckboxList(props) {
         }
     };
 
-    const checkedList = Object.keys(checked);
+    const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
 
     return useAutoComplete ? (
         <Autocomplete
@@ -254,17 +276,52 @@ function StyledCheckboxList(props) {
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
                 <li {...props} key={option}>
-                    <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={isExclusion ? !selected : selected}
-                        value={option}
-                    />
-                    {option}
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            sx={{
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                marginRight: 1
+                            }}
+                            checked={isExclusion ? !selected : selected}
+                            value={option}
+                        />
+
+                        <span
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'baseline',
+                                gap: '4px',
+                                lineHeight: 1.2
+                            }}
+                        >
+                            {option}
+                            {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                <Tooltip title="Unauthorized Program" placement="right">
+                                    <LockOutlinedIcon
+                                        sx={{
+                                            color: 'primary.main',
+                                            fontSize: '1.1rem',
+                                            verticalAlign: 'text-bottom',
+                                            position: 'relative',
+                                            top: '3px'
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
+                        </span>
+                    </div>
                 </li>
             )}
-            renderInput={(params) => <TextField {...params} label={groupName} />}
+            renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
             }
@@ -329,12 +386,10 @@ StyledCheckboxList.propTypes = {
     setSelectedPrograms: PropTypes.func,
     selectedPrograms: PropTypes.object,
     setChecked: PropTypes.func,
-    checked: PropTypes.object
+    checked: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
 };
 
 // A group of genomics data
-// Keeping this separate from the rest as it's all somewhat self-contained
-// NB: Should maybe go into a separate .js file
 function GenomicsGroup(props) {
     const {
         chromosomes,
@@ -348,11 +403,43 @@ function GenomicsGroup(props) {
         setSelectedChromosomes,
         setSelectedGenes,
         setStartPos,
-        setEndPos
+        setEndPos,
+        selectedGenomicDataTypes,
+        setGenomicDataTypes
     } = props;
 
     const [selectedGenome, _setSelectedGenome] = useState('hg38');
     const [_timeout, setNewTimeout] = useState(null);
+
+    const writerContext = useSearchQueryWriterContext();
+
+    // helper: convert the UI checked shape (object or array) into the pipe-delimited string expected by backend
+    const formatGenomicDataTypes = (gdt) => {
+        if (!gdt) return '';
+        if (Array.isArray(gdt)) {
+            return gdt.join('|');
+        }
+        if (typeof gdt === 'object') {
+            return Object.keys(gdt)
+                .filter((k) => gdt[k])
+                .join('|');
+        }
+        return String(gdt);
+    };
+
+    // Whenever the checked object changes, update writerContext.query.genomicDataTypes
+    useEffect(() => {
+        const formatted = formatGenomicDataTypes(selectedGenomicDataTypes);
+        writerContext((old) => ({
+            ...old,
+            query: {
+                ...old.query,
+                // use undefined if empty so it doesn't appear in query params
+                genomic_data_types: formatted || undefined
+            }
+        }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedGenomicDataTypes]);
 
     if (hide) {
         return null;
@@ -371,6 +458,7 @@ function GenomicsGroup(props) {
                     start: startPos,
                     end: endPos,
                     assembly: selectedGenome,
+                    genomic_data_types: formatGenomicDataTypes(selectedGenomicDataTypes),
                     [toChange]: value
                 };
 
@@ -380,7 +468,9 @@ function GenomicsGroup(props) {
                         ...old.query,
                         chrom: newQuery.referenceName ? `chr${newQuery.referenceName}:${newQuery.start}-${newQuery.end}` : undefined,
                         gene: newQuery.gene || undefined,
-                        assembly: newQuery.assembly
+                        assembly: newQuery.assembly,
+                        // format object/array → pipe-delimited string
+                        genomic_data_types: formatGenomicDataTypes(newQuery.genomic_data_types)
                     }
                 }));
             }, 1000);
@@ -390,19 +480,6 @@ function GenomicsGroup(props) {
 
     return (
         <>
-            {/* <SidebarGroup name="Reference Genome">
-                <RadioGroup onChange={(event) => HandleChange(event.target.value, setSelectedGenome)} value={selectedGenome}>
-                    {referenceGenomes.map((genome) => (
-                        <FormControlLabel
-                            label={genome}
-                            control={<Radio className={classes.checkbox} />}
-                            key={genome}
-                            value={genome}
-                            className={classes.checkboxLabel}
-                        />
-                    ))}
-                </RadioGroup>
-            </SidebarGroup> */}
             <SidebarGroup name="Gene Search">
                 {selectedChromosomes && <Typography sx={{ paddingTop: '0.5em' }}>(Disabled during position search)</Typography>}
                 <Autocomplete
@@ -446,6 +523,16 @@ function GenomicsGroup(props) {
                     disabled={!!selectedGenes}
                 />
             </SidebarGroup>
+            <SidebarGroup name="Genomic Data Types">
+                <StyledCheckboxList
+                    options={['Variants', 'Transcriptomes (WTS)', 'Reads (WGS)']}
+                    onWrite={writerContext}
+                    groupName="genomic_data_types"
+                    isFilterList
+                    checked={Object.fromEntries(Object.entries(selectedGenomicDataTypes).filter(([_, isChecked]) => isChecked))}
+                    setChecked={setGenomicDataTypes}
+                />
+            </SidebarGroup>
         </>
     );
 }
@@ -462,7 +549,9 @@ GenomicsGroup.propTypes = {
     selectedGenes: PropTypes.string,
     setSelectedGenes: PropTypes.func,
     selectedChromosomes: PropTypes.string,
-    setSelectedChromosomes: PropTypes.func
+    setSelectedChromosomes: PropTypes.func,
+    selectedGenomicDataTypes: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    setGenomicDataTypes: PropTypes.func
 };
 
 function Sidebar() {
@@ -471,11 +560,15 @@ function Sidebar() {
     const writerContext = useSearchQueryWriterContext();
 
     // Genomic data
-    // const referenceGenomes = ['hg38'];
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
     const [startPos, setStartPos] = useState('0');
     const [endPos, setEndPos] = useState('0');
+    const [selectedGenomicDataTypes, setGenomicDataTypes] = useState({
+        Variants: false,
+        'Transcriptomes (WTS)': false,
+        'Reads (WGS)': false
+    });
 
     // Clinical Data
     const [selectedNodes, setSelectedNodes] = useState({});
@@ -513,16 +606,30 @@ function Sidebar() {
                 },
                 reqNum: old.reqNum + 1
             }));
-        } else if (readerContext.clear === 'gene' || readerContext.clear === 'chrom' || readerContext.clear === 'assembly') {
+        } else if (
+            readerContext.clear === 'gene' ||
+            readerContext.clear === 'chrom' ||
+            readerContext.clear === 'assembly' ||
+            readerContext.genomic_data_type === 'genomic_data_types'
+        ) {
             setSelectedGenes('');
             setSelectedChromosomes('');
             setStartPos('0');
             setEndPos('0');
+            // reset to object shape
+            setGenomicDataTypes({
+                Variants: false,
+                'Transcriptomes (WTS)': false,
+                'Reads (WGS)': false
+            });
             writerContext((old) => {
                 const retVal = { ...old, reqNum: old.reqNum + 1 };
                 delete retVal.query.chrom;
                 delete retVal.query.gene;
                 delete retVal.query.assembly;
+                delete retVal.query.genomic_data_types;
+                retVal.query.page = 0;
+                retVal.query.page_size = old.query?.page_size || 10;
                 return retVal;
             });
         } else if (readerContext.clear === 'treatment') {
@@ -564,6 +671,11 @@ function Sidebar() {
         setSelectedChromosomes('');
         setStartPos('0');
         setEndPos('0');
+        setGenomicDataTypes({
+            Variants: false,
+            'Transcriptomes (WTS)': false,
+            'Reads (WGS)': false
+        });
 
         // Clinical
         setSelectedTreatment({});
@@ -574,17 +686,16 @@ function Sidebar() {
         writerContext({
             // Set nodes and programs in the filter
             filter: {
-                node: [readerContext?.programs?.map((loc) => loc.location.name) || []], // Set your default nodes
+                node: [readerContext?.programs?.map((loc) => loc.location.name) || []],
                 exclude_programs: [
                     readerContext?.programs?.map((loc) => loc?.results?.items?.map((program) => program.program_id)).flat(1) || []
-                ], // Set programs to empty array or whichever default value you want
+                ],
                 query: {}
             }
         });
     }
 
     // Fill up a list of options from the results of a Katsu query
-    // This includes treatment types within the dataset, etc.
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
 
@@ -628,11 +739,12 @@ function Sidebar() {
                     Search
                 </Button>
             </div>
-            <SidebarGroup name="Node">
+            <SidebarGroup name="Nodes">
                 <StyledCheckboxList
                     options={sites}
                     onWrite={writerContext}
                     groupName="node"
+                    useAutoComplete={sites.length >= 5}
                     isFilterList
                     isExclusion
                     selectedPrograms={selectedPrograms}
@@ -641,12 +753,13 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Program">
+            <SidebarGroup name="Programs">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
                     groupName="exclude_programs"
+                    useAutoComplete={programs.length >= 5}
                     isExclusion
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
@@ -665,8 +778,10 @@ function Sidebar() {
                 setSelectedGenes={setSelectedGenes}
                 setStartPos={setStartPos}
                 setEndPos={setEndPos}
+                setGenomicDataTypes={setGenomicDataTypes}
+                selectedGenomicDataTypes={selectedGenomicDataTypes}
             />
-            <SidebarGroup name="Treatment" hide={hideClinical}>
+            <SidebarGroup name="Treatments" hide={hideClinical}>
                 <StyledCheckboxList
                     options={treatmentTypes}
                     onWrite={writerContext}
@@ -677,7 +792,7 @@ function Sidebar() {
                     setChecked={setSelectedTreatment}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Site" hide={hideClinical}>
+            <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
                 <StyledCheckboxList
                     options={tumourPrimarySites}
                     onWrite={writerContext}

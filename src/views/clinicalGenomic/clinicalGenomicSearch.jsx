@@ -7,7 +7,6 @@ import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 import MainCard from '../../ui-component/cards/MainCard';
 import PatientCounts from './widgets/patientCounts';
 import DataVisualization from './widgets/dataVisualization';
-import ClinicalData from './widgets/clinicalData';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
 import SearchHandler from './search/SearchHandler';
@@ -15,6 +14,7 @@ import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from '../../ui-component/LoadingIndicator/SearchIndicator';
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';
+import MatchingPatients from './widgets/matchingPatients';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -115,14 +115,9 @@ const sections = [
         component: <AuthorizationSections title="Authorized Programs" />
     },
     {
-        id: 'clinical',
-        header: 'Clinical Data',
-        component: <ClinicalData />
-    },
-    {
-        id: 'genomic',
-        header: 'Genomic Data',
-        component: <GenomicData />
+        id: 'Matching Patients',
+        header: 'Matching Patients',
+        component: <MatchingPatients />
     }
 ];
 function ClinicalGenomicSearch() {

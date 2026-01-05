@@ -84,7 +84,7 @@ function FieldLevelCompletenessGraph(props) {
     const allPrograms = ['All programs'];
     if (data) {
         Object.values(data).forEach((site) => {
-            const programs = site.results?.programs;
+            const programs = site?.results?.programs;
             if (!programs) {
                 return;
             }

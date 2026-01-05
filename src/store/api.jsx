@@ -95,7 +95,6 @@ export function query(parameters, abort, path = 'query') {
     const payload = {
         ...parameters
     };
-
     return fetchOrRelogin(`${federation}/fanout`, {
         method: 'post',
         signal: abort,
@@ -166,9 +165,9 @@ export function fetchGenomicCompleteness() {
         const numCompleteGenomic = {};
         data.filter((site) => site.status === 200).forEach((site) => {
             numCompleteGenomic[site.location.name] = {};
-            Object.keys(site.results).forEach((program) => {
-                Object.keys(site.results[program]).forEach((type) => {
-                    numCompleteGenomic[site.location.name][`${program} (${type})`] = site.results[program][type];
+            Object.keys(site?.results || {}).forEach((program) => {
+                Object.keys(site?.results[program] || {}).forEach((type) => {
+                    numCompleteGenomic[site.location.name][`${program} (${type})`] = site?.results?.[program]?.[type];
                 });
             });
         });

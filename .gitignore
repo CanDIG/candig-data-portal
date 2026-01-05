@@ -1,17 +1,15 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
+/node_modules/
 /.pnp
 .pnp.js
 
 # testing
-/coverage
+/coverage/
 
 # production
-/build
-/dist
-/dist-ssr
+/build/
+/dist/
+/dist-ssr/
 
 # misc
 .DS_Store
@@ -27,7 +25,7 @@ lerna-debug.log*
 # editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 *.suo
 *.ntvs*
 *.njsproj

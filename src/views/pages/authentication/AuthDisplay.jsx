@@ -162,8 +162,8 @@ function AuthDisplay() {
                     <Typography variant="h1" className={classes.welcomeText}>
                         Welcome to{' '}
                         <span className={classes.boldText}>
-                            <span className={classes.primaryText}> Can</span>
-                            <span className={classes.secondaryText}>DIG</span>
+                            <span className={classes.secondaryText}> Can</span>
+                            <span className={classes.primaryText}>DIG</span>
                         </span>
                         <span>!</span>
                     </Typography>

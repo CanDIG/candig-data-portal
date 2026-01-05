@@ -31,7 +31,13 @@ function AuthCheck(props) {
         fetch(`${INGEST_URL}/user/me`)
             .then((request) => {
                 if (request.ok) {
-                    setAuthCheckValue('authorized', true);
+                    return request.json();
+                }
+                return undefined;
+            })
+            .then((response) => {
+                if (typeof response !== 'undefined') {
+                    setAuthCheckValue('authorized', response.userinfo.is_candig_authorized);
                     return undefined;
                 }
                 setAuthCheckValue('authorized', false);
