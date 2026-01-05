@@ -276,14 +276,49 @@ function StyledCheckboxList(props) {
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => (
                 <li {...props} key={option}>
-                    <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={isExclusion ? !selected : selected}
-                        value={option}
-                    />
-                    {option}
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            sx={{
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                marginRight: 1
+                            }}
+                            checked={isExclusion ? !selected : selected}
+                            value={option}
+                        />
+
+                        <span
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'baseline',
+                                gap: '4px',
+                                lineHeight: 1.2
+                            }}
+                        >
+                            {option}
+                            {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                <Tooltip title="Unauthorized Program" placement="right">
+                                    <LockOutlinedIcon
+                                        sx={{
+                                            color: 'primary.main',
+                                            fontSize: '1.1rem',
+                                            verticalAlign: 'text-bottom',
+                                            position: 'relative',
+                                            top: '3px'
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
+                        </span>
+                    </div>
                 </li>
             )}
             renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}

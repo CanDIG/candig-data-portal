@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
 // mui
-// import { useTheme, makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import useTheme from '@mui/system/useTheme';
 import SmallCountCard from 'ui-component/cards/SmallCountCard';
@@ -13,7 +12,6 @@ import { fetchClinicalCompleteness, fetchGenomicCompleteness } from 'store/api';
 // assets
 import { CheckCircleOutline, WarningAmber, Person } from '@mui/icons-material';
 
-// Test data
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import FieldLevelCompletenessGraph from './fieldLevelCompletenessGraph';
 
@@ -55,6 +53,10 @@ function Completeness() {
         });
     }, []);
 
+    // Compute totals for display
+    const totalNodes = numNodes;
+    const activeNodes = numNodes - numErrorNodes;
+
     return (
         <Grid container spacing={1}>
             {numErrorNodes > 0 ? (
@@ -63,7 +65,7 @@ function Completeness() {
                         <Grid item xs={6} pr={1}>
                             <SmallCountCard
                                 title="Nodes"
-                                count={`${numNodes}/${numNodes + numErrorNodes}`}
+                                count={`${activeNodes}/${totalNodes}`}
                                 icon={<CheckCircleOutline fontSize="inherit" />}
                                 color={theme.palette.secondary.main}
                             />
@@ -71,7 +73,7 @@ function Completeness() {
                         <Grid item xs={6}>
                             <SmallCountCard
                                 title="Connection Error"
-                                count={`${numErrorNodes}/${numNodes + numErrorNodes}`}
+                                count={`${numErrorNodes}/${totalNodes}`}
                                 icon={<WarningAmber fontSize="inherit" />}
                                 color={theme.palette.error.main}
                             />
@@ -83,12 +85,13 @@ function Completeness() {
                     <SmallCountCard
                         isLoading={isLoading}
                         title="Nodes"
-                        count={numNodes}
+                        count={activeNodes}
                         icon={<CheckCircleOutline fontSize="inherit" />}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
             )}
+
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading}
@@ -99,6 +102,7 @@ function Completeness() {
                     color={theme.palette.primary.main}
                 />
             </Grid>
+
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading}
@@ -109,6 +113,7 @@ function Completeness() {
                     color={theme.palette.secondary.main}
                 />
             </Grid>
+
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading}
@@ -119,6 +124,7 @@ function Completeness() {
                     color={theme.palette.tertiary.main}
                 />
             </Grid>
+
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
                     dataObject={numClinicalComplete || {}}
@@ -132,6 +138,7 @@ function Completeness() {
                     cutoff={10}
                 />
             </Grid>
+
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <CustomOfflineChart
                     dataObject={numGenomicComplete || {}}
@@ -145,9 +152,7 @@ function Completeness() {
                     cutoff={10}
                 />
             </Grid>
-            {/* <Grid item xs={12} sm={12} md={6} lg={6}>
-                <MainCard>(Percentage complete graph)</MainCard>
-            </Grid> */}
+
             <Grid item xs={12} sm={12} md={6} lg={6}>
                 <FieldLevelCompletenessGraph data={clinicalComplete} loading={clinicalComplete.length === 0} title="Field Level" />
             </Grid>
