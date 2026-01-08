@@ -10,7 +10,6 @@ import DataVisualization from './widgets/dataVisualization';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import Sidebar from './widgets/sidebar';
 import SearchHandler from './search/SearchHandler';
-import GenomicData from './widgets/genomicData';
 import { SearchIndicator } from '../../ui-component/LoadingIndicator/SearchIndicator';
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';

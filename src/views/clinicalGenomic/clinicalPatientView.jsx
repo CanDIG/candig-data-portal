@@ -9,7 +9,7 @@ import MainCard from '../../ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
-import { query } from 'store/api';
+import { query } from '../../store/api';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
