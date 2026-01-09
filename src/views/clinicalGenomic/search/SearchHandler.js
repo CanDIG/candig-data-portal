@@ -72,6 +72,9 @@ function SearchHandler({ setLoading }) {
         if (reader.query?.genomic_data_types) {
             queryNoPageSize.genomic_data_types = reader.query.genomic_data_types;
         }
+        if (reader.filter?.node) {
+            queryNoPageSize.exclude_servers = reader.filter.node.join('|');
+        }
 
         setLoading(true);
         const discoveryPromise = () =>
