@@ -18,6 +18,15 @@ function SearchHandler({ setLoading }) {
     const summaryFetchAbort = useRef(new AbortController());
     const clinicalFetchAbort = useRef(new AbortController());
 
+    const { ...fullQuery } = reader.query || {};
+    // **Add genomic_data_types if it exists**
+    if (reader.query?.genomic_data_types) {
+        fullQuery.genomic_data_types = reader.query.genomic_data_types;
+    }
+    if (reader.filter?.node) {
+        fullQuery.exclude_servers = reader.filter.node.join('|');
+    }
+
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
     useEffect(() => {
@@ -64,21 +73,13 @@ function SearchHandler({ setLoading }) {
         };
 
         // Prepare query excluding pagination
-        const { ...queryNoPageSize } = reader.query || {};
-        if ('page' in queryNoPageSize) delete queryNoPageSize.page;
-        if ('page_size' in queryNoPageSize) delete queryNoPageSize.page_size;
-
-        // **Add genomic_data_types if it exists**
-        if (reader.query?.genomic_data_types) {
-            queryNoPageSize.genomic_data_types = reader.query.genomic_data_types;
-        }
-        if (reader.filter?.node) {
-            queryNoPageSize.exclude_servers = reader.filter.node.join('|');
-        }
+        const { ...discoveryQuery } = fullQuery || {};
+        if ('page' in discoveryQuery) delete discoveryQuery.page;
+        if ('page_size' in discoveryQuery) delete discoveryQuery.page_size;
 
         setLoading(true);
         const discoveryPromise = () =>
-            query(queryNoPageSize, newAbort.signal, 'discovery/query')
+            query(discoveryQuery, newAbort.signal, 'discovery/query')
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
@@ -119,7 +120,7 @@ function SearchHandler({ setLoading }) {
         const newAbort = new AbortController();
 
         const donorQueryPromise = () =>
-            query(reader.query, newAbort.signal)
+            query(fullQuery, newAbort.signal)
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));
