@@ -227,7 +227,7 @@ export function fetchClinicalCompleteness() {
  * Directly query Query for the /get-token endpoint, which reflects our refresh token.
  */
 export function fetchRefreshToken() {
-    return fetchOrRelogin(`${INGEST_URL}/get-token`)
+    return fetchOrRelogin(`${API_URL}/v1/authz/get-token`)
         .then((response) => response.json())
         .catch((error) => {
             console.log('Error:', error);

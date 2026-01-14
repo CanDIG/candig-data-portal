@@ -25,7 +25,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import { SITE } from 'store/constant';
 
 // assets
-import { IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 import siteLogo from 'assets/images/users/siteLogo.png';
 import APITokenButton from './apiTokenbutton';
 
@@ -287,7 +287,7 @@ function ProfileSection() {
                                         <Divider />
                                         <List component="nav" className={classes.navContainer}>
                                             <APITokenButton classes={classes} customization={customization} />
-                                            <ListItemButton
+                                            {/* <ListItemButton
                                                 className={classes.listItem}
                                                 sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                 to="/auth/logout"
@@ -296,7 +296,7 @@ function ProfileSection() {
                                                     <IconLogout stroke={1.5} size="1.3rem" />
                                                 </ListItemIcon>
                                                 <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
-                                            </ListItemButton>
+                                            </ListItemButton> */}
                                         </List>
                                     </CardContent>
                                 </MainCard>
