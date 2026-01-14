@@ -293,6 +293,7 @@ function DataVisualization() {
                                 dropDown
                                 onRemoveChart={() => removeChart(index)}
                                 edit={edit}
+                                cutoff={10}
                                 orderByFrequency={item.data !== 'diagnosis_age_count'}
                                 orderAlphabetically={item.data === 'diagnosis_age_count'}
                                 trimByDefault={item.trim}

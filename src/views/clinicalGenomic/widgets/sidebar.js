@@ -718,7 +718,7 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Programs">
+            <SidebarGroup name="Datasets">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
@@ -757,7 +757,7 @@ function Sidebar() {
                     setChecked={setSelectedTreatment}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
+            <SidebarGroup name="Diseases" hide={hideClinical}>
                 <StyledCheckboxList
                     options={tumourPrimarySites}
                     onWrite={writerContext}
@@ -768,7 +768,7 @@ function Sidebar() {
                     setChecked={setSelectedPrimarySite}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
+            <SidebarGroup name="Drug Names" hide={hideClinical}>
                 <StyledCheckboxList
                     options={systemicTherapyDrugNames}
                     onWrite={writerContext}

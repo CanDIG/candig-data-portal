@@ -136,12 +136,12 @@ export const DataVisualizationChartInfo = {
         yAxis: 'Number of Treatments'
     },
     primary_site_count: {
-        title: 'Tumour Primary Site Distribution',
-        xAxis: 'Primary Site',
-        yAxis: 'Number of Primary Sites'
+        title: 'Disease Distribution',
+        xAxis: 'Disease',
+        yAxis: 'Number of Cases'
     },
     patients_per_program: {
-        title: 'Distribution of Program by Node',
+        title: 'Distribution of Datasets by Node',
         xAxis: 'Site',
         yAxis: 'Number of Patients'
     },

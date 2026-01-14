@@ -136,7 +136,7 @@ function MatchingPatientsView() {
     // Column definitions
     const clinicalFields = [
         ['location', 'Location', 75],
-        ['program_id', 'Program ID', 150],
+        ['program_id', 'Dataset ID', 150],
         ['sex_at_birth', 'Sex At Birth', 115],
         ['deceased', 'Deceased', 115],
         ['age_at_diagnosis', 'Age at First Diagnosis', 160]

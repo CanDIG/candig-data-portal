@@ -264,10 +264,11 @@ export function queryBeacon(params, filter_mapping, abort = null) {
 
             if (!NON_ID_FILTERS.includes(param)) {
                 new_param.id = filter_mapping[params[param]];
-                // } else {
+                params_filters.push(new_param);
+            } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
+                console.log(`Non-ID filter found but not yet supported: ${param}`);
             }
-            params_filters.push(new_param);
         });
     }
 

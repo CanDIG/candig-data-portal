@@ -79,7 +79,7 @@ function PatientCounts() {
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" className={`${PREFIX}-header`}>
-                            Total Programs
+                            Total Datasets
                         </Typography>
                     </Grid>
                     <Grid item xs={1} ml="auto" className={`${PREFIX}-button`}>
