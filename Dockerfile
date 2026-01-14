@@ -45,13 +45,20 @@ RUN npm run build
 
 FROM nginx:1.25-alpine
 
-
 COPY --from=build /app/candig-data-portal/dist /usr/share/nginx/html
 
+RUN mkdir -p /etc/nginx/templates
+
+COPY nginx.default.conf.template /etc/nginx/templates/default.conf.template
+
 COPY nginx.default.conf.template /etc/nginx/conf.d/default.conf
+
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
 
 RUN chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 4173
 
-ENTRYPOINT ["bash", "entrypoint.sh"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
