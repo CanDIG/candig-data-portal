@@ -296,17 +296,8 @@ function CustomOfflineChart({
                             fontWeight: 'normal'
                         }
                     },
-                    xAxis: {
-                        title: { text: DataVisualizationChartInfo[chartData]?.xAxis },
-                        labels: { style: { textOverflow: 'none' } },
-                        categories,
-                        allowDecimals: false
-                    },
-                    yAxis: {
-                        title: { text: DataVisualizationChartInfo[chartData]?.yAxis },
-                        labels: { style: { textOverflow: 'none' } },
-                        allowDecimals: false
-                    },
+                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories, allowDecimals: false },
+                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis }, allowDecimals: false },
                     colors: [theme.palette.primary.dark],
                     series: [{ data, colorByPoint: true, showInLegend: false }],
                     tooltip: {
