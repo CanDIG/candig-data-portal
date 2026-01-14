@@ -37,4 +37,4 @@ jobs:
               with:
                   eslint: true
                   prettier: true
-                  eslint_options: ". --ext .js,.jsx,.ts,.tsx"
+                  eslint_options: "src --ext .js,.jsx,.ts,.tsx"
