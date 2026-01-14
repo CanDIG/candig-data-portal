@@ -1,3 +1,4 @@
+# Build Stage
 ARG alpine_version
 
 FROM node:21.7.0-alpine${alpine_version} as build
@@ -24,5 +25,33 @@ ENV PATH /app/candig-data-portal/node_modules/.bin:$PATH
 RUN npm install
 
 RUN touch initial_setup
+
+ARG VITE_FEDERATION_API_SERVER
+ARG VITE_INGEST_SERVER
+ARG VITE_HTSGET_SERVER
+ARG VITE_KATSU_API_SERVER
+ARG VITE_BASE_NAME
+
+ENV VITE_FEDERATION_API_SERVER=${VITE_FEDERATION_API_SERVER}
+ENV VITE_INGEST_SERVER=${VITE_INGEST_SERVER}
+ENV VITE_HTSGET_SERVER=${VITE_HTSGET_SERVER}
+ENV VITE_KATSU_API_SERVER=${VITE_KATSU_API_SERVER}
+ENV VITE_BASE_NAME=${VITE_BASE_NAME}
+ENV CANDIG_DOMAIN=${CANDIG_DOMAIN}
+
+RUN npm run build
+
+# Production Stage
+
+FROM nginx:1.25-alpine
+
+
+COPY --from=build /app/candig-data-portal/dist /usr/share/nginx/html
+
+COPY nginx.default.conf.template /etc/nginx/conf.d/default.conf
+
+RUN chmod -R 755 /usr/share/nginx/html
+
+EXPOSE 4173
 
 ENTRYPOINT ["bash", "entrypoint.sh"]

@@ -9,8 +9,13 @@ if [[ -f "initial_setup" ]]; then
     rm initial_setup
 fi
 
-# npx vite
-npx vite build
-npx vite preview --host 0.0.0.0 --port 4173
-# npm start
-# npm run build
+# Default fallback
+: "${CANDIG_DOMAIN:=localhost}"
+
+# Substitute environment variables into nginx config template
+envsubst '$CANDIG_DOMAIN' \
+  < /etc/nginx/templates/default.conf.template \
+  > /etc/nginx/conf.d/default.conf
+
+# Run nginx in the foreground
+exec nginx -g 'daemon off;'
