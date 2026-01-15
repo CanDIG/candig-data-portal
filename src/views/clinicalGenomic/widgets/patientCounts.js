@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Grid, Typography } from '@mui/material';
 import { useSearchResultsReaderContext } from '../SearchResultsContext';
 import PatientCountSingle from './patientCountSingle';
+import config from 'config';
 
 const PREFIX = 'PatientCounts';
 
@@ -15,7 +16,11 @@ const Root = styled('div')(({ theme }) => ({
         marginBottom: 4
     },
     [`& .${PREFIX}-header`]: {
-        textAlign: 'center'
+        textAlign: config.isDHDP ? 'left' : 'center',
+        color: config.isDHDP ? theme.palette.grey[500] : 'black'
+    },
+    [`& .${PREFIX}-firstheader`]: {
+        color: config.isDHDP ? theme.palette.grey[500] : 'black'
     },
     [`& .${PREFIX}-spacing`]: {
         marginTop: theme.spacing(2),
@@ -65,7 +70,9 @@ function PatientCounts() {
             <Box sx={{ border: 1, borderRadius: 2, borderColor: 'white' }}>
                 <Grid container justifyContent="center" alignItems="center" spacing={2}>
                     <Grid item xs={2}>
-                        <Typography variant="h4">Patient Data</Typography>
+                        <Typography variant="h4" className={`${PREFIX}-firstheader`}>
+                            Patient Data
+                        </Typography>
                     </Grid>
                     <Grid item xs={2}>
                         <Typography variant="h5" className={`${PREFIX}-header`}>

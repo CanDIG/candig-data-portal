@@ -20,6 +20,7 @@ import { useSearchResultsReaderContext } from '../SearchResultsContext';
 // Constants
 import { validStackedCharts, DataVisualizationChartInfo } from 'store/constant';
 import { isCensored, HAS_CENSORED_DATA_MARKER } from 'utils/utils';
+import config from 'config';
 
 const DEFAULT_CHART_DEFINITIONS = [
     {
@@ -277,7 +278,7 @@ function DataVisualization() {
                 {!edit ? <IconEdit /> : <IconX />}
             </IconButton>
             <Grid container spacing={1} direction="column">
-                <Typography pb={1} variant="h4">
+                <Typography pb={1} variant="h4" sx={{ color: config.isDHDP ? theme.palette.primary.main : 'black' }}>
                     Data Visualization
                 </Typography>
                 <Grid container spacing={1} alignItems="center" justifyContent="center">

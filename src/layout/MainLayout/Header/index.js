@@ -12,6 +12,7 @@ import MenuList from '../../../MenuList';
 // assets
 import { IconMenu2 } from '@tabler/icons-react';
 import { useSidebarReaderContext } from '../Sidebar/SidebarContext';
+import config from 'config';
 
 // style constant
 const PREFIX = 'MainLayoutHeader';
@@ -55,29 +56,40 @@ function Header({ handleLeftDrawerToggle }) {
         <>
             {/* logo & toggler button */}
             <StyledBox sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <div className={classes.boxContainer}>
-                    <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
-                        <LogoSection />
-                    </Box>
-                    {sidebar && (
+                {config.isDHDP ? (
+                    // eslint-disable-next-line react/jsx-no-useless-fragment
+                    sidebar && (
                         <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
                             <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
                                 <IconMenu2 stroke={1.5} size="1.3rem" />
                             </Avatar>
                         </ButtonBase>
-                    )}
-                </div>
+                    )
+                ) : (
+                    <div className={classes.boxContainer}>
+                        <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
+                            <LogoSection />
+                        </Box>
+                        {sidebar && (
+                            <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                                <Avatar variant="rounded" className={classes.headerAvatar} onClick={handleLeftDrawerToggle} color="inherit">
+                                    <IconMenu2 stroke={1.5} size="1.3rem" />
+                                </Avatar>
+                            </ButtonBase>
+                        )}
+                    </div>
+                )}
                 <Box pl={2} sx={{ display: 'flex', flexDirection: 'row' }}>
                     <MenuList />
                 </Box>
+                <StyledGrow className={classes.grow} />
+                <ProfileSection />
             </StyledBox>
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
-            <StyledGrow className={classes.grow} />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
-            <ProfileSection />
         </>
     );
 }

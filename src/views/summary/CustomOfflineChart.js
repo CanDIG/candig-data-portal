@@ -68,6 +68,9 @@ function CustomOfflineChart({
     NoDataToDisplay(Highcharts);
     highchartsAccessibility(Highcharts);
 
+    const titleLabelStyle = config.isDHDP ? { color: '#58595B', fontFamily: 'Montserrat', fontSize: 8 } : {};
+    const axisLabelStyle = config.isDHDP ? { color: '#58595B', fontFamily: 'Montserrat', fontSize: '0.8em' } : {};
+
     const [chartOptions, setChartOptions] = useState({
         credits: {
             enabled: false
@@ -87,8 +90,12 @@ function CustomOfflineChart({
             theme.palette.tertiary[800]
         ],
         title: {
+            align: config.isDHDP ? 'left' : undefined,
             style: {
-                fontWeight: 'normal'
+                fontFamily: config.isDHDP ? 'Montserrat' : undefined,
+                fontSize: config.isDHDP ? 14 : undefined,
+                fontWeight: config.isDHDP ? 'bold' : 'normal',
+                color: config.isDHDP ? theme.palette.primary.dark : undefined
             }
         }
     });
@@ -242,13 +249,29 @@ function CustomOfflineChart({
                         height
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title,
-                        style: {
-                            fontWeight: 'normal'
-                        }
+                        text: DataVisualizationChartInfo[chartData].title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].xAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        categories,
+                        allowDecimals: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].yAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        allowDecimals: false
+                    },
                     colors: stackedTheme,
                     plotOptions: {
                         series: {
@@ -291,15 +314,49 @@ function CustomOfflineChart({
                         type: chart
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData]?.title,
-                        style: {
-                            fontWeight: 'normal'
-                        }
+                        text: DataVisualizationChartInfo[chartData]?.title
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData]?.xAxis }, categories, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData]?.yAxis }, allowDecimals: false },
-                    colors: [theme.palette.primary.dark],
-                    series: [{ data, colorByPoint: true, showInLegend: false }],
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData]?.xAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        categories,
+                        allowDecimals: false
+                    },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData]?.yAxis,
+                            style: titleLabelStyle
+                        },
+                        labels: {
+                            style: axisLabelStyle
+                        },
+                        allowDecimals: false
+                    },
+                    colors: ['#00879D'],
+                    series: [
+                        {
+                            data,
+                            dataLabels: config.isDHDP
+                                ? {
+                                      enabled: true,
+                                      inside: true,
+                                      style: {
+                                          color: '#FFFFFF',
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 8,
+                                          textOutline: false
+                                      }
+                                  }
+                                : {},
+                            colorByPoint: true,
+                            showInLegend: false
+                        }
+                    ],
                     tooltip: {
                         useHTML: true,
                         // Anonymous functions don't appear to work with highcharts for some reason?
@@ -351,13 +408,28 @@ function CustomOfflineChart({
                         plotShadow: false
                     },
                     title: {
-                        text: DataVisualizationChartInfo[chartData].title,
-                        style: {
-                            fontWeight: 'normal'
+                        text: DataVisualizationChartInfo[chartData].title
+                    },
+                    xAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].xAxis,
+                            style: titleLabelStyle
+                        },
+                        allowDecimals: false,
+                        labels: {
+                            style: axisLabelStyle
                         }
                     },
-                    xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, allowDecimals: false },
-                    yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
+                    yAxis: {
+                        title: {
+                            text: DataVisualizationChartInfo[chartData].yAxis,
+                            style: titleLabelStyle
+                        },
+                        allowDecimals: false,
+                        labels: {
+                            style: axisLabelStyle
+                        }
+                    },
                     tooltip: {
                         pointFormat: '<b>{point.name}:</b> {point.y}'
                     },

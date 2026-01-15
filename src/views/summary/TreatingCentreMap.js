@@ -7,12 +7,20 @@ import PropTypes from 'prop-types';
 
 import { trackPromise } from 'ui-component/LoadingIndicator/LoadingIndicator';
 import MainCard from 'ui-component/cards/MainCard';
+import config from 'config';
 
 // Initialize HighchartsMap
 HighchartsMap(Highcharts);
 const initialState = {
     title: {
-        text: 'CanDIG Data Source'
+        text: 'Data Source',
+        align: config.isDHDP ? 'left' : undefined,
+        style: {
+            color: config.isDHDP ? '#00434F' : undefined,
+            fontFamily: config.isDHDP ? 'Montserrat' : undefined,
+            fontSize: config.isDHDP ? 14 : undefined,
+            fontWeight: config.isDHDP ? 'bold' : 'normal'
+        }
     },
     credits: {
         enabled: false
@@ -24,9 +32,13 @@ const initialState = {
     },
     colorAxis: {
         min: 0,
-        minColor: '#E4FFE9',
-        maxColor: '#36B84C'
+        nullColor: config.isDHDP ? '#B0DAE1' : undefined,
+        minColor: config.isDHDP ? '#B0DAE1' : '#E4FFE9',
+        maxColor: config.isDHDP ? '#00879D' : '#36B84C'
     },
+    negativeColor: config.isDHDP ? '#B0DAE1' : undefined,
+    nullColor: config.isDHDP ? '#B0DAE1' : undefined,
+    nullInteraction: false,
     series: [
         {
             type: 'map',
@@ -34,7 +46,14 @@ const initialState = {
             mapData: mapDataCanada,
             states: {
                 hover: {
-                    color: '#1E88E5'
+                    color: config.isDHDP ? '#00879D' : '#1E88E5',
+                    borderColor: config.isDHDP ? '#003D47' : undefined
+                },
+                select: {
+                    color: config.isDHDP ? '#B0DAE1' : undefined
+                },
+                normal: {
+                    color: config.isDHDP ? '#B0DAE1' : undefined
                 }
             }
         }

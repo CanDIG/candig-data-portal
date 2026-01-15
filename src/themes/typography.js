@@ -1,10 +1,12 @@
+import config from 'config';
+
 /**
  * Typography used in theme
  * @param {JsonObject} theme theme customization object
  */
 export default function themeTypography(theme) {
     return {
-        fontFamily: theme.customization.fontFamily,
+        fontFamily: 'Montserrat', // theme.customization.fontFamily,
         h6: {
             fontWeight: 500,
             color: theme.heading,
@@ -88,7 +90,7 @@ export default function themeTypography(theme) {
             minHeight: 'calc(100vh - 88px)',
             flexGrow: 1,
             padding: '20px',
-            marginTop: '88px',
+            marginTop: config.isDHDP ? '0px' : '88px',
             marginRight: '20px',
             borderRadius: `${theme.customization.borderRadius}px`
         },
