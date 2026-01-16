@@ -93,7 +93,7 @@ function ClinicalView() {
     const rows = processSearchResults(searchResults);
 
     const handleRowClick = (row) => {
-        /* Disabled until we have the patient view up and running
+        /* TODO: Disabled until we have the patient view up and running
         const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}`;
         window.open(url, '_blank'); */
     };
