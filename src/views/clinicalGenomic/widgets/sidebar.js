@@ -290,9 +290,9 @@ function StyledCheckboxList(props) {
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
     let label = groupName;
     if (groupName === 'exclude_programs') {
-        groupName = 'Datasets';
+        label = 'Datasets';
     } else if (groupName === 'primary_site') {
-        groupName = 'Diseases';
+        label = 'Diseases';
     }
 
     return useAutoComplete ? (
@@ -314,9 +314,7 @@ function StyledCheckboxList(props) {
                     {option}
                 </li>
             )}
-            renderInput={(params) => (
-                <TextField {...params} className={classes.inputDHDP} label={label} />
-            )}
+            renderInput={(params) => <TextField {...params} className={classes.inputDHDP} label={label} />}
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
             }
