@@ -234,9 +234,9 @@ function MatchingPatientsView() {
     if (!searchResultsGenomic && !hasClinicalResults) {
         headingTextResults = 'No matching patients found. Try adjusting your filters.';
     } else if (!hasValidQuery) {
-        headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
+        // headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
     } else {
-        headingTextResults = `Clinical and Genomic results`;
+        headingTextResults = `Clinical results`;
     }
 
     const totalRows = searchResultsClinical

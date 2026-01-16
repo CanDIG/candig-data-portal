@@ -11,12 +11,12 @@ const { basename } = config;
 
 const clinicalGenomicSearch = {
     id: 'clinicalGenomicSearch',
-    title: 'clinical & Genomic Search',
+    title: 'clinical Search',
     type: 'group',
     children: [
         {
             id: 'clinicalGenomicSearch',
-            title: 'Clinical & Genomic Search',
+            title: 'Clinical Search',
             type: 'item',
             url: `${basename}/clinicalGenomicSearch `,
             icon: config.isDHDP ? IconSearch : IconReportSearch,
