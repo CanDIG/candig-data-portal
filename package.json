@@ -52,7 +52,7 @@
     "scripts": {
         "start": "vite",
         "build": "vite build",
-        "lint": "eslint .",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "serve": "vite preview"
     },
     "eslintConfig": {
