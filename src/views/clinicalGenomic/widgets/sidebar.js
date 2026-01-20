@@ -764,7 +764,7 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Datasets">
+            {/* <SidebarGroup name="Datasets">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
@@ -775,7 +775,7 @@ function Sidebar() {
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
                 />
-            </SidebarGroup>
+            </SidebarGroup> */}
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}
