@@ -256,6 +256,7 @@ export function queryBeacon(params, filter_mapping, abort = null) {
 
     const NON_FILTER_PARAMS = ['page', 'page_size'];
     const NON_ID_FILTERS = [];
+    const INVALID_FILTERS = ['', null, undefined];
 
     if (typeof params !== 'undefined' && params !== null) {
         Object.keys(params).forEach((param) => {
@@ -265,7 +266,7 @@ export function queryBeacon(params, filter_mapping, abort = null) {
 
             const new_param = {};
 
-            if (!NON_ID_FILTERS.includes(param)) {
+            if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
                 new_param.id = filter_mapping[params[param]];
                 params_filters.push(new_param);
             } else {
