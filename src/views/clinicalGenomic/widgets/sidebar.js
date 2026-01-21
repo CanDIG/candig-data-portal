@@ -288,6 +288,12 @@ function StyledCheckboxList(props) {
     };
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
+    let label = groupName;
+    if (groupName === 'exclude_programs') {
+        label = 'Datasets';
+    } else if (groupName === 'primary_site') {
+        label = 'Diseases';
+    }
 
     return useAutoComplete ? (
         <Autocomplete
@@ -308,9 +314,7 @@ function StyledCheckboxList(props) {
                     {option}
                 </li>
             )}
-            renderInput={(params) => (
-                <TextField {...params} className={classes.inputDHDP} label={groupName === 'exclude_programs' ? 'Datasets' : groupName} />
-            )}
+            renderInput={(params) => <TextField {...params} className={classes.inputDHDP} label={label} />}
             renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
             }
@@ -760,7 +764,7 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            <SidebarGroup name="Datasets">
+            {/* <SidebarGroup name="Datasets">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
@@ -771,7 +775,7 @@ function Sidebar() {
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
                 />
-            </SidebarGroup>
+            </SidebarGroup> */}
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}

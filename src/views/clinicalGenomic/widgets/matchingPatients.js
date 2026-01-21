@@ -119,7 +119,8 @@ function MatchingPatientsView() {
             return;
         }
         const url = `/patientView?patientId=${row.submitter_donor_id}&programId=${row.program_id}&location=${row.location}&submitterSampleId=${row.submitter_sample_id}&tumourNormalDesignation=${row.tumour_normal_designation}&variantCount=${row.variant_count}`;
-        window.open(url, '_blank');
+        // TODO: Disabled until we have the patient view up and running
+        // window.open(url, '_blank');
     };
 
     // Responsive
@@ -234,9 +235,9 @@ function MatchingPatientsView() {
     if (!searchResultsGenomic && !hasClinicalResults) {
         headingTextResults = 'No matching patients found. Try adjusting your filters.';
     } else if (!hasValidQuery) {
-        headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
+        // headingTextResults = 'Showing Clinical matches only. Genomic results require a query for gene, position, or genomic data type';
     } else {
-        headingTextResults = `Clinical and Genomic results`;
+        headingTextResults = `Clinical results`;
     }
 
     const totalRows = searchResultsClinical

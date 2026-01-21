@@ -348,7 +348,7 @@ function CustomOfflineChart({
                                       style: {
                                           color: '#FFFFFF',
                                           fontFamily: 'Montserrat',
-                                          fontSize: 8,
+                                          fontSize: '0.7em',
                                           textOutline: false
                                       }
                                   }

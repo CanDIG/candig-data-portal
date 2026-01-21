@@ -66,14 +66,20 @@ function FormatClinicalData(data) {
 }
 
 function FormatFederationData(data) {
-    return data.map((site) => {
-        const newResults = Object.keys(site?.results?.info?.patients_per_program).map((program) => ({
-            patients_count: site?.results?.info?.patients_per_program[program],
-            program_id: program
-        }));
+    return data
+        .map((site) => {
+            if (!site?.results?.info?.patients_per_program) {
+                return undefined;
+            }
 
-        return { ...site, results: newResults };
-    });
+            const newResults = Object.keys(site?.results?.info?.patients_per_program).map((program) => ({
+                patients_count: site?.results?.info?.patients_per_program[program],
+                program_id: program
+            }));
+
+            return { ...site, results: newResults };
+        })
+        .filter((item) => item);
 }
 
 function FormatSidebarData(data) {

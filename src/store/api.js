@@ -251,11 +251,12 @@ export function queryBeacon(params, filter_mapping, abort = null) {
     // Transform the parameters into something that it'll understand
     const params_filters = [];
     // Grab out the page and page number
-    const page = undefined; // params?.page;
-    const page_size = undefined; // params?.page_size;
+    const page = params?.page ? `${params.page}` : undefined;
+    const page_size = params?.page_size;
 
     const NON_FILTER_PARAMS = ['page', 'page_size'];
     const NON_ID_FILTERS = [];
+    const INVALID_FILTERS = ['', null, undefined];
 
     if (typeof params !== 'undefined' && params !== null) {
         Object.keys(params).forEach((param) => {
@@ -265,7 +266,7 @@ export function queryBeacon(params, filter_mapping, abort = null) {
 
             const new_param = {};
 
-            if (!NON_ID_FILTERS.includes(param)) {
+            if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
                 new_param.id = filter_mapping[params[param]];
                 params_filters.push(new_param);
             } else {
@@ -281,11 +282,14 @@ export function queryBeacon(params, filter_mapping, abort = null) {
         query: {
             requestedGranularity: 'record',
             filters: params_filters, // [{ "id": "SNOMED:33821000087103" }]
-            pagination: {
+            // TO FIX: currently candig-api is reading its pagination parameters from the wrong place
+            /* pagination: {
                 page,
                 pageSize: page_size
                 // "skip": ?
-            }
+            } */
+            skip: page ? page * page_size : undefined,
+            limit: page_size
         }
     };
 
