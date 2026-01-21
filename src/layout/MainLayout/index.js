@@ -13,7 +13,7 @@ import clsx from 'clsx';
 // project imports
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from './Header';
-import Footer from './Footer';
+// import Footer from './Footer';
 import Sidebar from './Sidebar';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
@@ -22,6 +22,8 @@ import { SidebarProvider } from './Sidebar/SidebarContext';
 
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
+import config from 'config';
+import MainCard from 'ui-component/cards/MainCard';
 
 // style constant
 const PREFIX = 'MainLayout';
@@ -98,6 +100,7 @@ const Root = styled('div')(({ theme, leftDrawerOpened }) => ({
 function MainLayout() {
     const theme = useTheme();
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
+    const customization = useSelector((state) => state.customization);
 
     // Handle left drawer
     const [sidebarContent, setSidebarContent] = useState(null);
@@ -112,6 +115,36 @@ function MainLayout() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd]);
 
+    const header = config.isDHDP ? (
+        <MainCard
+            sx={{
+                position: 'relative',
+                borderRadius: customization.borderRadius * 0.25,
+                marginTop: '2.5em',
+                marginBottom: '2.5em'
+            }}
+            contentSX={{
+                paddingBottom: '0.5em !important'
+            }}
+        >
+            <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+        </MainCard>
+    ) : (
+        <AppBar
+            enableColorOnDark
+            position="fixed"
+            color="inherit"
+            elevation={0}
+            className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
+        >
+            <Toolbar>
+                <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+            </Toolbar>
+        </AppBar>
+    );
+
+    const sidebar = <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />;
+
     return (
         <Root
             className={clsx([
@@ -123,21 +156,15 @@ function MainLayout() {
         >
             <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
                 <CssBaseline />
-                {/* header */}
-                <AppBar
-                    enableColorOnDark
-                    position="fixed"
-                    color="inherit"
-                    elevation={0}
-                    className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
-                >
-                    <Toolbar>
-                        <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-                    </Toolbar>
-                </AppBar>
-
-                {/* drawer */}
-                <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+                {config.isDHDP ? (
+                    // eslint-disable-next-line react/jsx-no-useless-fragment
+                    sidebar
+                ) : (
+                    <>
+                        {header}
+                        {sidebar}
+                    </>
+                )}
 
                 {/* main content */}
                 <main
@@ -148,13 +175,19 @@ function MainLayout() {
                         }
                     ])}
                 >
+                    {config.isDHDP ? (
+                        header
+                    ) : (
+                        // eslint-disable-next-line react/jsx-no-useless-fragment
+                        <></>
+                    )}
                     {/* breadcrumb */}
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />
                 </main>
 
                 {/* FOOTER */}
-                <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
+                {/* <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} /> */}
             </SidebarProvider>
         </Root>
     );

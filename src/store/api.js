@@ -190,6 +190,7 @@ export function fetchClinicalCompleteness() {
         // Step 1: Determine the number of provinces
         const provinces = data?.map((site) => site?.location?.province);
         const uniqueProvinces = [...new Set(provinces)];
+        const uniquePrograms = new Set();
         const retVal = {};
         retVal.numProvinces = uniqueProvinces.length;
 
@@ -203,6 +204,7 @@ export function fetchClinicalCompleteness() {
             totalSites += 1;
             totalErroredSites += site.status === 200 ? 0 : 1;
             site?.results?.programs?.forEach((program) => {
+                uniquePrograms.add(program.program_id);
                 if (program?.metadata?.summary_cases) {
                     totalCases += program.metadata.summary_cases.total_cases;
                     completeCases += program.metadata.summary_cases.complete_cases;
@@ -218,6 +220,7 @@ export function fetchClinicalCompleteness() {
         retVal.numDonors = totalCases;
         retVal.numCompleteDonors = completeCases;
         retVal.numClinicalComplete = completeClinical;
+        retVal.uniquePrograms = uniquePrograms;
         retVal.data = data;
         return retVal;
     });
@@ -227,7 +230,7 @@ export function fetchClinicalCompleteness() {
  * Directly query Query for the /get-token endpoint, which reflects our refresh token.
  */
 export function fetchRefreshToken() {
-    return fetchOrRelogin(`${INGEST_URL}/get-token`)
+    return fetchOrRelogin(`${API_URL}/v1/authz/get-token`)
         .then((response) => response.json())
         .catch((error) => {
             console.log('Error:', error);
@@ -264,10 +267,11 @@ export function queryBeacon(params, filter_mapping, abort = null) {
 
             if (!NON_ID_FILTERS.includes(param)) {
                 new_param.id = filter_mapping[params[param]];
-                // } else {
+                params_filters.push(new_param);
+            } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
+                console.log(`Non-ID filter found but not yet supported: ${param}`);
             }
-            params_filters.push(new_param);
         });
     }
 

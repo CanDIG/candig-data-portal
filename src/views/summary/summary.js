@@ -16,6 +16,7 @@ import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/ico
 
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import FieldLevelCompletenessGraph from '../completeness/fieldLevelCompletenessGraph';
+import config from 'config';
 
 function Summary() {
     const theme = useTheme();
@@ -54,7 +55,21 @@ function Summary() {
 
     /* Aggregated count of federated data */
     function federationStatCount(data, endpoint) {
-        const candigDataSourceCollection = {};
+        const candigDataSourceCollection = {
+            'ca-bc': 0,
+            'ca-on': 0,
+            'ca-nu': 0,
+            'ca-nt': 0,
+            'ca-ab': 0,
+            'ca-nl': 0,
+            'ca-sk': 0,
+            'ca-mb': 0,
+            'ca-qc': 0,
+            'ca-nb': 0,
+            'ca-ns': 0,
+            'ca-pe': 0,
+            'ca-yt': 0
+        };
 
         if (data && Array.isArray(data)) {
             // Fake Server with same URL
@@ -73,7 +88,10 @@ function Summary() {
                     case '/individual_count':
                         setIndividualCount((oldIndividualCount) => aggregateObj(stat.results, oldIndividualCount));
                         if (stat.location) {
-                            if (!(stat.location['province-code'] in candigDataSourceCollection)) {
+                            if (
+                                !(stat.location['province-code'] in candigDataSourceCollection) ||
+                                candigDataSourceCollection[stat.location['province-code']] == null
+                            ) {
                                 candigDataSourceCollection[stat.location['province-code']] = 0;
                             }
                             candigDataSourceCollection[stat.location['province-code']] += parseInt(stat.results.individual_count, 10);
@@ -184,7 +202,7 @@ function Summary() {
                             <SmallCountCard
                                 title="Nodes"
                                 count={`${sites}/${totalSites}`}
-                                icon={<CheckCircleOutline fontSize="inherit" />}
+                                icon={config.isDHDP ? null : <CheckCircleOutline fontSize="inherit" />}
                                 color={theme.palette.secondary.main}
                             />
                         </Grid>
@@ -192,7 +210,7 @@ function Summary() {
                             <SmallCountCard
                                 title="Connection Error"
                                 count={`${connectionError}/${totalSites}`}
-                                icon={<WarningAmber fontSize="inherit" />}
+                                icon={config.isDHDP ? null : <WarningAmber fontSize="inherit" />}
                                 color={theme.palette.error.main}
                             />
                         </Grid>
@@ -203,7 +221,7 @@ function Summary() {
                     <SmallCountCard
                         title="Nodes"
                         count={sites}
-                        icon={<CheckCircleOutline fontSize="inherit" />}
+                        icon={config.isDHDP ? null : <CheckCircleOutline fontSize="inherit" />}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
@@ -211,10 +229,10 @@ function Summary() {
             <Grid item xs={12} sm={12} md={6} lg={3}>
                 <SmallCountCard
                     isLoading={isLoading['/individual_count']}
-                    title="Number of Patients"
+                    title={config.isDHDP ? 'Patients' : 'Number of Patients'}
                     count={individualCount?.individual_count || 0}
                     primary
-                    icon={<Person fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Person fontSize="inherit" />}
                     color={theme.palette.primary.main}
                 />
             </Grid>
@@ -223,7 +241,7 @@ function Summary() {
                     isLoading={isLoading['/individual_count']}
                     title="Programs"
                     count={programCount?.program_count || 0}
-                    icon={<Hive fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Hive fontSize="inherit" />}
                     color={theme.palette.secondary.main}
                 />
             </Grid>
@@ -232,7 +250,7 @@ function Summary() {
                     isLoading={isLoading['/individual_count']}
                     title="Provinces"
                     count={provinceCounter || 0}
-                    icon={<Public fontSize="inherit" />}
+                    icon={config.isDHDP ? null : <Public fontSize="inherit" />}
                     color={theme.palette.tertiary.main}
                 />
             </Grid>

@@ -1,15 +1,11 @@
 // assets
-import { IconTrendingUp } from '@tabler/icons-react';
+import { IconChartBar, IconTrendingUp } from '@tabler/icons-react';
 
 // import project config
 import config from 'config';
 
 // constant
 const { basename } = config;
-
-const icons = {
-    IconTrendingUp
-};
 
 // ===========================|| Completeness Stats MENU ITEMS ||=========================== //
 
@@ -23,7 +19,7 @@ const completenessStats = {
             title: 'Completeness Stats',
             type: 'item',
             url: `${basename}/completeness `,
-            icon: icons.IconTrendingUp,
+            icon: config.isDHDP ? IconChartBar : IconTrendingUp,
             breadcrumbs: false
         }
     ]

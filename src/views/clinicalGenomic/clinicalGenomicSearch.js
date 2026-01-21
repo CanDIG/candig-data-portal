@@ -14,6 +14,7 @@ import { SearchIndicator } from 'ui-component/LoadingIndicator/SearchIndicator';
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';
 import MatchingPatients from './widgets/matchingPatients';
+import config from 'config';
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -55,7 +56,7 @@ const Root = styled('div')(({ _ }) => ({
     },
 
     [`& .${classes.headerSpacing}`]: {
-        height: 70
+        height: config.isDHDP ? 0 : 70
     },
 
     [`& .${classes.anchor}`]: {
@@ -94,9 +95,9 @@ const StyledMainCard = styled(MainCard)((_) => ({
 
 const sections = [
     {
-        id: 'Programs summary',
+        id: 'Datasets summary',
         header: undefined,
-        component: <AuthorizationSections title="All Programs" />
+        component: config.isDHDP ? ' ' : <AuthorizationSections title="All Datasets" />
     },
     {
         id: 'counts',
@@ -109,9 +110,9 @@ const sections = [
         component: <DataVisualization />
     },
     {
-        id: 'authorized programs',
+        id: 'authorized datasets',
         header: undefined,
-        component: <AuthorizationSections title="Authorized Programs" />
+        component: config.isDHDP ? ' ' : <AuthorizationSections title="Authorized Datasets" />
     },
     {
         id: 'Matching Patients',
@@ -132,38 +133,8 @@ function ClinicalGenomicSearch() {
         sidebarWriter(<Sidebar />);
     }, [sidebarWriter]);
 
-    return (
-        <Root>
-            {/* Top bar */}
-            <AppBar
-                component="nav"
-                className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
-            >
-                <Toolbar className={classes.toolbar}>
-                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        Federated Search
-                    </Typography>
-                    {sections
-                        .map((section) =>
-                            section.header !== undefined ? (
-                                <Button
-                                    onClick={() => {
-                                        window.location.href = `#${section.id}`;
-                                    }}
-                                    sx={{ my: 2, display: 'block' }}
-                                    key={section.id}
-                                    className={classes.navigationLink}
-                                    variant="text"
-                                >
-                                    {section.header}
-                                </Button>
-                            ) : undefined
-                        )
-                        .filter((obj) => obj !== undefined)}
-                </Toolbar>
-                <SearchExplainer />
-            </AppBar>
-            {/* Empty div to make sure the header takes up space */}
+    const mainArea = (
+        <>
             <div className={classes.headerSpacing} />
             <SearchHandler setLoading={setLoading} />
             <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
@@ -188,6 +159,46 @@ function ClinicalGenomicSearch() {
                     </div>
                 ))}
             </MainCard>
+        </>
+    );
+
+    return (
+        <Root>
+            {config.isDHDP ? (
+                mainArea
+            ) : (
+                <>
+                    <AppBar
+                        component="nav"
+                        className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
+                    >
+                        <Toolbar className={classes.toolbar}>
+                            <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                                Federated Search
+                            </Typography>
+                            {sections
+                                .map((section) =>
+                                    section.header !== undefined ? (
+                                        <Button
+                                            onClick={() => {
+                                                window.location.href = `#${section.id}`;
+                                            }}
+                                            sx={{ my: 2, display: 'block' }}
+                                            key={section.id}
+                                            className={classes.navigationLink}
+                                            variant="text"
+                                        >
+                                            {section.header}
+                                        </Button>
+                                    ) : undefined
+                                )
+                                .filter((obj) => obj !== undefined)}
+                        </Toolbar>
+                        <SearchExplainer />
+                    </AppBar>
+                    {mainArea}
+                </>
+            )}
         </Root>
     );
 }
