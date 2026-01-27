@@ -63,7 +63,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
         color: theme.palette.text.disabled
     },
     [`& .${classes.warningIcon}`]: {
-        color: theme.palette.warning.main,
+        color: theme.palette.tertiary[800],
         marginLeft: '0.25em',
         fontSize: '1.25em',
         verticalAlign: 'text-bottom'
