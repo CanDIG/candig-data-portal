@@ -22,6 +22,7 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
 
@@ -35,7 +36,8 @@ const classes = {
     hidden: `${PREFIX}-hidden`,
     button: `${PREFIX}-button`,
     lockIcon: `${PREFIX}-lockIcon`,
-    lockContainer: `${PREFIX}-lockContainer`
+    lockContainer: `${PREFIX}-lockContainer`,
+    warningIcon: `${PREFIX}-warningIcon`
 };
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
@@ -77,6 +79,11 @@ const Root = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    [`& .${classes.warningIcon}`]: {
+        color: theme.palette.tertiary[800],
+        marginLeft: '0.25em',
+        fontSize: '1.25em'
     }
 }));
 
@@ -133,15 +140,14 @@ function StyledCheckboxList(props) {
         selectedPrograms,
         setSelectedPrograms,
         checked,
-        setChecked
+        setChecked,
+        optionStatusMap
     } = props;
 
     const context = useSearchResultsReaderContext();
     const sites = context?.federation;
 
-    if (hide) {
-        return null;
-    }
+    if (hide) return null;
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -274,35 +280,87 @@ function StyledCheckboxList(props) {
             id={`checkboxes-tags-${groupName}`}
             options={options}
             disableCloseOnSelect
-            renderOption={(props, option, { selected }) => (
-                <li {...props} key={option}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: '100%'
-                        }}
-                    >
-                        <Checkbox
-                            icon={icon}
-                            checkedIcon={checkedIcon}
-                            sx={{
-                                paddingTop: 0,
-                                paddingBottom: 0,
-                                marginRight: 1
-                            }}
-                            checked={isExclusion ? !selected : selected}
-                            value={option}
-                        />
+            renderOption={(props, option, { selected }) => {
+                const status = optionStatusMap?.[option];
+                const isHealthy = status?.healthy !== false;
 
-                        <span
+                return (
+                    <li {...props} key={option}>
+                        <div
                             style={{
-                                display: 'inline-flex',
-                                alignItems: 'baseline',
-                                gap: '4px',
-                                lineHeight: 1.2
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '100%'
                             }}
                         >
+                            <Checkbox
+                                icon={icon}
+                                checkedIcon={checkedIcon}
+                                sx={{
+                                    paddingTop: 0,
+                                    paddingBottom: 0,
+                                    marginRight: 1
+                                }}
+                                checked={isExclusion ? !selected : selected}
+                                value={option}
+                                disabled={!isHealthy}
+                            />
+                            <span
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'baseline',
+                                    gap: '4px',
+                                    lineHeight: 1.2
+                                }}
+                            >
+                                {option}
+                                {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                    <Tooltip title="Unauthorized Program" placement="right">
+                                        <LockOutlinedIcon
+                                            sx={{
+                                                color: 'primary.main',
+                                                fontSize: '1.1rem',
+                                                verticalAlign: 'text-bottom',
+                                                position: 'relative',
+                                                top: '3px'
+                                            }}
+                                        />
+                                    </Tooltip>
+                                )}
+                                {!isHealthy && (
+                                    <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
+                                        <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                                    </Tooltip>
+                                )}
+                            </span>
+                        </div>
+                    </li>
+                );
+            }}
+            value={checkedList}
+            // set width to match parent
+            sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
+            onChange={(_, value, reason) => {
+                const safeValue = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
+                HandleChange(safeValue, reason === 'selectOption');
+            }}
+            renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
+            renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
+            }
+            getOptionDisabled={(option) => optionStatusMap?.[option]?.healthy === false}
+        />
+    ) : (
+        options?.map((option) => {
+            const status = optionStatusMap?.[option];
+            const isHealthy = status?.healthy !== false;
+
+            return (
+                <FormControlLabel
+                    key={option}
+                    className={classes.checkboxLabel}
+                    label={
+                        <div className={classes.lockContainer}>
                             {option}
                             {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
                                 <Tooltip title="Unauthorized Program" placement="right">
@@ -317,58 +375,37 @@ function StyledCheckboxList(props) {
                                     />
                                 </Tooltip>
                             )}
-                        </span>
-                    </div>
-                </li>
-            )}
-            renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
-            renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
-            }
-            // set width to match parent
-            sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
-            onChange={(_, value, reason) => {
-                HandleChange(value, reason === 'selectOption');
-            }}
-            value={checkedList}
-        />
-    ) : (
-        options?.map((option) => (
-            <FormControlLabel
-                label={
-                    <div className={classes.lockContainer}>
-                        {option}
-                        {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
-                            <Tooltip title="Unauthorized Program" placement="right">
-                                <LockOutlinedIcon className={classes.lockIcon} />
-                            </Tooltip>
-                        )}
-                    </div>
-                }
-                control={
-                    <Checkbox
-                        className={classes.checkbox}
-                        checked={isExclusion ? !(option in checked) : option in checked}
-                        onChange={(event) => {
-                            const newList = Object.keys(checked).slice();
-                            if (!(option in checked)) {
-                                // Add to list
-                                newList.push(option);
-                            } else {
-                                // Remove from list
-                                const oldPos = newList.indexOf(option);
-                                if (oldPos >= 0) {
-                                    newList.splice(oldPos, 1);
+                            {!isHealthy && (
+                                <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
+                                    <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                                </Tooltip>
+                            )}
+                        </div>
+                    }
+                    control={
+                        <Checkbox
+                            className={classes.checkbox}
+                            checked={isExclusion ? !(option in checked) : option in checked}
+                            disabled={!isHealthy}
+                            onChange={(event) => {
+                                const newList = Object.keys(checked).slice();
+                                if (!(option in checked)) {
+                                    // Add to list
+                                    newList.push(option);
+                                } else {
+                                    // Remove from list
+                                    const oldPos = newList.indexOf(option);
+                                    if (oldPos >= 0) {
+                                        newList.splice(oldPos, 1);
+                                    }
                                 }
-                            }
-                            HandleChange(newList, event.target.checked);
-                        }}
-                    />
-                }
-                key={option}
-                className={classes.checkboxLabel}
-            />
-        ))
+                                HandleChange(newList, event.target.checked);
+                            }}
+                        />
+                    }
+                />
+            );
+        })
     );
 }
 
@@ -386,7 +423,8 @@ StyledCheckboxList.propTypes = {
     setSelectedPrograms: PropTypes.func,
     selectedPrograms: PropTypes.object,
     setChecked: PropTypes.func,
-    checked: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
+    checked: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    optionStatusMap: PropTypes.object
 };
 
 // A group of genomics data
@@ -577,6 +615,26 @@ function Sidebar() {
     const [selectedPrimarySite, setSelectedPrimarySite] = useState({});
     const [selectedSystemicTherapy, setSelectedSystemicTherapy] = useState({});
 
+    const nodeStatusMap = (() => {
+        const map = {};
+        readerContext?.federation?.forEach((site) => {
+            const nodeName = site?.location?.name;
+
+            map[nodeName] = {
+                healthy: true
+            };
+
+            if (!site?.results) {
+                map[nodeName] = {
+                    healthy: false,
+                    reason: 'Connection Error: No data returned from node'
+                };
+            }
+        });
+
+        return map;
+    })();
+
     // On our first load, remove all query parameters
     useEffect(() => {
         writerContext(() => ({ reqNum: 0 }));
@@ -751,6 +809,7 @@ function Sidebar() {
                     setSelectedPrograms={setSelectedPrograms}
                     checked={selectedNodes}
                     setChecked={setSelectedNodes}
+                    optionStatusMap={nodeStatusMap}
                 />
             </SidebarGroup>
             <SidebarGroup name="Programs">
