@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
 // mui
-import { Box, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, MenuItem, Switch, TextField as MuiTextField, Typography } from '@mui/material';
 
 const PREFIX = 'TextField';
 
 const classes = {
-    subLabel: `${PREFIX}-subLabel`
+    input: `${PREFIX}-input`
 };
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -16,14 +16,44 @@ const StyledBox = styled(Box)(({ theme }) => ({
     gap: '0.5rem',
     width: '100%',
 
-    [`& .${classes.subLabel}`]: {
-        color: 'inherit'
+    [`& .${classes.input}`]: {
+        '&.Mui-disabled': {
+            color: theme.palette.grey[900],
+            WebkitTextFillColor: theme.palette.grey[900]
+        }
+    }
+}));
+
+const StyledFormControlLabel = styled(FormControlLabel)(() => ({
+    '& .MuiFormControlLabel-asterisk': {
+        display: 'none'
     }
 }));
 
 // ===========================|| TEXTFIELD ||=========================== //
 
-function TextField({ onChange, value, options, multiline, label, subLabel, required = true, ...rest }) {
+function TextField({ label, onChange, checkbox, hidden, id, multiline, options, required = true, subLabel, sx, toggle, value, ...rest }) {
+    if (hidden) {
+        return null;
+    }
+
+    if (checkbox || toggle) {
+        const handleChange = (_, checked) => {
+            onChange(checked);
+        };
+
+        return (
+            <StyledFormControlLabel
+                label={<Typography>{label}</Typography>}
+                control={checkbox ? <Checkbox required={required} /> : <Switch required={required} />}
+                onChange={handleChange}
+                checked={value || false}
+                sx={sx}
+                className={classes.formControl}
+            />
+        );
+    }
+
     const handleChange = (event) => {
         onChange(event.target.value);
     };
@@ -32,13 +62,15 @@ function TextField({ onChange, value, options, multiline, label, subLabel, requi
         onChange: handleChange,
         value: value || '',
         required,
-        inputProps: { id: label && label.replace(/\W/g, '') }
+        inputProps: { id: id || (label && label.replace(/\W/g, '')), className: classes.input },
+        sx,
+        ...rest
     };
 
     let textField;
     if (options) {
         textField = (
-            <MuiTextField select {...universalProps} {...rest}>
+            <MuiTextField select {...universalProps}>
                 {options.map((option) => (
                     <MenuItem key={option} value={option}>
                         {option}
@@ -47,15 +79,15 @@ function TextField({ onChange, value, options, multiline, label, subLabel, requi
             </MuiTextField>
         );
     } else if (multiline) {
-        textField = <MuiTextField multiline minRows={5} {...universalProps} {...rest} />;
+        textField = <MuiTextField multiline minRows={5} maxRows={10} {...universalProps} />;
     } else {
-        textField = <MuiTextField {...universalProps} {...rest} />;
+        textField = <MuiTextField {...universalProps} />;
     }
 
     return (
         <StyledBox>
             {label && (
-                <Typography component="label" htmlFor={label.replace(/\W/g, '')}>
+                <Typography component="label" htmlFor={id || label.replace(/\W/g, '')}>
                     {label}
                     {subLabel && <span className={classes.subLabel}> {subLabel}</span>}
                     {required && ' *'}
@@ -67,13 +99,18 @@ function TextField({ onChange, value, options, multiline, label, subLabel, requi
 }
 
 TextField.propTypes = {
-    onChange: PropTypes.func.isRequired,
     label: PropTypes.string.isRequired,
-    subLabel: PropTypes.string,
-    required: PropTypes.bool,
-    value: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    checkbox: PropTypes.bool,
+    hidden: PropTypes.bool,
+    id: PropTypes.string,
+    multiline: PropTypes.bool,
     options: PropTypes.arrayOf(PropTypes.string),
-    multiline: PropTypes.bool
+    required: PropTypes.bool,
+    subLabel: PropTypes.string,
+    sx: PropTypes.object,
+    toggle: PropTypes.bool,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
 };
 
 export default TextField;
