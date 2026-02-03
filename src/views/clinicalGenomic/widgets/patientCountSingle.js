@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import PropTypes from 'prop-types';
 import { SITE } from 'store/constant';
 import siteLogo from 'assets/images/users/siteLogo.png';
@@ -18,7 +19,9 @@ const classes = {
     siteName: `${PREFIX}-siteName`,
     locked: `${PREFIX}-locked`,
     button: `${PREFIX}-button`,
-    divider: `${PREFIX}-divider`
+    divider: `${PREFIX}-divider`,
+    unhealthy: `${PREFIX}-unhealthy`,
+    warningIcon: `${PREFIX}-warningIcon`
 };
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -55,6 +58,15 @@ const StyledBox = styled(Box)(({ theme }) => ({
         borderColor: theme.palette.primary.main,
         marginTop: 20,
         marginBottom: 4
+    },
+    [`& .${classes.unhealthy}`]: {
+        color: theme.palette.text.disabled
+    },
+    [`& .${classes.warningIcon}`]: {
+        color: theme.palette.tertiary[800],
+        marginLeft: '0.25em',
+        fontSize: '1.25em',
+        verticalAlign: 'text-bottom'
     }
 }));
 
@@ -63,6 +75,22 @@ function PatientCountSingle(props) {
     const theme = useTheme();
 
     const [expanded, setExpanded] = useState(false);
+
+    const nodeStatus = useMemo(() => {
+        const map = {};
+        const isHealthy = Object.keys(counts.totals).length > 0 && Object.keys(counts.counts).length > 0;
+        if (!isHealthy) {
+            console.log(counts);
+            console.log(counts.location);
+            map[counts.location] = {
+                healthy: false,
+                reason: 'Connection Error: No data returned from node'
+            };
+        } else {
+            map[counts.location] = { healthy: true };
+        }
+        return map;
+    }, [site, counts]);
 
     const SumCensoredTotals = (countsArray) =>
         countsArray.reduce(
@@ -93,7 +121,16 @@ function PatientCountSingle(props) {
                 <Grid item xs={2}>
                     <CardHeader
                         avatar={<Avatar src={SITE === site ? siteLogo : ''}>{SITE === site ? '' : site.slice(0, 1).toUpperCase()}</Avatar>}
-                        title={<b>{site}</b>}
+                        title={
+                            <Typography component="span" className={!nodeStatus[site].healthy ? classes.unhealthy : ''}>
+                                <b>{site}</b>
+                                {!nodeStatus[site].healthy && (
+                                    <Tooltip title={nodeStatus[site].reason || 'Node connection issue'} placement="right">
+                                        <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                                    </Tooltip>
+                                )}
+                            </Typography>
+                        }
                     />
                 </Grid>
                 <Divider flexItem orientation="vertical" className={classes.divider} />
