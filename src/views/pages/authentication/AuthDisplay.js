@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { MutatingDots } from 'react-loader-spinner';
 
 // MUI Imports
@@ -7,6 +8,7 @@ import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTo
 
 // Project Imports
 import MainCard from 'ui-component/cards/MainCard';
+import RequestAccessForm from 'ui-component/RequestAccessForm';
 import { useAuthContext } from './AuthContext';
 import config from 'config';
 
@@ -110,6 +112,9 @@ AlertCard.propTypes = {
 };
 
 function AuthDisplay() {
+    const [requestAccessFormOpen, setRequestAccessFormOpen] = useState(false);
+    const [requestAccessFormData, setRequestAccessFormData] = useState({});
+
     // Fire off the authorization check
     const authContext = useAuthContext();
     const authStatus = authContext[0];
@@ -126,6 +131,10 @@ function AuthDisplay() {
                 return retVal;
             });
         });
+    };
+
+    const openRequestAccessForm = () => {
+        setRequestAccessFormOpen(true);
     };
 
     let content;
@@ -188,9 +197,18 @@ function AuthDisplay() {
                     </Typography>
                 }
                 button={
-                    <Button variant="contained" onClick={requestAccess}>
-                        Request access
-                    </Button>
+                    <>
+                        <Button variant="contained" onClick={openRequestAccessForm}>
+                            Request access
+                        </Button>
+                        <RequestAccessForm
+                            open={requestAccessFormOpen}
+                            setOpen={setRequestAccessFormOpen}
+                            data={requestAccessFormData}
+                            setData={setRequestAccessFormData}
+                            onSubmit={requestAccess}
+                        />
+                    </>
                 }
             />
         );
