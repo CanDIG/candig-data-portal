@@ -247,7 +247,7 @@ export function fetchBeaconFilteringTerms() {
 
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
-export function queryBeacon(params, filter_mapping, abort = null) {
+export function queryBeacon(params, filter_mapping, programs, abort = null) {
     // Transform the parameters into something that it'll understand
     const params_filters = [];
     // Grab out the page and page number
@@ -257,6 +257,7 @@ export function queryBeacon(params, filter_mapping, abort = null) {
     const NON_FILTER_PARAMS = ['page', 'page_size'];
     const NON_ID_FILTERS = [];
     const INVALID_FILTERS = ['', null, undefined];
+    const DATASET_PARAM = 'dataset_ids';
 
     if (typeof params !== 'undefined' && params !== null) {
         Object.keys(params).forEach((param) => {
@@ -264,10 +265,16 @@ export function queryBeacon(params, filter_mapping, abort = null) {
                 return;
             }
 
-            const new_param = {};
-
             if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
-                new_param.id = filter_mapping[params[param]];
+                // Determine if we're dealing with a list or not (and if so, are we dealing with the datasets?)
+                const new_param = {};
+                if (param === DATASET_PARAM) {
+                    new_param.id = `dataset_id:${params[param].join('|')}`;
+                } else if (Array.isArray(filter_mapping[params[param]])) {
+                    new_param.id = params[param].map((thisParam) => filter_mapping[thisParam]).join('|');
+                } else {
+                    new_param.id = filter_mapping[params[param]];
+                }
                 params_filters.push(new_param);
             } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?

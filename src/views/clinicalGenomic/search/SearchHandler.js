@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { fetchFederation, queryBeacon, fetchBeaconFilteringTerms } from 'store/api';
+import { queryBeacon, fetchBeaconFilteringTerms } from 'store/api';
 import { isCensored } from 'utils/utils';
 
 // The old function to collate summary statistics from multiple sites together
