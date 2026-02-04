@@ -288,7 +288,12 @@ function StyledCheckboxList(props) {
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
     let label = groupName;
-    if (groupName === 'exclude_programs') {
+    let renderTags = (tagValue, getTagProps) =>
+        tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+    if (groupName === 'dataset_ids') {
+        // Datasets: instead of using Chips to display the selected datasets (which can be confusing)
+        // we instead just show a short text description describing how many datasets have been selected
+        renderTags = (tagValue, _) => <span>{`${tagValue.length} datasets selected, expand to see more`}</span>;
         label = 'Datasets';
     } else if (groupName === 'primary_site') {
         label = 'Diseases';
@@ -314,9 +319,7 @@ function StyledCheckboxList(props) {
                 </li>
             )}
             renderInput={(params) => <TextField {...params} className={classes.inputDHDP} label={label} />}
-            renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
-            }
+            renderTags={renderTags}
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason) => {
@@ -685,6 +688,14 @@ function Sidebar() {
         });
     }
 
+    function setPrograms(programs) {
+        const newPrograms = {};
+        programs.forEach((program) => {
+            newPrograms[program] = true;
+        });
+        setSelectedPrograms(newPrograms);
+    }
+
     // Fill up a list of options from the results of a Katsu query
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
@@ -771,6 +782,14 @@ function Sidebar() {
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
                 />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button className={classes.button} onClick={() => setPrograms(programs)}>
+                        Select all
+                    </Button>
+                    <Button className={classes.button} onClick={() => setPrograms([])}>
+                        Reset
+                    </Button>
+                </div>
             </SidebarGroup>
             <GenomicsGroup
                 chromosomes={chromosomes}

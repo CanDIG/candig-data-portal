@@ -267,21 +267,19 @@ export function queryBeacon(params, filter_mapping, programs, abort = null) {
 
             if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
                 // Determine if we're dealing with a list or not (and if so, are we dealing with the datasets?)
-                const new_param = {};
+                console.log(params[param]);
                 if (param === DATASET_PARAM) {
-                    new_param.id = `dataset_id:${params[param].join('|')}`;
-                } else if (Array.isArray(filter_mapping[params[param]])) {
-                    new_param.id = params[param].map((thisParam) => filter_mapping[thisParam]).join('|');
-                } else {
-                    new_param.id = filter_mapping[params[param]];
-                }
-
-                // Prevent an empty filter from somehow being passed on
-                if (typeof new_param.id === 'undefined') {
+                    params_filters.push({ id: `dataset_id:${params[param].join('|')}` });
+                } else if (Array.isArray(params[param])) {
+                    params[param].forEach((thisParam) => {
+                        params_filters.push({ id: filter_mapping[thisParam] });
+                    });
+                } else if (filter_mapping[params[param]] === 'undefined') {
+                    // Prevent an empty filter from somehow being passed on
                     console.log(`ID filter has no mapping: ${param} / ${params[param]}`);
-                    return;
+                } else {
+                    params_filters.push({ id: filter_mapping[params[param]] });
                 }
-                params_filters.push(new_param);
             } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
                 console.log(`Non-ID filter found but not yet supported: ${param}`);
