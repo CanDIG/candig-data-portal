@@ -254,7 +254,7 @@ export function queryBeacon(params, filter_mapping, programs, abort = null) {
     const page = params?.page ? `${params.page}` : undefined;
     const page_size = params?.page_size;
 
-    const NON_FILTER_PARAMS = ['page', 'page_size'];
+    const NON_FILTER_PARAMS = ['page', 'page_size', 'genomic_data_types'];
     const NON_ID_FILTERS = [];
     const INVALID_FILTERS = ['', null, undefined];
     const DATASET_PARAM = 'dataset_ids';
@@ -274,6 +274,12 @@ export function queryBeacon(params, filter_mapping, programs, abort = null) {
                     new_param.id = params[param].map((thisParam) => filter_mapping[thisParam]).join('|');
                 } else {
                     new_param.id = filter_mapping[params[param]];
+                }
+
+                // Prevent an empty filter from somehow being passed on
+                if (typeof new_param.id === 'undefined') {
+                    console.log(`ID filter has no mapping: ${param} / ${params[param]}`);
+                    return;
                 }
                 params_filters.push(new_param);
             } else {
