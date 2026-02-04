@@ -132,7 +132,7 @@ function MatchingPatientsView() {
         () => searchResultsClinical && Object.values(searchResultsClinical).some((location) => location?.results?.length > 0),
         [searchResultsClinical]
     );
-    const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.trim().length > 0;
+    const hasValidQuery = (query?.assembly && query?.chrom) || query?.gene || query?.genomic_data_types?.length > 0;
 
     // Column definitions
     const clinicalFields = [
