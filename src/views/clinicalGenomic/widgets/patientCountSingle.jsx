@@ -90,7 +90,7 @@ function PatientCountSingle(props) {
             map[counts.location] = { healthy: true };
         }
         return map;
-    }, [site, counts]);
+    }, [counts]);
 
     const SumCensoredTotals = (countsArray) =>
         countsArray.reduce(
