@@ -245,6 +245,10 @@ export function fetchBeaconFilteringTerms() {
     return fetchFederation('v1/beacon/datasets/filtering_terms', 'candig-api');
 }
 
+export function fetchDatasetPermissions() {
+    return fetchFederation('v1/authz/user/me', 'candig-api');
+}
+
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
 export function queryBeacon(params, filter_mapping, programs, abort = null) {

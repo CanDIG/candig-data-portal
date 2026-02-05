@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
-import { queryBeacon, fetchBeaconFilteringTerms } from 'store/api';
+import { queryBeacon, fetchBeaconFilteringTerms, fetchDatasetPermissions } from 'store/api';
 import { isCensored } from 'utils/utils';
 
 // The old function to collate summary statistics from multiple sites together
@@ -117,6 +117,35 @@ function FormatFilters(data) {
     return retVal;
 }
 
+function FormatAuthorization(authData, fedData) {
+    const allowedPrograms = {};
+    // authData contains the results from federating v1/authz/user/me
+    authData.forEach((site) => {
+        const siteID = site.location.name;
+
+        if (typeof site?.results?.site_roles === 'undefined') {
+            // We have run into some sort of error here
+            return;
+        }
+
+        // Each site has an object with: userinfo, site_roles, dataset_authorizations{ team_member: [], dataset_curator: [], dac_authorizaztions: [] }
+        // In the case of site-admins, we are allowed to see every authorization in this site
+        if (site.results.site_roles.includes('admin')) {
+            const matchingFedSite = fedData.find((fedSite) => fedSite.location.name === siteID);
+            if (matchingFedSite && Array.isArray(matchingFedSite.results)) {
+                allowedPrograms[siteID] = matchingFedSite.results.map((results) => results.program_id);
+            }
+            return;
+        }
+
+        // Otherwise, we are authorized to view each program with any of the given dataset_authorizations
+        allowedPrograms[siteID] = site.results.dataset_authorizations.team_member
+            .concat(site.results.dataset_authorizations.dataset_curator)
+            .concat(site.results.dataset_authorizations.dac_authorizations);
+    });
+    return allowedPrograms;
+}
+
 // This handles transforming queries in the SearchResultsContext to actual search queries
 // NB: I assign to lastPromise a bunch to keep track of whether or not we need to chain promises together
 // However, the linter really dislikes this, and assumes I want to put everything inside one useEffect?
@@ -139,13 +168,23 @@ function SearchHandler({ setLoading }) {
                     setFilters((_) => FormatFilters(data));
                 })
                 .then(() => queryBeacon({ page_size: 1 }))
-                .then((data) =>
+                .then((data) => {
                     writer((old) => ({
                         ...old,
                         federation: FormatFederationData(data),
                         sidebar: FormatSidebarData(data)
-                    }))
-                )
+                    }));
+                    return FormatFederationData(data);
+                })
+                .then((fedData) => Promise.all([fetchDatasetPermissions(), fedData]))
+                .then((data) => {
+                    const authData = data[0];
+                    const fedData = data[1];
+                    writer((old) => ({
+                        ...old,
+                        auth: FormatAuthorization(authData, fedData)
+                    }));
+                })
                 .finally(() => setLoading(false)),
             'federation'
             /* fetchFederatedSubServices(`v3/discovery/sidebar_list`)
