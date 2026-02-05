@@ -1,13 +1,27 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-set -Euo pipefail
+set -eu
 
-if [[ -f "initial_setup" ]]; then
-    [[ $DEBUG_MODE = 1 ]] && export DISABLE_ESLINT="false" || export DISABLE_ESLINT="true"
+# Run env setup if initial_setup exists
+if [ -f "initial_setup" ]; then
+    if [ "${DEBUG_MODE:-0}" = "1" ]; then
+        export DISABLE_ESLINT="false"
+    else
+        export DISABLE_ESLINT="true"
+    fi
+
     envsubst < .env.docker > .env.development
     envsubst < .env.docker > .env.production
     rm initial_setup
 fi
 
-npm start
-# npm run build
+# Default fallback for CANDIG_DOMAIN
+: "${CANDIG_DOMAIN:=localhost}"
+
+# Substitute environment variables into nginx config template
+envsubst '$CANDIG_DOMAIN' \
+  < /etc/nginx/templates/default.conf.template \
+  > /etc/nginx/conf.d/default.conf
+
+# Run nginx in foreground
+exec nginx -g 'daemon off;'
