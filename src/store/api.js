@@ -247,16 +247,17 @@ export function fetchBeaconFilteringTerms() {
 
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
-export function queryBeacon(params, filter_mapping, abort = null) {
+export function queryBeacon(params, filter_mapping, programs, abort = null) {
     // Transform the parameters into something that it'll understand
     const params_filters = [];
     // Grab out the page and page number
     const page = params?.page ? `${params.page}` : undefined;
     const page_size = params?.page_size;
 
-    const NON_FILTER_PARAMS = ['page', 'page_size'];
+    const NON_FILTER_PARAMS = ['page', 'page_size', 'genomic_data_types'];
     const NON_ID_FILTERS = [];
     const INVALID_FILTERS = ['', null, undefined];
+    const DATASET_PARAM = 'dataset_ids';
 
     if (typeof params !== 'undefined' && params !== null) {
         Object.keys(params).forEach((param) => {
@@ -264,11 +265,21 @@ export function queryBeacon(params, filter_mapping, abort = null) {
                 return;
             }
 
-            const new_param = {};
-
             if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
-                new_param.id = filter_mapping[params[param]];
-                params_filters.push(new_param);
+                // Determine if we're dealing with a list or not (and if so, are we dealing with the datasets?)
+                console.log(params[param]);
+                if (param === DATASET_PARAM) {
+                    params_filters.push({ id: `dataset_id:${params[param].join('|')}` });
+                } else if (Array.isArray(params[param])) {
+                    params[param].forEach((thisParam) => {
+                        params_filters.push({ id: filter_mapping[thisParam] });
+                    });
+                } else if (filter_mapping[params[param]] === 'undefined') {
+                    // Prevent an empty filter from somehow being passed on
+                    console.log(`ID filter has no mapping: ${param} / ${params[param]}`);
+                } else {
+                    params_filters.push({ id: filter_mapping[params[param]] });
+                }
             } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
                 console.log(`Non-ID filter found but not yet supported: ${param}`);

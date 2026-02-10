@@ -213,7 +213,7 @@ function StyledCheckboxList(props) {
                             const associatedNodes = cohortMap[programId] || new Set();
                             return Array.from(associatedNodes).every((node) => !(node in checked));
                         });
-                        retVal.query.exclude_programs = validProgramIds.join('|');
+                        retVal.query.exclude_programs = validProgramIds;
                         setSelectedPrograms((old) => {
                             const newPrograms = { ...old };
                             validProgramIds.forEach((id) => {
@@ -225,10 +225,10 @@ function StyledCheckboxList(props) {
 
                     // if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
                     if (groupName === 'genomic_data_types') {
-                        retVal.query.genomic_data_types = ids.join('|');
+                        retVal.query.genomic_data_types = ids;
                     }
                 } else if (ids.length > 0) {
-                    retVal.query[groupName] = ids.join('|');
+                    retVal.query[groupName] = ids;
                 }
                 retVal.query.page = 0;
                 retVal.query.page_size = old.query?.page_size || 10;
@@ -259,10 +259,9 @@ function StyledCheckboxList(props) {
                                 delete currentPrograms[id];
                             }
                         });
+
                         if (currentPrograms && Object.keys(currentPrograms).length > 0) {
-                            retVal.query.exclude_programs = Object.keys(currentPrograms)
-                                .filter((id) => currentPrograms[id])
-                                .join('|');
+                            retVal.query.exclude_programs = Object.keys(currentPrograms).filter((id) => currentPrograms[id]);
                         } else {
                             delete retVal.query.exclude_programs;
                             retVal.query = {};
@@ -272,12 +271,12 @@ function StyledCheckboxList(props) {
 
                     // if this filter is genomicDataTypes, also update query string
                     if (groupName === 'genomic_data_types') {
-                        retVal.query.genomic_data_types = ids.join('|');
+                        retVal.query.genomic_data_types = ids;
                     }
                 } else {
                     const newList = Object.fromEntries(Object.entries(retVal.query).filter(([name, _]) => name !== groupName));
                     if (ids.length > 0) {
-                        newList[groupName] = ids.join('|');
+                        newList[groupName] = ids;
                     }
                     retVal.query = newList;
                 }
@@ -289,7 +288,12 @@ function StyledCheckboxList(props) {
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
     let label = groupName;
-    if (groupName === 'exclude_programs') {
+    let renderTags = (tagValue, getTagProps) =>
+        tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+    if (groupName === 'dataset_ids') {
+        // Datasets: instead of using Chips to display the selected datasets (which can be confusing)
+        // we instead just show a short text description describing how many datasets have been selected
+        renderTags = (tagValue, _) => <span>{`${tagValue.length} datasets selected, expand to see more`}</span>;
         label = 'Datasets';
     } else if (groupName === 'primary_site') {
         label = 'Diseases';
@@ -315,9 +319,7 @@ function StyledCheckboxList(props) {
                 </li>
             )}
             renderInput={(params) => <TextField {...params} className={classes.inputDHDP} label={label} />}
-            renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
-            }
+            renderTags={renderTags}
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason) => {
@@ -410,12 +412,10 @@ function GenomicsGroup(props) {
     const formatGenomicDataTypes = (gdt) => {
         if (!gdt) return '';
         if (Array.isArray(gdt)) {
-            return gdt.join('|');
+            return gdt;
         }
         if (typeof gdt === 'object') {
-            return Object.keys(gdt)
-                .filter((k) => gdt[k])
-                .join('|');
+            return Object.keys(gdt).filter((k) => gdt[k]);
         }
         return String(gdt);
     };
@@ -688,6 +688,14 @@ function Sidebar() {
         });
     }
 
+    function setPrograms(programs) {
+        const newPrograms = {};
+        programs.forEach((program) => {
+            newPrograms[program] = true;
+        });
+        setSelectedPrograms(newPrograms);
+    }
+
     // Fill up a list of options from the results of a Katsu query
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
@@ -764,18 +772,25 @@ function Sidebar() {
                     setChecked={setSelectedNodes}
                 />
             </SidebarGroup>
-            {/* <SidebarGroup name="Datasets">
+            <SidebarGroup name="Datasets">
                 <StyledCheckboxList
                     options={programs}
                     authorizedPrograms={authorizedPrograms}
                     onWrite={writerContext}
-                    groupName="exclude_programs"
+                    groupName="dataset_ids"
                     useAutoComplete={programs.length >= 5}
-                    isExclusion
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
                 />
-            </SidebarGroup> */}
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button className={classes.button} onClick={() => setPrograms(programs)}>
+                        Select all
+                    </Button>
+                    <Button className={classes.button} onClick={() => setPrograms([])}>
+                        Reset
+                    </Button>
+                </div>
+            </SidebarGroup>
             <GenomicsGroup
                 chromosomes={chromosomes}
                 genes={genes}
