@@ -271,7 +271,6 @@ export function queryBeacon(params, filter_mapping, programs, abort = null) {
 
             if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
                 // Determine if we're dealing with a list or not (and if so, are we dealing with the datasets?)
-                console.log(params[param]);
                 if (param === DATASET_PARAM) {
                     params_filters.push({ id: `dataset_id:${params[param].join('|')}` });
                 } else if (Array.isArray(params[param])) {
