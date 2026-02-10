@@ -333,7 +333,7 @@ function StyledCheckboxList(props) {
                 label={
                     <div className={classes.lockContainer + (config.isDHDP ? ` ${classes.checkboxLabelDHDP}` : '')}>
                         {option}
-                        {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                        {groupName === 'dataset_ids' && authorizedPrograms && !authorizedPrograms.includes(option) && (
                             <Tooltip title="Unauthorized Program" placement="right">
                                 <LockOutlinedIcon className={classes.lockIcon} />
                             </Tooltip>
@@ -707,7 +707,7 @@ function Sidebar() {
     // Parse out what we need:
     const sites = readerContext?.federation?.map((loc) => loc.location.name) || [];
     const programs = readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || [];
-    const authorizedPrograms = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((program) => program.program_id)) || [];
+    const authorizedPrograms = Object.values(readerContext?.auth || {})?.flat(1);
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
     const systemicTherapyDrugNames = ExtractSidebarElements('drug_names');
