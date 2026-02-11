@@ -113,7 +113,6 @@ AlertCard.propTypes = {
 
 function AuthDisplay() {
     const [requestAccessFormOpen, setRequestAccessFormOpen] = useState(false);
-    const [requestAccessFormData, setRequestAccessFormData] = useState({});
 
     // Fire off the authorization check
     const authContext = useAuthContext();
@@ -201,13 +200,7 @@ function AuthDisplay() {
                         <Button variant="contained" onClick={openRequestAccessForm}>
                             Request access
                         </Button>
-                        <RequestAccessForm
-                            open={requestAccessFormOpen}
-                            setOpen={setRequestAccessFormOpen}
-                            data={requestAccessFormData}
-                            setData={setRequestAccessFormData}
-                            onSubmit={requestAccess}
-                        />
+                        <RequestAccessForm open={requestAccessFormOpen} setOpen={setRequestAccessFormOpen} onSubmit={requestAccess} />
                     </>
                 }
             />

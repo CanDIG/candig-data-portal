@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { useEffect } from 'react';
 
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Typography } from '@mui/material';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
@@ -10,9 +10,17 @@ import TextField from 'ui-component/extended/TextField';
 const DATE = 'date';
 const FUNDERS = 'funders';
 const INSTITUTIONAL_APPROVAL = 'institutional_approval';
+const PI_EMAIL = 'pi_email';
+const PI_INSTITUTION_NAME = 'pi_institution_name';
+const PI_NAME = 'pi_name';
+const PI_TITLE = 'pi_title';
 const REB = 'reb';
 const REQUEST_TYPE = 'request_type';
+const REQUESTOR_EMAIL = 'requestor_email';
+const REQUESTOR_INSTUTUTION_NAME = 'requestor_institution_name';
 const REQUESTOR_INSTITUTION_TYPE = 'requestor_institution_type';
+const REQUESTOR_NAME = 'requestor_name';
+const REQUESTOR_TITLE = 'requestor_title';
 const RESEARCH_TEAM_INFORMATION = 'research_team';
 const SAME_AS_REQUESTOR = 'pi_same_as_requestor';
 
@@ -21,7 +29,6 @@ const PREFIX = 'RequestAccessForm';
 const classes = {
     action: `${PREFIX}-action`,
     addButton: `${PREFIX}-add-button`,
-    bold: `${PREFIX}-bold`,
     content: `${PREFIX}-content`,
     funderBlock: `${PREFIX}-funder-block`,
     grid: `${PREFIX}-grid`,
@@ -40,10 +47,6 @@ const StyledDialog = styled(Dialog)(() => ({
         width: 'max-content',
         alignSelf: 'center',
         marginTop: '0.25rem'
-    },
-
-    [`& .${classes.bold}`]: {
-        fontWeight: 700
     },
 
     [`& .${classes.content}`]: {
@@ -88,24 +91,26 @@ const StyledDialog = styled(Dialog)(() => ({
     }
 }));
 
-function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
+function RequestAccessForm({ open, setOpen, onSubmit }) {
+    const [data, setData] = useState({});
+
     const requestorInformation = [
         {
             label: 'Full Name',
-            field: 'requestor_name'
+            field: REQUESTOR_NAME
         },
         {
             label: 'Title',
-            field: 'requestor_title'
+            field: REQUESTOR_TITLE
         },
         {
             label: 'Email',
-            field: 'requestor_email',
+            field: REQUESTOR_EMAIL,
             type: 'email'
         },
         {
             label: 'DHDP Member Institution Name',
-            field: 'requestor_institution_name'
+            field: REQUESTOR_INSTUTUTION_NAME
         },
         {
             label: 'DHDP Member Institution Details',
@@ -143,24 +148,24 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
         },
         {
             label: 'Full Name',
-            field: 'pi_name',
+            field: PI_NAME,
             sublabel: '(non-confidential)',
             hidden: data[SAME_AS_REQUESTOR]
         },
         {
             label: 'Title',
-            field: 'pi_title',
+            field: PI_TITLE,
             hidden: data[SAME_AS_REQUESTOR]
         },
         {
             label: 'Email',
-            field: 'pi_email',
+            field: PI_EMAIL,
             type: 'email',
             hidden: data[SAME_AS_REQUESTOR]
         },
         {
             label: 'DHDP Member Institution',
-            field: 'pi_institution_name',
+            field: PI_INSTITUTION_NAME,
             subLabel: '(non-confidential)',
             hidden: data[SAME_AS_REQUESTOR]
         }
@@ -333,6 +338,7 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
             label: 'An institutional representative has reviewed this form and approves of the provided information and data access request.',
             field: INSTITUTIONAL_APPROVAL,
             checkbox: true,
+            required: false,
             sx: {
                 gridColumnStart: 'span 2'
             }
@@ -340,7 +346,8 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
         {
             label: 'Institutional Signature',
             field: 'institutional_signature',
-            subLabel: '(Please type full name)'
+            subLabel: '(Please type full name)',
+            required: false
         },
         {
             label: 'Date',
@@ -424,9 +431,21 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
             }
         });
 
+        // If PI info is same as requestor info, copy info over
+        if (data[SAME_AS_REQUESTOR]) {
+            alteredData[PI_NAME] = data[REQUESTOR_NAME];
+            alteredData[PI_TITLE] = data[REQUESTOR_TITLE];
+            alteredData[PI_EMAIL] = data[REQUESTOR_EMAIL];
+            alteredData[PI_INSTITUTION_NAME] = data[REQUESTOR_INSTUTUTION_NAME];
+        }
+
         setData((prevData) => ({ ...prevData, ...alteredData }));
         onSubmit();
     };
+
+    useEffect(() => {
+        console.log(data);
+    }, [data]);
 
     const mapToTextField = (textFieldList) =>
         textFieldList.map(({ key, field, maxLength, ...rest }) => (
@@ -599,7 +618,6 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
                     Note: Fields in the form marked as non-confidential may be published or shared by the DHDP/Terry Fox Research Institute
                     (TFRI) with other DHDP members or publicly, such as on the DHDP website.
                 </Typography>
-                <Typography className={classes.bold}>All fields are mandatory.</Typography>
                 <Typography variant="h2">Requestor Information</Typography>
                 {mapToTextField(requestorInformation)}
                 <Typography variant="h2">Principal Investigator (PI) Information</Typography>
@@ -662,8 +680,6 @@ function RequestAccessForm({ open, setOpen, onSubmit, data, setData }) {
 RequestAccessForm.propTypes = {
     open: PropTypes.bool.isRequired,
     setOpen: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired,
-    setData: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired
 };
 
