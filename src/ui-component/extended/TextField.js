@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
@@ -15,6 +16,10 @@ const StyledBox = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     gap: '0.5rem',
     width: '100%',
+    '& .MuiFormHelperText-root': {
+        color: theme.palette.grey[900],
+        textAlign: 'right'
+    },
 
     [`& .${classes.input}`]: {
         '&.Mui-disabled': {
@@ -32,7 +37,24 @@ const StyledFormControlLabel = styled(FormControlLabel)(() => ({
 
 // ===========================|| TEXTFIELD ||=========================== //
 
-function TextField({ label, onChange, checkbox, hidden, id, multiline, options, required = true, subLabel, sx, toggle, value, ...rest }) {
+function TextField({
+    label,
+    onChange,
+    checkbox,
+    hidden,
+    id,
+    maxWords,
+    multiline,
+    options,
+    required = true,
+    subLabel,
+    sx,
+    toggle,
+    value,
+    ...rest
+}) {
+    const [wordCount, setWordCount] = useState(0);
+
     if (hidden) {
         return null;
     }
@@ -54,15 +76,34 @@ function TextField({ label, onChange, checkbox, hidden, id, multiline, options, 
         );
     }
 
-    const handleChange = (event) => {
-        onChange(event.target.value);
-    };
+    let handleChange;
+    if (maxWords) {
+        handleChange = (event) => {
+            const newValue = event.target.value;
+            const numWords = (newValue.match(/\S+/g) || []).length;
+            if (numWords <= maxWords) {
+                // Make sure there can only be one trailing string
+                onChange(newValue.replace(/\s+$/, ' '));
+                setWordCount(numWords);
+            } else {
+                setWordCount(maxWords);
+            }
+        };
+    } else {
+        handleChange = (event) => {
+            onChange(event.target.value);
+        };
+    }
 
     const universalProps = {
         onChange: handleChange,
         value: value || '',
         required,
-        inputProps: { id: id || (label && label.replace(/\W/g, '')), className: classes.input },
+        helperText: maxWords && `${wordCount} / ${maxWords} words`,
+        inputProps: {
+            id: id || (label && label.replace(/\W/g, '')),
+            className: classes.input
+        },
         sx,
         ...rest
     };
@@ -104,6 +145,7 @@ TextField.propTypes = {
     checkbox: PropTypes.bool,
     hidden: PropTypes.bool,
     id: PropTypes.string,
+    maxWords: PropTypes.number,
     multiline: PropTypes.bool,
     options: PropTypes.arrayOf(PropTypes.string),
     required: PropTypes.bool,

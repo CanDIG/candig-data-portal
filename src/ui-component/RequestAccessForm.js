@@ -187,6 +187,7 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
             field: 'request_type_highlight_changes',
             subLabel: '(500 words max)',
             multiline: true,
+            maxWords: 500,
             hidden: ![
                 'Amendment (to current approval)',
                 'Renewal (2 years after last approval)',
@@ -225,6 +226,7 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
             label: 'Lay Summary',
             field: 'lay_summary',
             subLabel: '(500 words max, non-confidential)',
+            maxWords: 500,
             multiline: true
         },
         {
@@ -278,25 +280,25 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
             options: ['Yes (identify name and # of agreement)', 'Pending negotiation/signature', 'Not applicable']
         },
         {
-            label: 'Describe the project objectives and alignment to DHDP research and technology   development aims.',
+            label: 'Describe the project objectives and alignment to DHDP research and technology development aims.',
             field: 'project_objectives',
-            subLabel: '(2500 characters max)',
+            subLabel: '(500 words max)',
             multiline: true,
-            maxLength: 2500
+            maxWords: 500
         },
         {
-            label: 'Describe how the project will use data and provide justification for access to the   specified data for (federated) analysis/learning.',
+            label: 'Describe how the project will use data and provide justification for access to the specified data for (federated) analysis/learning.',
             field: 'project_data_use',
-            subLabel: '(2500 characters max)',
+            subLabel: '(500 words max)',
             multiline: true,
-            maxLength: 1500
+            maxWords: 300
         },
         {
-            label: 'Describe any potential legal, ethical or reputational risks to DHDP or its members.   Note that the possibility of these risks does not prevent approval. It is merely a way to provide those impacted with respectful notice.',
+            label: 'Describe any potential legal, ethical or reputational risks to DHDP or its members. Note that the possibility of these risks does not prevent approval. It is merely a way to provide those impacted with respectful notice.',
             field: 'project_risks',
-            subLabel: '(1500 characters max)',
+            subLabel: '(300 words max)',
             multiline: true,
-            maxLength: 1500
+            maxWords: 300
         }
     ];
 
@@ -443,22 +445,13 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
         onSubmit();
     };
 
-    useEffect(() => {
-        console.log(data);
-    }, [data]);
-
     const mapToTextField = (textFieldList) =>
-        textFieldList.map(({ key, field, maxLength, ...rest }) => (
+        textFieldList.map(({ key, field, ...rest }) => (
             <TextField
                 key={key || field}
                 id={key || field}
                 value={data[field]}
-                onChange={(newValue) => {
-                    if (maxLength && newValue.length > maxLength) {
-                        return;
-                    }
-                    handleChange(field, newValue);
-                }}
+                onChange={(newValue) => handleChange(field, newValue)}
                 {...rest}
             />
         ));
