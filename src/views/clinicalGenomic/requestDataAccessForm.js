@@ -51,7 +51,7 @@ const StyledMainCard = styled(MainCard)(({ theme }) => ({
         display: 'flex',
         flexDirection: 'column',
         gap: '1rem',
-        padding: '4rem 2rem 2rem'
+        padding: '5rem 6rem 4rem'
     },
 
     [`& .${classes.action}`]: {
@@ -818,7 +818,11 @@ function RequestDataAccessForm() {
                 Form submitted for processing
             </Typography>
             {/* TODO: Display Jira request ID */}
-            <Button onClick={() => setShowForm(true)} variant="outlined" sx={{ width: 'max-content', margin: '1rem', alignSelf: 'center' }}>
+            <Button
+                onClick={() => setShowForm(true)}
+                variant="outlined"
+                sx={{ width: 'max-content', marginTop: '2rem ', alignSelf: 'center' }}
+            >
                 Submit another request
             </Button>
         </StyledMainCard>
