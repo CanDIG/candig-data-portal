@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { MutatingDots } from 'react-loader-spinner';
 
 // MUI Imports
@@ -111,8 +110,6 @@ AlertCard.propTypes = {
 };
 
 function AuthDisplay() {
-    const [requestAccessFormOpen, setRequestAccessFormOpen] = useState(false);
-
     // Fire off the authorization check
     const authContext = useAuthContext();
     const authStatus = authContext[0];
@@ -129,10 +126,6 @@ function AuthDisplay() {
                 return retVal;
             });
         });
-    };
-
-    const openRequestAccessForm = () => {
-        setRequestAccessFormOpen(true);
     };
 
     let content;
@@ -195,7 +188,7 @@ function AuthDisplay() {
                     </Typography>
                 }
                 button={
-                    <Button variant="contained" onClick={openRequestAccessForm}>
+                    <Button variant="contained" onClick={requestAccess}>
                         Request access
                     </Button>
                 }
