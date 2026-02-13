@@ -1,12 +1,18 @@
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Typography } from '@mui/material';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { Box, Button, Typography } from '@mui/material';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
+import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded';
 
+import { useSearchResultsWriterContext } from 'views/clinicalGenomic/SearchResultsContext';
+import MainCard from 'ui-component/cards/MainCard';
 import TextField from 'ui-component/extended/TextField';
 
+const DATA_COHORT_ID = 'data_cohort_id';
+const DATA_PROVIDER_NODE = 'data_provider_node';
 const DATE = 'date';
 const FUNDERS = 'funders';
 const INSTITUTIONAL_APPROVAL = 'institutional_approval';
@@ -29,17 +35,27 @@ const PREFIX = 'RequestAccessForm';
 const classes = {
     action: `${PREFIX}-action`,
     addButton: `${PREFIX}-add-button`,
+    buttonIcon: `${PREFIX}-button-icon`,
     content: `${PREFIX}-content`,
     funderBlock: `${PREFIX}-funder-block`,
     grid: `${PREFIX}-grid`,
     teamBlock: `${PREFIX}-team-block`,
     removeButton: `${PREFIX}-remove-button`,
+    subtitle: `${PREFIX}-subtitle`,
     title: `${PREFIX}-title`
 };
 
-const StyledDialog = styled(Dialog)(() => ({
+const StyledMainCard = styled(MainCard)(() => ({
+    '& .MuiCardContent-root': {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+        padding: '4rem 2rem 2rem'
+    },
+
     [`& .${classes.action}`]: {
-        padding: '1.5rem 2.5rem 1.5rem 1.5rem',
+        marginTop: '2rem',
+        display: 'flex',
         justifyContent: 'space-between'
     },
 
@@ -47,6 +63,12 @@ const StyledDialog = styled(Dialog)(() => ({
         width: 'max-content',
         alignSelf: 'center',
         marginTop: '0.25rem'
+    },
+
+    [`& .${classes.buttonIcon}`]: {
+        marginRight: '0.5rem',
+        height: '1.25rem',
+        width: '1.25rem'
     },
 
     [`& .${classes.content}`]: {
@@ -86,12 +108,19 @@ const StyledDialog = styled(Dialog)(() => ({
         gridColumnStart: '2'
     },
 
+    [`& .${classes.subtitle}`]: {
+        paddingTop: '1rem'
+    },
+
     [`& .${classes.title}`]: {
-        padding: '2rem 2rem 1rem'
+        paddingBottom: '1rem'
     }
 }));
 
-function RequestAccessForm({ open, setOpen, onSubmit }) {
+function RequestDataAccessForm() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const writer = useSearchResultsWriterContext();
     const [data, setData] = useState({});
 
     const requestorInformation = [
@@ -316,7 +345,7 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
             field: 'data_cohort_id'
         },
         {
-            label: 'Describe the types of data requested (data must be available as described on the   DHDP Portal).',
+            label: 'Describe the types of data requested (data must be available as described on the DHDP Portal).',
             multiline: true,
             field: 'data_description'
         }
@@ -372,17 +401,17 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
     ].flat();
 
     useEffect(() => {
-        // Update date whenever dialog is opened
+        // Update date whenever page loads
         const now = new Date();
         const date = `${now.getFullYear()}-${'0'.concat(now.getMonth() + 1).slice(-2)}-${'0'.concat(now.getDate()).slice(-2)}`;
 
         setData((prevData) => ({
             ...prevData,
-            [DATE]: date
+            [DATE]: date,
+            [DATA_PROVIDER_NODE]: location.state.site,
+            [DATA_COHORT_ID]: location.state.programId
         }));
-    }, [open]);
 
-    useEffect(() => {
         // Add one empty research team member to data form
         if (!data[RESEARCH_TEAM_INFORMATION]) {
             setData((prevData) => ({
@@ -408,11 +437,24 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
                 ]
             }));
         }
-    }, []);
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+        // Grab the email for the logged in user
+        fetch(`/query/whoami`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                console.log(`whoami could not determine logged in user: ${response}`);
+                throw new Error(`${response}`);
+            })
+            .then((response) => {
+                setData((prevData) => ({ ...prevData, [REQUESTOR_EMAIL]: response?.key }));
+            })
+            .catch((error) => {
+                console.log(`Whoami error: ${error}`);
+                return '';
+            });
+    }, []);
 
     const handleChange = (key, value) => {
         setData((prevData) => ({
@@ -421,7 +463,17 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleBack = () => {
+        if (location.key !== 'default') {
+            // Navigation history exists
+            navigate(-1);
+        } else {
+            // No navigation history, go to clinical genomic search
+            navigate('/clinicalGenomicSearch');
+        }
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const alteredData = {};
@@ -441,8 +493,56 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
             alteredData[PI_INSTITUTION_NAME] = data[REQUESTOR_INSTUTUTION_NAME];
         }
 
-        setData((prevData) => ({ ...prevData, ...alteredData }));
-        onSubmit();
+        const newData = { ...data, ...alteredData };
+
+        // Send data
+        const answers = {};
+        let counter = 1;
+        Object.entries(newData).forEach(([key, value]) => {
+            answers[counter] = {
+                [key]: value
+            };
+            counter += 1;
+        });
+
+        const bodyData = JSON.stringify({
+            form: {
+                answers
+            },
+            isAdfRequest: false, // TODO
+            requestFieldValues: {}, // TODO
+            requestParticipants: {}, // TODO
+            requestTypeId: 0, // TODO
+            serviceDeskId: 0 // TODO
+        });
+
+        await fetch('', {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer', // TODO
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: bodyData
+        });
+
+        // Change "Request Access" button to "Access Requested"
+        writer((old) => {
+            const oldAccessRequested = old.accessRequested || [];
+            return {
+                ...old,
+                accessRequested: [
+                    ...oldAccessRequested,
+                    {
+                        site: data[DATA_PROVIDER_NODE],
+                        programId: data[DATA_COHORT_ID]
+                    }
+                ]
+            };
+        });
+
+        // Go back to previous page
+        handleBack();
     };
 
     const mapToTextField = (textFieldList) =>
@@ -497,6 +597,7 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
                     />
                 ))}
                 <Button variant="outlined" className={classes.removeButton} onClick={handleRemove}>
+                    <RemoveCircleOutlineRoundedIcon className={classes.buttonIcon} />
                     Remove Team Member
                 </Button>
             </Box>
@@ -561,11 +662,10 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
                         {...rest}
                     />
                 ))}
-                <Tooltip title="Remove Funder">
-                    <IconButton onClick={handleRemove}>
-                        <RemoveCircleOutlineIcon />
-                    </IconButton>
-                </Tooltip>
+                <Button variant="outlined" sx={{ marginLeft: '0.75rem' }} onClick={handleRemove}>
+                    <RemoveCircleOutlineRoundedIcon className={classes.buttonIcon} />
+                    Remove Funder
+                </Button>
             </Box>
         );
     };
@@ -588,92 +688,100 @@ function RequestAccessForm({ open, setOpen, onSubmit }) {
     };
 
     return (
-        <StyledDialog open={open} onClose={handleClose} component="form" onSubmit={handleSubmit} maxWidth="md">
-            <DialogTitle variant="h1" className={classes.title}>
+        <StyledMainCard component="form" onSubmit={handleSubmit}>
+            <Button onClick={handleBack} sx={{ alignSelf: 'flex-start' }}>
+                <ChevronLeftRoundedIcon className={classes.buttonIcon} />
+                Back to Clinical & Genomic Search
+            </Button>
+            <Typography variant="h1" className={classes.title}>
                 DHDP Data Access Request Form
-            </DialogTitle>
-            <DialogContent className={classes.content} dividers>
-                <Typography>
-                    Submit an access request through the DHDP by navigating to a Cohort of interest on the DHDP Portal and click the Request
-                    Access button, which will create a Request ticket on Jira (managed by TFRI).
-                </Typography>
-                <Typography>Submit general inquiries to DHDP at: dhdp@tfri.ca</Typography>
-                <Typography>
-                    Access requests will be directed to the data owners/Data Access Committees (DAC) at the relevant Data Provider
-                    institutions responsible for and authorized to approve access to data for federated analysis/learning subject to
-                    institutional policies.
-                </Typography>
-                <Typography>
-                    An administrative review of the form should occur within 10 business days. Additional information may later be requested
-                    by the Data Owner/DAC.
-                </Typography>
-                <Typography>
-                    Note: Fields in the form marked as non-confidential may be published or shared by the DHDP/Terry Fox Research Institute
-                    (TFRI) with other DHDP members or publicly, such as on the DHDP website.
-                </Typography>
-                <Typography variant="h2">Requestor Information</Typography>
-                {mapToTextField(requestorInformation)}
-                <Typography variant="h2">Principal Investigator (PI) Information</Typography>
-                {mapToTextField(principalInvestigatorInformation)}
-                <Typography variant="h2">Request Type</Typography>
-                {mapToTextField(requestType)}
-                <Typography variant="h2">Research Team Information</Typography>
-                <Typography>
-                    List all team members beyond the PI who will have access to the data here (where applicable). All individuals are under
-                    the supervision and responsibility of the PI.
-                </Typography>
-                {data[RESEARCH_TEAM_INFORMATION] &&
-                    data[RESEARCH_TEAM_INFORMATION].map((teamMember, index) => renderResearchTeamInformationBlock(teamMember, index))}
-                <Button variant="outlined" className={classes.addButton} onClick={addResearchTeamInformationBlock}>
-                    Add team member
-                </Button>
-                <Typography variant="h2">Project Information</Typography>
-                {mapToTextField(projectInformation1)}
-                <Typography>Funders (Please indicate for-profit sponsors) *</Typography>
-                {data[FUNDERS] && data[FUNDERS].map((funder, index) => renderFunderBlock(funder, index))}
-                <Button variant="outlined" className={classes.addButton} onClick={addFunderBlock}>
-                    Add Funder
-                </Button>
-                {mapToTextField(projectInformation2)}
-                <Typography variant="h2">Data Cohort Requested</Typography>
-                {mapToTextField(dataCohortRequested)}
-                <Typography variant="h2">Acknowledgement and Signature</Typography>
-                <Typography component="span">
-                    By signing this form, you attest and confirm that:
-                    <ul>
-                        <li>You have read, understood and will comply with DHDP policies and protocols</li>
-                        <li>You are compliant with all institutional policies around privacy, confidentiality and security.</li>
-                        <li>
-                            The data is being accessed and used for the purposes of the specified federated analysis/learning project only.
-                        </li>
-                        <li>
-                            Data will only be accessed by listed team members, who are all under the supervision and responsibility of the
-                            PI.
-                        </li>
-                        <li>
-                            The PI and research team will ensure the security of any user accounts, and will report any privacy or security
-                            breach within 24 hours to TFRI and all relevant Data Providers,
-                        </li>
-                    </ul>
-                </Typography>
-                <Box className={classes.grid}>{mapToTextField(acknowledgementAndSignature)}</Box>
-            </DialogContent>
-            <DialogActions className={classes.action}>
-                <Button variant="outlined" onClick={handleClose}>
-                    Close
+            </Typography>
+            <Typography>
+                Submit an access request through the DHDP by navigating to a Cohort of interest on the DHDP Portal and click the Request
+                Access button, which will create a Request ticket on Jira (managed by TFRI).
+            </Typography>
+            <Typography>Submit general inquiries to DHDP at: dhdp@tfri.ca</Typography>
+            <Typography>
+                Access requests will be directed to the data owners/Data Access Committees (DAC) at the relevant Data Provider institutions
+                responsible for and authorized to approve access to data for federated analysis/learning subject to institutional policies.
+            </Typography>
+            <Typography>
+                An administrative review of the form should occur within 10 business days. Additional information may later be requested by
+                the Data Owner/DAC.
+            </Typography>
+            <Typography>
+                Note: Fields in the form marked as non-confidential may be published or shared by the DHDP/Terry Fox Research Institute
+                (TFRI) with other DHDP members or publicly, such as on the DHDP website.
+            </Typography>
+            <Typography variant="h2" className={classes.subtitle}>
+                Requestor Information
+            </Typography>
+            {mapToTextField(requestorInformation)}
+            <Typography variant="h2" className={classes.subtitle}>
+                Principal Investigator (PI) Information
+            </Typography>
+            {mapToTextField(principalInvestigatorInformation)}
+            <Typography variant="h2" className={classes.subtitle}>
+                Request Type
+            </Typography>
+            {mapToTextField(requestType)}
+            <Typography variant="h2" className={classes.subtitle}>
+                Research Team Information
+            </Typography>
+            <Typography>
+                List all team members beyond the PI who will have access to the data here (where applicable). All individuals are under the
+                supervision and responsibility of the PI.
+            </Typography>
+            {data[RESEARCH_TEAM_INFORMATION] &&
+                data[RESEARCH_TEAM_INFORMATION].map((teamMember, index) => renderResearchTeamInformationBlock(teamMember, index))}
+            <Button variant="outlined" className={classes.addButton} onClick={addResearchTeamInformationBlock}>
+                <AddCircleOutlineRoundedIcon className={classes.buttonIcon} />
+                Add team member
+            </Button>
+            <Typography variant="h2" className={classes.subtitle}>
+                Project Information
+            </Typography>
+            {mapToTextField(projectInformation1)}
+            <Typography>Funders (Please indicate for-profit sponsors) *</Typography>
+            {data[FUNDERS] && data[FUNDERS].map((funder, index) => renderFunderBlock(funder, index))}
+            <Button variant="outlined" className={classes.addButton} onClick={addFunderBlock}>
+                <AddCircleOutlineRoundedIcon className={classes.buttonIcon} />
+                Add Funder
+            </Button>
+            {mapToTextField(projectInformation2)}
+            <Typography variant="h2" className={classes.subtitle}>
+                Data Cohort Requested
+            </Typography>
+            {mapToTextField(dataCohortRequested)}
+            <Typography variant="h2" className={classes.subtitle}>
+                Acknowledgement and Signature
+            </Typography>
+            <Typography component="span">
+                By signing this form, you attest and confirm that:
+                <ul>
+                    <li>You have read, understood and will comply with DHDP policies and protocols</li>
+                    <li>You are compliant with all institutional policies around privacy, confidentiality and security.</li>
+                    <li>The data is being accessed and used for the purposes of the specified federated analysis/learning project only.</li>
+                    <li>
+                        Data will only be accessed by listed team members, who are all under the supervision and responsibility of the PI.
+                    </li>
+                    <li>
+                        The PI and research team will ensure the security of any user accounts, and will report any privacy or security
+                        breach within 24 hours to TFRI and all relevant Data Providers,
+                    </li>
+                </ul>
+            </Typography>
+            <Box className={classes.grid}>{mapToTextField(acknowledgementAndSignature)}</Box>
+            <Box className={classes.action}>
+                <Button variant="outlined" onClick={handleBack}>
+                    Back to Clinical & Genomic Search
                 </Button>
                 <Button type="submit" variant="contained">
-                    Submit
+                    Submit Data Access Request Form
                 </Button>
-            </DialogActions>
-        </StyledDialog>
+            </Box>
+        </StyledMainCard>
     );
 }
 
-RequestAccessForm.propTypes = {
-    open: PropTypes.bool.isRequired,
-    setOpen: PropTypes.func.isRequired,
-    onSubmit: PropTypes.func.isRequired
-};
-
-export default RequestAccessForm;
+export default RequestDataAccessForm;

@@ -8,7 +8,6 @@ import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTo
 
 // Project Imports
 import MainCard from 'ui-component/cards/MainCard';
-import RequestAccessForm from 'ui-component/RequestAccessForm';
 import { useAuthContext } from './AuthContext';
 import config from 'config';
 
@@ -196,12 +195,9 @@ function AuthDisplay() {
                     </Typography>
                 }
                 button={
-                    <>
-                        <Button variant="contained" onClick={openRequestAccessForm}>
-                            Request access
-                        </Button>
-                        <RequestAccessForm open={requestAccessFormOpen} setOpen={setRequestAccessFormOpen} onSubmit={requestAccess} />
-                    </>
+                    <Button variant="contained" onClick={openRequestAccessForm}>
+                        Request access
+                    </Button>
                 }
             />
         );
