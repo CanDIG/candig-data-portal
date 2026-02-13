@@ -6,6 +6,8 @@ import { styled } from '@mui/material/styles';
 import { Box, Checkbox, FormControlLabel, MenuItem, Switch, TextField as MuiTextField, Typography } from '@mui/material';
 
 const PREFIX = 'TextField';
+// 0.5rem gap + 0.875rem font size * 1.334em line height
+const labelHeightInRem = 0.5 + 0.875 * 1.334;
 
 const classes = {
     input: `${PREFIX}-input`
@@ -16,6 +18,11 @@ const StyledBox = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     gap: '0.5rem',
     width: '100%',
+
+    '& .MuiInputBase-input': {
+        scrollMarginTop: `calc(88px + ${labelHeightInRem}rem)` // Header height + text field label height
+    },
+
     '& .MuiFormHelperText-root': {
         color: theme.palette.grey[900],
         textAlign: 'right'
