@@ -116,7 +116,7 @@ function AuthDisplay() {
 
     const requestAccess = () => {
         const authWriter = authContext[1];
-        fetch('/ingest/user/pending/request', {
+        fetch('/candig-api/user/pending/request', {
             method: 'POST'
         }).then(() => {
             // Then, force re-check of the status
@@ -189,7 +189,7 @@ function AuthDisplay() {
                 }
                 button={
                     <Button variant="contained" onClick={requestAccess}>
-                        Request access
+                        Request&nbsp;access
                     </Button>
                 }
             />
