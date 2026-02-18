@@ -116,7 +116,7 @@ function AuthDisplay() {
 
     const requestAccess = () => {
         const authWriter = authContext[1];
-        fetch('/candig-api/user/pending/request', {
+        fetch('/candig-api/v1/authz/user/pending/request', {
             method: 'POST'
         }).then(() => {
             // Then, force re-check of the status
