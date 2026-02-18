@@ -8,6 +8,7 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded';
 
 import { useSearchResultsWriterContext } from 'views/clinicalGenomic/SearchResultsContext';
+import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import MainCard from 'ui-component/cards/MainCard';
 import TextField from 'ui-component/extended/TextField';
 
@@ -408,6 +409,12 @@ function RequestDataAccessForm() {
         dataCohortRequested,
         acknowledgementAndSignature
     ].flat();
+
+    // Clear the sidebar, if available
+    const sidebarWriter = useSidebarWriterContext();
+    useEffect(() => {
+        sidebarWriter(null);
+    }, [sidebarWriter]);
 
     useEffect(() => {
         // Reset data when page loads
