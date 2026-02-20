@@ -250,7 +250,7 @@ export function fetchDatasetPermissions() {
 }
 
 function getBeaconFilterForID(id) {
-    return { id: id, includeDescendantTerms: false };
+    return { id, includeDescendantTerms: false };
 }
 
 // params.filters should be a list of objects
