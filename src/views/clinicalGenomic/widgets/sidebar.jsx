@@ -851,7 +851,7 @@ function Sidebar() {
                 />
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button className={classes.button} onClick={() => setPrograms(programs)}>
-                        Select all
+                        Select&nbsp;all
                     </Button>
                     <Button className={classes.button} onClick={() => setPrograms([])}>
                         Reset
