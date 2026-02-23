@@ -272,6 +272,15 @@ function StyledCheckboxList(props) {
     };
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
+    let label = groupName;
+    let renderTags = (tagValue, getTagProps) =>
+        tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+    if (groupName === 'exclude_programs') {
+        // Datasets: instead of using Chips to display the selected datasets (which can be confusing)
+        // we instead just show a short text description describing how many datasets have been selected
+        renderTags = (tagValue, _) => <span>{`${options.length - tagValue.length} programs selected, expand to see more`}</span>;
+        label = 'Programs';
+    }
 
     return useAutoComplete ? (
         <Autocomplete
@@ -344,10 +353,8 @@ function StyledCheckboxList(props) {
                 const safeValue = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
                 HandleChange(safeValue, reason === 'selectOption');
             }}
-            renderInput={(params) => <TextField {...params} label={groupName === 'exclude_programs' ? 'Programs' : groupName} />}
-            renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />)
-            }
+            renderInput={(params) => <TextField {...params} label={label} />}
+            renderTags={renderTags}
             getOptionDisabled={(option) => optionStatusMap?.[option]?.healthy === false}
         />
     ) : (
@@ -753,6 +760,25 @@ function Sidebar() {
         });
     }
 
+    // Set programs to the given list
+    function setPrograms(programs) {
+        const newPrograms = {};
+        programs.forEach((program) => {
+            newPrograms[program] = true;
+        });
+        setSelectedPrograms(newPrograms);
+
+        writerContext((old) => {
+            const retVal = { filter: {}, query: {}, ...old };
+            if (programs.length > 0) {
+                retVal.query.exclude_programs = programs.join('|');
+            } else {
+                delete retVal.query["exclude_programs"]
+            }
+            return retVal;
+        });
+    }
+
     // Fill up a list of options from the results of a Katsu query
     const ExtractSidebarElements = (key) => {
         const allResults = readerContext?.sidebar?.map((loc) => loc?.results?.[key] || [])?.flat(1) || [];
@@ -823,6 +849,14 @@ function Sidebar() {
                     checked={selectedPrograms}
                     setChecked={setSelectedPrograms}
                 />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button className={classes.button} onClick={() => setPrograms(programs)}>
+                        Select all
+                    </Button>
+                    <Button className={classes.button} onClick={() => setPrograms([])}>
+                        Reset
+                    </Button>
+                </div>
             </SidebarGroup>
             <GenomicsGroup
                 chromosomes={chromosomes}
