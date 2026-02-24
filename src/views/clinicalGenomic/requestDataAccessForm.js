@@ -468,7 +468,7 @@ function RequestDataAccessForm() {
             ]
         };
 
-        // Grab the email for the logged in user
+        // Grab the email for the logged in user (TODO: test)
         fetch(`/candig-api/v1/whoami`)
             .then((response) => {
                 if (response.ok) {
@@ -485,7 +485,7 @@ function RequestDataAccessForm() {
                 return '';
             });
 
-        // Get the data access committee for this data cohort, if applicable
+        // Get the data access committee for this data cohort, if applicable (TODO: test)
         if (newData[DATA_COHORT_ID]) {
             fetch(`/candig-api/v1/datasets/${newData[DATA_COHORT_ID]}/info`)
                 .then((response) => {
@@ -598,7 +598,7 @@ function RequestDataAccessForm() {
                 body: bodyData
             });
 
-            // Change "Request Access" button to "Access Requested"
+            // Change "Request Access" button to "Access Requested" (TODO: test)
             writer((old) => {
                 const oldAccessRequested = old.accessRequested || [];
                 return {
