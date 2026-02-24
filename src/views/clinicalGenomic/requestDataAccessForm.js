@@ -14,6 +14,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import TextField from 'ui-component/extended/TextField';
 
 const DATA_COHORT_ID = 'data_cohort_id';
+const DATA_OWNER = 'data_owner';
 const DATA_PROVIDER_NODE = 'data_provider_node';
 const DATA_SHARING_AGREEMENT = 'data_sharing_agreement';
 const DATE = 'date';
@@ -368,15 +369,15 @@ function RequestDataAccessForm() {
     const dataCohortRequested = [
         {
             label: 'DHDP Data Provider Node',
-            field: 'data_provider_node'
+            field: DATA_PROVIDER_NODE
         },
         {
             label: 'DHDP Data Owner/Data Access Committee',
-            field: 'data_owner'
+            field: DATA_OWNER
         },
         {
             label: 'DHDP Cohort ID',
-            field: 'data_cohort_id'
+            field: DATA_COHORT_ID
         },
         {
             label: 'Describe the types of data requested (data must be available as described on the DHDP Portal).',
@@ -468,7 +469,7 @@ function RequestDataAccessForm() {
         };
 
         // Grab the email for the logged in user
-        fetch(`/query/whoami`)
+        fetch(`/candig-api/v1/whoami`)
             .then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -483,6 +484,25 @@ function RequestDataAccessForm() {
                 console.log(`Whoami error: ${error}`);
                 return '';
             });
+
+        // Get the data access committee for this data cohort, if applicable
+        if (newData[DATA_COHORT_ID]) {
+            fetch(`/candig-api/v1/datasets/${newData[DATA_COHORT_ID]}/info`)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    console.log(`could not determine dataset information: ${response}`);
+                    throw new Error(`${response}`);
+                })
+                .then((response) => {
+                    newData[DATA_OWNER] = response?.dac_id;
+                })
+                .catch((error) => {
+                    console.log(`Datasets error: ${error}`);
+                    return '';
+                });
+        }
 
         // Fill in user information from last form, if applicable
         newData = {
