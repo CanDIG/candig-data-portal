@@ -8,7 +8,7 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded';
 
-import { useSearchResultsWriterContext } from 'views/clinicalGenomic/SearchResultsContext';
+import { useSearchResultsReaderContext, useSearchResultsWriterContext } from 'views/clinicalGenomic/SearchResultsContext';
 import { useSidebarWriterContext } from 'layout/MainLayout/Sidebar/SidebarContext';
 import MainCard from 'ui-component/cards/MainCard';
 import TextField from 'ui-component/extended/TextField';
@@ -140,6 +140,7 @@ const StyledMainCard = styled(MainCard)(({ theme }) => ({
 function RequestDataAccessForm() {
     const location = useLocation();
     const navigate = useNavigate();
+    const context = useSearchResultsReaderContext();
     const writer = useSearchResultsWriterContext();
 
     const [data, setData] = useState({});
@@ -507,8 +508,7 @@ function RequestDataAccessForm() {
 
             // Fill in user information from last form, if applicable
             newData = {
-                ...Object.fromEntries(requestorInformation.map(({ field }) => [field, data[field]])),
-                ...Object.fromEntries(principalInvestigatorInformation.map(({ field }) => [field, data[field]])),
+                ...context?.accessRequestFormData,
                 ...newData
             };
 
@@ -616,7 +616,11 @@ function RequestDataAccessForm() {
                             site: data[DATA_PROVIDER_NODE],
                             programId: data[DATA_COHORT_ID]
                         }
-                    ]
+                    ],
+                    accessRequestFormData: {
+                        ...Object.fromEntries(requestorInformation.map(({ field }) => [field, data[field]])),
+                        ...Object.fromEntries(principalInvestigatorInformation.map(({ field }) => [field, data[field]]))
+                    }
                 };
             });
 
