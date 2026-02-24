@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, SvgIcon, Tooltip, Typography } from '@mui/material';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded';
 
@@ -31,6 +32,7 @@ const REQUESTOR_TITLE = 'requestor_title';
 const RESEARCH_TEAM_INFORMATION = 'research_team';
 const SAME_AS_REQUESTOR = 'pi_same_as_requestor';
 
+const DHDP_EMAIL = 'dhdp@tfri.ca';
 const PREFIX = 'RequestAccessForm';
 
 const classes = {
@@ -38,6 +40,7 @@ const classes = {
     addButton: `${PREFIX}-add-button`,
     buttonIcon: `${PREFIX}-button-icon`,
     content: `${PREFIX}-content`,
+    copyButton: `${PREFIX}-copy-button`,
     funderBlock: `${PREFIX}-funder-block`,
     grid: `${PREFIX}-grid`,
     loading: `${PREFIX}-loading`,
@@ -77,6 +80,14 @@ const StyledMainCard = styled(MainCard)(({ theme }) => ({
         display: 'flex',
         flexDirection: 'column',
         gap: '1rem'
+    },
+
+    [`& .${classes.copyButton}`]: {
+        textTransform: 'none',
+        padding: '0 4px 1px 6px',
+        marginLeft: '2px',
+        alignItems: 'center',
+        gap: '0.25rem'
     },
 
     [`& .${classes.funderBlock}`]: {
@@ -132,6 +143,7 @@ function RequestDataAccessForm() {
     const [data, setData] = useState({});
     const [showForm, setShowForm] = useState(true);
     const [isLoading, setIsLoading] = useState();
+    const [tooltipText, setTooltipText] = useState('Click to copy');
 
     const requestorInformation = [
         {
@@ -474,6 +486,15 @@ function RequestDataAccessForm() {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, [showForm]);
 
+    const handleCopy = async () => {
+        await navigator.clipboard.writeText(DHDP_EMAIL);
+        setTooltipText('Copied');
+    };
+
+    const handleMouseEnter = () => {
+        setTooltipText('Click to copy');
+    };
+
     const handleChange = (key, value) => {
         setData((prevData) => ({
             ...prevData,
@@ -729,7 +750,17 @@ function RequestDataAccessForm() {
                     Submit an access request through the DHDP by navigating to a Cohort of interest on the DHDP Portal and click the Request
                     Access button, which will create a Request ticket on Jira (managed by TFRI).
                 </Typography>
-                <Typography>Submit general inquiries to DHDP at: dhdp@tfri.ca</Typography>
+                <Typography>
+                    Submit general inquiries to DHDP at:
+                    <Tooltip title={tooltipText} placement="top">
+                        <Button className={classes.copyButton} onClick={handleCopy} onMouseEnter={handleMouseEnter}>
+                            {DHDP_EMAIL}
+                            <SvgIcon fontSize="small">
+                                <ContentCopyRoundedIcon />
+                            </SvgIcon>
+                        </Button>
+                    </Tooltip>
+                </Typography>
                 <Typography>
                     Access requests will be directed to the data owners/Data Access Committees (DAC) at the relevant Data Provider
                     institutions responsible for and authorized to approve access to data for federated analysis/learning subject to
