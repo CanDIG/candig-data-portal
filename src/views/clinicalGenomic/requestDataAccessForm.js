@@ -15,6 +15,7 @@ import TextField from 'ui-component/extended/TextField';
 
 const DATA_COHORT_ID = 'data_cohort_id';
 const DATA_PROVIDER_NODE = 'data_provider_node';
+const DATA_SHARING_AGREEMENT = 'data_sharing_agreement';
 const DATE = 'date';
 const FUNDERS = 'funders';
 const INSTITUTIONAL_APPROVAL = 'institutional_approval';
@@ -327,9 +328,19 @@ function RequestDataAccessForm() {
         },
         {
             label: 'Data Sharing Agreement',
-            field: 'data_sharing_agreement',
+            field: DATA_SHARING_AGREEMENT,
             subLabel: '(where required by Data Owner/Data Access Committee)',
             options: ['Yes (identify name and # of agreement)', 'Pending negotiation/signature', 'Not applicable']
+        },
+        {
+            label: 'Data Sharing Agreement Name',
+            field: 'data_sharing_agreement_name',
+            hidden: data[DATA_SHARING_AGREEMENT] !== 'Yes (identify name and # of agreement)'
+        },
+        {
+            label: 'Data Sharing Agreement #',
+            field: 'data_sharing_agreement_number',
+            hidden: data[DATA_SHARING_AGREEMENT] !== 'Yes (identify name and # of agreement)'
         },
         {
             label: 'Describe the project objectives and alignment to DHDP research and technology development aims.',
