@@ -442,76 +442,80 @@ function RequestDataAccessForm() {
     }, [sidebarWriter]);
 
     useEffect(() => {
-        // Reset data when page loads
-        const now = new Date();
-        const date = `${now.getFullYear()}-${'0'.concat(now.getMonth() + 1).slice(-2)}-${'0'.concat(now.getDate()).slice(-2)}`;
+        const resetData = async () => {
+            // Reset data when page loads
+            const now = new Date();
+            const date = `${now.getFullYear()}-${'0'.concat(now.getMonth() + 1).slice(-2)}-${'0'.concat(now.getDate()).slice(-2)}`;
 
-        let newData = {
-            // Prefill some data
-            [DATA_PROVIDER_NODE]: location.state?.site,
-            [DATA_COHORT_ID]: location.state?.programId,
-            // Update date
-            [DATE]: date,
-            // Add one empty research team member to data form
-            [RESEARCH_TEAM_INFORMATION]: [
-                researchTeamInformation.reduce((acc, curr) => {
-                    acc[curr.field] = '';
-                    return acc;
-                }, {})
-            ],
-            // Add one empty funder to data form
-            [FUNDERS]: [
-                funderInformation.reduce((acc, curr) => {
-                    acc[curr.field] = '';
-                    return acc;
-                }, {})
-            ]
-        };
+            let newData = {
+                // Prefill some data
+                [DATA_PROVIDER_NODE]: location.state?.site,
+                [DATA_COHORT_ID]: location.state?.programId,
+                // Update date
+                [DATE]: date,
+                // Add one empty research team member to data form
+                [RESEARCH_TEAM_INFORMATION]: [
+                    researchTeamInformation.reduce((acc, curr) => {
+                        acc[curr.field] = '';
+                        return acc;
+                    }, {})
+                ],
+                // Add one empty funder to data form
+                [FUNDERS]: [
+                    funderInformation.reduce((acc, curr) => {
+                        acc[curr.field] = '';
+                        return acc;
+                    }, {})
+                ]
+            };
 
-        // Grab the email for the logged in user (TODO: test)
-        fetch(`/candig-api/v1/whoami`)
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                console.log(`whoami could not determine logged in user: ${response}`);
-                throw new Error(`${response}`);
-            })
-            .then((response) => {
-                newData[REQUESTOR_EMAIL] = response?.key;
-            })
-            .catch((error) => {
-                console.log(`Whoami error: ${error}`);
-                return '';
-            });
-
-        // Get the data access committee for this data cohort, if applicable (TODO: test)
-        if (newData[DATA_COHORT_ID]) {
-            fetch(`/candig-api/v1/datasets/${newData[DATA_COHORT_ID]}/info`)
+            // Grab the email for the logged in user (TODO: test)
+            await fetch(`/candig-api/v1/whoami`)
                 .then((response) => {
                     if (response.ok) {
                         return response.json();
                     }
-                    console.log(`could not determine dataset information: ${response}`);
+                    console.log(`whoami could not determine logged in user: ${response}`);
                     throw new Error(`${response}`);
                 })
                 .then((response) => {
-                    newData[DATA_OWNER] = response?.dac_id;
+                    newData[REQUESTOR_EMAIL] = response?.key;
                 })
                 .catch((error) => {
-                    console.log(`Datasets error: ${error}`);
+                    console.log(`Whoami error: ${error}`);
                     return '';
                 });
-        }
 
-        // Fill in user information from last form, if applicable
-        newData = {
-            ...newData,
-            ...Object.fromEntries(requestorInformation.map(({ field }) => [field, data[field]])),
-            ...Object.fromEntries(principalInvestigatorInformation.map(({ field }) => [field, data[field]]))
+            // Get the data access committee for this data cohort, if applicable (TODO: test)
+            if (newData[DATA_COHORT_ID]) {
+                await fetch(`/candig-api/v1/datasets/${newData[DATA_COHORT_ID]}/info`)
+                    .then((response) => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        console.log(`could not determine dataset information: ${response}`);
+                        throw new Error(`${response}`);
+                    })
+                    .then((response) => {
+                        newData[DATA_OWNER] = response?.dac_id;
+                    })
+                    .catch((error) => {
+                        console.log(`Datasets error: ${error}`);
+                        return '';
+                    });
+            }
+
+            // Fill in user information from last form, if applicable
+            newData = {
+                ...Object.fromEntries(requestorInformation.map(({ field }) => [field, data[field]])),
+                ...Object.fromEntries(principalInvestigatorInformation.map(({ field }) => [field, data[field]])),
+                ...newData
+            };
+
+            setData(newData);
         };
 
-        setData(newData);
+        resetData();
 
         // Scroll to top of page
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
