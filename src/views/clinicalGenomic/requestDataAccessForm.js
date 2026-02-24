@@ -294,6 +294,7 @@ function RequestDataAccessForm() {
             label: 'For-Profit',
             field: 'for_profit',
             toggle: true,
+            required: false,
             sx: {
                 mx: '0.5rem'
             }
