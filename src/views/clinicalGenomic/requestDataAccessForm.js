@@ -283,17 +283,17 @@ function RequestDataAccessForm() {
         {
             label: 'Research Ethics Board (REB)',
             field: REB,
-            options: ['Yes (identify name and # of approval)', 'Pending']
+            options: ['Yes (identify name and # of approval)', 'Pending', 'Not applicable']
         },
         {
             label: 'REB Institution Name',
             field: 'reb_institution_name',
-            hidden: data[REB] !== 'Yes (identify name and # of approval)'
+            hidden: !['Yes (identify name and # of approval)', 'Pending'].includes(data[REB])
         },
         {
             label: 'Approval #',
             field: 'reb_approval_number',
-            hidden: data[REB] !== 'Yes (identify name and # of approval)'
+            hidden: !['Yes (identify name and # of approval)', 'Pending'].includes(data[REB])
         }
     ];
 
