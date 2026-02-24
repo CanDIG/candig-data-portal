@@ -588,6 +588,8 @@ function RequestDataAccessForm() {
                 serviceDeskId: 0 // TODO
             });
 
+            /* 
+            TODO
             await fetch('', {
                 method: 'POST',
                 headers: {
@@ -597,6 +599,7 @@ function RequestDataAccessForm() {
                 },
                 body: bodyData
             });
+            */
 
             // Change "Request Access" button to "Access Requested" (TODO: test)
             writer((old) => {
