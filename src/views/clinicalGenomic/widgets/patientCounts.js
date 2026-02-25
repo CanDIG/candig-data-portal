@@ -59,7 +59,8 @@ function PatientCounts() {
                 location: entry.location.name,
                 counts: finalCounts,
                 totals: entry?.results || {},
-                unlockedPrograms
+                unlockedPrograms,
+                accessRequestedPrograms: context?.accessRequested
             };
         });
     }

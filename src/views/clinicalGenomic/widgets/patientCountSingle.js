@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
@@ -155,6 +156,9 @@ function PatientCountSingle(props) {
                               <LockOutlinedIcon className={classes.lockIcon} />
                           </Tooltip>
                       );
+                      const accessRequested = counts.accessRequestedPrograms?.some(
+                          ({ programId, site }) => programId === program.program_id && site === counts.location
+                      );
                       return (
                           <Grid
                               container
@@ -185,8 +189,15 @@ function PatientCountSingle(props) {
                               <Divider flexItem orientation="vertical" className={classes.divider} />
                               <Grid item ml="auto" className={classes.button}>
                                   {locked ? (
-                                      <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>
-                                          Request&nbsp;Access
+                                      <Button
+                                          variant="contained"
+                                          component={Link}
+                                          to="/requestAccess"
+                                          state={{ site, programId: program.program_id }}
+                                          sx={{ borderRadius: 1.8 }}
+                                          disabled={accessRequested}
+                                      >
+                                          {accessRequested ? 'Access\u00A0Requested' : 'Request\u00A0Access'}
                                       </Button>
                                   ) : null}
                               </Grid>
