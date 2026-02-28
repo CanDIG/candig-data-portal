@@ -54,6 +54,7 @@ function hexToHSL(hex) {
             case r: h = (g - b) / d + (g < b ? 6 : 0); break;
             case g: h = (b - r) / d + 2; break;
             case b: h = (r - g) / d + 4; break;
+            default: h = 0;break;
         }
         h /= 6;
     }
@@ -480,7 +481,12 @@ function CustomOfflineChart({
         theme.palette.grey,
         theme.palette.primary,
         theme.palette.secondary,
-        theme.palette.tertiary
+        theme.palette.tertiary,
+        theme.palette.teal,
+        theme.palette.plum,
+        theme.palette.coral,
+        theme.palette.burntOrange,
+        theme.palette.sage
     ]);
 
     function setLocalStorageDataVis(event, key) {
