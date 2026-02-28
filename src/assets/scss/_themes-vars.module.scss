@@ -22,6 +22,16 @@ $tertiaryMain: #ffd34f;
 $tertiaryDark: #ffb800;
 $tertiary800: #fc9803;
 
+// Stacked Charts Additional Colours
+// $primaryMain: #1e88e5;
+// $secondaryMain: #36b84c;
+// $tertiaryMain: #ffd34f;
+$burntOrangeMain: #c63d1e;
+$tealMain: #00796b;
+$plumMain: #B47EB3;
+$sageMain: #6b8f71;
+$coralMain: #E15554;
+
 // success Colors
 $successLight: #b9f6ca;
 $success200: #69f0ae;
@@ -79,6 +89,13 @@ $grey900: #212121;
     tertiaryDark: $tertiaryDark;
     tertiary200: $tertiary200;
     tertiary800: $tertiary800;
+
+    // Stacked Charts Additional Colours
+    burntOrangeMain: $burntOrangeMain;
+    tealMain: $tealMain;
+    plumMain: $plumMain;
+    sageMain: $sageMain;
+    coralMain: $coralMain;
 
     // success
     successLight: $successLight;

@@ -29,6 +29,21 @@ export default function themePalette(theme) {
             200: theme.colors.tertiary200,
             800: theme.colors.tertiary800
         },
+        teal: {
+            main: theme.colors.tealMain
+        },
+        plum: {
+            main: theme.colors.plumMain
+        },
+        burntOrange: {
+            main: theme.colors.burntOrangeMain
+        },
+        sage: {
+            main: theme.colors.sageMain
+        },
+        coral: {
+            main: theme.colors.coralMain
+        },
         error: {
             light: theme.colors.errorLight,
             main: theme.colors.errorMain,
