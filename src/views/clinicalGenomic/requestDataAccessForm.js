@@ -521,8 +521,27 @@ function RequestDataAccessForm() {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, [showForm]);
 
+    function fallbackCopyTextToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
+
     const handleCopy = async () => {
-        await navigator.clipboard.writeText(DHDP_EMAIL);
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(DHDP_EMAIL);
+        } else {
+            fallbackCopyTextToClipboard(DHDP_EMAIL);
+        }
         setTooltipText('Copied');
     };
 
