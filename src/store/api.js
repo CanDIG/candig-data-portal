@@ -249,6 +249,10 @@ export function fetchDatasetPermissions() {
     return fetchFederation('v1/authz/user/me', 'candig-api');
 }
 
+function getBeaconFilterForID(id) {
+    return { id, includeDescendantTerms: false };
+}
+
 // params.filters should be a list of objects
 // e.g. [{ "id": "SNOMED:33821000087103" }]
 export function queryBeacon(params, filter_mapping, programs, abort = null) {
@@ -272,16 +276,16 @@ export function queryBeacon(params, filter_mapping, programs, abort = null) {
             if (!NON_ID_FILTERS.includes(param) && !INVALID_FILTERS.includes(param)) {
                 // Determine if we're dealing with a list or not (and if so, are we dealing with the datasets?)
                 if (param === DATASET_PARAM) {
-                    params_filters.push({ id: `dataset_id:${params[param].join('|')}` });
+                    params_filters.push(getBeaconFilterForID(`dataset_id:${params[param].join('|')}`));
                 } else if (Array.isArray(params[param])) {
                     params[param].forEach((thisParam) => {
-                        params_filters.push({ id: filter_mapping[thisParam] });
+                        params_filters.push(getBeaconFilterForID(filter_mapping[thisParam]));
                     });
                 } else if (filter_mapping[params[param]] === 'undefined') {
                     // Prevent an empty filter from somehow being passed on
                     console.log(`ID filter has no mapping: ${param} / ${params[param]}`);
                 } else {
-                    params_filters.push({ id: filter_mapping[params[param]] });
+                    params_filters.push(getBeaconFilterForID(filter_mapping[params[param]]));
                 }
             } else {
                 // Non-ID filters need to be applied as well -- how should I approach this?
