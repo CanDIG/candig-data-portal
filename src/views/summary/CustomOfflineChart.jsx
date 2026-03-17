@@ -28,6 +28,45 @@ export const VALID_CHART_TYPES = ['bar', 'line', 'column', 'scatter', 'pie'];
 // Defined here in order to prevent a circular dependancy
 export const VISUALIZATION_LOCAL_STORAGE_KEY = 'chartDefinitions';
 
+// Helper: find the index of the first non-zero value in an array, modded by the max number of colours we have (to prevent out of bounds errors)
+function findSiteIndexMod(value, max) {
+    const siteIndex = value.findIndex((v) => v!== 0) || 0;
+    return siteIndex % max;
+}
+
+// Helper: convert hex to HSL
+function hexToHSL(hex) {
+    const bigint = parseInt(hex.replace('#', ''), 16);
+    let r = ((bigint >> 16) & 255) / 255;
+    let g = ((bigint >> 8) & 255) / 255;
+    let b = (bigint & 255) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if(max === min){
+        h = s = 0; // achromatic
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+            default: h = 0;break;
+        }
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
+
+// Helper: HSL to CSS string
+function hslToCss([h, s, l]) {
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+}
+
 /*
  * Component for offline chart
  * @param {string} chartType
@@ -97,6 +136,28 @@ function CustomOfflineChart({
     useEffect(() => {
         // Determine whether or not there exists censored data in the object provided
         function hasCensoredData(dataObj) {
+            // For testing purposes, generate some random censored data
+            // if (dataObj.local) {
+            //     const generateLocal = (name, cohortCount = 25) => {
+            //         dataObj[name] = {};
+
+            //         for (let i = 1; i <= cohortCount; i++) {
+            //             const cohortNum = String(i).padStart(2, '0');
+            //             const synthNum = (i % 30) + 1;
+
+            //             const key = `${name}_SYNTH_${synthNum.toString().padStart(2, '0')}`;
+
+            //             const value = Math.floor(Math.random() * 46) + 5;
+
+            //             dataObj[name][`${key}_${cohortNum}`] = value;
+            //         }
+            //     };
+
+            //     generateLocal("local2");
+            //     generateLocal("local3");
+            //     generateLocal("local4");
+            //     generateLocal("local6");
+            // }
             function isObjectCensored(obj) {
                 if (dataObj[HAS_CENSORED_DATA_MARKER]) {
                     return true;
@@ -186,12 +247,13 @@ function CustomOfflineChart({
                 const data = new Map();
                 let categories = [];
                 const thisData = dataObjectToUse;
+                const bars = Object.keys(thisData).length;
 
                 Object.keys(thisData).forEach((key, i) => {
                     categories.push(key);
                     Object.keys(thisData[key]).forEach((program) => {
                         if (!data.has(program)) {
-                            data.set(program, new Array(Object.keys(thisData).length).fill(0));
+                            data.set(program, new Array(bars).fill(0));
                         }
                         data.get(program).splice(i, 1, thisData[key][program]);
                     });
@@ -206,9 +268,7 @@ function CustomOfflineChart({
                 });
 
                 const stackSeries = [];
-                data?.forEach((value, key) => {
-                    stackSeries.push({ name: key, data: value });
-                });
+
                 const grayscaleTheme = [
                     theme.palette.grey[200],
                     theme.palette.grey[300],
@@ -218,20 +278,52 @@ function CustomOfflineChart({
                     theme.palette.grey[900]
                 ];
                 const colouredTheme = [
-                    theme.palette.secondary[200],
-                    theme.palette.tertiary[200],
-                    theme.palette.primary[200],
+                    theme.palette.primary.main,
                     theme.palette.secondary.main,
                     theme.palette.tertiary.main,
-                    theme.palette.primary.main,
-                    theme.palette.secondary.dark,
-                    theme.palette.tertiary.dark,
-                    theme.palette.primary.dark,
-                    theme.palette.secondary[800],
-                    theme.palette.tertiary[800],
-                    theme.palette.primary[800]
+                    theme.palette.teal.main,
+                    theme.palette.plum.main,
+                    theme.palette.coral.main,
+                    theme.palette.burntOrange.main,
+                    theme.palette.sage.main
                 ];
                 const stackedTheme = grayscale ? grayscaleTheme : colouredTheme;
+                const maxes = new Array(bars).fill(0);
+                const mins = new Array(bars).fill(Infinity);
+
+                // Site based max and min
+                data?.forEach((value) => {
+                    value.forEach((v, i) => {
+                        maxes[i] = Math.max(maxes[i], v);
+                        mins[i] = Math.min(mins[i], v === 0 ? mins[i] : v);
+                    });
+                });
+
+                data?.forEach((value, key) => {
+                    const baseIndex = findSiteIndexMod(value, stackedTheme.length);
+                    // Colour conversion and manipulation
+                    const baseHex = stackedTheme[baseIndex];
+                    const baseHSL = hexToHSL(baseHex);
+
+                    const points = value.map((y, i) => {
+                        let ratio = maxes[i] === mins[i] ? 0.5 : (y - mins[i]) / (maxes[i] - mins[i]);
+
+                        let [h, s, l] = baseHSL;
+
+                        // Hue shift ±5° but scaled up for small value differences
+                        h = (h + (ratio - 0.5) * (20 / 360) + 1) % 1; 
+
+                        // Lightness shift ±30% for small differences
+                        l = Math.min(1, Math.max(0, l - 0.15 + ratio * 0.3));
+
+                        // Saturation shift ±10% for small differences
+                        s = Math.min(1, Math.max(0, s - 0.05 + ratio * 0.1));
+
+                        return { y, color: hslToCss([h, s, l]) };
+                    });
+
+                    stackSeries.push({ name: key, data: points });
+                });
 
                 setChartOptions({
                     credits: {
@@ -249,7 +341,6 @@ function CustomOfflineChart({
                     },
                     xAxis: { title: { text: DataVisualizationChartInfo[chartData].xAxis }, categories, allowDecimals: false },
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
-                    colors: stackedTheme,
                     plotOptions: {
                         series: {
                             stacking: 'normal'
@@ -390,7 +481,12 @@ function CustomOfflineChart({
         theme.palette.grey,
         theme.palette.primary,
         theme.palette.secondary,
-        theme.palette.tertiary
+        theme.palette.tertiary,
+        theme.palette.teal,
+        theme.palette.plum,
+        theme.palette.coral,
+        theme.palette.burntOrange,
+        theme.palette.sage
     ]);
 
     function setLocalStorageDataVis(event, key) {
