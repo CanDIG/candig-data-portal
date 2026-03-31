@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
@@ -172,50 +173,60 @@ function PatientCountSingle(props) {
 
             {expanded
                 ? counts.totals.map((program) => {
-                      const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
-                      return (
-                          <Grid
-                              container
-                              justifyContent="center"
-                              alignItems="center"
-                              spacing={2}
-                              key={program.program_id}
-                              className={classes.container}
-                          >
-                              <Grid item xs={2}>
-                                  <Typography variant="h5" align="center" className={classes.patientEntry}>
-                                      <b className={classes.patientEntry}>
-                                          {program.program_id}
-                                          {locked && (
-                                              <Tooltip title="Unauthorized Program" placement="right">
-                                                  <LockOutlinedIcon className={classes.lockIcon} />
-                                              </Tooltip>
-                                          )}
-                                      </b>
-                                  </Typography>
-                              </Grid>
-                              <Divider flexItem orientation="vertical" className={classes.divider} />
-                              <Grid item xs={2}>
-                                  <Typography align="center" className={classes.patientEntry}>
-                                      {counts.counts?.[program.program_id] || 0}
-                                  </Typography>
-                              </Grid>
-                              <Divider flexItem orientation="vertical" className={classes.divider} />
-                              <Grid item xs={2}>
-                                  <Typography align="center" className={classes.patientEntry}>
-                                      {program.patients_count || 0}
-                                  </Typography>
-                              </Grid>
-                              <Divider flexItem orientation="vertical" className={classes.divider} />
-                              <Grid item ml="auto" className={classes.button}>
-                                  {locked ? (
-                                      <Button type="submit" variant="contained" disabled sx={{ borderRadius: 1.8 }}>
-                                          Request&nbsp;Access
+                    const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
+                    const accessRequested = counts.accessRequestedPrograms?.some(
+                        ({ programId, site }) => programId === program.program_id && site === counts.location
+                    );
+                    return (
+                        <Grid
+                            container
+                            justifyContent="center"
+                            alignItems="center"
+                            spacing={2}
+                            key={program.program_id}
+                            className={classes.container}
+                        >
+                            <Grid item xs={2}>
+                                <Typography variant="h5" align="center" className={classes.patientEntry}>
+                                    <b className={classes.patientEntry}>
+                                        {program.program_id}
+                                        {locked && (
+                                            <Tooltip title="Unauthorized Program" placement="right">
+                                                <LockOutlinedIcon className={classes.lockIcon} />
+                                            </Tooltip>
+                                        )}
+                                    </b>
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item xs={2}>
+                                <Typography align="center" className={classes.patientEntry}>
+                                    {counts.counts?.[program.program_id] || 0}
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item xs={2}>
+                                <Typography align="center" className={classes.patientEntry}>
+                                    {program.patients_count || 0}
+                                </Typography>
+                            </Grid>
+                            <Divider flexItem orientation="vertical" className={classes.divider} />
+                            <Grid item ml="auto" className={classes.button}>
+                                {locked ? (
+                                    <Button
+                                          variant="contained"
+                                          component={Link}
+                                          to="/requestAccess"
+                                          state={{ site, programId: program.program_id }}
+                                          sx={{ borderRadius: 1.8 }}
+                                          disabled={accessRequested}
+                                      >
+                                          {accessRequested ? 'Access\u00A0Requested' : 'Request\u00A0Access'}
                                       </Button>
-                                  ) : null}
-                              </Grid>
-                          </Grid>
-                      );
+                                ) : null}
+                            </Grid>
+                        </Grid>
+                    );
                   })
                 : null}
         </StyledBox>
