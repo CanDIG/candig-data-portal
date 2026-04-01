@@ -44,7 +44,7 @@ const OTHER_REQUESTED = 'other_requested';
 const DOWNLOAD_REQUESTED = 'download_requested';
 const FILES_SECURE = 'files_secure';
 
-const MOH_CONTACT_EMAIL = 'dhdp@tfri.ca';
+const MOH_CONTACT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL;
 const PREFIX = 'RequestAccessForm';
 
 const classes = {
