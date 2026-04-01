@@ -35,11 +35,14 @@ const REB = 'reb';
 const REQUEST_TYPE = 'request_type';
 const SUBMITTER_EMAIL = 'requestor_email';
 const SUBMITTER_INSTUTUTION_NAME = 'requestor_institution_name';
-const REQUESTOR_INSTITUTION_TYPE = 'requestor_institution_type';
+const FILES_SECURE_ENVIRONMENT_NAME = 'files_secure_environment_name';
 const SUBMITTER_NAME = 'requestor_name';
 const SUBMITTER_ROLE = 'requestor_title';
 const RESEARCH_TEAM_INFORMATION = 'research_team';
 const SAME_AS_SUBMITTER = 'pi_same_as_requestor';
+const OTHER_REQUESTED = 'other_requested';
+const DOWNLOAD_REQUESTED = 'download_requested';
+const FILES_SECURE = 'files_secure';
 
 const MOH_CONTACT_EMAIL = 'dhdp@tfri.ca';
 const PREFIX = 'RequestAccessForm';
@@ -460,7 +463,95 @@ function RequestDataAccessForm() {
             checkbox: true,
             required: false
         },
+        {
+            label: 'Clinical Data',
+            subLabel: '(includes all available data)',
+            field: 'clinical_data_requested',
+            checkbox: true,
+            required: false
+        },
+        {
+            label: 'H&E Slide Images',
+            subLabel: '(to be arranged with the contributing cohort(s))',
+            field: 'he_slides_requested',
+            checkbox: true,
+            required: false
+        },
+        {
+            label: 'Other',
+            field: OTHER_REQUESTED,
+            checkbox: true,
+            required: false
+        },
+        {
+            label: 'If other, describe the types of data (e.g., Gold Cohort preferred data types) and provide documentation confirming the availability of the data type for request.',
+            field: 'other_description',
+            required: false,
+            multiline: true,
+            hidden: data[OTHER_REQUESTED] !== true
+        },
     ];
+
+    const dataDownloadAndSecurity = [
+        {
+            label: 'Is download of data required?',
+            field: DOWNLOAD_REQUESTED,
+            checkbox: true,
+            required: false
+        },
+        {
+            label: 'If yes, list which data types.',
+            field: 'download_request_types',
+            required: false,
+            multiline: true,
+            hidden: data[DOWNLOAD_REQUESTED] !== true
+        },
+        {
+            label: 'Will files be stored in a secure location that is approved by the Institution for purposes of genomic and clinical data? ',
+            subLabel: 'For example, are you using a pre-vetted environment within your institution for this type of work? If yes, please confirm and name the environment so the DAC can create a master list.',
+            field: FILES_SECURE,
+            checkbox: true,
+            required: false
+        },
+        {
+            label: 'Environment name:',
+            field: FILES_SECURE_ENVIRONMENT_NAME,
+            required: false,
+            options: ['HPC4Health private cloud (UHN)', 'Michael Smith Genome Science Centre – closed network (BCCancer ISO 27001 certified)', 'Secure Data 4 Health – secure cloud (McGill/Calcul Quebec).', 'Other'],
+            hidden: data[FILES_SECURE] !== true
+        },
+    ];
+
+    const otherSecurePractices = [
+        {
+            label: 'Organizational safeguards',
+            subLabel: '(regular privacy and security training, access controls, logging and regular auditing of access and user activity, incident response)',
+            field: 'organizational_safeguards',
+            required: false,
+            checkbox: true
+        },
+        {
+            label: 'Physical safeguards',
+            subLabel: '(secure offices, labs, server rooms)',
+            field: 'physical_safeguards',
+            required: false,
+            checkbox: true
+        },
+        {
+            label: 'Technical safeguards',
+            subLabel: '(strong passwords, MFA for remote access, unique accounts, on-boarding/offboarding; closed network or firewall/intrusion detection, regular patching/malware updates)',
+            field: 'technical_safeguards',
+            required: false,
+            checkbox: true
+        },
+        {
+            label: 'How will data storage and security be funded?',
+            field: 'data_security_funding',
+            subLabel: '(300 words max)',
+            multiline: true,
+            maxWords: 300
+        },
+    ]
 
     const acknowledgementAndSignature = [
         {
@@ -946,6 +1037,19 @@ function RequestDataAccessForm() {
                     Other:
                 </Typography>
                 {mapToTextField(otherDataTypesRequested)}
+                <Typography component="h2">
+                    Data Download & Security
+                </Typography>
+                {mapToTextField(dataDownloadAndSecurity)}
+                {(data[FILES_SECURE_ENVIRONMENT_NAME] === 'Other' ?
+                    <>
+                        <Typography component="h2">
+                            If other location, please confirm that you follow best practices or standards for organizational, physical and technical safeguards. Please describe the safeguards you have in place.
+                        </Typography>
+                        {mapToTextField(otherSecurePractices)}
+                    </>
+                : <></>
+                )}
                 <Typography variant="h2" className={classes.subtitle}>
                     Acknowledgement and Signature
                 </Typography>
