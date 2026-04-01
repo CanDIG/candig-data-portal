@@ -12,6 +12,7 @@ import { useSearchResultsReaderContext, useSearchResultsWriterContext } from './
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
 import MainCard from '../../ui-component/cards/MainCard';
 import TextField from '../../ui-component/extended/TextField';
+import config from '../../config';
 
 const DATA_COHORT_ID = 'data_cohort_id';
 const DATA_OWNER = 'data_owner';
@@ -44,7 +45,7 @@ const OTHER_REQUESTED = 'other_requested';
 const DOWNLOAD_REQUESTED = 'download_requested';
 const FILES_SECURE = 'files_secure';
 
-const MOH_CONTACT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL;
+const MOH_CONTACT_EMAIL = config.supportEmail;
 const PREFIX = 'RequestAccessForm';
 
 const classes = {
