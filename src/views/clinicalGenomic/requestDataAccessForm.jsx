@@ -527,22 +527,22 @@ function RequestDataAccessForm() {
             label: 'Organizational safeguards',
             subLabel: '(regular privacy and security training, access controls, logging and regular auditing of access and user activity, incident response)',
             field: 'organizational_safeguards',
-            required: false,
-            checkbox: true
+            multiline: true,
+            required: false
         },
         {
             label: 'Physical safeguards',
             subLabel: '(secure offices, labs, server rooms)',
             field: 'physical_safeguards',
-            required: false,
-            checkbox: true
+            multiline: true,
+            required: false
         },
         {
             label: 'Technical safeguards',
             subLabel: '(strong passwords, MFA for remote access, unique accounts, on-boarding/offboarding; closed network or firewall/intrusion detection, regular patching/malware updates)',
             field: 'technical_safeguards',
-            required: false,
-            checkbox: true
+            multiline: true,
+            required: false
         },
         {
             label: 'How will data storage and security be funded?',
