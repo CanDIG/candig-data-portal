@@ -23,9 +23,6 @@ const RequestDataAccessForm = Loadable(lazy(() => import('../views/clinicalGenom
 // Ingest Portal
 const IngestPortal = Loadable(lazy(() => import('../views/ingest/ingest')));
 
-// Ingest Portal
-// const IngestPortal = Loadable(lazy(() => import('./views/ingest/ingest')));
-
 // Completeness
 const CompletenessStats = Loadable(lazy(() => import('../views/completeness/completeness')));
 

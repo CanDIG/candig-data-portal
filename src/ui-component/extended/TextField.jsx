@@ -10,7 +10,8 @@ const PREFIX = 'TextField';
 const labelHeightInRem = 0.5 + 0.875 * 1.334;
 
 const classes = {
-    input: `${PREFIX}-input`
+    input: `${PREFIX}-input`,
+    formControl: `${PREFIX}-formControl`
 };
 
 const StyledBox = styled(Box)(({ theme }) => ({

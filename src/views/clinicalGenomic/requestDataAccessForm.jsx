@@ -35,7 +35,7 @@ const PI_MOHCCN_MEMBER = 'pi_mohccn_member';
 const REB = 'reb';
 const REQUEST_TYPE = 'request_type';
 const SUBMITTER_EMAIL = 'requestor_email';
-const SUBMITTER_INSTUTUTION_NAME = 'requestor_institution_name';
+const SUBMITTER_INSTITUTION_NAME = 'requestor_institution_name';
 const FILES_SECURE_ENVIRONMENT_NAME = 'files_secure_environment_name';
 const SUBMITTER_NAME = 'requestor_name';
 const SUBMITTER_ROLE = 'requestor_title';
@@ -175,7 +175,7 @@ function RequestDataAccessForm() {
         },
         {
             label: 'Institution',
-            field: SUBMITTER_INSTUTUTION_NAME
+            field: SUBMITTER_INSTITUTION_NAME
         }
     ];
 
@@ -242,7 +242,7 @@ function RequestDataAccessForm() {
         },
         {
             label: 'If amendment or renewal, what is the existing Request Number?',
-            field: 'request_type_highlight_changes',
+            field: 'existing_request_number',
             subLabel: '(e.g. MOHDA######)',
             multiline: true,
             hidden: ![
@@ -597,9 +597,16 @@ function RequestDataAccessForm() {
         submitterInformation,
         principalInvestigatorInformation,
         requestType,
+        researchTeamInformation,
         projectInformation1,
+        funderInformation,
         projectInformation2,
         dataCohortRequested,
+        rawDataTypesRequested,
+        alignedDataTypesRequested,
+        otherDataTypesRequested,
+        dataDownloadAndSecurity,
+        otherSecurePractices,
         acknowledgementAndSignature
     ].flat();
 
@@ -733,7 +740,7 @@ function RequestDataAccessForm() {
                 alteredData[PI_NAME] = data[SUBMITTER_NAME];
                 alteredData[PI_TITLE] = data[SUBMITTER_ROLE];
                 alteredData[PI_EMAIL] = data[SUBMITTER_EMAIL];
-                alteredData[PI_INSTITUTION_NAME] = data[SUBMITTER_INSTUTUTION_NAME];
+                alteredData[PI_INSTITUTION_NAME] = data[SUBMITTER_INSTITUTION_NAME];
             }
 
             const newData = { ...data, ...alteredData };
@@ -825,7 +832,7 @@ function RequestDataAccessForm() {
             while (alteredValue.length <= index) {
                 alteredValue.push(
                     researchTeamInformation.reduce((acc, curr) => {
-                        acc[curr.label] = '';
+                        acc[curr.field] = '';
                         return acc;
                     }, {})
                 );

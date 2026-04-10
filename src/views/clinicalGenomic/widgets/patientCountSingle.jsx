@@ -81,8 +81,6 @@ function PatientCountSingle(props) {
         const map = {};
         const isHealthy = Object.keys(counts.totals).length > 0 && Object.keys(counts.counts).length > 0;
         if (!isHealthy) {
-            console.log(counts);
-            console.log(counts.location);
             map[counts.location] = {
                 healthy: false,
                 reason: 'Connection Error: No data returned from node'
@@ -175,7 +173,7 @@ function PatientCountSingle(props) {
                 ? counts.totals.map((program) => {
                     const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
                     const accessRequested = counts.accessRequestedPrograms?.some(
-                        ({ programId, site }) => programId === program.program_id && site === counts.location
+                        ({ programId, this_site }) => programId === program.program_id && this_site === counts.location
                     );
                     return (
                         <Grid
@@ -214,15 +212,15 @@ function PatientCountSingle(props) {
                             <Grid item ml="auto" className={classes.button}>
                                 {locked ? (
                                     <Button
-                                          variant="contained"
-                                          component={Link}
-                                          to="/requestAccess"
-                                          state={{ site, programId: program.program_id }}
-                                          sx={{ borderRadius: 1.8 }}
-                                          disabled={accessRequested}
-                                      >
-                                          {accessRequested ? 'Access\u00A0Requested' : 'Request\u00A0Access'}
-                                      </Button>
+                                        variant="contained"
+                                        component={Link}
+                                        to="/requestAccess"
+                                        state={{ site, programId: program.program_id }}
+                                        sx={{ borderRadius: 1.8 }}
+                                        disabled={accessRequested}
+                                    >
+                                        {accessRequested ? 'Access\u00A0Requested' : 'Request\u00A0Access'}
+                                    </Button>
                                 ) : null}
                             </Grid>
                         </Grid>
