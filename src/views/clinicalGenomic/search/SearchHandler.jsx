@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
+import Snackbar from '@mui/material/Snackbar';
 import { trackPromise } from 'react-promise-tracker';
 
 import { useSearchResultsWriterContext, useSearchQueryReaderContext } from '../SearchResultsContext';
@@ -18,6 +19,9 @@ function SearchHandler({ setLoading }) {
     const summaryFetchAbort = useRef(new AbortController());
     const clinicalFetchAbort = useRef(new AbortController());
 
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarError, setSnackbarError] = useState("");
+
     const { ...fullQuery } = reader.query || {};
     // **Add genomic_data_types if it exists**
     if (reader.query?.genomic_data_types) {
@@ -25,6 +29,12 @@ function SearchHandler({ setLoading }) {
     }
     if (reader.filter?.node) {
         fullQuery.exclude_servers = reader.filter.node.join('|');
+    }
+
+    const openErrorPopup = (message) => {
+        console.log(message);
+        setSnackbarError(message);
+        setSnackbarOpen(true)
     }
 
     // Query 1: always have the federation sites and authorized programs query results available
@@ -42,6 +52,7 @@ function SearchHandler({ setLoading }) {
                 .then(() => fetch('/genomics/htsget/v1/genes'))
                 .then((response) => (response.ok ? response.json() : console.log(response)))
                 .then((data) => writer((old) => ({ ...old, genes: data?.results })))
+                .catch((error) => openErrorPopup(error.message))
                 .finally(() => setLoading(false)),
             'federation'
         );
@@ -100,7 +111,7 @@ function SearchHandler({ setLoading }) {
                 .catch((error) => {
                     // Ignore abort errors
                     if (error !== 'New request started') {
-                        console.log(error.message);
+                        openErrorPopup(error.message);
                     }
                 });
 
@@ -143,7 +154,9 @@ function SearchHandler({ setLoading }) {
                 })
                 .catch((error) => {
                     // Ignore abort errors
-                    if (error !== 'New request started') console.log(error.message);
+                    if (error !== 'New request started') {
+                        openErrorPopup(error.message);
+                    }
                 })
                 .finally(() => setLoading(false));
 
@@ -171,9 +184,15 @@ function SearchHandler({ setLoading }) {
             'donor'
         );
     }, [JSON.stringify(reader.donorID)]);
-    // We don't really implement a graphical component
-    // NB: This might be a good reason to have this be a function call instead of what it currently is.
-    return null;
+
+    // We don't really implement a graphical component unless there's been an error
+    return <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        autoHideDuration={5000}
+        message={snackbarError}
+        />;
 }
 /* eslint-enable react-hooks/exhaustive-deps */
 
