@@ -10,6 +10,7 @@ import TreatingCentreMap from '../../views/summary/TreatingCentreMap';
 // project imports
 import { aggregateObj, aggregateKatsuObj, aggregateObjStack, invertkatsu } from '../../utils/utils';
 import { fetchClinicalCompleteness, fetchFederatedSubServices } from '../../store/api';
+import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
 
 // assets
 import { Hive, CheckCircleOutline, WarningAmber, Person, Public } from '@mui/icons-material';
@@ -176,127 +177,129 @@ function Summary() {
     }, []);
 
     return (
-        <Grid container spacing={1}>
-            {nodeStatus ? (
-                <Grid item xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
-                    <Grid container>
-                        <Grid item xs={6} pr={1}>
-                            <SmallCountCard
-                                title="Nodes"
-                                count={`${sites}/${totalSites}`}
-                                icon={<CheckCircleOutline fontSize="inherit" />}
-                                color={theme.palette.secondary.main}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <SmallCountCard
-                                title="Connection Error"
-                                count={`${connectionError}/${totalSites}`}
-                                icon={<WarningAmber fontSize="inherit" />}
-                                color={theme.palette.error.main}
-                            />
+        <DefaultErrorBoundary>
+            <Grid container spacing={1}>
+                {nodeStatus ? (
+                    <Grid item xs={12} sm={12} md={6} lg={3} pt={1} pl={1}>
+                        <Grid container>
+                            <Grid item xs={6} pr={1}>
+                                <SmallCountCard
+                                    title="Nodes"
+                                    count={`${sites}/${totalSites}`}
+                                    icon={<CheckCircleOutline fontSize="inherit" />}
+                                    color={theme.palette.secondary.main}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <SmallCountCard
+                                    title="Connection Error"
+                                    count={`${connectionError}/${totalSites}`}
+                                    icon={<WarningAmber fontSize="inherit" />}
+                                    color={theme.palette.error.main}
+                                />
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
-            ) : (
+                ) : (
+                    <Grid item xs={12} sm={12} md={6} lg={3}>
+                        <SmallCountCard
+                            title="Nodes"
+                            count={sites}
+                            icon={<CheckCircleOutline fontSize="inherit" />}
+                            color={theme.palette.secondary.main}
+                        />
+                    </Grid>
+                )}
                 <Grid item xs={12} sm={12} md={6} lg={3}>
                     <SmallCountCard
-                        title="Nodes"
-                        count={sites}
-                        icon={<CheckCircleOutline fontSize="inherit" />}
+                        isLoading={isLoading['/individual_count']}
+                        title="Number of Patients"
+                        count={individualCount?.individual_count || 0}
+                        primary
+                        icon={<Person fontSize="inherit" />}
+                        color={theme.palette.primary.main}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <SmallCountCard
+                        isLoading={isLoading['/individual_count']}
+                        title="Programs"
+                        count={programCount?.program_count || 0}
+                        icon={<Hive fontSize="inherit" />}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
-            )}
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <SmallCountCard
-                    isLoading={isLoading['/individual_count']}
-                    title="Number of Patients"
-                    count={individualCount?.individual_count || 0}
-                    primary
-                    icon={<Person fontSize="inherit" />}
-                    color={theme.palette.primary.main}
-                />
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <SmallCountCard
+                        isLoading={isLoading['/individual_count']}
+                        title="Provinces"
+                        count={provinceCounter || 0}
+                        icon={<Public fontSize="inherit" />}
+                        color={theme.palette.tertiary.main}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={6}>
+                    <TreatingCentreMap datasetName="" data={canDigDataSource} />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        data="diagnosis_age_count"
+                        dataObject={diagnosisAgeCount || {}}
+                        dataVis=""
+                        height="400px; auto"
+                        loading={isLoading['/diagnosis_age_count']}
+                        orderAlphabetically
+                        chartType="bar"
+                        dropDown={false}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        dataObject={treatmentTypeCount || {}}
+                        data="treatment_type_count"
+                        dataVis=""
+                        chartType="bar"
+                        height="400px; auto"
+                        loading={isLoading['/treatment_type_count']}
+                        orderByFrequency
+                        cutoff={10}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        dataObject={primarySiteCount || {}}
+                        data="primary_site_count"
+                        dataVis=""
+                        chartType="bar"
+                        height="400px; auto"
+                        dropDown={false}
+                        loading={isLoading['/primary_site_count']}
+                        orderByFrequency
+                        cutoff={10}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={3}>
+                    <CustomOfflineChart
+                        dataObject={patientsPerProgram || {}}
+                        data="patients_per_program"
+                        dataVis=""
+                        chartType="bar"
+                        height="400px; auto"
+                        dropDown={false}
+                        loading={isLoading['/patients_per_program']}
+                        orderByFrequency
+                        cutoff={10}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <FieldLevelCompletenessGraph
+                        data={clinicalComplete}
+                        loading={clinicalComplete.length === 0}
+                        title="Field Level Completeness"
+                    />
+                </Grid>
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <SmallCountCard
-                    isLoading={isLoading['/individual_count']}
-                    title="Programs"
-                    count={programCount?.program_count || 0}
-                    icon={<Hive fontSize="inherit" />}
-                    color={theme.palette.secondary.main}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <SmallCountCard
-                    isLoading={isLoading['/individual_count']}
-                    title="Provinces"
-                    count={provinceCounter || 0}
-                    icon={<Public fontSize="inherit" />}
-                    color={theme.palette.tertiary.main}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={6}>
-                <TreatingCentreMap datasetName="" data={canDigDataSource} />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    data="diagnosis_age_count"
-                    dataObject={diagnosisAgeCount || {}}
-                    dataVis=""
-                    height="400px; auto"
-                    loading={isLoading['/diagnosis_age_count']}
-                    orderAlphabetically
-                    chartType="bar"
-                    dropDown={false}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    dataObject={treatmentTypeCount || {}}
-                    data="treatment_type_count"
-                    dataVis=""
-                    chartType="bar"
-                    height="400px; auto"
-                    loading={isLoading['/treatment_type_count']}
-                    orderByFrequency
-                    cutoff={10}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    dataObject={primarySiteCount || {}}
-                    data="primary_site_count"
-                    dataVis=""
-                    chartType="bar"
-                    height="400px; auto"
-                    dropDown={false}
-                    loading={isLoading['/primary_site_count']}
-                    orderByFrequency
-                    cutoff={10}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={3}>
-                <CustomOfflineChart
-                    dataObject={patientsPerProgram || {}}
-                    data="patients_per_program"
-                    dataVis=""
-                    chartType="bar"
-                    height="400px; auto"
-                    dropDown={false}
-                    loading={isLoading['/patients_per_program']}
-                    orderByFrequency
-                    cutoff={10}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6}>
-                <FieldLevelCompletenessGraph
-                    data={clinicalComplete}
-                    loading={clinicalComplete.length === 0}
-                    title="Field Level Completeness"
-                />
-            </Grid>
-        </Grid>
+        </DefaultErrorBoundary>
     );
 }
 
