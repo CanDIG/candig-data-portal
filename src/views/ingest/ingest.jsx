@@ -1,4 +1,5 @@
 import IngestMenu from '../../ui-component/ingest/IngestMenu';
+import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
 import { styled } from '@mui/material/styles';
 import { Grid } from '@mui/material';
 
@@ -39,8 +40,10 @@ function IngestPage() {
     return (
         <StyledGrid container className={classes.container}>
             <Grid item sx={{ height: '100%', width: '100%' }}>
-                <div className={classes.label}>Ingest Data</div>
-                <IngestMenu />
+                <DefaultErrorBoundary>
+                    <div className={classes.label}>Ingest Data</div>
+                    <IngestMenu />
+                </DefaultErrorBoundary>
             </Grid>
         </StyledGrid>
     );
