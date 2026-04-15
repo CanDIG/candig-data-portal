@@ -34,7 +34,7 @@ function SearchHandler({ setLoading }) {
     const openErrorPopup = (message) => {
         console.log(message);
         setSnackbarError(message);
-        setSnackbarOpen(true)
+        setSnackbarOpen(true);
     }
 
     // Query 1: always have the federation sites and authorized programs query results available
