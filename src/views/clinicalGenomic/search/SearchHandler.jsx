@@ -35,7 +35,7 @@ function SearchHandler({ setLoading }) {
         console.log(message);
         setSnackbarError(message);
         setSnackbarOpen(true);
-    }
+    };
 
     // Query 1: always have the federation sites and authorized programs query results available
     let lastPromise = null;
