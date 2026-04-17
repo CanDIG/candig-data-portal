@@ -50,7 +50,7 @@ function SearchHandler({ setLoading }) {
                 .then(() => fetchFederation('v3/authorized/programs', 'katsu', {}, fetch))
                 .then((data) => writer((old) => ({ ...old, programs: data })))
                 .then(() => fetch('/genomics/htsget/v1/genes'))
-                .then((response) => (response.ok ? response.json() : console.log(response)))
+                .then((response) => (response.ok ? response.json() : console.log(response) && {}))
                 .then((data) => writer((old) => ({ ...old, genes: data?.results })))
                 .catch((error) => openErrorPopup(error.message))
                 .finally(() => setLoading(false)),

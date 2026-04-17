@@ -54,7 +54,7 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
                 return response.json();
             } else {
                 throw new Error(`Error while accessing ${service}/${path} ${response.status}: ${response.statusText}`);
-            };
+            }
         });
 }
 
