@@ -1,14 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { Snackbar } from '@mui/material'
 
 function ErrorFallback({ error }) {
 	const [snackbarOpen, setSnackbarOpen] = useState(true);
-
-	useEffect(() => {
-		setSnackbarOpen(true);
-	}, [error]);
 
 	return (
 		<div role="alert">
