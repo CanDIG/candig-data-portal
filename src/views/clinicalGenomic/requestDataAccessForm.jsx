@@ -385,7 +385,7 @@ function RequestDataAccessForm() {
             field: DATA_COHORT_ID
         },
         {
-            label: 'Describe the types of data requested (data must be available as described on the DHDP Portal).',
+            label: 'Describe the types of data requested (data must be available as described on the CanDIG Portal).',
             multiline: true,
             field: 'data_description'
         }
@@ -963,8 +963,8 @@ function RequestDataAccessForm() {
                     Data Access Request Form
                 </Typography>
                 <Typography>
-                    Submit an access request through MoHCCN by navigating to a Cohort of interest on the DHDP Portal and click the Request
-                    Access button, which will create a Data Access Request to be reviewed by an MOH network committee.
+                    Submit an access request through MoHCCN by clicking the Request
+                    Access button next to the program of interest, which will create a Data Access Request form that can be downloaded and sent to the MOHCCN network Data Access Committee.
                 </Typography>
                 <Typography>
                     Submit general inquiries to the Marathon of Hope at:
@@ -988,7 +988,7 @@ function RequestDataAccessForm() {
                 </Typography>
                 <Typography>
                     Note: Fields in the form marked as non-confidential may be published or shared by the Marathon of Hope Cancer Care Network
-                    (MoHCCN) or publicly, such as on the DHDP website.
+                    (MoHCCN) or publicly, such as on the MOHCCN website.
                 </Typography>
                 <Typography variant="h2" className={classes.subtitle}>
                     Request Type
@@ -1064,7 +1064,7 @@ function RequestDataAccessForm() {
                 <Typography component="span">
                     By signing this form, you attest and confirm that:
                     <ul>
-                        <li>You have read, understood and will comply with DHDP policies and protocols</li>
+                        <li>You have read, understood and will comply with MOHCCN policies and protocols</li>
                         <li>You are compliant with all institutional policies around privacy, confidentiality and security.</li>
                         <li>
                             The data is being accessed and used for the purposes of the specified federated analysis/learning project only.
