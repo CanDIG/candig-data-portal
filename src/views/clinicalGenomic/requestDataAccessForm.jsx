@@ -552,7 +552,7 @@ function RequestDataAccessForm() {
             multiline: true,
             maxWords: 300
         },
-    ]
+    ];
 
     const acknowledgementAndSignature = [
         {
@@ -726,7 +726,7 @@ function RequestDataAccessForm() {
         setIsLoading(true);
 
         try {
-            const alteredData = {};
+            /* const alteredData = {};
 
             // Remove data from hidden fields
             allUniqueFields.forEach(({ hidden, field }) => {
@@ -764,7 +764,7 @@ function RequestDataAccessForm() {
                 requestParticipants: {}, // TODO
                 requestTypeId: 0, // TODO
                 serviceDeskId: 0 // TODO
-            });
+            }); */
 
             /* 
             TODO
