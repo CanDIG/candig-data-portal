@@ -593,7 +593,7 @@ function RequestDataAccessForm() {
         }
     ];
 
-    const allUniqueFields = [
+    /* const allUniqueFields = [
         submitterInformation,
         principalInvestigatorInformation,
         requestType,
@@ -608,7 +608,7 @@ function RequestDataAccessForm() {
         dataDownloadAndSecurity,
         otherSecurePractices,
         acknowledgementAndSignature
-    ].flat();
+    ].flat(); */
 
     // Clear the sidebar, if available
     const sidebarWriter = useSidebarWriterContext();
