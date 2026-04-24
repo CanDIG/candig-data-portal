@@ -17,11 +17,11 @@ const Summary = Loadable(lazy(() => import('../views/summary/summary')));
 const ClinicalGenomicSearch = Loadable(lazy(() => import('../views/clinicalGenomic/clinicalGenomicSearch')));
 const ClinicalPatientView = Loadable(lazy(() => import('../views/clinicalGenomic/clinicalPatientView')));
 
-// Ingest Portal
-const IngestPortal = Loadable(lazy(() => import('../views/ingest/ingest')));
+// Request data access form
+const RequestDataAccessForm = Loadable(lazy(() => import('../views/clinicalGenomic/requestDataAccessForm')));
 
 // Ingest Portal
-// const IngestPortal = Loadable(lazy(() => import('./views/ingest/ingest')));
+const IngestPortal = Loadable(lazy(() => import('../views/ingest/ingest')));
 
 // Completeness
 const CompletenessStats = Loadable(lazy(() => import('../views/completeness/completeness')));
@@ -66,6 +66,10 @@ const MainRoutes = {
         {
             path: `${basename}/frontendIngest`,
             element: <IngestPortal />
+        },
+        {
+            path: `${basename}/requestAccess`,
+            element: <RequestDataAccessForm />
         },
         {
             path: '*',
