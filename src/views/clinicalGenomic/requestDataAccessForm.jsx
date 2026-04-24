@@ -696,7 +696,24 @@ function RequestDataAccessForm() {
     }, [showForm]);
 
     const handleCopy = async () => {
-        await navigator.clipboard.writeText(MOH_CONTACT_EMAIL);
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(MOH_CONTACT_EMAIL);
+        } else {
+            // Fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = MOH_CONTACT_EMAIL;
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
         setTooltipText('Copied');
     };
 
