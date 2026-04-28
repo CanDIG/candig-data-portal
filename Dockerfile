@@ -45,7 +45,7 @@ RUN npm run build
 
 # Production Stage
 
-FROM nginx:1.25-alpine
+FROM nginx:1.30.0-alpine
 
 COPY --from=build /app/candig-data-portal/dist /usr/share/nginx/html
 
