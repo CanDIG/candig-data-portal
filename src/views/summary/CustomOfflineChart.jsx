@@ -30,7 +30,7 @@ export const VISUALIZATION_LOCAL_STORAGE_KEY = 'chartDefinitions';
 
 // Helper: find the index of the first non-zero value in an array, modded by the max number of colours we have (to prevent out of bounds errors)
 function findSiteIndexMod(value, max) {
-    const siteIndex = value.findIndex((v) => v!== 0) || 0;
+    const siteIndex = Math.max(0, value.findIndex((v) => v!== 0));
     return siteIndex % max;
 }
 
