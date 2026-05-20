@@ -79,7 +79,7 @@ function SearchHandler({ setLoading }) {
 
         setLoading(true);
         const discoveryPromise = () =>
-            query(discoveryQuery, newAbort.signal, 'discovery/query')
+            query(discoveryQuery, newAbort.signal, 'query/discovery/query')
                 .then((data) => {
                     if (reader.filter?.node) {
                         data = data.filter((site) => !reader.filter.node.includes(site.location.name));

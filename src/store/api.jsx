@@ -66,11 +66,11 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
  *
  * @param {string} targetPath - The specific path within the target service to request data from
  * @param {string} [targetService='katsu'] - The target service being queried (default: 'katsu')
- * @param {string} [endpoint='discovery] - The endpoint used for the federation request (default: 'discovery')
+ * @param {string} [endpoint='discovery] - The endpoint used for the federation request (default: 'query/discovery')
  * @param {string} [service='query'] - The service handling the request (default: 'query')
  * @returns {Promise<Object|string>} A promise that resolves to the response data or 'error' if the request fails
  */
-export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'discovery', service = 'query') {
+export function fetchFederatedSubServices(targetPath, targetService = 'katsu', endpoint = 'query/discovery', service = 'query') {
     const payload = {
         targetService,
         targetPath
@@ -91,7 +91,7 @@ export function fetchFederatedSubServices(targetPath, targetService = 'katsu', e
     * @param {path} Query API path used to send the request to, assumed to be /query but
     * can be used for e.g. /genomic_completeness if need be
 */
-export function query(parameters, abort, path = 'query') {
+export function query(parameters, abort, path = 'query/query') {
     const payload = {
         ...parameters
     };
@@ -161,7 +161,7 @@ export function ingestGenomicData(data, program_id) {
  * as a dictionary of {site: {program (type)} = #}
  */
 export function fetchGenomicCompleteness() {
-    return fetchFederation('genomic_completeness', 'query').then((data) => {
+    return fetchFederation('query/genomic_completeness', 'query').then((data) => {
         const numCompleteGenomic = {};
         data.filter((site) => site.status === 200).forEach((site) => {
             numCompleteGenomic[site.location.name] = {};
@@ -180,7 +180,7 @@ export function fetchGenomicCompleteness() {
  * with: numNodes, numErrorNodes, numDonors, numCompleteDonors, numClinicalComplete, data
  */
 export function fetchClinicalCompleteness() {
-    return fetchFederation('discovery/programs', 'query').then((data) => {
+    return fetchFederation('query/discovery/programs', 'query').then((data) => {
         // Step 1: Determine the number of provinces
         const provinces = data?.map((site) => site?.location?.province);
         const uniqueProvinces = [...new Set(provinces)];
