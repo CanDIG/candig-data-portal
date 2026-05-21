@@ -171,7 +171,7 @@ function ClinicalGenomicSearch() {
                 <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
                     {sections.map((section) => (
                         <div key={section.id}>
-                            <a id={section.id} className={classes.anchor} aria-hidden="true">
+                            <a id={section.id} className={classes.anchor} aria-hidden="true" href={`#${section.id}`}>
                                 &nbsp;
                             </a>
                             {isLoading ? (
