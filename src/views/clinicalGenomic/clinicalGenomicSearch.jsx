@@ -14,6 +14,7 @@ import { SearchIndicator } from '../../ui-component/LoadingIndicator/SearchIndic
 import AuthorizationSections from './widgets/authorizationSections';
 import SearchExplainer from './widgets/searchExplainer';
 import MatchingPatients from './widgets/matchingPatients';
+import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary'
 
 const PREFIX = 'ClinicalGenomicSearch';
 
@@ -134,60 +135,62 @@ function ClinicalGenomicSearch() {
 
     return (
         <Root>
-            {/* Top bar */}
-            <AppBar
-                component="nav"
-                className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
-            >
-                <Toolbar className={classes.toolbar}>
-                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        Federated Search
-                    </Typography>
-                    {sections
-                        .map((section) =>
-                            section.header !== undefined ? (
-                                <Button
-                                    onClick={() => {
-                                        window.location.href = `#${section.id}`;
-                                    }}
-                                    sx={{ my: 2, display: 'block' }}
+            <DefaultErrorBoundary>
+                {/* Top bar */}
+                <AppBar
+                    component="nav"
+                    className={`${classes.stickytop} ${classes.headerSize} ${sidebarOpened ? classes.sidebarOffset : classes.noSidebarOffset}`}
+                >
+                    <Toolbar className={classes.toolbar}>
+                        <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                            Federated Search
+                        </Typography>
+                        {sections
+                            .map((section) =>
+                                section.header !== undefined ? (
+                                    <Button
+                                        onClick={() => {
+                                            window.location.href = `#${section.id}`;
+                                        }}
+                                        sx={{ my: 2, display: 'block' }}
+                                        key={section.id}
+                                        className={classes.navigationLink}
+                                        variant="text"
+                                    >
+                                        {section.header}
+                                    </Button>
+                                ) : undefined
+                            )
+                            .filter((obj) => obj !== undefined)}
+                    </Toolbar>
+                    <SearchExplainer />
+                </AppBar>
+                {/* Empty div to make sure the header takes up space */}
+                <div className={classes.headerSpacing} />
+                <SearchHandler setLoading={setLoading} />
+                <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
+                    {sections.map((section) => (
+                        <div key={section.id}>
+                            <a id={section.id} className={classes.anchor} aria-hidden="true" href={`#${section.id}`}>
+                                &nbsp;
+                            </a>
+                            {isLoading ? (
+                                <StyledMainCard
                                     key={section.id}
-                                    className={classes.navigationLink}
-                                    variant="text"
+                                    border
+                                    sx={{ borderRadius: customization.borderRadius * 0.25 }}
+                                    contentClass={classes.mainContent}
                                 >
-                                    {section.header}
-                                </Button>
-                            ) : undefined
-                        )
-                        .filter((obj) => obj !== undefined)}
-                </Toolbar>
-                <SearchExplainer />
-            </AppBar>
-            {/* Empty div to make sure the header takes up space */}
-            <div className={classes.headerSpacing} />
-            <SearchHandler setLoading={setLoading} />
-            <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
-                {sections.map((section) => (
-                    <div key={section.id}>
-                        <a id={section.id} className={classes.anchor} aria-hidden="true">
-                            &nbsp;
-                        </a>
-                        {isLoading ? (
-                            <StyledMainCard
-                                key={section.id}
-                                border
-                                sx={{ borderRadius: customization.borderRadius * 0.25 }}
-                                contentClass={classes.mainContent}
-                            >
-                                <SearchIndicator />
-                            </StyledMainCard>
-                        ) : (
-                            section.component
-                        )}
-                        <div className={classes.spaceBetween} />
-                    </div>
-                ))}
-            </MainCard>
+                                    <SearchIndicator />
+                                </StyledMainCard>
+                            ) : (
+                                section.component
+                            )}
+                            <div className={classes.spaceBetween} />
+                        </div>
+                    ))}
+                </MainCard>
+            </DefaultErrorBoundary>
         </Root>
     );
 }

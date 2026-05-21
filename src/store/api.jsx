@@ -52,12 +52,9 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
         .then((response) => {
             if (response.ok) {
                 return response.json();
+            } else {
+                throw new Error(`Error while accessing ${service}/${path} ${response.status}: ${response.statusText}`);
             }
-            return [];
-        })
-        .catch((error) => {
-            console.log(`Error: ${error}`);
-            return 'error';
         });
 }
 
@@ -77,11 +74,7 @@ export function fetchFederatedSubServices(targetPath, targetService = 'katsu', e
     };
 
     return fetchFederation(endpoint, service, payload)
-        .then((data) => data)
-        .catch((error) => {
-            console.log(`Error: ${error}`);
-            return 'error';
-        });
+        .then((data) => data);
 }
 
 /*

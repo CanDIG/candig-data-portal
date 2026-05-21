@@ -10,6 +10,7 @@ import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
 import { query } from '../../store/api';
+import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -108,67 +109,69 @@ function ClinicalPatientView() {
 
     return (
         <MainCard sx={{ borderRadius: customization.borderRadius * 0.25, margin: 0 }}>
-            {!dateOfBirth && (
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                    <Alert variant="outlined" severity="warning">
-                        Unable to display timeline due to missing date of birth information.
-                    </Alert>
+            <DefaultErrorBoundary>
+                {!dateOfBirth && (
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        <Alert variant="outlined" severity="warning">
+                            Unable to display timeline due to missing date of birth information.
+                        </Alert>
+                    </div>
+                )}
+                <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
+                    {title}
+                </Typography>
+                <Typography pb={1} variant="h6">
+                    {patientId}
+                </Typography>
+                <StyledTopLevelBox>
+                    {Object.entries(topLevel).map(([key, value]) => (
+                        <div
+                            key={key}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '0.5em'
+                            }}
+                        >
+                            <p style={{ fontWeight: 'bold', margin: 0 }}>{formatKey(key)}:</p>
+                            <p style={{ margin: 0 }}>{String(value)}</p>
+                        </div>
+                    ))}
+                </StyledTopLevelBox>
+                <div style={{ width: '100%' }}>
+                    <DataGrid
+                        sx={{ minHeight: '30vh', maxHeight: '68vh' }}
+                        rows={rows}
+                        columns={columns}
+                        pageSize={10}
+                        rowsPerPageOptions={[10]}
+                        hideFooterSelectedRowCount
+                    />
                 </div>
-            )}
-            <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
-                {title}
-            </Typography>
-            <Typography pb={1} variant="h6">
-                {patientId}
-            </Typography>
-            <StyledTopLevelBox>
-                {Object.entries(topLevel).map(([key, value]) => (
-                    <div
-                        key={key}
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            gap: '0.5em'
-                        }}
-                    >
-                        <p style={{ fontWeight: 'bold', margin: 0 }}>{formatKey(key)}:</p>
-                        <p style={{ margin: 0 }}>{String(value)}</p>
-                    </div>
-                ))}
-            </StyledTopLevelBox>
-            <div style={{ width: '100%' }}>
-                <DataGrid
-                    sx={{ minHeight: '30vh', maxHeight: '68vh' }}
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[10]}
-                    hideFooterSelectedRowCount
-                />
-            </div>
-            {genomicRows.length > 0 && (
-                <>
-                    <Typography pb={1} variant="h5" sx={{ mt: 3 }}>
-                        Genomic Data
-                    </Typography>
+                {genomicRows.length > 0 && (
+                    <>
+                        <Typography pb={1} variant="h5" sx={{ mt: 3 }}>
+                            Genomic Data
+                        </Typography>
 
-                    <div style={{ width: '100%' }}>
-                        <DataGrid
-                            sx={{ minHeight: '20vh', marginBottom: '2em' }}
-                            rows={genomicRows}
-                            columns={genomicColumns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5, 10]}
-                            disableRowSelectionOnClick
-                        />
-                    </div>
-                </>
-            )}
-            {dateOfBirth && (
-                <TimelineContainer>
-                    <Timeline data={data} onEventClick={handleEventClick} />
-                </TimelineContainer>
-            )}
+                        <div style={{ width: '100%' }}>
+                            <DataGrid
+                                sx={{ minHeight: '20vh', marginBottom: '2em' }}
+                                rows={genomicRows}
+                                columns={genomicColumns}
+                                pageSize={5}
+                                rowsPerPageOptions={[5, 10]}
+                                disableRowSelectionOnClick
+                            />
+                        </div>
+                    </>
+                )}
+                {dateOfBirth && (
+                    <TimelineContainer>
+                        <Timeline data={data} onEventClick={handleEventClick} />
+                    </TimelineContainer>
+                )}
+            </DefaultErrorBoundary>
         </MainCard>
     );
 }

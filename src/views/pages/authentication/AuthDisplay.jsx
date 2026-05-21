@@ -9,6 +9,7 @@ import HourglassBottomTwoToneIcon from '@mui/icons-material/HourglassBottomTwoTo
 import MainCard from '../../../ui-component/cards/MainCard';
 import { useAuthContext } from './AuthContext';
 import config from '../../../config';
+import DefaultErrorBoundary from '../../../ui-component/DefaultErrorBoundary';
 
 // Assets
 import CanDIGLogo from '../../../assets/images/icons/canDIGLogo.png';
@@ -185,7 +186,9 @@ function AuthDisplay() {
 
     return (
         <StyledDiv className={classes.root}>
-            <MainCard className={classes.mainCard}>{content}</MainCard>
+            <DefaultErrorBoundary>
+                <MainCard className={classes.mainCard}>{content}</MainCard>
+            </DefaultErrorBoundary>
         </StyledDiv>
     );
 }
