@@ -1,19 +1,24 @@
+import { useEffect } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/system';
 
 import { useTour } from './TourContext';
 
+// The search page has a fixed global header + a sticky page AppBar (~200px tall).
+// Offset Joyride's scrolling so highlighted sections land below them rather than
+// behind the header.
+const HEADER_SCROLL_OFFSET = 200;
+
 // Expand/collapse the first node's per-program breakdown to demonstrate it during
-// the tour. The expand button toggles between an UnfoldMore icon (collapsed) and
-// an UnfoldLess icon (expanded), so we only click when a change is actually needed
-// — keeping this idempotent across Next/Back navigation.
+// the tour. The button exposes its state via data-expanded (set in
+// patientCountSingle.jsx), so we only click when a change is actually needed —
+// keeping this idempotent across Next/Back navigation.
 function setNodeExpanded(shouldExpand) {
     const button = document.querySelector('[data-tour="results-expand-node"]');
     if (!button) return;
-    const isCollapsed = !!button.querySelector('[data-testid="UnfoldMoreIcon"]');
-    if (shouldExpand && isCollapsed) {
-        button.click();
-    } else if (!shouldExpand && !isCollapsed) {
+    const isExpanded = button.dataset.expanded === 'true';
+    if (shouldExpand !== isExpanded) {
         button.click();
     }
 }
@@ -23,7 +28,20 @@ function setNodeExpanded(shouldExpand) {
 
 function TourRunner() {
     const theme = useTheme();
+    const location = useLocation();
     const { run, steps, stepIndex, setStepIndex, stopTour } = useTour();
+
+    // If the user navigates to another page mid-tour, end it — its targets are
+    // gone, so continuing would just skip through the remaining steps.
+    useEffect(() => {
+        if (run) {
+            setNodeExpanded(false);
+            stopTour();
+        }
+        // Only react to path changes; including `run` would stop the tour the
+        // instant it starts.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname]);
 
     const handleCallback = (data) => {
         const { action, index, status, step, type } = data;
@@ -60,10 +78,7 @@ function TourRunner() {
             showProgress
             showSkipButton
             scrollToFirstStep
-            // The search page has a fixed global header + a sticky page AppBar
-            // (~200px). Offset scrolling so highlighted sections land below them
-            // instead of behind the header.
-            scrollOffset={200}
+            scrollOffset={HEADER_SCROLL_OFFSET}
             callback={handleCallback}
             locale={{ last: 'Finish' }}
             styles={{

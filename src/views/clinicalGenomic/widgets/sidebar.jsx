@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
     Chip,
@@ -25,6 +25,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useTour } from '../../../ui-component/tour/TourContext';
 
 const PREFIX = 'Sidebar';
 
@@ -603,6 +604,15 @@ function Sidebar() {
     const [selectedtab, setSelectedTab] = useState('All');
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
+
+    // When a tour starts, switch to the "All" tab so every filter group (and the
+    // steps that target them) is mounted, regardless of which tab was last active.
+    const { run: tourRunning } = useTour();
+    const prevTourRunning = useRef(false);
+    useEffect(() => {
+        if (tourRunning && !prevTourRunning.current) setSelectedTab('All');
+        prevTourRunning.current = tourRunning;
+    }, [tourRunning]);
 
     // Genomic data
     const [selectedChromosomes, setSelectedChromosomes] = useState('');

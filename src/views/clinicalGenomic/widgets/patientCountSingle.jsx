@@ -155,6 +155,7 @@ function PatientCountSingle(props) {
                     {numPrograms > 1 ? (
                         <Button
                             data-tour="results-expand-node"
+                            data-expanded={expanded ? 'true' : 'false'}
                             onClick={(_) => setExpanded((old) => !old)}
                             variant="contained"
                             sx={{

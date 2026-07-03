@@ -71,17 +71,24 @@ function ClinicalPatientView() {
     const dateOfBirth = data?.date_of_birth;
 
     // Start the patient-page tour, making sure the folder sidebar is open and the
-    // page has rendered before Joyride looks for its targets.
+    // page has rendered before Joyride looks for its targets. Resolves true if the
+    // tour actually started (its first target appeared), false otherwise.
     const runPatientTour = () => {
         dispatch({ type: SET_MENU, opened: true });
-        waitForElement('[data-tour="patient-info"]').then(() => startTour(patientTourSteps));
+        return waitForElement('[data-tour="patient-info"]').then((found) => {
+            if (found) startTour(patientTourSteps);
+            return found;
+        });
     };
 
     // Auto-start the tour the first time a patient page is opened (per browser).
+    // Only record it as "seen" once it has actually started, so a page that never
+    // renders (e.g. a failed load) doesn't permanently suppress the auto-tour.
     useEffect(() => {
         if (localStorage.getItem(PATIENT_TOUR_SEEN_KEY)) return;
-        localStorage.setItem(PATIENT_TOUR_SEEN_KEY, 'true');
-        runPatientTour();
+        runPatientTour().then((started) => {
+            if (started) localStorage.setItem(PATIENT_TOUR_SEEN_KEY, 'true');
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

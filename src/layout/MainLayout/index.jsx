@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -20,10 +20,13 @@ import { drawerWidth } from '../../store/constant';
 import { SET_MENU } from '../../store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';
 import { TourProvider } from '../../ui-component/tour/TourContext';
-import TourRunner from '../../ui-component/tour/TourRunner';
 
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
+
+// Lazy so react-joyride is code-split out of the main bundle (it's only used by
+// the guided tours). It starts loading on mount, so it's ready before any tour.
+const TourRunner = lazy(() => import('../../ui-component/tour/TourRunner'));
 
 // style constant
 const PREFIX = 'MainLayout';
@@ -160,7 +163,9 @@ function MainLayout() {
                     <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
                 </SidebarProvider>
                 {/* Guided tour overlay (driven from the header "Take a tour" button and the patient page) */}
-                <TourRunner />
+                <Suspense fallback={null}>
+                    <TourRunner />
+                </Suspense>
             </TourProvider>
         </Root>
     );
