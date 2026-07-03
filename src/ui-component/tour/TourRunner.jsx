@@ -46,9 +46,11 @@ function TourRunner() {
     const handleCallback = (data) => {
         const { action, index, status, step, type } = data;
 
-        if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+        // Clicking the close (X) button ends the tour — the user has opted out,
+        // so don't advance to the next step (which would render its beacon).
+        if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status) || action === ACTIONS.CLOSE) {
             // Leave nothing expanded behind us. Tours run in place, so there's
-            // nothing to navigate to on finish/skip.
+            // nothing to navigate to on finish/skip/close.
             setNodeExpanded(false);
             stopTour();
             return;
