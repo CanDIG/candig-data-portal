@@ -342,7 +342,11 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
         return sidebarTitles;
     }
 
-    return <div style={{ marginTop: 12 }}>{createMainSidebarHeaders(sidebar)}</div>;
+    return (
+        <div style={{ marginTop: 12 }} data-tour="patient-sidebar">
+            {createMainSidebarHeaders(sidebar)}
+        </div>
+    );
 }
 
 PatientSidebar.propTypes = {

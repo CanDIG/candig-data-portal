@@ -809,8 +809,8 @@ function Sidebar() {
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
-        <Root>
-            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
+        <Root data-tour="search-sidebar">
+            <Tabs data-tour="search-tabs" value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
@@ -819,61 +819,67 @@ function Sidebar() {
                 <Button className={classes.button} onClick={() => resetButton()}>
                     Reset
                 </Button>
-                <Button className={classes.button} onClick={triggerSearch}>
+                <Button data-tour="search-run" className={classes.button} onClick={triggerSearch}>
                     Search
                 </Button>
             </div>
-            <SidebarGroup name="Nodes">
-                <StyledCheckboxList
-                    options={sites}
+            <div data-tour="search-nodes">
+                <SidebarGroup name="Nodes">
+                    <StyledCheckboxList
+                        options={sites}
+                        onWrite={writerContext}
+                        groupName="node"
+                        useAutoComplete={sites.length >= 5}
+                        isFilterList
+                        isExclusion
+                        selectedPrograms={selectedPrograms}
+                        setSelectedPrograms={setSelectedPrograms}
+                        checked={selectedNodes}
+                        setChecked={setSelectedNodes}
+                        optionStatusMap={nodeStatusMap}
+                    />
+                </SidebarGroup>
+            </div>
+            <div data-tour="search-programs">
+                <SidebarGroup name="Programs">
+                    <StyledCheckboxList
+                        options={programs}
+                        authorizedPrograms={authorizedPrograms}
+                        onWrite={writerContext}
+                        groupName="exclude_programs"
+                        useAutoComplete={programs.length >= 5}
+                        isExclusion
+                        checked={selectedPrograms}
+                        setChecked={setSelectedPrograms}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Button className={classes.button} onClick={() => setPrograms(programs)}>
+                            Deselect&nbsp;all
+                        </Button>
+                        <Button className={classes.button} onClick={() => setPrograms([])}>
+                            Reset
+                        </Button>
+                    </div>
+                </SidebarGroup>
+            </div>
+            <div data-tour="search-genomic">
+                <GenomicsGroup
+                    chromosomes={chromosomes}
+                    genes={genes}
                     onWrite={writerContext}
-                    groupName="node"
-                    useAutoComplete={sites.length >= 5}
-                    isFilterList
-                    isExclusion
-                    selectedPrograms={selectedPrograms}
-                    setSelectedPrograms={setSelectedPrograms}
-                    checked={selectedNodes}
-                    setChecked={setSelectedNodes}
-                    optionStatusMap={nodeStatusMap}
+                    hide={hideGenomic}
+                    selectedChromosomes={selectedChromosomes}
+                    selectedGenes={selectedGenes}
+                    startPos={startPos}
+                    endPos={endPos}
+                    setSelectedChromosomes={setSelectedChromosomes}
+                    setSelectedGenes={setSelectedGenes}
+                    setStartPos={setStartPos}
+                    setEndPos={setEndPos}
+                    setGenomicDataTypes={setGenomicDataTypes}
+                    selectedGenomicDataTypes={selectedGenomicDataTypes}
                 />
-            </SidebarGroup>
-            <SidebarGroup name="Programs">
-                <StyledCheckboxList
-                    options={programs}
-                    authorizedPrograms={authorizedPrograms}
-                    onWrite={writerContext}
-                    groupName="exclude_programs"
-                    useAutoComplete={programs.length >= 5}
-                    isExclusion
-                    checked={selectedPrograms}
-                    setChecked={setSelectedPrograms}
-                />
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button className={classes.button} onClick={() => setPrograms(programs)}>
-                        Deselect&nbsp;all
-                    </Button>
-                    <Button className={classes.button} onClick={() => setPrograms([])}>
-                        Reset
-                    </Button>
-                </div>
-            </SidebarGroup>
-            <GenomicsGroup
-                chromosomes={chromosomes}
-                genes={genes}
-                onWrite={writerContext}
-                hide={hideGenomic}
-                selectedChromosomes={selectedChromosomes}
-                selectedGenes={selectedGenes}
-                startPos={startPos}
-                endPos={endPos}
-                setSelectedChromosomes={setSelectedChromosomes}
-                setSelectedGenes={setSelectedGenes}
-                setStartPos={setStartPos}
-                setEndPos={setEndPos}
-                setGenomicDataTypes={setGenomicDataTypes}
-                selectedGenomicDataTypes={selectedGenomicDataTypes}
-            />
+            </div>
             <SidebarGroup name="Treatments" hide={hideClinical}>
                 <StyledCheckboxList
                     options={treatmentTypes}

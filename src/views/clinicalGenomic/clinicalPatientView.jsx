@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/system';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Alert from '@mui/material/Alert';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { IconPlayerPlay } from '@tabler/icons-react';
 
 import MainCard from '../../ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
@@ -11,6 +12,13 @@ import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
 import { query } from '../../store/api';
 import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
+import { SET_MENU } from '../../store/actions';
+import { useTour } from '../../ui-component/tour/TourContext';
+import patientTourSteps from '../../ui-component/tour/patientTourSteps';
+import waitForElement from '../../ui-component/tour/waitForElement';
+
+// Only auto-start the patient-page tour the first time (per browser).
+const PATIENT_TOUR_SEEN_KEY = 'candig_patient_tour_seen';
 
 const StyledTopLevelBox = styled(Box)(({ theme }) => ({
     border: `1px solid ${theme.palette.primary.main}`,
@@ -34,6 +42,8 @@ const TimelineContainer = styled(Box)(({ theme }) => ({
 
 function ClinicalPatientView() {
     const { customization } = useSelector((state) => state);
+    const dispatch = useDispatch();
+    const { startTour } = useTour();
     const [patientId, setPatientId] = useState('');
     const [programId, setProgramId] = useState('');
     const [location, setLocation] = useState('');
@@ -59,6 +69,21 @@ function ClinicalPatientView() {
     );
     const ageAtFirstDiagnosis = topLevel.age_at_first_diagnosis;
     const dateOfBirth = data?.date_of_birth;
+
+    // Start the patient-page tour, making sure the folder sidebar is open and the
+    // page has rendered before Joyride looks for its targets.
+    const runPatientTour = () => {
+        dispatch({ type: SET_MENU, opened: true });
+        waitForElement('[data-tour="patient-info"]').then(() => startTour(patientTourSteps));
+    };
+
+    // Auto-start the tour the first time a patient page is opened (per browser).
+    useEffect(() => {
+        if (localStorage.getItem(PATIENT_TOUR_SEEN_KEY)) return;
+        localStorage.setItem(PATIENT_TOUR_SEEN_KEY, 'true');
+        runPatientTour();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleEventClick = (category, array) => {
         const { titleClick, reorderedColumns, rowsClick } = handleTableSet(category[0], array, ageAtFirstDiagnosis);
@@ -117,13 +142,18 @@ function ClinicalPatientView() {
                         </Alert>
                     </div>
                 )}
-                <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
-                    {title}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
+                        {title}
+                    </Typography>
+                    <Button size="small" startIcon={<IconPlayerPlay size={18} />} onClick={runPatientTour}>
+                        Take a tour
+                    </Button>
+                </Box>
                 <Typography pb={1} variant="h6">
                     {patientId}
                 </Typography>
-                <StyledTopLevelBox>
+                <StyledTopLevelBox data-tour="patient-info">
                     {Object.entries(topLevel).map(([key, value]) => (
                         <div
                             key={key}
@@ -138,7 +168,7 @@ function ClinicalPatientView() {
                         </div>
                     ))}
                 </StyledTopLevelBox>
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '100%' }} data-tour="patient-clinical">
                     <DataGrid
                         sx={{ minHeight: '30vh', maxHeight: '68vh' }}
                         rows={rows}
@@ -154,7 +184,7 @@ function ClinicalPatientView() {
                             Genomic Data
                         </Typography>
 
-                        <div style={{ width: '100%' }}>
+                        <div style={{ width: '100%' }} data-tour="patient-genomic">
                             <DataGrid
                                 sx={{ minHeight: '20vh', marginBottom: '2em' }}
                                 rows={genomicRows}
@@ -167,7 +197,7 @@ function ClinicalPatientView() {
                     </>
                 )}
                 {dateOfBirth && (
-                    <TimelineContainer>
+                    <TimelineContainer data-tour="patient-timeline">
                         <Timeline data={data} onEventClick={handleEventClick} />
                     </TimelineContainer>
                 )}

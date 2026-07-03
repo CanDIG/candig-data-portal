@@ -35,6 +35,7 @@
         "react-device-detect": "^2.2.3",
         "react-dom": "^18.2.0",
         "react-error-boundary": "^6.1.1",
+        "react-joyride": "^2.9.3",
         "react-loader-spinner": "^6.1.6",
         "react-multi-select-component": "^4.3.4",
         "react-new-window": "^1.0.1",

@@ -19,6 +19,8 @@ import navigation from '../../menu-items';
 import { drawerWidth } from '../../store/constant';
 import { SET_MENU } from '../../store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';
+import { TourProvider } from '../../ui-component/tour/TourContext';
+import TourRunner from '../../ui-component/tour/TourRunner';
 
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
@@ -121,41 +123,45 @@ function MainLayout() {
                 }
             ])}
         >
-            <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
-                <CssBaseline />
-                {/* header */}
-                <AppBar
-                    enableColorOnDark
-                    position="fixed"
-                    color="inherit"
-                    elevation={0}
-                    className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
-                >
-                    <Toolbar>
-                        <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-                    </Toolbar>
-                </AppBar>
+            <TourProvider>
+                <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
+                    <CssBaseline />
+                    {/* header */}
+                    <AppBar
+                        enableColorOnDark
+                        position="fixed"
+                        color="inherit"
+                        elevation={0}
+                        className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
+                    >
+                        <Toolbar>
+                            <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+                        </Toolbar>
+                    </AppBar>
 
-                {/* drawer */}
-                <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+                    {/* drawer */}
+                    <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
-                {/* main content */}
-                <main
-                    className={clsx([
-                        classes.content,
-                        {
-                            [classes.contentShift]: leftDrawerOpened
-                        }
-                    ])}
-                >
-                    {/* breadcrumb */}
-                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                    <Outlet />
-                </main>
+                    {/* main content */}
+                    <main
+                        className={clsx([
+                            classes.content,
+                            {
+                                [classes.contentShift]: leftDrawerOpened
+                            }
+                        ])}
+                    >
+                        {/* breadcrumb */}
+                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                        <Outlet />
+                    </main>
 
-                {/* FOOTER */}
-                <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
-            </SidebarProvider>
+                    {/* FOOTER */}
+                    <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
+                </SidebarProvider>
+                {/* Guided tour overlay (driven from the header "Take a tour" button and the patient page) */}
+                <TourRunner />
+            </TourProvider>
         </Root>
     );
 }
