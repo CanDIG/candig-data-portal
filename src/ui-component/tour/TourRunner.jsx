@@ -87,6 +87,19 @@ function TourRunner() {
                 options: {
                     primaryColor: theme.palette.primary.main,
                     zIndex: 10000
+                },
+                // Keep the whole tooltip within the viewport on short/small screens
+                // so the footer (Back / Next / Finish) is always reachable...
+                tooltip: {
+                    maxWidth: 'min(90vw, 380px)',
+                    maxHeight: '85vh',
+                    display: 'flex',
+                    flexDirection: 'column'
+                },
+                // ...and let only the body scroll when the content is tall, rather
+                // than pushing the footer buttons off-screen.
+                tooltipContent: {
+                    overflowY: 'auto'
                 }
             }}
         />
