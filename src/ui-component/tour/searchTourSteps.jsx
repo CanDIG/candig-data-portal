@@ -40,7 +40,7 @@ const searchTourSteps = [
         placement: 'right',
         title: 'Scope by program',
         content:
-            'Narrow results to particular programs. A locked padlock icon marks programs you are not authorized to see individual-level data for, whereas an unlocked padlock means you have full authorization to see donor-level metadata for all donors in the program.'
+            'Narrow results to particular programs. A locked padlock icon marks programs you are not authorized to see donor-level data for, whereas an unlocked padlock means you have full authorization to see donor-level metadata for all donors in the program.'
     },
     {
         target: '[data-tour="search-genomic"]',
@@ -67,7 +67,8 @@ const searchTourSteps = [
         target: '[data-tour="results-counts"]',
         placement: 'top',
         title: 'Patient counts',
-        content: 'A summary of how many patients match your query, broken down by node across the federated network.'
+        content:
+            'A summary of how many patients match your query, broken down by node across the federated network. If any count is below 10 donors, it will show as <10.'
     },
     {
         target: '[data-tour="results-expand-node"]',
@@ -82,7 +83,8 @@ const searchTourSteps = [
         target: '[data-tour="results-visualization"]',
         placement: 'top',
         title: 'Data visualization',
-        content: 'Charts summarising the matching cohort — for example age distribution, treatment types, and primary sites.'
+        content:
+            'Charts summarising the matching cohort — for example age distribution, treatment types, and primary sites. If any category has less than 10 donors, the chart is censored for that category.'
     },
     {
         target: '[data-tour="results-matching"]',
@@ -98,13 +100,6 @@ const searchTourSteps = [
         title: 'Opening a patient',
         content:
             'Click any patient row like this one to open their full clinical and genomic record in a new tab. A short tour of that page starts automatically the first time you open it.'
-    },
-    {
-        target: '[data-tour="results-counts"]',
-        placement: 'top',
-        title: 'A note on small counts',
-        content:
-            'To protect privacy, small counts are censored. A value shown as "<10" means the true count is below the reporting threshold.'
     }
 ];
 
