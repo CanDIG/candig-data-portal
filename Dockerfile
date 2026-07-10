@@ -1,7 +1,7 @@
 # Build Stage
 ARG alpine_version
 
-FROM node:21.7.0-alpine${alpine_version} as build
+FROM node:24-alpine${alpine_version} as build
 
 LABEL Maintainer="CanDIG Project"
 LABEL "candigv2"="candig-data-portal"
@@ -9,8 +9,6 @@ LABEL "candigv2"="candig-data-portal"
 RUN apk update && apk add gettext
 
 RUN apk add --no-cache git curl vim bash
-
-RUN npm install -g npm@10.8.0
 
 RUN addgroup -S candig && adduser -S candig -G candig
 
