@@ -890,39 +890,41 @@ function Sidebar() {
                     selectedGenomicDataTypes={selectedGenomicDataTypes}
                 />
             </div>
-            <SidebarGroup name="Treatments" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={treatmentTypes}
-                    onWrite={writerContext}
-                    groupName="treatment"
-                    useAutoComplete={treatmentTypes.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedTreatment}
-                    setChecked={setSelectedTreatment}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={tumourPrimarySites}
-                    onWrite={writerContext}
-                    groupName="primary_site"
-                    useAutoComplete={tumourPrimarySites.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedPrimarySite}
-                    setChecked={setSelectedPrimarySite}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={systemicTherapyDrugNames}
-                    onWrite={writerContext}
-                    groupName="drug_name"
-                    useAutoComplete={systemicTherapyDrugNames.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedSystemicTherapy}
-                    setChecked={setSelectedSystemicTherapy}
-                />
-            </SidebarGroup>
+            <div data-tour="search-clinical">
+                <SidebarGroup name="Treatments" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={treatmentTypes}
+                        onWrite={writerContext}
+                        groupName="treatment"
+                        useAutoComplete={treatmentTypes.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedTreatment}
+                        setChecked={setSelectedTreatment}
+                    />
+                </SidebarGroup>
+                <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={tumourPrimarySites}
+                        onWrite={writerContext}
+                        groupName="primary_site"
+                        useAutoComplete={tumourPrimarySites.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedPrimarySite}
+                        setChecked={setSelectedPrimarySite}
+                    />
+                </SidebarGroup>
+                <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={systemicTherapyDrugNames}
+                        onWrite={writerContext}
+                        groupName="drug_name"
+                        useAutoComplete={systemicTherapyDrugNames.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedSystemicTherapy}
+                        setChecked={setSelectedSystemicTherapy}
+                    />
+                </SidebarGroup>
+            </div>
         </Root>
     );
 }

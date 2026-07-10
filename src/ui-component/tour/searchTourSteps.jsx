@@ -44,7 +44,10 @@ const searchTourSteps = [
     },
     {
         target: '[data-tour="search-genomic"]',
-        placement: 'right',
+        // 'right-start' top-aligns the tooltip to this (tall) section so its footer
+        // stays on screen; plain 'right' would center it and push the footer below
+        // the fold on short viewports.
+        placement: 'right-start',
         title: 'Genomic filters',
         content: (
             <>

@@ -23,6 +23,26 @@ function setNodeExpanded(shouldExpand) {
     }
 }
 
+// The sidebar lives in a fixed MUI Drawer that scrolls via react-perfect-scrollbar
+// (overflow: hidden), which Joyride's auto-scroll doesn't recognize — so lower
+// sections (genomic / clinical filters) stay below the drawer's fold and Joyride
+// anchors the tooltip off-screen. For any step whose target is inside the
+// scrollbar container, scroll that container so the target sits near the top of
+// the drawer before Joyride positions the tooltip.
+function scrollSidebarTargetIntoView(step) {
+    const selector = typeof step?.target === 'string' ? step.target : null;
+    if (!selector) return;
+    const target = document.querySelector(selector);
+    if (!target) return;
+    // react-perfect-scrollbar renders `<div class="scrollbar-container ...">`.
+    const scrollParent = target.closest('.scrollbar-container');
+    if (!scrollParent) return; // not a sidebar step — Joyride handles page scroll.
+    const parentTop = scrollParent.getBoundingClientRect().top;
+    const targetTop = target.getBoundingClientRect().top;
+    // Leave a small gap above the target so it isn't flush against the drawer edge.
+    scrollParent.scrollTop += targetTop - parentTop - 12;
+}
+
 // Single controlled <Joyride> instance for the whole app. Reads its run state
 // from TourContext so it can render over whichever page the tour targets.
 
@@ -54,6 +74,12 @@ function TourRunner() {
             setNodeExpanded(false);
             stopTour();
             return;
+        }
+
+        // Before a step opens, make sure a sidebar target is scrolled into the
+        // visible part of the drawer so its tooltip lands on screen.
+        if (type === EVENTS.STEP_BEFORE) {
+            scrollSidebarTargetIntoView(step);
         }
 
         // Demonstrate the per-program breakdown: expand as the step opens...
@@ -92,14 +118,16 @@ function TourRunner() {
                 // so the footer (Back / Next / Finish) is always reachable...
                 tooltip: {
                     maxWidth: 'min(90vw, 380px)',
-                    maxHeight: '85vh',
+                    maxHeight: '80vh',
                     display: 'flex',
                     flexDirection: 'column'
                 },
-                // ...and let only the body scroll when the content is tall, rather
-                // than pushing the footer buttons off-screen.
-                tooltipContent: {
-                    overflowY: 'auto'
+                // ...and let the title+body region scroll when the content is tall
+                // rather than pushing the footer buttons off-screen. `minHeight: 0`
+                // is required for a flex child to shrink below its content size.
+                tooltipContainer: {
+                    overflowY: 'auto',
+                    minHeight: 0
                 }
             }}
         />
