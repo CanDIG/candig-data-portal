@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
     Chip,
@@ -25,6 +25,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 import { useSearchQueryWriterContext, useSearchResultsReaderContext } from '../SearchResultsContext';
+import { useTour } from '../../../ui-component/tour/TourContext';
 
 const PREFIX = 'Sidebar';
 
@@ -604,6 +605,15 @@ function Sidebar() {
     const readerContext = useSearchResultsReaderContext();
     const writerContext = useSearchQueryWriterContext();
 
+    // When a tour starts, switch to the "All" tab so every filter group (and the
+    // steps that target them) is mounted, regardless of which tab was last active.
+    const { run: tourRunning } = useTour();
+    const prevTourRunning = useRef(false);
+    useEffect(() => {
+        if (tourRunning && !prevTourRunning.current) setSelectedTab('All');
+        prevTourRunning.current = tourRunning;
+    }, [tourRunning]);
+
     // Genomic data
     const [selectedChromosomes, setSelectedChromosomes] = useState('');
     const [selectedGenes, setSelectedGenes] = useState('');
@@ -809,8 +819,8 @@ function Sidebar() {
     const hideClinical = selectedtab !== 'All' && selectedtab !== 'Clinical';
 
     return (
-        <Root>
-            <Tabs value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
+        <Root data-tour="search-sidebar">
+            <Tabs data-tour="search-tabs" value={selectedtab} onChange={(_, value) => setSelectedTab(value)}>
                 <Tab className={classes.tab} value="All" label="All" />
                 <Tab className={classes.tab} value="Clinical" label="Clinical" />
                 <Tab className={classes.tab} value="Genomic" label="Genomic" />
@@ -819,94 +829,102 @@ function Sidebar() {
                 <Button className={classes.button} onClick={() => resetButton()}>
                     Reset
                 </Button>
-                <Button className={classes.button} onClick={triggerSearch}>
+                <Button data-tour="search-run" className={classes.button} onClick={triggerSearch}>
                     Search
                 </Button>
             </div>
-            <SidebarGroup name="Nodes">
-                <StyledCheckboxList
-                    options={sites}
+            <div data-tour="search-nodes">
+                <SidebarGroup name="Nodes">
+                    <StyledCheckboxList
+                        options={sites}
+                        onWrite={writerContext}
+                        groupName="node"
+                        useAutoComplete={sites.length >= 5}
+                        isFilterList
+                        isExclusion
+                        selectedPrograms={selectedPrograms}
+                        setSelectedPrograms={setSelectedPrograms}
+                        checked={selectedNodes}
+                        setChecked={setSelectedNodes}
+                        optionStatusMap={nodeStatusMap}
+                    />
+                </SidebarGroup>
+            </div>
+            <div data-tour="search-programs">
+                <SidebarGroup name="Programs">
+                    <StyledCheckboxList
+                        options={programs}
+                        authorizedPrograms={authorizedPrograms}
+                        onWrite={writerContext}
+                        groupName="exclude_programs"
+                        useAutoComplete={programs.length >= 5}
+                        isExclusion
+                        checked={selectedPrograms}
+                        setChecked={setSelectedPrograms}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Button className={classes.button} onClick={() => setPrograms(programs)}>
+                            Deselect&nbsp;all
+                        </Button>
+                        <Button className={classes.button} onClick={() => setPrograms([])}>
+                            Reset
+                        </Button>
+                    </div>
+                </SidebarGroup>
+            </div>
+            <div data-tour="search-genomic">
+                <GenomicsGroup
+                    chromosomes={chromosomes}
+                    genes={genes}
                     onWrite={writerContext}
-                    groupName="node"
-                    useAutoComplete={sites.length >= 5}
-                    isFilterList
-                    isExclusion
-                    selectedPrograms={selectedPrograms}
-                    setSelectedPrograms={setSelectedPrograms}
-                    checked={selectedNodes}
-                    setChecked={setSelectedNodes}
-                    optionStatusMap={nodeStatusMap}
+                    hide={hideGenomic}
+                    selectedChromosomes={selectedChromosomes}
+                    selectedGenes={selectedGenes}
+                    startPos={startPos}
+                    endPos={endPos}
+                    setSelectedChromosomes={setSelectedChromosomes}
+                    setSelectedGenes={setSelectedGenes}
+                    setStartPos={setStartPos}
+                    setEndPos={setEndPos}
+                    setGenomicDataTypes={setGenomicDataTypes}
+                    selectedGenomicDataTypes={selectedGenomicDataTypes}
                 />
-            </SidebarGroup>
-            <SidebarGroup name="Programs">
-                <StyledCheckboxList
-                    options={programs}
-                    authorizedPrograms={authorizedPrograms}
-                    onWrite={writerContext}
-                    groupName="exclude_programs"
-                    useAutoComplete={programs.length >= 5}
-                    isExclusion
-                    checked={selectedPrograms}
-                    setChecked={setSelectedPrograms}
-                />
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button className={classes.button} onClick={() => setPrograms(programs)}>
-                        Deselect&nbsp;all
-                    </Button>
-                    <Button className={classes.button} onClick={() => setPrograms([])}>
-                        Reset
-                    </Button>
-                </div>
-            </SidebarGroup>
-            <GenomicsGroup
-                chromosomes={chromosomes}
-                genes={genes}
-                onWrite={writerContext}
-                hide={hideGenomic}
-                selectedChromosomes={selectedChromosomes}
-                selectedGenes={selectedGenes}
-                startPos={startPos}
-                endPos={endPos}
-                setSelectedChromosomes={setSelectedChromosomes}
-                setSelectedGenes={setSelectedGenes}
-                setStartPos={setStartPos}
-                setEndPos={setEndPos}
-                setGenomicDataTypes={setGenomicDataTypes}
-                selectedGenomicDataTypes={selectedGenomicDataTypes}
-            />
-            <SidebarGroup name="Treatments" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={treatmentTypes}
-                    onWrite={writerContext}
-                    groupName="treatment"
-                    useAutoComplete={treatmentTypes.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedTreatment}
-                    setChecked={setSelectedTreatment}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={tumourPrimarySites}
-                    onWrite={writerContext}
-                    groupName="primary_site"
-                    useAutoComplete={tumourPrimarySites.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedPrimarySite}
-                    setChecked={setSelectedPrimarySite}
-                />
-            </SidebarGroup>
-            <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
-                <StyledCheckboxList
-                    options={systemicTherapyDrugNames}
-                    onWrite={writerContext}
-                    groupName="drug_name"
-                    useAutoComplete={systemicTherapyDrugNames.length >= 5}
-                    hide={hideClinical}
-                    checked={selectedSystemicTherapy}
-                    setChecked={setSelectedSystemicTherapy}
-                />
-            </SidebarGroup>
+            </div>
+            <div data-tour="search-clinical">
+                <SidebarGroup name="Treatments" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={treatmentTypes}
+                        onWrite={writerContext}
+                        groupName="treatment"
+                        useAutoComplete={treatmentTypes.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedTreatment}
+                        setChecked={setSelectedTreatment}
+                    />
+                </SidebarGroup>
+                <SidebarGroup name="Tumour Primary Sites" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={tumourPrimarySites}
+                        onWrite={writerContext}
+                        groupName="primary_site"
+                        useAutoComplete={tumourPrimarySites.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedPrimarySite}
+                        setChecked={setSelectedPrimarySite}
+                    />
+                </SidebarGroup>
+                <SidebarGroup name="Systemic Therapy Drug Names" hide={hideClinical}>
+                    <StyledCheckboxList
+                        options={systemicTherapyDrugNames}
+                        onWrite={writerContext}
+                        groupName="drug_name"
+                        useAutoComplete={systemicTherapyDrugNames.length >= 5}
+                        hide={hideClinical}
+                        checked={selectedSystemicTherapy}
+                        setChecked={setSelectedSystemicTherapy}
+                    />
+                </SidebarGroup>
+            </div>
         </Root>
     );
 }

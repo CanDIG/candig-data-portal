@@ -154,6 +154,8 @@ function PatientCountSingle(props) {
                 <Grid item className={classes.button} pr={-2}>
                     {numPrograms > 1 ? (
                         <Button
+                            data-tour="results-expand-node"
+                            data-expanded={expanded ? 'true' : 'false'}
                             onClick={(_) => setExpanded((old) => !old)}
                             variant="contained"
                             sx={{

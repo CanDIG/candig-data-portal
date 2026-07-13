@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 
@@ -19,9 +19,14 @@ import navigation from '../../menu-items';
 import { drawerWidth } from '../../store/constant';
 import { SET_MENU } from '../../store/actions';
 import { SidebarProvider } from './Sidebar/SidebarContext';
+import { TourProvider } from '../../ui-component/tour/TourContext';
 
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
+
+// Lazy so react-joyride is code-split out of the main bundle (it's only used by
+// the guided tours). It starts loading on mount, so it's ready before any tour.
+const TourRunner = lazy(() => import('../../ui-component/tour/TourRunner'));
 
 // style constant
 const PREFIX = 'MainLayout';
@@ -121,41 +126,47 @@ function MainLayout() {
                 }
             ])}
         >
-            <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
-                <CssBaseline />
-                {/* header */}
-                <AppBar
-                    enableColorOnDark
-                    position="fixed"
-                    color="inherit"
-                    elevation={0}
-                    className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
-                >
-                    <Toolbar>
-                        <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-                    </Toolbar>
-                </AppBar>
+            <TourProvider>
+                <SidebarProvider data={sidebarContent} setData={setSidebarContent}>
+                    <CssBaseline />
+                    {/* header */}
+                    <AppBar
+                        enableColorOnDark
+                        position="fixed"
+                        color="inherit"
+                        elevation={0}
+                        className={leftDrawerOpened ? classes.appBarWidth : classes.appBar}
+                    >
+                        <Toolbar>
+                            <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+                        </Toolbar>
+                    </AppBar>
 
-                {/* drawer */}
-                <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+                    {/* drawer */}
+                    <Sidebar useFullScreen={!matchDownMd} drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
-                {/* main content */}
-                <main
-                    className={clsx([
-                        classes.content,
-                        {
-                            [classes.contentShift]: leftDrawerOpened
-                        }
-                    ])}
-                >
-                    {/* breadcrumb */}
-                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                    <Outlet />
-                </main>
+                    {/* main content */}
+                    <main
+                        className={clsx([
+                            classes.content,
+                            {
+                                [classes.contentShift]: leftDrawerOpened
+                            }
+                        ])}
+                    >
+                        {/* breadcrumb */}
+                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                        <Outlet />
+                    </main>
 
-                {/* FOOTER */}
-                <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
-            </SidebarProvider>
+                    {/* FOOTER */}
+                    <Footer className={leftDrawerOpened ? classes.footerWidth : classes.footer} />
+                </SidebarProvider>
+                {/* Guided tour overlay (driven from the header "Take a tour" button and the patient page) */}
+                <Suspense fallback={null}>
+                    <TourRunner />
+                </Suspense>
+            </TourProvider>
         </Root>
     );
 }

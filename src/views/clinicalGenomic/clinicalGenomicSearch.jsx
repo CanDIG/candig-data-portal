@@ -93,6 +93,13 @@ const StyledMainCard = styled(MainCard)((_) => ({
     position: 'relative'
 }));
 
+// Maps section ids to the guided-tour target names (see searchTourSteps.js).
+const sectionTourTargets = {
+    counts: 'results-counts',
+    visualization: 'results-visualization',
+    'Matching Patients': 'results-matching'
+};
+
 const sections = [
     {
         id: 'Programs summary',
@@ -170,7 +177,7 @@ function ClinicalGenomicSearch() {
                 <SearchHandler setLoading={setLoading} />
                 <MainCard sx={{ minHeight: 830, position: 'relative', borderRadius: customization.borderRadius * 0.25, marginTop: '2.5em' }}>
                     {sections.map((section) => (
-                        <div key={section.id}>
+                        <div key={section.id} data-tour={sectionTourTargets[section.id]}>
                             <a id={section.id} className={classes.anchor} aria-hidden="true" href={`#${section.id}`}>
                                 &nbsp;
                             </a>

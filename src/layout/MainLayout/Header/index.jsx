@@ -6,6 +6,7 @@ import { Avatar, Box, ButtonBase } from '@mui/material';
 import LogoSection from '../LogoSection';
 // import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
+import TourButton from './TourButton';
 // import NotificationSection from './NotificationSection';
 import MenuList from '../../../MenuList';
 
@@ -74,6 +75,9 @@ function Header({ handleLeftDrawerToggle }) {
             {/* header search */}
             {/* <SearchSection theme="light" />  Currently not needed */}
             <StyledGrow className={classes.grow} />
+
+            {/* take a tour (search page only) */}
+            <TourButton />
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
