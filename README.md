@@ -4,8 +4,8 @@ A data analytics and visualization portal for CanDIG Services. Is built off the 
 
 ## Setup Development Server
 
--   Node: v21.7.0
--   npm: 10.8.0
+-   Node: v24 (LTS)
+-   npm: v11 (bundled with Node 24)
 -   MUI: V5
 
 There was a migration from V4 - V5 of MUI following https://mui.com/material-ui/guides/migration-v4/
@@ -37,18 +37,16 @@ Note that if you change any of the variables above, you need to restart your ser
 npm start
 ```
 
-This will start your local server at http://localhost:3000. Also, your terminal shows the following message when compiled successfully.
+This will start the Vite dev server at http://localhost:4173. Your terminal shows the following message when it is ready.
 
 ```
-Compiled successfully!
+VITE ready in ... ms
 
-You can now view candig-data-portal in the browser.
-
-Local:            http://localhost:3000
-On Your Network:  http://192.168.29.77:3000
+➜  Local:   http://localhost:4173/
+➜  Network: http://192.168.29.77:4173/
 
 Note that the development build is not optimized.
-To create a production build, use yarn build.
+To create a production build, use npm run build.
 ```
 
 ## Deployment
@@ -69,4 +67,4 @@ Once you have all of the required environment variables defined, you may run
 npm run build
 ```
 
-This will produce a static folder `/build` to be served with any static file server.
+This will produce a static folder `/dist` to be served with any static file server.
