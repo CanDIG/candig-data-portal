@@ -161,15 +161,49 @@ function StyledCheckboxList(props) {
             ids = [ids];
         }
 
-        const cohortMap = {};
-        sites?.forEach((site) => {
-            site?.results?.forEach((result) => {
-                if (!cohortMap[result.program_id]) {
-                    cohortMap[result.program_id] = new Set();
-                }
-                cohortMap[result.program_id].add(site.location.name);
+        // Keep the Programs filter in sync with the Nodes filter. We apply only
+        // the DELTA of nodes whose selection changed: a node just deselected
+        // excludes all its programs, a node just reselected re-includes them.
+        // Programs on nodes that didn't change are left untouched, so manual
+        // per-program (de)selections survive node toggles. `checked` is the OLD
+        // excluded-node set (state before this change); `newExcludedNodeIds` the new.
+        const syncProgramExclusionsWithNodes = (newExcludedNodeIds, retVal) => {
+            const oldExcludedNodes = new Set(Array.isArray(checked) ? checked : Object.keys(checked || {}));
+            const newExcludedNodes = new Set(newExcludedNodeIds);
+
+            const programsByNode = {};
+            sites?.forEach((site) => {
+                const nodeName = site?.location?.name;
+                if (!nodeName) return;
+                programsByNode[nodeName] = (site.results || []).map((result) => result.program_id);
             });
-        });
+
+            const newExcludedPrograms = { ...selectedPrograms };
+            Object.keys(programsByNode).forEach((nodeName) => {
+                const wasExcluded = oldExcludedNodes.has(nodeName);
+                const isExcluded = newExcludedNodes.has(nodeName);
+                if (isExcluded && !wasExcluded) {
+                    // node just deselected -> exclude all of its programs
+                    programsByNode[nodeName].forEach((programId) => {
+                        newExcludedPrograms[programId] = true;
+                    });
+                } else if (!isExcluded && wasExcluded) {
+                    // node just reselected -> re-include all of its programs
+                    programsByNode[nodeName].forEach((programId) => {
+                        delete newExcludedPrograms[programId];
+                    });
+                }
+            });
+
+            setSelectedPrograms(newExcludedPrograms);
+
+            const excludeList = Object.keys(newExcludedPrograms).filter((id) => newExcludedPrograms[id]);
+            if (excludeList.length > 0) {
+                retVal.query.exclude_programs = excludeList.join('|');
+            } else {
+                delete retVal.query.exclude_programs;
+            }
+        };
 
         if (isExclusion ? !isChecked : isChecked) {
             // set local checked state (object shape)
@@ -189,23 +223,9 @@ function StyledCheckboxList(props) {
                     // keep filter entry
                     retVal.filter[groupName] = ids;
 
-                    // special-case node handling from original code
+                    // Keep the Programs filter in sync with node (de)selection.
                     if (groupName === 'node') {
-                        const programIds = sites
-                            .filter((item) => ids.includes(item.location.name))
-                            .flatMap((item) => item.results.map((result) => result.program_id));
-                        const validProgramIds = programIds.filter((programId) => {
-                            const associatedNodes = cohortMap[programId] || new Set();
-                            return Array.from(associatedNodes).every((node) => !(node in checked));
-                        });
-                        retVal.query.exclude_programs = validProgramIds.join('|');
-                        setSelectedPrograms((old) => {
-                            const newPrograms = { ...old };
-                            validProgramIds.forEach((id) => {
-                                newPrograms[id] = true;
-                            });
-                            return newPrograms;
-                        });
+                        syncProgramExclusionsWithNodes(ids, retVal);
                     }
 
                     // if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
@@ -234,25 +254,9 @@ function StyledCheckboxList(props) {
                     newList[groupName] = ids;
                     retVal.filter = newList;
 
+                    // Keep the Programs filter in sync with node (de)selection.
                     if (groupName === 'node') {
-                        const currentPrograms = { ...selectedPrograms };
-                        const programIds = sites
-                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
-                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
-                        Object.keys(selectedPrograms).forEach((id) => {
-                            if (currentPrograms[id] && !programIds.includes(id)) {
-                                delete currentPrograms[id];
-                            }
-                        });
-                        if (currentPrograms && Object.keys(currentPrograms).length > 0) {
-                            retVal.query.exclude_programs = Object.keys(currentPrograms)
-                                .filter((id) => currentPrograms[id])
-                                .join('|');
-                        } else {
-                            delete retVal.query.exclude_programs;
-                            retVal.query = {};
-                        }
-                        setSelectedPrograms(currentPrograms);
+                        syncProgramExclusionsWithNodes(ids, retVal);
                     }
 
                     // if this filter is genomicDataTypes, also update query string
@@ -276,18 +280,34 @@ function StyledCheckboxList(props) {
     let label = groupName;
     let renderTags = (tagValue, getTagProps) =>
         tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+    // For the exclusion filters (Nodes, Programs) the Autocomplete `value` is the
+    // list of *deselected* items, so rendering those as chips inside the box is
+    // counter-intuitive (deselecting adds a chip). Instead we show a short
+    // "N of M selected" summary ABOVE the dropdown and render nothing inside it.
+    // `options.length - checkedList.length` is the count still selected.
+    let summaryText = null;
     if (groupName === 'exclude_programs') {
-        // Datasets: instead of using Chips to display the selected datasets (which can be confusing)
-        // we instead just show a short text description describing how many datasets have been selected
-        renderTags = (tagValue, _) => <span>{`${options.length - tagValue.length} programs selected, expand to see more`}</span>;
+        summaryText = `${options.length - checkedList.length} of ${options.length} programs selected`;
         label = 'Programs';
+    } else if (groupName === 'node') {
+        summaryText = `${options.length - checkedList.length} of ${options.length} nodes selected`;
+        label = 'Nodes';
+    }
+    if (summaryText) {
+        renderTags = () => null;
     }
 
     return useAutoComplete ? (
-        <Autocomplete
-            size="small"
-            multiple
-            id={`checkboxes-tags-${groupName}`}
+        <>
+            {summaryText && (
+                <Typography variant="body2" sx={{ paddingTop: '0.5em', fontStyle: 'italic', color: 'text.secondary' }}>
+                    {summaryText}
+                </Typography>
+            )}
+            <Autocomplete
+                size="small"
+                multiple
+                id={`checkboxes-tags-${groupName}`}
             options={options}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => {
@@ -357,7 +377,8 @@ function StyledCheckboxList(props) {
             renderInput={(params) => <TextField {...params} label={label} />}
             renderTags={renderTags}
             getOptionDisabled={(option) => optionStatusMap?.[option]?.healthy === false}
-        />
+            />
+        </>
     ) : (
         options?.map((option) => {
             const status = optionStatusMap?.[option];
