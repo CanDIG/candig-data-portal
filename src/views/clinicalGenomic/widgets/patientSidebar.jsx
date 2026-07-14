@@ -5,6 +5,7 @@ import { Button, Typography } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
 import { formatKey } from '../../../utils/utils';
+import DonorLookup from './donorLookup';
 
 const HeaderButton = styled(Button)(({ theme, selected }) => ({
     textAlign: 'left',
@@ -114,6 +115,9 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
             } else if (key.startsWith('date_of_')) {
                 value = key.split('date_of_')[1];
                 value = `Diagnosis_to_${value.trim()}`;
+            } else if (key === 'specimen_collection_date') {
+                // Table cell shows the interval relative to diagnosis, so label it as such.
+                value = `Diagnosis_to_specimen_collection_date`;
             }
 
             return hasNonEmptyValue
@@ -345,6 +349,7 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
     return (
         <div style={{ marginTop: 12 }} data-tour="patient-sidebar">
             {createMainSidebarHeaders(sidebar)}
+            <DonorLookup />
         </div>
     );
 }
