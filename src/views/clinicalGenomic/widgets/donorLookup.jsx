@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Box, Button, CircularProgress, MenuItem, TextField, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Button, CircularProgress, MenuItem, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 
 import { fetchFederation } from '../../../store/api';
@@ -7,12 +7,22 @@ import { fetchFederation } from '../../../store/api';
 /*
  * A small form, shown beneath the clinical metadata folders, that lets a user jump
  * to a specific donor. Node and program are dropdowns limited to what the user is
- * actually authorized for (from v3/authorized/programs); donor ID is free text.
+ * actually authorized for (from v3/authorized/programs). Once a program is chosen we
+ * load the donors the user may read in that program (v3/authorized/donors/) and offer
+ * them as a searchable dropdown, so a valid ID in the wrong program is impossible.
  *
- * Authorization is still enforced by katsu on fetch: the donor endpoint returns 404
- * ("does not exist or inaccessible") for anything the user cannot see, so we only
- * navigate on a real hit and otherwise show an error without revealing any data.
+ * Because the donor is picked from the authorized list, it is guaranteed to exist and
+ * be accessible, so we can navigate straight to the patient view without re-fetching
+ * (which, on a real deployment, would come back as an aggregate 404 for anything a node
+ * cannot return and be surfaced as a generic error).
  */
+
+// katsu returns list results as a plain array; the mock nests them under `items`.
+function resultItems(results) {
+    if (Array.isArray(results)) return results;
+    return Array.isArray(results?.items) ? results.items : [];
+}
+
 function DonorLookup() {
     const theme = useTheme();
 
@@ -23,8 +33,13 @@ function DonorLookup() {
     const [node, setNode] = useState('');
     const [programId, setProgramId] = useState('');
     const [donorId, setDonorId] = useState('');
+
+    // Donor IDs available in the selected node+program, cached by `${node}|||${program}`.
+    const [donorCache, setDonorCache] = useState({});
+    const [loadingDonors, setLoadingDonors] = useState(false);
+    const [donorLoadError, setDonorLoadError] = useState('');
+
     const [error, setError] = useState('');
-    const [looking, setLooking] = useState(false);
 
     // Build a { nodeName: [program_id, ...] } map of what the user may access.
     useEffect(() => {
@@ -37,9 +52,9 @@ function DonorLookup() {
                 (Array.isArray(data) ? data : []).forEach((entry) => {
                     const name = entry?.location?.name;
                     if (!name) return;
-                    // katsu returns results as an array; the mock nests it under items.
-                    const items = Array.isArray(entry.results) ? entry.results : entry.results?.items || [];
-                    const ids = items.map((program) => program?.program_id).filter(Boolean);
+                    const ids = resultItems(entry.results)
+                        .map((program) => program?.program_id)
+                        .filter(Boolean);
                     if (ids.length === 0) return;
                     map[name] = Array.from(new Set([...(map[name] || []), ...ids])).sort();
                 });
@@ -56,48 +71,65 @@ function DonorLookup() {
         };
     }, []);
 
+    const cacheKey = node && programId ? `${node}|||${programId}` : '';
+
+    // When a node+program is chosen, load the donors the user may read there.
+    useEffect(() => {
+        if (!cacheKey || donorCache[cacheKey]) return undefined;
+        let active = true;
+        setLoadingDonors(true);
+        setDonorLoadError('');
+        // Plain fetch so a katsu 401 doesn't reload the page mid-selection.
+        fetchFederation('v3/authorized/donors/', 'katsu', { program_id: programId }, fetch)
+            .then((data) => {
+                if (!active) return;
+                const match = Array.isArray(data) ? data.find((obj) => obj?.location?.name === node) : null;
+                const ids = resultItems(match?.results)
+                    .map((donor) => donor?.submitter_donor_id)
+                    .filter(Boolean);
+                setDonorCache((prev) => ({ ...prev, [cacheKey]: Array.from(new Set(ids)).sort() }));
+            })
+            .catch(() => {
+                if (active) setDonorLoadError('Could not load the donors for this program.');
+            })
+            .finally(() => {
+                if (active) setLoadingDonors(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [cacheKey, node, programId, donorCache]);
+
     const nodes = Object.keys(programsByNode).sort();
     const programs = node ? programsByNode[node] || [] : [];
-    const canSubmit = node && programId && donorId.trim() && !looking;
+    const donorOptions = cacheKey ? donorCache[cacheKey] || [] : [];
+    const canSubmit = Boolean(node && programId && donorId && donorOptions.includes(donorId));
 
     const handleNodeChange = (value) => {
         setNode(value);
         setProgramId(''); // program list depends on the node, so reset it
+        setDonorId('');
         setError('');
     };
 
-    const handleLookup = async () => {
+    const handleProgramChange = (value) => {
+        setProgramId(value);
+        setDonorId(''); // donor list depends on the program, so reset it
         setError('');
-        setLooking(true);
-        const trimmedDonor = donorId.trim();
+    };
 
-        try {
-            const path = `v3/authorized/donor_with_clinical_data/program/${encodeURIComponent(
-                programId
-            )}/donor/${encodeURIComponent(trimmedDonor)}`;
-            const result = await fetchFederation(path, 'katsu');
-
-            const match = Array.isArray(result) ? result.find((obj) => obj?.location?.name === node) : null;
-            const donor = match?.results;
-            const found = donor && !donor.error && (donor.submitter_donor_id || donor.program_id);
-
-            if (found) {
-                window.location.href =
-                    `/patientView?patientId=${encodeURIComponent(trimmedDonor)}` +
-                    `&programId=${encodeURIComponent(programId)}` +
-                    `&location=${encodeURIComponent(node)}` +
-                    `&submitterDonorId=${encodeURIComponent(trimmedDonor)}`;
-            } else {
-                setError(
-                    `No donor "${trimmedDonor}" found in program "${programId}" at "${node}". ` +
-                        `Check the donor ID — the donor may not exist or may not be accessible to you.`
-                );
-            }
-        } catch (e) {
-            setError('Something went wrong looking up that donor. Please try again.');
-        } finally {
-            setLooking(false);
+    const handleLookup = () => {
+        setError('');
+        // donorId came from the authorized list for this node+program, so it is known-good.
+        if (!donorOptions.includes(donorId)) {
+            setError('Please choose a donor from the list.');
+            return;
         }
+        window.location.href =
+            `/patientView?patientId=${encodeURIComponent(donorId)}` +
+            `&programId=${encodeURIComponent(programId)}` +
+            `&location=${encodeURIComponent(node)}` +
+            `&submitterDonorId=${encodeURIComponent(donorId)}`;
     };
 
     return (
@@ -147,10 +179,7 @@ function DonorLookup() {
                         size="small"
                         label="Program"
                         value={programId}
-                        onChange={(event) => {
-                            setProgramId(event.target.value);
-                            setError('');
-                        }}
+                        onChange={(event) => handleProgramChange(event.target.value)}
                         disabled={!node}
                         helperText={node ? '' : 'Select a node first'}
                     >
@@ -161,20 +190,49 @@ function DonorLookup() {
                         ))}
                     </TextField>
 
-                    <TextField
+                    <Autocomplete
                         size="small"
-                        label="Donor ID"
-                        value={donorId}
-                        onChange={(event) => setDonorId(event.target.value)}
+                        options={donorOptions}
+                        value={donorId || null}
+                        onChange={(event, value) => {
+                            setDonorId(value || '');
+                            setError('');
+                        }}
+                        disabled={!programId || loadingDonors}
+                        loading={loadingDonors}
+                        noOptionsText={donorLoadError || 'No donors found'}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Donor ID"
+                                helperText={
+                                    // eslint-disable-next-line no-nested-ternary
+                                    !programId
+                                        ? 'Select a program first'
+                                        : loadingDonors
+                                        ? 'Loading donors…'
+                                        : `${donorOptions.length} donor${donorOptions.length === 1 ? '' : 's'} available`
+                                }
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                            {loadingDonors ? <CircularProgress color="inherit" size={16} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </>
+                                    )
+                                }}
+                            />
+                        )}
                     />
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        size="small"
-                        disabled={!canSubmit}
-                        startIcon={looking ? <CircularProgress size={16} color="inherit" /> : null}
-                    >
+                    {donorLoadError && (
+                        <Alert severity="error" variant="outlined">
+                            {donorLoadError}
+                        </Alert>
+                    )}
+
+                    <Button type="submit" variant="contained" size="small" disabled={!canSubmit}>
                         Look up donor
                     </Button>
 
