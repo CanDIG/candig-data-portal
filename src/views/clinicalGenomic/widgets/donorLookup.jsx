@@ -133,7 +133,7 @@ function DonorLookup() {
     };
 
     return (
-        <Box sx={{ mt: 2, pt: 1.5, px: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
+        <Box data-tour="patient-donor-lookup" sx={{ mt: 2, pt: 1.5, px: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
                 Look up donor by ID
             </Typography>

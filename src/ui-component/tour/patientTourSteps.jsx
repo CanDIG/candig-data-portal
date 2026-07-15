@@ -27,6 +27,13 @@ const patientTourSteps = [
             'Use these folders to move between clinical categories — primary diagnoses, treatments, specimens, follow-ups and more. Selecting one shows its details in the table.'
     },
     {
+        target: '[data-tour="patient-donor-lookup"]',
+        placement: 'right',
+        title: 'Jump to another donor',
+        content:
+            'Look up a specific donor without going back to search. Pick a node and program you have access to, then choose a donor ID from the list — only donors you’re authorized to view appear — to open that patient’s page.'
+    },
+    {
         target: '[data-tour="patient-clinical"]',
         placement: 'top',
         title: 'Clinical data table',
