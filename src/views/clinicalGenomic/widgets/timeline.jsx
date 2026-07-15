@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
@@ -47,9 +47,9 @@ const tooltipFormatter = () =>
             const endYearText = `End: ${getDateText(this.end)}`;
 
             if (this.name === 'Treatments') {
-                tooltipContent = `${boldName}${startYearText}<br/>${endYearText}<br/>`;
+                tooltipContent = `${boldName}${startYearText}<br/>${endYearText}`;
             } else {
-                tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}<br/>`;
+                tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}`;
             }
         } else {
             tooltipContent = `${boldName}${getDateText(this.x)}`;
@@ -102,6 +102,38 @@ function Timeline({ data, onEventClick }) {
             return next;
         });
     }, []);
+
+    // The first treatment that has an expand toggle — i.e. it is placed on the
+    // timeline (has a treatment date) AND carries dated systemic therapies. The
+    // guided tour expands this one to demonstrate the per-drug rows. Mirrors the
+    // conditions used when building the sub-treatment rows in the effect below.
+    const firstExpandableTreatmentId = useMemo(() => {
+        let found = null;
+        (data?.primary_diagnoses || []).forEach((diagnosis) =>
+            (diagnosis.treatments || []).forEach((treatment) => {
+                if (found) return;
+                const hasTreatmentDate =
+                    treatment.treatment_start_date?.month_interval != null || treatment.treatment_end_date?.month_interval != null;
+                if (!hasTreatmentDate) return;
+                const hasDatedTherapy = (treatment.systemic_therapies || []).some(
+                    (therapy) => therapy?.start_date?.month_interval != null || therapy?.end_date?.month_interval != null
+                );
+                if (hasDatedTherapy) found = treatment.submitter_treatment_id;
+            })
+        );
+        return found;
+    }, [data]);
+
+    const demoTreatmentExpanded = firstExpandableTreatmentId ? expandedTreatments.has(firstExpandableTreatmentId) : false;
+
+    // Driven by the guided tour (via a hidden control) to show a systemic-therapy
+    // treatment expanding into its drug rows. Also ensures the Treatments group is
+    // open so the expanded rows are visible.
+    const toggleDemoTreatmentExpand = useCallback(() => {
+        if (!firstExpandableTreatmentId) return;
+        setIsTreatmentsCollapsed(false);
+        toggleTreatmentExpand(firstExpandableTreatmentId);
+    }, [firstExpandableTreatmentId, toggleTreatmentExpand]);
     useEffect(() => {
         let dob = data?.date_of_birth?.month_interval ?? 0;
         dob += data?.date_of_birth?.day_interval ? (data.date_of_birth.day_interval % 32) / 32 : 0;
@@ -813,7 +845,23 @@ function Timeline({ data, onEventClick }) {
     ]);
 
     // Render the HighchartsReact component with the configured chart options
-    return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
+    return (
+        <>
+            {/* Hidden control the guided tour clicks to demonstrate a systemic-therapy
+                treatment expanding into its per-drug rows. Not a visible/targetable
+                tour step — the step anchors to the timeline container. */}
+            <button
+                type="button"
+                data-tour="timeline-expand-demo"
+                data-active={demoTreatmentExpanded ? 'true' : 'false'}
+                aria-hidden="true"
+                tabIndex={-1}
+                style={{ display: 'none' }}
+                onClick={toggleDemoTreatmentExpand}
+            />
+            <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />
+        </>
+    );
 }
 
 // PropTypes for component validation
