@@ -221,3 +221,200 @@ export function fetchRefreshToken() {
             return error;
         });
 }
+
+/* ============================================================================
+ * Site administration (ingest service)
+ *
+ * All of the endpoints below are served by the ingest service and are only
+ * accessible to site administrators. They are consumed by the Site Admin
+ * Dashboard (src/views/siteAdmin). Authentication is handled by the Tyk
+ * gateway via the session cookie, exactly as with the other ingest calls
+ * above, so no Authorization header is set here.
+ * ========================================================================== */
+
+/*
+ * Small helper that unwraps an ingest response as JSON and throws a useful
+ * error (including the server-supplied message when present) on failure.
+ */
+async function ingestJson(response) {
+    let body;
+    try {
+        body = await response.json();
+    } catch (e) {
+        body = undefined;
+    }
+    if (!response.ok) {
+        const detail = body?.error || body?.message || body?.result || response.statusText;
+        throw new Error(`${response.status}: ${detail}`);
+    }
+    return body;
+}
+
+/*
+ * Return authorization information for the currently logged-in user, including
+ * their site_roles (e.g. "admin", "curator"). Used to gate the admin dashboard.
+ */
+export function fetchCurrentUserAuthorization() {
+    return fetchOrRelogin(`${INGEST_URL}/user/me`).then(ingestJson);
+}
+
+/* ---- Pending users ---- */
+
+export function fetchPendingUsers() {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending`)
+        .then(ingestJson)
+        .then((data) => data?.results || []);
+}
+
+export function approvePendingUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending/${encodeURIComponent(userId)}`, {
+        method: 'post'
+    }).then(ingestJson);
+}
+
+export function rejectPendingUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(ingestJson);
+}
+
+export function approvePendingUsers(userIds) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userIds)
+    }).then(ingestJson);
+}
+
+/* ---- Preapproved users ---- */
+
+export function fetchPreapprovedUsers() {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved`)
+        .then(ingestJson)
+        .then((data) => data?.results || []);
+}
+
+export function addPreapprovedUsers(userIds) {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userIds)
+    }).then(ingestJson);
+}
+
+export function removePreapprovedUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(ingestJson);
+}
+
+/* ---- Programs ---- */
+
+export function fetchPrograms() {
+    return fetchOrRelogin(`${INGEST_URL}/program`).then(ingestJson);
+}
+
+export function addProgram(program) {
+    return fetchOrRelogin(`${INGEST_URL}/program`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(program)
+    }).then(ingestJson);
+}
+
+/*
+ * Fetch a single program's authorization info (program_curators, team_members).
+ * Resolves to { ok, status, data } so callers can distinguish "not found" (404)
+ * from other errors without throwing. Note the ingest service strips
+ * dac_authorizations from this response; use fetchProgramDacs for those.
+ */
+export function fetchProgram(programId) {
+    return fetchOrRelogin(`${INGEST_URL}/program/${encodeURIComponent(programId)}`).then(async (response) => {
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = undefined;
+        }
+        return { ok: response.ok, status: response.status, data };
+    });
+}
+
+/*
+ * Get the DAC authorizations for a single program. The ingest service returns
+ * an object keyed by user id: { <user_id>: { program_id, start_date, end_date } }
+ */
+export function fetchProgramDacs(programId) {
+    return fetchOrRelogin(`${INGEST_URL}/program/${encodeURIComponent(programId)}/dac_authorization`).then(ingestJson);
+}
+
+/*
+ * Aggregate every DAC authorization across all programs into a flat list of
+ * { program_id, user_id, start_date, end_date } rows, suitable for a table.
+ */
+export function fetchAllDacAuthorizations() {
+    return fetchPrograms().then((programs) => {
+        const programIds = Array.isArray(programs) ? programs : [];
+        return Promise.all(
+            programIds.map((programId) =>
+                fetchProgramDacs(programId)
+                    .then((dacs) =>
+                        Object.entries(dacs || {}).map(([userId, dac]) => ({
+                            program_id: dac?.program_id || programId,
+                            user_id: userId,
+                            dac_id: dac?.dac_id || '',
+                            start_date: dac?.start_date || '',
+                            end_date: dac?.end_date || ''
+                        }))
+                    )
+                    .catch((error) => {
+                        console.log(`Could not fetch DAC authorizations for ${programId}: ${error}`);
+                        return [];
+                    })
+            )
+        ).then((nested) => nested.flat());
+    });
+}
+
+/* ---- DAC authorizations ---- */
+
+export function addDacAuthorization(userId, authorizations) {
+    return fetchOrRelogin(`${INGEST_URL}/user/${encodeURIComponent(userId)}/dac_authorization`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(authorizations)
+    }).then(ingestJson);
+}
+
+/* ---- Site roles ---- */
+
+/*
+ * List the users assigned to a given site role (e.g. "curator", "admin"). The
+ * ingest service returns an object keyed by role type: { <role_type>: [...] },
+ * so we normalise it down to a plain array of user ids.
+ */
+export function fetchSiteRoleUsers(roleType) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}`)
+        .then(ingestJson)
+        .then((data) => {
+            if (Array.isArray(data)) {
+                return data;
+            }
+            if (data && Array.isArray(data[roleType])) {
+                return data[roleType];
+            }
+            return [];
+        });
+}
+
+export function addUserToSiteRole(roleType, userId) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}/user_id/${encodeURIComponent(userId)}`, {
+        method: 'post'
+    }).then(ingestJson);
+}
+
+export function removeUserFromSiteRole(roleType, userId) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}/user_id/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(ingestJson);
+}
