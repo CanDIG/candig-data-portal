@@ -27,13 +27,6 @@ const patientTourSteps = [
             'Use these folders to move between clinical categories — primary diagnoses, treatments, specimens, follow-ups and more. Selecting one shows its details in the table.'
     },
     {
-        target: '[data-tour="patient-donor-lookup"]',
-        placement: 'right',
-        title: 'Jump to another donor',
-        content:
-            'Look up a specific donor without going back to search. Pick a node and program you have access to, then choose a donor ID from the list — only donors you’re authorized to view appear — to open that patient’s page.'
-    },
-    {
         target: '[data-tour="patient-clinical"]',
         placement: 'top',
         title: 'Clinical data table',
@@ -44,7 +37,17 @@ const patientTourSteps = [
         placement: 'top',
         title: 'Patient timeline',
         content:
-            'A timeline of the donor’s diagnosis, treatments and follow-ups. The timeline can be zoomed in and out to focus on different time periods. The list of treatments can be expanded and clicking on an event will show its details in the table above.'
+            'A timeline of the donor’s diagnosis, treatments and follow-ups. The timeline can be zoomed in and out to focus on different time periods, and clicking an event shows its details in the table above.'
+    },
+    {
+        target: '[data-tour="patient-timeline"]',
+        placement: 'top',
+        title: 'Expand treatment details',
+        // Live-demonstrates expanding a systemic-therapy treatment into its drug
+        // rows while the step is shown (handled in TourRunner), then resets on exit.
+        expandTreatmentDemo: true,
+        content:
+            'Use the triangle toggles on the left edge of the chart to expand rows. The “Treatments” row expands to list each individual treatment, and any treatment that includes systemic therapy expands again to show each drug on its own dated row — as shown here.'
     },
     {
         target: '[data-tour="patient-genomic"]',
@@ -52,6 +55,13 @@ const patientTourSteps = [
         title: 'Genomic data',
         content:
             'Any genomic samples associated with this donor — sample and experiment IDs, variant counts, and links to the associated files.'
+    },
+    {
+        target: '[data-tour="patient-donor-lookup"]',
+        placement: 'right',
+        title: 'Look up another donor',
+        content:
+            'Finally, you can look up a specific donor without going back to search. Pick a node and program you have access to, then choose a donor ID from the list to open that patient’s page.'
     }
 ];
 

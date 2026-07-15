@@ -347,8 +347,8 @@ function PatientSidebar({ sidebar = {}, setColumns, setRows, setTitle, ageAtFirs
     }
 
     return (
-        <div style={{ marginTop: 12 }} data-tour="patient-sidebar">
-            {createMainSidebarHeaders(sidebar)}
+        <div style={{ marginTop: 12 }}>
+            <div data-tour="patient-sidebar">{createMainSidebarHeaders(sidebar)}</div>
             <DonorLookup />
         </div>
     );
