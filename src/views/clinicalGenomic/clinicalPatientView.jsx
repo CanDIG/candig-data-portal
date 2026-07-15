@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/system';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Alert from '@mui/material/Alert';
 import { useSelector, useDispatch } from 'react-redux';
-import { IconPlayerPlay } from '@tabler/icons-react';
 
 import MainCard from '../../ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
@@ -149,14 +148,9 @@ function ClinicalPatientView() {
                         </Alert>
                     </div>
                 )}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
-                        {title}
-                    </Typography>
-                    <Button size="small" startIcon={<IconPlayerPlay size={18} />} onClick={runPatientTour}>
-                        Take a tour
-                    </Button>
-                </Box>
+                <Typography pb={1} variant="h5" style={{ fontWeight: 'bold' }}>
+                    {title}
+                </Typography>
                 <Typography pb={1} variant="h6">
                     {patientId}
                 </Typography>
