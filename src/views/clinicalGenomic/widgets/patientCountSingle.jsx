@@ -172,7 +172,9 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded
-                ? counts.totals.map((program) => {
+                ? [...counts.totals]
+                      .sort((a, b) => a.program_id.localeCompare(b.program_id, undefined, { numeric: true, sensitivity: 'base' }))
+                      .map((program) => {
                     const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
                     const accessRequested = counts.accessRequestedPrograms?.some(
                         ({ programId, this_site }) => programId === program.program_id && this_site === counts.location
