@@ -429,13 +429,20 @@ function Timeline({ data, onEventClick }) {
         // Category names in row order (parent treatments interleaved with their
         // expanded sub-treatments), used to build the yAxis categories.
         const orderedTreatmentNames = [];
+        // Display label and indent depth per treatment row, parallel to
+        // orderedTreatmentNames. Depth drives the y-axis label indentation so each
+        // treatment sits under the "Treatments" bar and each drug sits under its
+        // treatment. The display label can differ from the point name (used in
+        // tooltips), so an indented drug row needn't repeat its treatment id.
+        const orderedTreatmentLabels = [];
+        const orderedTreatmentDepths = [];
         // Treatments that have at least one dated sub-treatment; each gets an
         // expand/collapse toggle rendered next to its row.
         const subTreatmentParents = [];
 
         // Adds one dated row (a gantt bar if it has both dates, otherwise a single
         // point) and records its category name in row order.
-        const pushDatedRow = ({ name, start, end, treatment_type, intervalColour, pointColour, isSubTreatment, surgeries, radiations }) => {
+        const pushDatedRow = ({ name, displayLabel, start, end, treatment_type, intervalColour, pointColour, isSubTreatment, surgeries, radiations }) => {
             if (start != null && end != null) {
                 treatmentIntervals.push({
                     name,
@@ -468,6 +475,8 @@ function Timeline({ data, onEventClick }) {
                 });
             }
             orderedTreatmentNames.push(name);
+            orderedTreatmentLabels.push(displayLabel ?? name);
+            orderedTreatmentDepths.push(isSubTreatment ? 2 : 1);
         };
 
         // Pulls surgery/radiation detail for a treatment's tooltip, but only when the
@@ -489,6 +498,11 @@ function Timeline({ data, onEventClick }) {
             treatmentTypeIncludes(treatment, 'radiation') && Array.isArray(treatment?.radiations)
                 ? treatment.radiations.map((radiation) => radiation?.radiation_therapy_modality).filter(Boolean)
                 : [];
+
+        // treatment_type may be a single string or an array of them; join into a
+        // readable string for the row label (e.g. "Systemic therapy, Surgery").
+        const formatTreatmentType = (type) =>
+            (Array.isArray(type) ? type : type != null ? [type] : []).filter(Boolean).join(', ');
 
         // The parent "Treatments" summary bar spans the full treatment range, so
         // compute that range from the raw dates regardless of collapse state.
@@ -519,8 +533,13 @@ function Timeline({ data, onEventClick }) {
                         return;
                     }
 
+                    const treatmentTypeText = formatTreatmentType(treatment?.treatment_type);
                     pushDatedRow({
                         name: treatmentId,
+                        // Show the treatment type next to the id in the row label,
+                        // e.g. "TR_001: Systemic therapy". The point name stays the
+                        // bare id (the tooltip lists the type separately).
+                        displayLabel: treatmentTypeText ? `${treatmentId}: ${treatmentTypeText}` : treatmentId,
                         start: treatmentStart,
                         end: treatmentEnd,
                         treatment_type: treatment?.treatment_type,
@@ -550,6 +569,9 @@ function Timeline({ data, onEventClick }) {
                         const rowName = `↳ ${treatmentId}: ${label}`;
                         pushDatedRow({
                             name: rowName,
+                            // Indentation conveys the parent, so the row label shows
+                            // just the drug/therapy; the full name is kept for tooltips.
+                            displayLabel: label,
                             start: therapy.start_date?.month_interval,
                             end: therapy.end_date?.month_interval,
                             treatment_type: therapy.systemic_therapy_type,
@@ -612,6 +634,11 @@ function Timeline({ data, onEventClick }) {
         Updatedseries.push(treatmentsSeries);
 
         const newCategories = activeCategories.concat(orderedTreatmentNames);
+        // Indent depth and display text for every y category, parallel to
+        // newCategories. Non-treatment rows and the "Treatments" summary bar are
+        // depth 0; individual treatments depth 1; expanded drug rows depth 2.
+        const categoryDepths = [...activeCategories.map(() => 0), ...orderedTreatmentDepths];
+        const categoryLabels = [...activeCategories, ...orderedTreatmentLabels];
 
         // Initial view: zoom to the span between the first day of diagnosis and the
         // last displayed event. Earlier events (e.g. birth) remain reachable via the
@@ -697,9 +724,16 @@ function Timeline({ data, onEventClick }) {
                 // name, so the interleaved sub-treatment rows stay in the right order.
                 uniqueNames: false,
                 labels: {
-                    style: {
-                        fontFamily: 'Arial, sans-serif',
-                        fontWeight: 'bold'
+                    useHTML: true,
+                    align: 'left',
+                    // Indent each row by its depth so individual treatments sit under
+                    // the "Treatments" bar and expanded drug rows sit under their
+                    // treatment. Points are placed by explicit y index, so changing
+                    // the label text here doesn't affect row placement.
+                    formatter() {
+                        const depth = categoryDepths[this.pos] || 0;
+                        const label = categoryLabels[this.pos] ?? this.value;
+                        return `<span style="padding-left:${depth * 14}px;font-family:Arial,sans-serif;font-weight:bold">${label}</span>`;
                     }
                 },
                 min: 0,

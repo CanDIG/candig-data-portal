@@ -45,7 +45,9 @@ function DonorLookup() {
     useEffect(() => {
         let active = true;
         // Plain fetch (not the relogin wrapper) so a katsu 401 doesn't reload the page.
-        fetchFederation('v3/authorized/programs', 'katsu', {}, fetch)
+        // Paginated like the donors endpoint (default 100/page); pass a very large
+        // page_size so every authorized program appears rather than truncating.
+        fetchFederation('v3/authorized/programs', 'katsu', { page_size: 1000000000 }, fetch)
             .then((data) => {
                 if (!active) return;
                 const map = {};
@@ -80,7 +82,11 @@ function DonorLookup() {
         setLoadingDonors(true);
         setDonorLoadError('');
         // Plain fetch so a katsu 401 doesn't reload the page mid-selection.
-        fetchFederation('v3/authorized/donors/', 'katsu', { program_id: programId }, fetch)
+        // katsu paginates this endpoint (default 100/page); pass a very large
+        // page_size so the dropdown lists every authorized donor rather than
+        // silently truncating. The page_size cap in the docstring isn't enforced,
+        // so this returns the whole set in one request.
+        fetchFederation('v3/authorized/donors/', 'katsu', { program_id: programId, page_size: 1000000000 }, fetch)
             .then((data) => {
                 if (!active) return;
                 const match = Array.isArray(data) ? data.find((obj) => obj?.location?.name === node) : null;
