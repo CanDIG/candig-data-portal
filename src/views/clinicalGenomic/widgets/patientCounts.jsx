@@ -29,6 +29,10 @@ function PatientCounts() {
     const programs = context?.programs;
     const discoveryCounts = context?.counts?.patients_per_program;
     const clinicalCounts = context?.clinical;
+    // Nodes the user deselected in the sidebar for the current search. Use the same
+    // `.includes` test SearchHandler uses so the two stay consistent (e.g. the
+    // post-reset nested-array shape resolves to "nothing excluded" here too).
+    const excludedNodes = context?.excludedNodes;
 
     // Generate the map of site->program->numbers
     let siteData = [];
@@ -92,7 +96,11 @@ function PatientCounts() {
             {/* Individual counts */}
             {siteData?.map((site) => (
                 <React.Fragment key={site.location}>
-                    <PatientCountSingle site={site.location} counts={site} />
+                    <PatientCountSingle
+                        site={site.location}
+                        counts={site}
+                        excluded={Array.isArray(excludedNodes) && excludedNodes.includes(site.location)}
+                    />
                     <Box className={`${PREFIX}-spacing`} />
                 </React.Fragment>
             ))}
