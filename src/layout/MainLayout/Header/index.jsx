@@ -76,7 +76,7 @@ function Header({ handleLeftDrawerToggle }) {
             {/* <SearchSection theme="light" />  Currently not needed */}
             <StyledGrow className={classes.grow} />
 
-            {/* take a tour (search page only) */}
+            {/* take a tour (shown on pages that have a guided tour) */}
             <TourButton />
 
             {/* notification & profile */}

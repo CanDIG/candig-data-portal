@@ -23,6 +23,19 @@ function setNodeExpanded(shouldExpand) {
     }
 }
 
+// Expand (or reset) a systemic-therapy treatment on the patient timeline to
+// demonstrate its per-drug rows. The timeline exposes a hidden control whose
+// data-active reflects the current state, so we only click when a change is
+// needed — keeping this idempotent across Next/Back navigation.
+function setTimelineTreatmentExpanded(shouldExpand) {
+    const button = document.querySelector('[data-tour="timeline-expand-demo"]');
+    if (!button) return;
+    const isActive = button.dataset.active === 'true';
+    if (shouldExpand !== isActive) {
+        button.click();
+    }
+}
+
 // The sidebar lives in a fixed MUI Drawer that scrolls via react-perfect-scrollbar
 // (overflow: hidden), which Joyride's auto-scroll doesn't recognize — so lower
 // sections (genomic / clinical filters) stay below the drawer's fold and Joyride
@@ -56,6 +69,7 @@ function TourRunner() {
     useEffect(() => {
         if (run) {
             setNodeExpanded(false);
+            setTimelineTreatmentExpanded(false);
             stopTour();
         }
         // Only react to path changes; including `run` would stop the tour the
@@ -72,6 +86,7 @@ function TourRunner() {
             // Leave nothing expanded behind us. Tours run in place, so there's
             // nothing to navigate to on finish/skip/close.
             setNodeExpanded(false);
+            setTimelineTreatmentExpanded(false);
             stopTour();
             return;
         }
@@ -87,10 +102,18 @@ function TourRunner() {
             setNodeExpanded(true);
         }
 
+        // Demonstrate a treatment expanding into its systemic-therapy drug rows.
+        if (type === EVENTS.STEP_BEFORE && step?.expandTreatmentDemo) {
+            setTimelineTreatmentExpanded(true);
+        }
+
         if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
             // ...and collapse it again once we move on.
             if (step?.expandDemo) {
                 setNodeExpanded(false);
+            }
+            if (step?.expandTreatmentDemo) {
+                setTimelineTreatmentExpanded(false);
             }
             // Advance (or go back) once the current step is done.
             setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
