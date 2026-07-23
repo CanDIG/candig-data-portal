@@ -277,6 +277,26 @@ function StyledCheckboxList(props) {
     };
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
+
+    // Move disabled options (unhealthy nodes, or programs whose node has been
+    // deselected) to the bottom of the list while preserving the relative order of
+    // everything else. Array.prototype.sort is stable, so equal-priority items keep
+    // their original order.
+    const orderedOptions = Array.isArray(options)
+        ? [...options].sort((a, b) => {
+              const aDisabled = optionStatusMap?.[a]?.healthy === false ? 1 : 0;
+              const bDisabled = optionStatusMap?.[b]?.healthy === false ? 1 : 0;
+              return aDisabled - bDisabled;
+          })
+        : options;
+
+    // Disabled options that the user hasn't explicitly excluded — i.e. offline nodes.
+    // They are shown as deselected (unchecked) rather than selected-but-disabled, so
+    // they must also be left out of the "N of M selected" tally.
+    const disabledUnselected = (Array.isArray(options) ? options : []).filter(
+        (o) => optionStatusMap?.[o]?.healthy === false && !checkedList.includes(o)
+    ).length;
+
     let label = groupName;
     let renderTags = (tagValue, getTagProps) =>
         tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
@@ -287,10 +307,10 @@ function StyledCheckboxList(props) {
     // `options.length - checkedList.length` is the count still selected.
     let summaryText = null;
     if (groupName === 'exclude_programs') {
-        summaryText = `${options.length - checkedList.length} of ${options.length} programs selected`;
+        summaryText = `${options.length - checkedList.length - disabledUnselected} of ${options.length} programs selected`;
         label = 'Programs';
     } else if (groupName === 'node') {
-        summaryText = `${options.length - checkedList.length} of ${options.length} nodes selected`;
+        summaryText = `${options.length - checkedList.length - disabledUnselected} of ${options.length} nodes selected`;
         label = 'Nodes';
     }
     if (summaryText) {
@@ -308,62 +328,74 @@ function StyledCheckboxList(props) {
                 size="small"
                 multiple
                 id={`checkboxes-tags-${groupName}`}
-            options={options}
+            options={orderedOptions}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => {
                 const status = optionStatusMap?.[option];
                 const isHealthy = status?.healthy !== false;
 
-                return (
-                    <li {...props} key={option}>
-                        <div
+                const rowContent = (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            sx={{
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                marginRight: 1
+                            }}
+                            checked={isHealthy ? (isExclusion ? !selected : selected) : false}
+                            value={option}
+                            disabled={!isHealthy}
+                        />
+                        <span
                             style={{
-                                display: 'flex',
+                                display: 'inline-flex',
                                 alignItems: 'center',
-                                width: '100%'
+                                gap: '4px',
+                                lineHeight: 1.2
                             }}
                         >
-                            <Checkbox
-                                icon={icon}
-                                checkedIcon={checkedIcon}
-                                sx={{
-                                    paddingTop: 0,
-                                    paddingBottom: 0,
-                                    marginRight: 1
-                                }}
-                                checked={isExclusion ? !selected : selected}
-                                value={option}
-                                disabled={!isHealthy}
-                            />
-                            <span
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'baseline',
-                                    gap: '4px',
-                                    lineHeight: 1.2
-                                }}
-                            >
-                                {option}
-                                {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
-                                    <Tooltip title="Unauthorized Program" placement="right">
-                                        <LockOutlinedIcon
-                                            sx={{
-                                                color: 'primary.main',
-                                                fontSize: '1.1rem',
-                                                verticalAlign: 'text-bottom',
-                                                position: 'relative',
-                                                top: '3px'
-                                            }}
-                                        />
-                                    </Tooltip>
-                                )}
-                                {!isHealthy && (
-                                    <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
-                                        <WarningAmberOutlinedIcon className={classes.warningIcon} />
-                                    </Tooltip>
-                                )}
-                            </span>
-                        </div>
+                            {option}
+                            {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                <Tooltip title="Unauthorized Program" placement="right">
+                                    <LockOutlinedIcon
+                                        sx={{
+                                            color: 'primary.main',
+                                            fontSize: '1.1rem',
+                                            verticalAlign: 'text-bottom',
+                                            position: 'relative',
+                                            top: '3px'
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
+                            {!isHealthy && groupName !== 'exclude_programs' && (
+                                <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                            )}
+                        </span>
+                    </div>
+                );
+
+                // MUI sets `pointer-events: none` on disabled options, which would
+                // suppress the tooltip on hover — override it here so the reason is
+                // discoverable. Selection is still blocked by getOptionDisabled and
+                // the onChange safe-value filter below.
+                return (
+                    <li {...props} key={option} style={{ ...props.style, ...(isHealthy ? {} : { pointerEvents: 'auto' }) }}>
+                        {!isHealthy && status?.reason ? (
+                            <Tooltip title={status.reason} placement="right">
+                                {rowContent}
+                            </Tooltip>
+                        ) : (
+                            rowContent
+                        )}
                     </li>
                 );
             }}
@@ -371,7 +403,13 @@ function StyledCheckboxList(props) {
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason) => {
-                const safeValue = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
+                // Disabled options (unhealthy nodes / programs on a deselected node) are
+                // immutable: the user can't toggle them. Take the user's healthy picks,
+                // then re-add any disabled option that was already in the current value so
+                // it keeps its state rather than being silently dropped by this change.
+                const userSelectable = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
+                const disabledUnchanged = checkedList.filter((v) => optionStatusMap?.[v]?.healthy === false);
+                const safeValue = Array.from(new Set([...userSelectable, ...disabledUnchanged]));
                 HandleChange(safeValue, reason === 'selectOption');
             }}
             renderInput={(params) => <TextField {...params} label={label} />}
@@ -380,14 +418,15 @@ function StyledCheckboxList(props) {
             />
         </>
     ) : (
-        options?.map((option) => {
+        orderedOptions?.map((option) => {
             const status = optionStatusMap?.[option];
             const isHealthy = status?.healthy !== false;
 
-            return (
+            const control = (
                 <FormControlLabel
                     key={option}
                     className={classes.checkboxLabel}
+                    sx={isHealthy ? {} : { opacity: 0.38 }}
                     label={
                         <div className={classes.lockContainer}>
                             {option}
@@ -404,17 +443,15 @@ function StyledCheckboxList(props) {
                                     />
                                 </Tooltip>
                             )}
-                            {!isHealthy && (
-                                <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
-                                    <WarningAmberOutlinedIcon className={classes.warningIcon} />
-                                </Tooltip>
+                            {!isHealthy && groupName !== 'exclude_programs' && (
+                                <WarningAmberOutlinedIcon className={classes.warningIcon} />
                             )}
                         </div>
                     }
                     control={
                         <Checkbox
                             className={classes.checkbox}
-                            checked={isExclusion ? !(option in checked) : option in checked}
+                            checked={isHealthy ? (isExclusion ? !(option in checked) : option in checked) : false}
                             disabled={!isHealthy}
                             onChange={(event) => {
                                 const newList = Object.keys(checked).slice();
@@ -433,6 +470,14 @@ function StyledCheckboxList(props) {
                         />
                     }
                 />
+            );
+
+            return !isHealthy && status?.reason ? (
+                <Tooltip key={option} title={status.reason} placement="right">
+                    <span>{control}</span>
+                </Tooltip>
+            ) : (
+                control
             );
         })
     );
@@ -673,6 +718,29 @@ function Sidebar() {
         return map;
     })();
 
+    // Programs whose node has been deselected are excluded from the search by the
+    // Nodes filter, which takes precedence at the backend. Rather than letting a user
+    // individually re-select such a program — which silently has no effect — grey it
+    // out, move it to the bottom of the Programs dropdown, and explain via tooltip
+    // that the node must be re-selected. `selectedNodes` holds the set of *deselected*
+    // (excluded) node names.
+    const programStatusMap = (() => {
+        const map = {};
+        readerContext?.federation?.forEach((site) => {
+            const nodeName = site?.location?.name;
+            if (!nodeName || !(nodeName in selectedNodes)) return;
+            (site.results || []).forEach((program) => {
+                if (program?.program_id) {
+                    map[program.program_id] = {
+                        healthy: false,
+                        reason: `Re-select the "${nodeName}" node to search this program`
+                    };
+                }
+            });
+        });
+        return map;
+    })();
+
     // On our first load, remove all query parameters
     useEffect(() => {
         writerContext(() => ({ reqNum: 0 }));
@@ -884,6 +952,7 @@ function Sidebar() {
                         isExclusion
                         checked={selectedPrograms}
                         setChecked={setSelectedPrograms}
+                        optionStatusMap={programStatusMap}
                     />
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button className={classes.button} onClick={() => setPrograms(programs)}>

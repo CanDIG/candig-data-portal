@@ -150,7 +150,16 @@ function SearchHandler({ setLoading }) {
                         )
                         .flat(1);
                     // console.log('Genomic Data:', genomicData);
-                    writer((old) => ({ ...old, clinical: clinicalData, genomic: genomicData, loading: false }));
+                    // Record which nodes the user excluded from this search so the
+                    // results table can distinguish a user-excluded node from one that
+                    // is genuinely offline (both otherwise return no counts).
+                    writer((old) => ({
+                        ...old,
+                        clinical: clinicalData,
+                        genomic: genomicData,
+                        excludedNodes: reader.filter?.node || [],
+                        loading: false
+                    }));
                 })
                 .catch((error) => {
                     // Ignore abort errors
