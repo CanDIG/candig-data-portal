@@ -4,8 +4,8 @@ A data analytics and visualization portal for CanDIG Services. Is built off the 
 
 ## Setup Development Server
 
--   Node: v21.7.0
--   npm: 10.8.0
+-   Node: v24 (LTS)
+-   npm: v11 (bundled with Node 24)
 -   MUI: V5
 
 There was a migration from V4 - V5 of MUI following https://mui.com/material-ui/guides/migration-v4/
@@ -24,9 +24,9 @@ npm install
 
 The file `.env.development` is where you specify API Servers and site-specific variables.
 
--   `REACT_APP_KATSU_API_SERVER`: Path to the Katsu API.
--   `REACT_APP_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
--   `REACT_APP_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
+-   `VITE_KATSU_API_SERVER`: Path to the Katsu API.
+-   `VITE_BASE_NAME`: The prepending path of your server. For example, if you would like your app to be available at `/v2/data-portal`, you should specify the aforementioned value here. By default, the app will be running at root.
+-   `VITE_SITE_LOCATION`: If you specify `BCGSC` or `UHN`, the app will display the logo of respective institution.
 -   `GENERATE_SOURCEMAP`: Removes map fodlers from build when set to false
 
 After this you can start the application by running **npm start**
@@ -37,25 +37,23 @@ Note that if you change any of the variables above, you need to restart your ser
 npm start
 ```
 
-This will start your local server at http://localhost:3000. Also, your terminal shows the following message when compiled successfully.
+This will start the Vite dev server at http://localhost:4173. Your terminal shows the following message when it is ready.
 
 ```
-Compiled successfully!
+VITE ready in ... ms
 
-You can now view candig-data-portal in the browser.
-
-Local:            http://localhost:3000
-On Your Network:  http://192.168.29.77:3000
+➜  Local:   http://localhost:4173/
+➜  Network: http://192.168.29.77:4173/
 
 Note that the development build is not optimized.
-To create a production build, use yarn build.
+To create a production build, use npm run build.
 ```
 
 ## Deployment
 
 You would need to specify the variables required in `.env.production`, see the section above on what values are required for which variables.
 
-One thing worth noting is that the `REACT_APP_BASE_NAME` variable only affects the routes of the app. The static assets are still served from root.
+One thing worth noting is that the `VITE_BASE_NAME` variable only affects the routes of the app. The static assets are still served from root.
 
 As an example, if you would like the app's static assets to be served at `/v2/data-portal`, you would need to specify this line at `package.json`.
 
@@ -69,4 +67,4 @@ Once you have all of the required environment variables defined, you may run
 npm run build
 ```
 
-This will produce a static folder `/build` to be served with any static file server.
+This will produce a static folder `/dist` to be served with any static file server.

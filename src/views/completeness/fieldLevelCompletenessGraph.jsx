@@ -14,7 +14,7 @@ import HighchartsReact from 'highcharts-react-official';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 // assets
-import MainCard from 'ui-component/cards/MainCard';
+import MainCard from '../../ui-component/cards/MainCard';
 import { useTheme } from '@mui/system';
 
 HighchartsAccessibility(Highcharts);
