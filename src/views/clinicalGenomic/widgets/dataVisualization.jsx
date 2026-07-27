@@ -59,14 +59,30 @@ function DataVisualization() {
 
         let hasCensoredData = false;
         const newDataObj = {};
-        // Copy over the data into a new object, substituting 0 instead of any censored data
+        // Copy over the data into a new object, substituting 0 for any censored value.
+        // Object-valued categories (e.g. patients_per_program) are copied into a fresh
+        // object with their nested counts sanitised, so we neither leak a censored string
+        // ("<5") into a numeric series (Highcharts #14) nor mutate the original counts by
+        // reference. Flagging hasCensoredData here also ensures the censorship caption
+        // appears for object-valued categories, not just scalar ones.
         Object.keys(dataObj).forEach((key) => {
-            newDataObj[key] = 0;
-            if (isCensored(dataObj[key])) {
+            const value = dataObj[key];
+            if (isObject && value && typeof value === 'object') {
+                const inner = {};
+                Object.keys(value).forEach((innerKey) => {
+                    if (isCensored(value[innerKey])) {
+                        inner[innerKey] = 0;
+                        hasCensoredData = true;
+                    } else {
+                        inner[innerKey] = value[innerKey];
+                    }
+                });
+                newDataObj[key] = inner;
+            } else if (isCensored(value)) {
                 newDataObj[key] = 0;
                 hasCensoredData = true;
             } else {
-                newDataObj[key] = dataObj[key];
+                newDataObj[key] = value;
             }
         });
 
