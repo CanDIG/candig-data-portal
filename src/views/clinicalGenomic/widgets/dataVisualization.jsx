@@ -81,7 +81,14 @@ function DataVisualization() {
                 if (isObject) {
                     Object.keys(site.summary[dataKey]).forEach((innerKey) => {
                         if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
-                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey][innerKey];
+                            const siteValue = site.summary[dataKey][innerKey];
+                            // Same guard as the numeric path below: only substitute a real
+                            // numeric per-site count. A censored per-site value (e.g. "<5")
+                            // assigned here would put a string into the stacked-chart series
+                            // and trigger Highcharts #14 (string sent to numeric series).
+                            if (typeof siteValue === 'number') {
+                                newDataObj[transformer(siteName, key)][innerKey] = siteValue;
+                            }
                         }
                     });
                 } else if (isCensored(dataObj[transformer(siteName, key)])) {
