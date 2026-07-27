@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Avatar, Box, Button, CardHeader, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/system';
 import { styled } from '@mui/material/styles';
@@ -196,9 +195,6 @@ function PatientCountSingle(props) {
                       .sort((a, b) => a.program_id.localeCompare(b.program_id, undefined, { numeric: true, sensitivity: 'base' }))
                       .map((program) => {
                     const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
-                    const accessRequested = counts.accessRequestedPrograms?.some(
-                        ({ programId, this_site }) => programId === program.program_id && this_site === counts.location
-                    );
                     return (
                         <Grid
                             container
@@ -235,17 +231,41 @@ function PatientCountSingle(props) {
                             <Divider flexItem orientation="vertical" className={classes.divider} />
                             <Grid item ml="auto" className={classes.button}>
                                 {locked ? (
-                                    <Button
-                                        variant="contained"
-                                        component={Link}
-                                        to="/requestAccess"
-                                        state={{ site, programId: program.program_id }}
-                                        sx={{ borderRadius: 1.8 }}
-                                        disabled={accessRequested}
-                                    >
-                                        {accessRequested ? 'Access\u00A0Requested' : 'Request\u00A0Access'}
-                                    </Button>
+                                    // Request Access temporarily disabled \u2014 feature not yet released.
+                                    <Tooltip title="Coming soon" placement="left">
+                                        <span>
+                                            <Button
+                                                variant="contained"
+                                                sx={{ borderRadius: 1.8 }}
+                                                disabled
+                                            >
+                                                Request&nbsp;Access
+                                            </Button>
+                                        </span>
+                                    </Tooltip>
                                 ) : null}
+                                {/*
+                                    Original active Request Access button \u2014 re-enable when the feature is ready.
+                                    NOTE: also restore `import { Link } from 'react-router-dom';` (top of file)
+                                    and the `accessRequested` const inside the .map() above.
+
+                                    const accessRequested = counts.accessRequestedPrograms?.some(
+                                        ({ programId, this_site }) => programId === program.program_id && this_site === counts.location
+                                    );
+
+                                    {locked ? (
+                                        <Button
+                                            variant="contained"
+                                            component={Link}
+                                            to="/requestAccess"
+                                            state={{ site, programId: program.program_id }}
+                                            sx={{ borderRadius: 1.8 }}
+                                            disabled={accessRequested}
+                                        >
+                                            {accessRequested ? 'Access\u00a0Requested' : 'Request\u00a0Access'}
+                                        </Button>
+                                    ) : null}
+                                */}
                             </Grid>
                         </Grid>
                     );
