@@ -85,7 +85,14 @@ function DataVisualization() {
                         }
                     });
                 } else if (isCensored(dataObj[transformer(siteName, key)])) {
-                    newDataObj[transformer(site, key)] += site.summary[dataKey][key];
+                    const siteValue = site.summary[dataKey][key];
+                    // Only fold in real numeric per-site counts. If the per-site value is
+                    // itself censored (e.g. "<5"), we can't recover the real number, so skip
+                    // it — otherwise `0 + "<5"` would produce the string "0<5" and Highcharts
+                    // rejects it with error #14 (string sent to numeric series).
+                    if (typeof siteValue === 'number') {
+                        newDataObj[transformer(siteName, key)] += siteValue;
+                    }
                 }
             });
         });
