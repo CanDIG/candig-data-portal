@@ -28,12 +28,6 @@ export const VALID_CHART_TYPES = ['bar', 'line', 'column', 'scatter', 'pie'];
 // Defined here in order to prevent a circular dependancy
 export const VISUALIZATION_LOCAL_STORAGE_KEY = 'chartDefinitions';
 
-// Helper: find the index of the first non-zero value in an array, modded by the max number of colours we have (to prevent out of bounds errors)
-function findSiteIndexMod(value, max) {
-    const siteIndex = Math.max(0, value.findIndex((v) => v!== 0));
-    return siteIndex % max;
-}
-
 // Helper: convert hex to HSL
 function hexToHSL(hex) {
     const bigint = parseInt(hex.replace('#', ''), 16);
@@ -281,45 +275,48 @@ function CustomOfflineChart({
                     theme.palette.primary.main,
                     theme.palette.secondary.main,
                     theme.palette.tertiary.main,
-                    theme.palette.teal.main,
+                    // Muted amber, not theme.palette.teal.main: the chart renders each hue at
+                    // its own forced lightness (0.4-0.7), and teal's cyan hue turns neon at the
+                    // lighter shades and clashed with the rest of the set. This warm amber fills
+                    // the gap between the yellow and red hues and stays muted across all shades.
+                    // Hardcoded because the palette has no amber token (tertiary is yellow,
+                    // burntOrange is too red).
+                    '#E08A3C',
                     theme.palette.plum.main,
                     theme.palette.coral.main,
-                    theme.palette.burntOrange.main,
-                    theme.palette.sage.main
+                    // sage sits between coral and burntOrange on purpose: the two are both
+                    // warm reds and were hard to tell apart when adjacent. Keeping a green
+                    // between them separates them in the node order.
+                    theme.palette.sage.main,
+                    theme.palette.burntOrange.main
                 ];
                 const stackedTheme = grayscale ? grayscaleTheme : colouredTheme;
-                const maxes = new Array(bars).fill(0);
-                const mins = new Array(bars).fill(Infinity);
 
-                // Site based max and min
-                data?.forEach((value) => {
-                    value.forEach((v, i) => {
-                        maxes[i] = Math.max(maxes[i], v);
-                        mins[i] = Math.min(mins[i], v === 0 ? mins[i] : v);
-                    });
-                });
+                // Colour model: each node (x-axis category / bar) gets its own distinct hue
+                // from the theme. Within a bar we do NOT try to give every program a unique
+                // shade — nodes can stack up to ~65 programs, and that many lightness steps of
+                // one hue are impossible to tell apart. Instead we cycle through a small,
+                // fixed set of shades (dark / mid / light) of the node hue by stack position,
+                // so the boundary between adjacent segments always contrasts and segments stay
+                // countable no matter how many there are. Colour delineates segments; program
+                // identity comes from the tooltip, not the shade.
+                const SHADE_LIGHTNESS = [0.4, 0.55, 0.7];
 
+                let stackPos = 0;
                 data?.forEach((value, key) => {
-                    const baseIndex = findSiteIndexMod(value, stackedTheme.length);
-                    // Colour conversion and manipulation
-                    const baseHex = stackedTheme[baseIndex];
-                    const baseHSL = hexToHSL(baseHex);
+                    const l = SHADE_LIGHTNESS[stackPos % SHADE_LIGHTNESS.length];
+                    stackPos += 1;
 
                     const points = value.map((y, i) => {
-                        let ratio = maxes[i] === mins[i] ? 0.5 : (y - mins[i]) / (maxes[i] - mins[i]);
-
-                        let [h, s, l] = baseHSL;
-
-                        // Hue shift ±5° but scaled up for small value differences
-                        h = (h + (ratio - 0.5) * (20 / 360) + 1) % 1; 
-
-                        // Lightness shift ±30% for small differences
-                        l = Math.min(1, Math.max(0, l - 0.15 + ratio * 0.3));
-
-                        // Saturation shift ±10% for small differences
-                        s = Math.min(1, Math.max(0, s - 0.05 + ratio * 0.1));
-
-                        return { y, color: hslToCss([h, s, l]) };
+                        // Hue is taken from the node (category index), so every bar is a
+                        // different colour; lightness cycles so adjacent programs contrast.
+                        const [h, s] = hexToHSL(stackedTheme[i % stackedTheme.length]);
+                        // Every program is a series spanning all bars, so a program absent
+                        // from this node arrives as y=0. Render those as null (not 0): with
+                        // minPointLength set, a 0-value point would still be drawn at the
+                        // forced minimum height, stacking a "cap" of foreign 0-count programs
+                        // on top of every bar. null points are omitted entirely.
+                        return { y: y === 0 ? null : y, color: hslToCss([h, s, l]) };
                     });
 
                     stackSeries.push({ name: key, data: points });
@@ -343,7 +340,17 @@ function CustomOfflineChart({
                     yAxis: { title: { text: DataVisualizationChartInfo[chartData].yAxis }, allowDecimals: false },
                     plotOptions: {
                         series: {
-                            stacking: 'normal'
+                            stacking: 'normal',
+                            // Drop the 1px white segment border: on a bar of hundreds of
+                            // donors it visually erases small programs (2-5 donors), which end
+                            // up thinner than the border and read as an empty gap. Adjacent
+                            // segments already contrast by lightness shade, so no divider needed.
+                            borderWidth: 0,
+                            // Guarantee every non-zero program a few pixels of height so tiny
+                            // programs stay visible instead of collapsing to nothing. This
+                            // slightly over-represents them relative to their true share — an
+                            // acceptable trade for "present and clickable" over "invisible".
+                            minPointLength: 3
                         }
                     },
                     legend: { enabled: false },
