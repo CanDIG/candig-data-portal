@@ -418,3 +418,89 @@ export function removeUserFromSiteRole(roleType, userId) {
         method: 'delete'
     }).then(ingestJson);
 }
+
+/* ============================================================================
+ * Federation node management (federation service)
+ *
+ * Site administrators can register, list, and unregister peer CanDIG nodes.
+ * These endpoints live on the federation service (same base as /fanout) and
+ * are gated to site admins by the gateway, so — as with the ingest calls above
+ * — no Authorization header is set here. There is no dedicated node-liveness
+ * endpoint, so status is derived from an (unsafe) fanout probe; see
+ * fetchNodeStatus below.
+ * ========================================================================== */
+
+// Unwrap a federation JSON response, throwing a useful error (including the
+// server-supplied message when present) on failure.
+async function federationJson(response) {
+    let body;
+    try {
+        body = await response.json();
+    } catch (e) {
+        body = undefined;
+    }
+    if (!response.ok) {
+        const detail = body?.error || body?.message || body?.result || response.statusText;
+        throw new Error(`${response.status}: ${detail}`);
+    }
+    return body;
+}
+
+/*
+ * List the peer nodes registered with this node's federation service. Resolves
+ * to an array of { id, url, location: { name, province, province-code } }.
+ */
+export function fetchFederatedServers() {
+    return fetchOrRelogin(`${federation}/servers`)
+        .then(federationJson)
+        .then((data) => (Array.isArray(data) ? data : []));
+}
+
+/*
+ * Register a peer CanDIG node. `payload` is the full { server, authentication }
+ * body expected by POST /servers (assembled in AddFederatedServer).
+ */
+export function addFederatedServer(payload) {
+    return fetchOrRelogin(`${federation}/servers`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(federationJson);
+}
+
+/*
+ * Unregister a peer node by its server id.
+ */
+export function deleteFederatedServer(serverId) {
+    return fetchOrRelogin(`${federation}/servers/${encodeURIComponent(serverId)}`, {
+        method: 'delete'
+    }).then(federationJson);
+}
+
+/*
+ * Probe the reachability of every registered node. The federation service has
+ * no dedicated status endpoint, so we fan a lightweight discovery request out
+ * to all nodes with `unsafe` set: this bypasses the heartbeat's live-server
+ * filter so unreachable nodes are still contacted (and time out / error) rather
+ * than being silently skipped. Resolves to the raw fanout array, one entry per
+ * node: { location: { name, province }, status, message }. This is the same
+ * signal the Summary page uses for its node counts.
+ */
+export function fetchNodeStatus() {
+    return fetchOrRelogin(`${federation}/fanout`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method: 'GET',
+            path: 'query/discovery',
+            service: 'query',
+            payload: { targetService: 'katsu', targetPath: 'v3/discovery/overview/individual_count' },
+            unsafe: true
+        })
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error(`Error probing node status: ${response.status} ${response.statusText}`);
+    });
+}

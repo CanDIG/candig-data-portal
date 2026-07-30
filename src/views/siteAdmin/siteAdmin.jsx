@@ -16,7 +16,9 @@ import {
 import {
     IconLibraryPlus,
     IconListDetails,
+    IconNetwork,
     IconShieldPlus,
+    IconTopologyStarRing3,
     IconUserCheck,
     IconUserCog,
     IconUserExclamation,
@@ -35,6 +37,8 @@ import AddDacAuthorization from './AddDacAuthorization';
 import RegisterProgram from './RegisterProgram';
 import ManagePrograms from './ManagePrograms';
 import SiteRoleManager from './SiteRoleManager';
+import FederatedNodes from './FederatedNodes';
+import AddFederatedServer from './AddFederatedServer';
 
 // ===========================|| SITE ADMIN DASHBOARD ||=========================== //
 
@@ -47,7 +51,9 @@ const SECTIONS = [
     { id: 'register', label: 'Register Program', icon: IconLibraryPlus },
     { id: 'program', label: 'Manage Programs', icon: IconUserCog },
     { id: 'curators', label: 'Site Curators', icon: IconUsersGroup },
-    { id: 'admins', label: 'Site Admins', icon: IconUserShield }
+    { id: 'admins', label: 'Site Admins', icon: IconUserShield },
+    { id: 'nodes', label: 'Federated Nodes', icon: IconTopologyStarRing3 },
+    { id: 'add-node', label: 'Add Federated Node', icon: IconNetwork }
 ];
 
 function SiteAdmin() {
@@ -110,6 +116,10 @@ function SiteAdmin() {
                         emptyLabel="No site admins"
                     />
                 );
+            case 'nodes':
+                return <FederatedNodes onNavigate={setActiveSection} />;
+            case 'add-node':
+                return <AddFederatedServer onSuccess={() => setActiveSection('nodes')} />;
             default:
                 return null;
         }
