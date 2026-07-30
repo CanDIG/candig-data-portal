@@ -7,6 +7,7 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
 import PropTypes from 'prop-types';
 import { SITE } from '../../../store/constant';
 import siteLogo from '../../../assets/images/users/siteLogo.png';
@@ -22,7 +23,8 @@ const classes = {
     button: `${PREFIX}-button`,
     divider: `${PREFIX}-divider`,
     unhealthy: `${PREFIX}-unhealthy`,
-    warningIcon: `${PREFIX}-warningIcon`
+    warningIcon: `${PREFIX}-warningIcon`,
+    excludedIcon: `${PREFIX}-excludedIcon`
 };
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -68,28 +70,42 @@ const StyledBox = styled(Box)(({ theme }) => ({
         marginLeft: '0.25em',
         fontSize: '1.25em',
         verticalAlign: 'text-bottom'
+    },
+    [`& .${classes.excludedIcon}`]: {
+        color: theme.palette.primary.main,
+        marginLeft: '0.25em',
+        fontSize: '1.25em',
+        verticalAlign: 'text-bottom'
     }
 }));
 
 function PatientCountSingle(props) {
-    const { site, counts } = props;
+    const { site, counts, excluded } = props;
     const theme = useTheme();
 
     const [expanded, setExpanded] = useState(false);
 
+    // Three states: healthy, excluded (user deselected the node in the sidebar), or
+    // offline (node returned no data). Excluded takes precedence, since an excluded
+    // node also returns no counts and would otherwise be misread as a connection error.
     const nodeStatus = useMemo(() => {
-        const map = {};
-        const isHealthy = Object.keys(counts.totals).length > 0 && Object.keys(counts.counts).length > 0;
-        if (!isHealthy) {
-            map[counts.location] = {
+        if (excluded) {
+            return {
                 healthy: false,
+                excluded: true,
+                reason: 'Excluded from your search — re-select this node in the sidebar to include it'
+            };
+        }
+        const hasData = Object.keys(counts.totals).length > 0 && Object.keys(counts.counts).length > 0;
+        if (!hasData) {
+            return {
+                healthy: false,
+                excluded: false,
                 reason: 'Connection Error: No data returned from node'
             };
-        } else {
-            map[counts.location] = { healthy: true };
         }
-        return map;
-    }, [counts]);
+        return { healthy: true, excluded: false };
+    }, [counts, excluded]);
 
     const SumCensoredTotals = (countsArray) =>
         countsArray.reduce(
@@ -121,11 +137,15 @@ function PatientCountSingle(props) {
                     <CardHeader
                         avatar={<Avatar src={SITE === site ? siteLogo : ''}>{SITE === site ? '' : site.slice(0, 1).toUpperCase()}</Avatar>}
                         title={
-                            <Typography component="span" className={!nodeStatus[site].healthy ? classes.unhealthy : ''}>
+                            <Typography component="span" className={!nodeStatus.healthy ? classes.unhealthy : ''}>
                                 <b>{site}</b>
-                                {!nodeStatus[site].healthy && (
-                                    <Tooltip title={nodeStatus[site].reason || 'Node connection issue'} placement="right">
-                                        <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                                {!nodeStatus.healthy && (
+                                    <Tooltip title={nodeStatus.reason || 'Node connection issue'} placement="right">
+                                        {nodeStatus.excluded ? (
+                                            <FilterAltOffOutlinedIcon className={classes.excludedIcon} />
+                                        ) : (
+                                            <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                                        )}
                                     </Tooltip>
                                 )}
                             </Typography>
@@ -172,7 +192,9 @@ function PatientCountSingle(props) {
             </Grid>
 
             {expanded
-                ? counts.totals.map((program) => {
+                ? [...counts.totals]
+                      .sort((a, b) => a.program_id.localeCompare(b.program_id, undefined, { numeric: true, sensitivity: 'base' }))
+                      .map((program) => {
                     const locked = !counts.unlockedPrograms?.some((programID) => programID === program.program_id);
                     const accessRequested = counts.accessRequestedPrograms?.some(
                         ({ programId, this_site }) => programId === program.program_id && this_site === counts.location
@@ -235,7 +257,8 @@ function PatientCountSingle(props) {
 
 PatientCountSingle.propTypes = {
     site: PropTypes.string,
-    counts: PropTypes.object
+    counts: PropTypes.object,
+    excluded: PropTypes.bool
 };
 
 export default PatientCountSingle;

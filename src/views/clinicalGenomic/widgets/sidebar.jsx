@@ -161,15 +161,49 @@ function StyledCheckboxList(props) {
             ids = [ids];
         }
 
-        const cohortMap = {};
-        sites?.forEach((site) => {
-            site?.results?.forEach((result) => {
-                if (!cohortMap[result.program_id]) {
-                    cohortMap[result.program_id] = new Set();
-                }
-                cohortMap[result.program_id].add(site.location.name);
+        // Keep the Programs filter in sync with the Nodes filter. We apply only
+        // the DELTA of nodes whose selection changed: a node just deselected
+        // excludes all its programs, a node just reselected re-includes them.
+        // Programs on nodes that didn't change are left untouched, so manual
+        // per-program (de)selections survive node toggles. `checked` is the OLD
+        // excluded-node set (state before this change); `newExcludedNodeIds` the new.
+        const syncProgramExclusionsWithNodes = (newExcludedNodeIds, retVal) => {
+            const oldExcludedNodes = new Set(Array.isArray(checked) ? checked : Object.keys(checked || {}));
+            const newExcludedNodes = new Set(newExcludedNodeIds);
+
+            const programsByNode = {};
+            sites?.forEach((site) => {
+                const nodeName = site?.location?.name;
+                if (!nodeName) return;
+                programsByNode[nodeName] = (site.results || []).map((result) => result.program_id);
             });
-        });
+
+            const newExcludedPrograms = { ...selectedPrograms };
+            Object.keys(programsByNode).forEach((nodeName) => {
+                const wasExcluded = oldExcludedNodes.has(nodeName);
+                const isExcluded = newExcludedNodes.has(nodeName);
+                if (isExcluded && !wasExcluded) {
+                    // node just deselected -> exclude all of its programs
+                    programsByNode[nodeName].forEach((programId) => {
+                        newExcludedPrograms[programId] = true;
+                    });
+                } else if (!isExcluded && wasExcluded) {
+                    // node just reselected -> re-include all of its programs
+                    programsByNode[nodeName].forEach((programId) => {
+                        delete newExcludedPrograms[programId];
+                    });
+                }
+            });
+
+            setSelectedPrograms(newExcludedPrograms);
+
+            const excludeList = Object.keys(newExcludedPrograms).filter((id) => newExcludedPrograms[id]);
+            if (excludeList.length > 0) {
+                retVal.query.exclude_programs = excludeList.join('|');
+            } else {
+                delete retVal.query.exclude_programs;
+            }
+        };
 
         if (isExclusion ? !isChecked : isChecked) {
             // set local checked state (object shape)
@@ -189,23 +223,9 @@ function StyledCheckboxList(props) {
                     // keep filter entry
                     retVal.filter[groupName] = ids;
 
-                    // special-case node handling from original code
+                    // Keep the Programs filter in sync with node (de)selection.
                     if (groupName === 'node') {
-                        const programIds = sites
-                            .filter((item) => ids.includes(item.location.name))
-                            .flatMap((item) => item.results.map((result) => result.program_id));
-                        const validProgramIds = programIds.filter((programId) => {
-                            const associatedNodes = cohortMap[programId] || new Set();
-                            return Array.from(associatedNodes).every((node) => !(node in checked));
-                        });
-                        retVal.query.exclude_programs = validProgramIds.join('|');
-                        setSelectedPrograms((old) => {
-                            const newPrograms = { ...old };
-                            validProgramIds.forEach((id) => {
-                                newPrograms[id] = true;
-                            });
-                            return newPrograms;
-                        });
+                        syncProgramExclusionsWithNodes(ids, retVal);
                     }
 
                     // if this filter is genomicDataTypes, we also put it into query as a pipe-delimited string
@@ -234,25 +254,9 @@ function StyledCheckboxList(props) {
                     newList[groupName] = ids;
                     retVal.filter = newList;
 
+                    // Keep the Programs filter in sync with node (de)selection.
                     if (groupName === 'node') {
-                        const currentPrograms = { ...selectedPrograms };
-                        const programIds = sites
-                            .filter((item) => ids.includes(item.location.name)) // Check if location.name is in ids array
-                            .flatMap((item) => item.results.map((result) => result.program_id)); // Extract program_id
-                        Object.keys(selectedPrograms).forEach((id) => {
-                            if (currentPrograms[id] && !programIds.includes(id)) {
-                                delete currentPrograms[id];
-                            }
-                        });
-                        if (currentPrograms && Object.keys(currentPrograms).length > 0) {
-                            retVal.query.exclude_programs = Object.keys(currentPrograms)
-                                .filter((id) => currentPrograms[id])
-                                .join('|');
-                        } else {
-                            delete retVal.query.exclude_programs;
-                            retVal.query = {};
-                        }
-                        setSelectedPrograms(currentPrograms);
+                        syncProgramExclusionsWithNodes(ids, retVal);
                     }
 
                     // if this filter is genomicDataTypes, also update query string
@@ -273,77 +277,125 @@ function StyledCheckboxList(props) {
     };
 
     const checkedList = Array.isArray(checked) ? checked : Object.keys(checked || {});
+
+    // Move disabled options (unhealthy nodes, or programs whose node has been
+    // deselected) to the bottom of the list while preserving the relative order of
+    // everything else. Array.prototype.sort is stable, so equal-priority items keep
+    // their original order.
+    const orderedOptions = Array.isArray(options)
+        ? [...options].sort((a, b) => {
+              const aDisabled = optionStatusMap?.[a]?.healthy === false ? 1 : 0;
+              const bDisabled = optionStatusMap?.[b]?.healthy === false ? 1 : 0;
+              return aDisabled - bDisabled;
+          })
+        : options;
+
+    // Disabled options that the user hasn't explicitly excluded — i.e. offline nodes.
+    // They are shown as deselected (unchecked) rather than selected-but-disabled, so
+    // they must also be left out of the "N of M selected" tally.
+    const disabledUnselected = (Array.isArray(options) ? options : []).filter(
+        (o) => optionStatusMap?.[o]?.healthy === false && !checkedList.includes(o)
+    ).length;
+
     let label = groupName;
     let renderTags = (tagValue, getTagProps) =>
         tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+    // For the exclusion filters (Nodes, Programs) the Autocomplete `value` is the
+    // list of *deselected* items, so rendering those as chips inside the box is
+    // counter-intuitive (deselecting adds a chip). Instead we show a short
+    // "N of M selected" summary ABOVE the dropdown and render nothing inside it.
+    // `options.length - checkedList.length` is the count still selected.
+    let summaryText = null;
     if (groupName === 'exclude_programs') {
-        // Datasets: instead of using Chips to display the selected datasets (which can be confusing)
-        // we instead just show a short text description describing how many datasets have been selected
-        renderTags = (tagValue, _) => <span>{`${options.length - tagValue.length} programs selected, expand to see more`}</span>;
+        summaryText = `${options.length - checkedList.length - disabledUnselected} of ${options.length} programs selected`;
         label = 'Programs';
+    } else if (groupName === 'node') {
+        summaryText = `${options.length - checkedList.length - disabledUnselected} of ${options.length} nodes selected`;
+        label = 'Nodes';
+    }
+    if (summaryText) {
+        renderTags = () => null;
     }
 
     return useAutoComplete ? (
-        <Autocomplete
-            size="small"
-            multiple
-            id={`checkboxes-tags-${groupName}`}
-            options={options}
+        <>
+            {summaryText && (
+                <Typography variant="body2" sx={{ paddingTop: '0.5em', fontStyle: 'italic', color: 'text.secondary' }}>
+                    {summaryText}
+                </Typography>
+            )}
+            <Autocomplete
+                size="small"
+                multiple
+                id={`checkboxes-tags-${groupName}`}
+            options={orderedOptions}
             disableCloseOnSelect
             renderOption={(props, option, { selected }) => {
                 const status = optionStatusMap?.[option];
                 const isHealthy = status?.healthy !== false;
 
-                return (
-                    <li {...props} key={option}>
-                        <div
+                const rowContent = (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            sx={{
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                marginRight: 1
+                            }}
+                            checked={isHealthy ? (isExclusion ? !selected : selected) : false}
+                            value={option}
+                            disabled={!isHealthy}
+                        />
+                        <span
                             style={{
-                                display: 'flex',
+                                display: 'inline-flex',
                                 alignItems: 'center',
-                                width: '100%'
+                                gap: '4px',
+                                lineHeight: 1.2
                             }}
                         >
-                            <Checkbox
-                                icon={icon}
-                                checkedIcon={checkedIcon}
-                                sx={{
-                                    paddingTop: 0,
-                                    paddingBottom: 0,
-                                    marginRight: 1
-                                }}
-                                checked={isExclusion ? !selected : selected}
-                                value={option}
-                                disabled={!isHealthy}
-                            />
-                            <span
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'baseline',
-                                    gap: '4px',
-                                    lineHeight: 1.2
-                                }}
-                            >
-                                {option}
-                                {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
-                                    <Tooltip title="Unauthorized Program" placement="right">
-                                        <LockOutlinedIcon
-                                            sx={{
-                                                color: 'primary.main',
-                                                fontSize: '1.1rem',
-                                                verticalAlign: 'text-bottom',
-                                                position: 'relative',
-                                                top: '3px'
-                                            }}
-                                        />
-                                    </Tooltip>
-                                )}
-                                {!isHealthy && (
-                                    <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
-                                        <WarningAmberOutlinedIcon className={classes.warningIcon} />
-                                    </Tooltip>
-                                )}
-                            </span>
-                        </div>
+                            {option}
+                            {groupName === 'exclude_programs' && authorizedPrograms && !authorizedPrograms.includes(option) && (
+                                <Tooltip title="Unauthorized Program" placement="right">
+                                    <LockOutlinedIcon
+                                        sx={{
+                                            color: 'primary.main',
+                                            fontSize: '1.1rem',
+                                            verticalAlign: 'text-bottom',
+                                            position: 'relative',
+                                            top: '3px'
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
+                            {!isHealthy && groupName !== 'exclude_programs' && (
+                                <WarningAmberOutlinedIcon className={classes.warningIcon} />
+                            )}
+                        </span>
+                    </div>
+                );
+
+                // MUI sets `pointer-events: none` on disabled options, which would
+                // suppress the tooltip on hover — override it here so the reason is
+                // discoverable. Selection is still blocked by getOptionDisabled and
+                // the onChange safe-value filter below.
+                return (
+                    <li {...props} key={option} style={{ ...props.style, ...(isHealthy ? {} : { pointerEvents: 'auto' }) }}>
+                        {!isHealthy && status?.reason ? (
+                            <Tooltip title={status.reason} placement="right">
+                                {rowContent}
+                            </Tooltip>
+                        ) : (
+                            rowContent
+                        )}
                     </li>
                 );
             }}
@@ -351,22 +403,30 @@ function StyledCheckboxList(props) {
             // set width to match parent
             sx={{ width: '100%', paddingTop: '0.5em', paddingBottom: '0.5em' }}
             onChange={(_, value, reason) => {
-                const safeValue = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
+                // Disabled options (unhealthy nodes / programs on a deselected node) are
+                // immutable: the user can't toggle them. Take the user's healthy picks,
+                // then re-add any disabled option that was already in the current value so
+                // it keeps its state rather than being silently dropped by this change.
+                const userSelectable = value.filter((v) => optionStatusMap?.[v]?.healthy !== false);
+                const disabledUnchanged = checkedList.filter((v) => optionStatusMap?.[v]?.healthy === false);
+                const safeValue = Array.from(new Set([...userSelectable, ...disabledUnchanged]));
                 HandleChange(safeValue, reason === 'selectOption');
             }}
             renderInput={(params) => <TextField {...params} label={label} />}
             renderTags={renderTags}
             getOptionDisabled={(option) => optionStatusMap?.[option]?.healthy === false}
-        />
+            />
+        </>
     ) : (
-        options?.map((option) => {
+        orderedOptions?.map((option) => {
             const status = optionStatusMap?.[option];
             const isHealthy = status?.healthy !== false;
 
-            return (
+            const control = (
                 <FormControlLabel
                     key={option}
                     className={classes.checkboxLabel}
+                    sx={isHealthy ? {} : { opacity: 0.38 }}
                     label={
                         <div className={classes.lockContainer}>
                             {option}
@@ -383,17 +443,15 @@ function StyledCheckboxList(props) {
                                     />
                                 </Tooltip>
                             )}
-                            {!isHealthy && (
-                                <Tooltip title={status?.reason || 'Node connection issue'} placement="right">
-                                    <WarningAmberOutlinedIcon className={classes.warningIcon} />
-                                </Tooltip>
+                            {!isHealthy && groupName !== 'exclude_programs' && (
+                                <WarningAmberOutlinedIcon className={classes.warningIcon} />
                             )}
                         </div>
                     }
                     control={
                         <Checkbox
                             className={classes.checkbox}
-                            checked={isExclusion ? !(option in checked) : option in checked}
+                            checked={isHealthy ? (isExclusion ? !(option in checked) : option in checked) : false}
                             disabled={!isHealthy}
                             onChange={(event) => {
                                 const newList = Object.keys(checked).slice();
@@ -412,6 +470,14 @@ function StyledCheckboxList(props) {
                         />
                     }
                 />
+            );
+
+            return !isHealthy && status?.reason ? (
+                <Tooltip key={option} title={status.reason} placement="right">
+                    <span>{control}</span>
+                </Tooltip>
+            ) : (
+                control
             );
         })
     );
@@ -652,6 +718,29 @@ function Sidebar() {
         return map;
     })();
 
+    // Programs whose node has been deselected are excluded from the search by the
+    // Nodes filter, which takes precedence at the backend. Rather than letting a user
+    // individually re-select such a program — which silently has no effect — grey it
+    // out, move it to the bottom of the Programs dropdown, and explain via tooltip
+    // that the node must be re-selected. `selectedNodes` holds the set of *deselected*
+    // (excluded) node names.
+    const programStatusMap = (() => {
+        const map = {};
+        readerContext?.federation?.forEach((site) => {
+            const nodeName = site?.location?.name;
+            if (!nodeName || !(nodeName in selectedNodes)) return;
+            (site.results || []).forEach((program) => {
+                if (program?.program_id) {
+                    map[program.program_id] = {
+                        healthy: false,
+                        reason: `Re-select the "${nodeName}" node to search this program`
+                    };
+                }
+            });
+        });
+        return map;
+    })();
+
     // On our first load, remove all query parameters
     useEffect(() => {
         writerContext(() => ({ reqNum: 0 }));
@@ -799,7 +888,9 @@ function Sidebar() {
 
     // Parse out what we need:
     const sites = readerContext?.federation?.map((loc) => loc.location.name) || [];
-    const programs = readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || [];
+    const programs = (readerContext?.federation?.map((loc) => loc.results?.map((program) => program.program_id) || [])?.flat(1) || []).sort(
+        (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+    );
     const authorizedPrograms = readerContext?.programs?.flatMap((loc) => loc?.results?.items?.map((program) => program.program_id)) || [];
     const treatmentTypes = ExtractSidebarElements('treatment_types');
     const tumourPrimarySites = ExtractSidebarElements('tumour_primary_sites');
@@ -861,6 +952,7 @@ function Sidebar() {
                         isExclusion
                         checked={selectedPrograms}
                         setChecked={setSelectedPrograms}
+                        optionStatusMap={programStatusMap}
                     />
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button className={classes.button} onClick={() => setPrograms(programs)}>

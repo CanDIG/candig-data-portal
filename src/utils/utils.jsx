@@ -213,6 +213,9 @@ export function handleTableSet(title, array, ageAtFirstDiagnosis) {
         } else if (key.startsWith('date_of_')) {
             value = key.split('date_of_')[1];
             value = `Diagnosis_to_${value.trim()}`;
+        } else if (key === 'specimen_collection_date') {
+            // Table cell shows the interval relative to diagnosis, so label it as such.
+            value = `Diagnosis_to_specimen_collection_date`;
         }
 
         return hasNonEmptyValue

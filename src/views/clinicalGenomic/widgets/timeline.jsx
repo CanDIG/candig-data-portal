@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsGantt from 'highcharts/modules/gantt';
 import HighchartsReact from 'highcharts-react-official';
@@ -47,12 +47,34 @@ const tooltipFormatter = () =>
             const endYearText = `End: ${getDateText(this.end)}`;
 
             if (this.name === 'Treatments') {
-                tooltipContent = `${boldName}${startYearText}<br/>${endYearText}<br/>`;
+                tooltipContent = `${boldName}${startYearText}<br/>${endYearText}`;
             } else {
-                tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}<br/>`;
+                tooltipContent = `${boldName}${treatmentTypeText}<br/>${startYearText}<br/>${endYearText}`;
             }
         } else {
             tooltipContent = `${boldName}${getDateText(this.x)}`;
+        }
+
+        if (this.disease_status_at_followup) {
+            tooltipContent += `<br/>Disease status: ${this.disease_status_at_followup}`;
+        }
+
+        // Surgery / radiation detail for treatments whose type calls for it.
+        if (Array.isArray(this.surgeries)) {
+            this.surgeries.forEach((surgery) => {
+                if (surgery.type && surgery.site) {
+                    tooltipContent += `<br/>Surgery: ${surgery.type} (${surgery.site})`;
+                } else if (surgery.type) {
+                    tooltipContent += `<br/>Surgery: ${surgery.type}`;
+                } else if (surgery.site) {
+                    tooltipContent += `<br/>Surgery site: ${surgery.site}`;
+                }
+            });
+        }
+        if (Array.isArray(this.radiations)) {
+            this.radiations.forEach((modality) => {
+                tooltipContent += `<br/>Radiation modality: ${modality}`;
+            });
         }
 
         return tooltipContent;
@@ -63,7 +85,55 @@ function Timeline({ data, onEventClick }) {
     const [chartOptions, setChartOptions] = useState({});
     const birthMonthInterval = data?.date_of_birth?.month_interval ?? 0;
     const [isTreatmentsCollapsed, setIsTreatmentsCollapsed] = useState(false);
+    // Set of submitter_treatment_ids whose dated sub-treatments are expanded.
+    const [expandedTreatments, setExpandedTreatments] = useState(() => new Set());
     const theme = useTheme();
+
+    // Toggle whether a single treatment's dated sub-treatments (systemic therapies)
+    // are shown as indented rows beneath it.
+    const toggleTreatmentExpand = useCallback((treatmentId) => {
+        setExpandedTreatments((prev) => {
+            const next = new Set(prev);
+            if (next.has(treatmentId)) {
+                next.delete(treatmentId);
+            } else {
+                next.add(treatmentId);
+            }
+            return next;
+        });
+    }, []);
+
+    // The first treatment that has an expand toggle — i.e. it is placed on the
+    // timeline (has a treatment date) AND carries dated systemic therapies. The
+    // guided tour expands this one to demonstrate the per-drug rows. Mirrors the
+    // conditions used when building the sub-treatment rows in the effect below.
+    const firstExpandableTreatmentId = useMemo(() => {
+        let found = null;
+        (data?.primary_diagnoses || []).forEach((diagnosis) =>
+            (diagnosis.treatments || []).forEach((treatment) => {
+                if (found) return;
+                const hasTreatmentDate =
+                    treatment.treatment_start_date?.month_interval != null || treatment.treatment_end_date?.month_interval != null;
+                if (!hasTreatmentDate) return;
+                const hasDatedTherapy = (treatment.systemic_therapies || []).some(
+                    (therapy) => therapy?.start_date?.month_interval != null || therapy?.end_date?.month_interval != null
+                );
+                if (hasDatedTherapy) found = treatment.submitter_treatment_id;
+            })
+        );
+        return found;
+    }, [data]);
+
+    const demoTreatmentExpanded = firstExpandableTreatmentId ? expandedTreatments.has(firstExpandableTreatmentId) : false;
+
+    // Driven by the guided tour (via a hidden control) to show a systemic-therapy
+    // treatment expanding into its drug rows. Also ensures the Treatments group is
+    // open so the expanded rows are visible.
+    const toggleDemoTreatmentExpand = useCallback(() => {
+        if (!firstExpandableTreatmentId) return;
+        setIsTreatmentsCollapsed(false);
+        toggleTreatmentExpand(firstExpandableTreatmentId);
+    }, [firstExpandableTreatmentId, toggleTreatmentExpand]);
     useEffect(() => {
         let dob = data?.date_of_birth?.month_interval ?? 0;
         dob += data?.date_of_birth?.day_interval ? (data.date_of_birth.day_interval % 32) / 32 : 0;
@@ -100,7 +170,8 @@ function Timeline({ data, onEventClick }) {
                       name: `${namePrefix}${item?.[id]}`,
                       color: colour,
                       customGroupId: name,
-                      showInNavigator: true
+                      showInNavigator: true,
+                      disease_status_at_followup: item?.disease_status_at_followup
                   }))
                 : [];
 
@@ -173,7 +244,8 @@ function Timeline({ data, onEventClick }) {
                           name: `${namePrefix}${subItem?.[id]}`,
                           color: colour,
                           customGroupId: name,
-                          showInNavigator: true
+                          showInNavigator: true,
+                          disease_status_at_followup: subItem?.disease_status_at_followup
                       }))
                     : []
             ) || [];
@@ -190,7 +262,8 @@ function Timeline({ data, onEventClick }) {
                                     name: `${namePrefix}${subItem2?.[id]}`,
                                     color: colour,
                                     customGroupId: name,
-                                    showInNavigator: true
+                                    showInNavigator: true,
+                                    disease_status_at_followup: subItem2?.disease_status_at_followup
                                 }))
                               : []
                       )
@@ -353,71 +426,200 @@ function Timeline({ data, onEventClick }) {
         let yIndex = activeCategories.length - 1;
         const treatmentIntervals = [];
         const treatmentPoints = [];
+        // Category names in row order (parent treatments interleaved with their
+        // expanded sub-treatments), used to build the yAxis categories.
+        const orderedTreatmentNames = [];
+        // Display label and indent depth per treatment row, parallel to
+        // orderedTreatmentNames. Depth drives the y-axis label indentation so each
+        // treatment sits under the "Treatments" bar and each drug sits under its
+        // treatment. The display label can differ from the point name (used in
+        // tooltips), so an indented drug row needn't repeat its treatment id.
+        const orderedTreatmentLabels = [];
+        const orderedTreatmentDepths = [];
+        // Treatments that have at least one dated sub-treatment; each gets an
+        // expand/collapse toggle rendered next to its row.
+        const subTreatmentParents = [];
+
+        // Adds one dated row (a gantt bar if it has both dates, otherwise a single
+        // point) and records its category name in row order.
+        const pushDatedRow = ({ name, displayLabel, start, end, treatment_type, intervalColour, pointColour, isSubTreatment, surgeries, radiations }) => {
+            if (start != null && end != null) {
+                treatmentIntervals.push({
+                    name,
+                    start: start - birthMonthInterval,
+                    end: end - birthMonthInterval,
+                    treatment_type,
+                    y: (yIndex += 1),
+                    color: intervalColour,
+                    customGroupId: 'treatments',
+                    isSubTreatment,
+                    // A same-day treatment has zero width; render it as a visible milestone.
+                    milestone: start === end,
+                    surgeries,
+                    radiations
+                });
+            } else {
+                const presentDate = start != null ? start : end;
+                treatmentPoints.push({
+                    x: presentDate - birthMonthInterval,
+                    name,
+                    y: (yIndex += 1),
+                    color: pointColour,
+                    treatment_type,
+                    extra_info: start != null ? 'Start' : 'End',
+                    missing_info: start != null ? 'End' : 'Start',
+                    customGroupId: 'treatments',
+                    isSubTreatment,
+                    surgeries,
+                    radiations
+                });
+            }
+            orderedTreatmentNames.push(name);
+            orderedTreatmentLabels.push(displayLabel ?? name);
+            orderedTreatmentDepths.push(isSubTreatment ? 2 : 1);
+        };
+
+        // Pulls surgery/radiation detail for a treatment's tooltip, but only when the
+        // treatment_type calls for it and a matching linked object actually exists.
+        // Anything missing is simply omitted so nothing errors or shows blank.
+        const treatmentTypeIncludes = (treatment, keyword) =>
+            (Array.isArray(treatment?.treatment_type) ? treatment.treatment_type : [treatment?.treatment_type]).some(
+                (type) => typeof type === 'string' && type.toLowerCase().includes(keyword)
+            );
+
+        const getSurgeryDetails = (treatment) =>
+            treatmentTypeIncludes(treatment, 'surgery') && Array.isArray(treatment?.surgeries)
+                ? treatment.surgeries
+                      .map((surgery) => ({ type: surgery?.surgery_type, site: surgery?.surgery_site }))
+                      .filter((surgery) => surgery.type || surgery.site)
+                : [];
+
+        const getRadiationDetails = (treatment) =>
+            treatmentTypeIncludes(treatment, 'radiation') && Array.isArray(treatment?.radiations)
+                ? treatment.radiations.map((radiation) => radiation?.radiation_therapy_modality).filter(Boolean)
+                : [];
+
+        // treatment_type may be a single string or an array of them; join into a
+        // readable string for the row label (e.g. "Systemic therapy, Surgery").
+        const formatTreatmentType = (type) =>
+            (Array.isArray(type) ? type : type != null ? [type] : []).filter(Boolean).join(', ');
+
+        // The parent "Treatments" summary bar spans the full treatment range, so
+        // compute that range from the raw dates regardless of collapse state.
+        const treatmentTimes = [];
         data.primary_diagnoses?.forEach((diagnosis) =>
             diagnosis.treatments?.forEach((treatment) => {
-                const treatmentStart = treatment.treatment_start_date?.month_interval;
-                const treatmentEnd = treatment.treatment_end_date?.month_interval;
-
-                if (treatmentStart !== null && treatmentStart !== undefined && treatmentEnd !== null && treatmentEnd !== undefined) {
-                    treatmentIntervals.push({
-                        name: treatment.submitter_treatment_id,
-                        start: treatmentStart - birthMonthInterval,
-                        end: treatmentEnd - birthMonthInterval,
-                        treatment_type: treatment?.treatment_type,
-                        y: (yIndex += 1),
-                        color: theme.palette.primary.main,
-                        customGroupId: 'treatments'
-                    });
-                } else if (
-                    (treatmentStart !== null && treatmentStart !== undefined) ||
-                    (treatmentEnd !== null && treatmentEnd !== undefined)
-                ) {
-                    treatmentPoints.push({
-                        x: treatmentStart - birthMonthInterval,
-                        name: treatment.submitter_treatment_id,
-                        y: (yIndex += 1),
-                        color: theme.palette.primary.light,
-                        treatment_type: treatment?.treatment_type,
-                        extra_info: treatmentStart !== null ? 'Start' : 'End',
-                        missing_info: treatmentStart !== null ? 'End' : 'Start',
-                        customGroupId: 'treatments'
-                    });
-                }
+                const start = treatment.treatment_start_date?.month_interval;
+                const end = treatment.treatment_end_date?.month_interval;
+                if (start != null) treatmentTimes.push(start - birthMonthInterval);
+                if (end != null) treatmentTimes.push(end - birthMonthInterval);
             })
         );
+        const maxTime = treatmentTimes.length > 0 ? Math.max(...treatmentTimes) : undefined;
+        const minTime = treatmentTimes.length > 0 ? Math.min(...treatmentTimes) : undefined;
 
-        const startTimes = treatmentIntervals.map((interval) => interval.start);
-        const endTimes = treatmentIntervals.map((interval) => interval.end);
-        const xValues = treatmentPoints.map((point) => point.x);
-        const allValues = [...startTimes, ...endTimes, ...xValues];
-        const maxTime = allValues ? Math.max(...allValues) : 'undefined';
-        const minTime = allValues ? Math.min(...allValues) : 'undefined';
+        // Build the individual treatment (and expanded sub-treatment) rows only when the
+        // Treatments group is expanded. When collapsed we keep just the parent summary
+        // row so it — and its expand toggle — stay visible instead of scrolling off.
+        if (!isTreatmentsCollapsed) {
+            data.primary_diagnoses?.forEach((diagnosis) =>
+                diagnosis.treatments?.forEach((treatment) => {
+                    const treatmentId = treatment.submitter_treatment_id;
+                    const treatmentStart = treatment.treatment_start_date?.month_interval;
+                    const treatmentEnd = treatment.treatment_end_date?.month_interval;
 
-        const treatmentParentSeries = {
+                    // Treatments with no dates at all can't be placed on the timeline.
+                    if (treatmentStart == null && treatmentEnd == null) {
+                        return;
+                    }
+
+                    const treatmentTypeText = formatTreatmentType(treatment?.treatment_type);
+                    pushDatedRow({
+                        name: treatmentId,
+                        // Show the treatment type next to the id in the row label,
+                        // e.g. "TR_001: Systemic therapy". The point name stays the
+                        // bare id (the tooltip lists the type separately).
+                        displayLabel: treatmentTypeText ? `${treatmentId}: ${treatmentTypeText}` : treatmentId,
+                        start: treatmentStart,
+                        end: treatmentEnd,
+                        treatment_type: treatment?.treatment_type,
+                        intervalColour: theme.palette.primary.main,
+                        pointColour: theme.palette.primary.light,
+                        isSubTreatment: false,
+                        surgeries: getSurgeryDetails(treatment),
+                        radiations: getRadiationDetails(treatment)
+                    });
+
+                    // Only systemic therapies carry their own dates in the data model;
+                    // radiations and surgeries have none, so they are not shown here.
+                    const datedTherapies = (treatment.systemic_therapies || []).filter(
+                        (therapy) => therapy?.start_date?.month_interval != null || therapy?.end_date?.month_interval != null
+                    );
+                    if (datedTherapies.length === 0) {
+                        return;
+                    }
+
+                    subTreatmentParents.push({ name: treatmentId, expanded: expandedTreatments.has(treatmentId) });
+                    if (!expandedTreatments.has(treatmentId)) {
+                        return;
+                    }
+
+                    datedTherapies.forEach((therapy) => {
+                        const label = therapy.drug_name || therapy.systemic_therapy_type || 'Systemic therapy';
+                        const rowName = `↳ ${treatmentId}: ${label}`;
+                        pushDatedRow({
+                            name: rowName,
+                            // Indentation conveys the parent, so the row label shows
+                            // just the drug/therapy; the full name is kept for tooltips.
+                            displayLabel: label,
+                            start: therapy.start_date?.month_interval,
+                            end: therapy.end_date?.month_interval,
+                            treatment_type: therapy.systemic_therapy_type,
+                            intervalColour: theme.palette.secondary.main,
+                            pointColour: theme.palette.secondary.light,
+                            isSubTreatment: true
+                        });
+                    });
+                })
+            );
+        }
+
+        // All treatment rows (parent summary bar, each treatment, and each expanded
+        // sub-treatment) live in ONE gantt series. Highcharts does not reliably place
+        // many single-point gantt series on a category axis, so a single multi-point
+        // series is required for the y (row) of every point to be respected.
+        const treatmentData = [
+            {
+                start: minTime,
+                end: maxTime,
+                y: yIndexParent,
+                color: theme.palette.primary.dark,
+                name: 'Treatments',
+                customGroupId: 'treatments'
+            },
+            ...treatmentIntervals,
+            // Treatments with a single date render as gantt milestones.
+            ...treatmentPoints.map((point) => ({ ...point, start: point.x, end: point.x, milestone: true }))
+        ];
+
+        const treatmentsSeries = {
             type: 'gantt',
-            data: [
-                {
-                    start: minTime,
-                    end: maxTime,
-                    y: yIndexParent,
-                    color: theme.palette.primary.dark,
-                    name: 'Treatments',
-                    customGroupId: 'treatments'
-                }
-            ],
+            name: 'Treatments',
+            customGroupId: 'treatments',
+            data: treatmentData,
             marker: {
                 enabled: true,
                 symbol: 'circle',
                 radius: 4
             },
             tooltip,
-            name: 'Treatments'
+            // Always visible: collapsing is handled by omitting the detail rows above,
+            // so the parent summary row (and its toggle) stay on the chart.
+            visible: true
         };
 
-        adjustedSeries.push(...treatmentIntervals, ...treatmentPoints);
-
         const Updatedseries = adjustedSeries.map((s) => ({
-            type: typeof s?.start !== 'undefined' ? 'gantt' : 'scatter',
+            type: 'scatter',
             data: [s],
             name: s.name,
             marker: {
@@ -426,63 +628,87 @@ function Timeline({ data, onEventClick }) {
                 radius: 4
             },
             tooltip,
-            visible: s?.customGroupId === 'treatments' ? !isTreatmentsCollapsed : true
+            visible: true
         }));
 
-        Updatedseries.push(treatmentParentSeries);
+        Updatedseries.push(treatmentsSeries);
 
-        const newCategories = activeCategories.concat(
-            treatmentIntervals.map((t) => t.name),
-            treatmentPoints.map((t) => t.name)
-        );
+        const newCategories = activeCategories.concat(orderedTreatmentNames);
+        // Indent depth and display text for every y category, parallel to
+        // newCategories. Non-treatment rows and the "Treatments" summary bar are
+        // depth 0; individual treatments depth 1; expanded drug rows depth 2.
+        const categoryDepths = [...activeCategories.map(() => 0), ...orderedTreatmentDepths];
+        const categoryLabels = [...activeCategories, ...orderedTreatmentLabels];
 
-        const toggleTreatmentsCollapse = () => {
-            setIsTreatmentsCollapsed((current) => {
-                const newVisibility = !current;
-                Highcharts.charts.forEach((chart) => {
-                    if (chart) {
-                        chart.series.forEach((series) => {
-                            if (series.userOptions.customGroupId === 'treatments') {
-                                series.setVisible(newVisibility);
-                            }
-                        });
-                        chart.redraw();
-                    }
-                });
-                return newVisibility;
-            });
-        };
+        // Initial view: zoom to the span between the first day of diagnosis and the
+        // last displayed event. Earlier events (e.g. birth) remain reachable via the
+        // navigator/scrollbar.
+        const diagnosisX = -birthMonthInterval;
+        const displayedTimes = [
+            ...adjustedSeries.flatMap((s) => [s?.x, s?.start, s?.end]),
+            ...treatmentData.flatMap((s) => [s?.start, s?.end])
+        ].filter((v) => typeof v === 'number' && Number.isFinite(v));
+        const lastDisplayed = displayedTimes.length > 0 ? Math.max(...displayedTimes) : diagnosisX;
+        const zoomPadding = 2;
+        const initialMin = diagnosisX - zoomPadding;
+        const initialMax = Math.max(lastDisplayed + zoomPadding, initialMin + 12);
+
+        // Grow the chart with the number of rows so expanded sub-treatments always
+        // fit; a fixed height overflows and Highcharts clamps extra rows to the top.
+        const chartHeight = Math.max(600, 200 + newCategories.length * 45);
+
+        // Collapsing/expanding just flips the flag; the effect rebuilds the chart with
+        // or without the detail rows (the parent summary row always stays).
+        const toggleTreatmentsCollapse = () => setIsTreatmentsCollapsed((current) => !current);
 
         // Handles setup of the Highcharts chart with the patient data
         setChartOptions({
             chart: {
-                height: 600,
+                height: chartHeight,
                 marginRight: 50,
                 events: {
                     render() {
                         const chart = this;
 
-                        if (chart.customButton) {
-                            chart.customButton.destroy();
-                        }
+                        // Redraw all collapse/expand toggles from scratch each render.
+                        (chart.customButtons || []).forEach((button) => button?.destroy());
+                        chart.customButtons = [];
 
-                        const treatmentCategoryIndex = chart.yAxis[0].categories.indexOf('Treatments');
-                        const yPosition = chart.yAxis[0].toPixels(treatmentCategoryIndex) - 5;
-                        chart.customButton = chart.renderer
-                            .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
-                            .attr({
-                                fill: '#7cb5ec',
-                                cursor: 'pointer'
-                            })
-                            .add()
-                            .on('click', () => {
-                                toggleTreatmentsCollapse();
+                        // Draws a triangle toggle beside the row for `categoryName`.
+                        // `collapsed` controls its rotation (pointing up when collapsed).
+                        const drawToggle = (categoryName, collapsed, onClick) => {
+                            const categoryIndex = chart.yAxis[0].categories.indexOf(categoryName);
+                            if (categoryIndex < 0) {
+                                return;
+                            }
+                            const yPosition = chart.yAxis[0].toPixels(categoryIndex) - 5;
+                            const button = chart.renderer
+                                .symbol('triangle', chart.plotLeft - 15, yPosition, 10, 10)
+                                .attr({
+                                    fill: '#7cb5ec',
+                                    cursor: 'pointer',
+                                    zIndex: 6
+                                })
+                                .add()
+                                .on('click', onClick);
+
+                            if (collapsed) {
+                                button.attr({
+                                    transform: `rotate(180 ${button.x + 5} ${button.y + 5})`
+                                });
+                            }
+                            chart.customButtons.push(button);
+                        };
+
+                        // Parent toggle collapses/expands the whole Treatments group.
+                        drawToggle('Treatments', isTreatmentsCollapsed, () => toggleTreatmentsCollapse());
+
+                        // Per-treatment toggles reveal each treatment's dated sub-treatments.
+                        if (!isTreatmentsCollapsed) {
+                            subTreatmentParents.forEach(({ name, expanded }) => {
+                                drawToggle(name, !expanded, () => toggleTreatmentExpand(name));
                             });
-
-                        const rotationDeg = isTreatmentsCollapsed ? 180 : 0;
-                        chart.customButton.attr({
-                            transform: `rotate(${rotationDeg} ${chart.customButton.x + 5} ${chart.customButton.y + 5})`
-                        });
+                        }
                     }
                 }
             },
@@ -494,11 +720,20 @@ function Timeline({ data, onEventClick }) {
                 }
             },
             yAxis: {
-                uniqueNames: true,
+                // Place points by their explicit y (row index) rather than by point
+                // name, so the interleaved sub-treatment rows stay in the right order.
+                uniqueNames: false,
                 labels: {
-                    style: {
-                        fontFamily: 'Arial, sans-serif',
-                        fontWeight: 'bold'
+                    useHTML: true,
+                    align: 'left',
+                    // Indent each row by its depth so individual treatments sit under
+                    // the "Treatments" bar and expanded drug rows sit under their
+                    // treatment. Points are placed by explicit y index, so changing
+                    // the label text here doesn't affect row placement.
+                    formatter() {
+                        const depth = categoryDepths[this.pos] || 0;
+                        const label = categoryLabels[this.pos] ?? this.value;
+                        return `<span style="padding-left:${depth * 14}px;font-family:Arial,sans-serif;font-weight:bold">${label}</span>`;
                     }
                 },
                 min: 0,
@@ -511,6 +746,8 @@ function Timeline({ data, onEventClick }) {
                     type: 'linear',
                     tickInterval: 1,
                     minRange: 12,
+                    min: initialMin,
+                    max: initialMax,
                     labels: {
                         align: 'center',
                         formatter: formatHeader('Month'),
@@ -629,6 +866,8 @@ function Timeline({ data, onEventClick }) {
     }, [
         data,
         isTreatmentsCollapsed,
+        expandedTreatments,
+        toggleTreatmentExpand,
         birthMonthInterval,
         onEventClick,
         theme.palette.primary.dark,
@@ -640,7 +879,23 @@ function Timeline({ data, onEventClick }) {
     ]);
 
     // Render the HighchartsReact component with the configured chart options
-    return <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />;
+    return (
+        <>
+            {/* Hidden control the guided tour clicks to demonstrate a systemic-therapy
+                treatment expanding into its per-drug rows. Not a visible/targetable
+                tour step — the step anchors to the timeline container. */}
+            <button
+                type="button"
+                data-tour="timeline-expand-demo"
+                data-active={demoTreatmentExpanded ? 'true' : 'false'}
+                aria-hidden="true"
+                tabIndex={-1}
+                style={{ display: 'none' }}
+                onClick={toggleDemoTreatmentExpand}
+            />
+            <HighchartsReact highcharts={Highcharts} constructorType="ganttChart" options={chartOptions} />
+        </>
+    );
 }
 
 // PropTypes for component validation
