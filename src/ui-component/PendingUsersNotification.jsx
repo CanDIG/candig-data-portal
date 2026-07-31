@@ -34,9 +34,13 @@ function PendingUsersNotification() {
         if (sessionStorage.getItem(SESSION_KEY)) {
             return;
         }
+        // Claim the once-per-session sentinel up front so a concurrent mount
+        // (or React 18 StrictMode's double-invoke in dev) can't both fetch and
+        // double-notify. Trade-off: if this check fails there is no retry this
+        // session, which is fine for a best-effort notification.
+        sessionStorage.setItem(SESSION_KEY, 'true');
         fetchPendingUsers()
             .then((users) => {
-                sessionStorage.setItem(SESSION_KEY, 'true');
                 if (users.length > 0) {
                     setCount(users.length);
                     setOpen(true);

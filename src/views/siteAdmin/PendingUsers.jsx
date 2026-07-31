@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 // mui
 import { Alert, Box, Button, Chip, Stack, Typography } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { IconCheck, IconRefresh, IconX } from '@tabler/icons-react';
 
 // project imports
 import { approvePendingUser, approvePendingUsers, fetchPendingUsers, rejectPendingUser } from '../../store/api';
+import useAdminAction from '../../hooks/useAdminAction';
+import { adminDataGridProps } from '../../utils/adminHelpers';
 
 // ===========================|| PENDING USERS ||=========================== //
 
@@ -17,9 +19,8 @@ import { approvePendingUser, approvePendingUsers, fetchPendingUsers, rejectPendi
 function PendingUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [busy, setBusy] = useState(false);
     const [selection, setSelection] = useState([]);
-    const [feedback, setFeedback] = useState(null);
+    const { busy, feedback, setFeedback, runAction } = useAdminAction();
 
     const loadUsers = useCallback(() => {
         setLoading(true);
@@ -30,31 +31,20 @@ function PendingUsers() {
             })
             .catch((error) => setFeedback({ severity: 'error', text: `Could not load pending users. ${error}` }))
             .finally(() => setLoading(false));
-    }, []);
+    }, [setFeedback]);
 
     useEffect(() => {
         loadUsers();
     }, [loadUsers]);
 
-    // Run an action, refresh the list, and surface a success/error message.
-    const runAction = (action, successText) => {
-        setBusy(true);
-        setFeedback(null);
-        return action()
-            .then(() => {
-                setFeedback({ severity: 'success', text: successText });
-                return loadUsers();
-            })
-            .catch((error) => setFeedback({ severity: 'error', text: `${error}` }))
-            .finally(() => setBusy(false));
-    };
+    // Run an action and refresh the list only if it succeeded.
+    const run = (action, successText) => runAction(action, successText).then((result) => result.ok && loadUsers());
 
-    const handleApprove = (userId) => runAction(() => approvePendingUser(userId), `Approved ${userId}.`);
-    const handleReject = (userId) => runAction(() => rejectPendingUser(userId), `Rejected ${userId}.`);
-    const handleApproveSelected = () =>
-        runAction(() => approvePendingUsers(selection), `Approved ${selection.length} user(s).`);
+    const handleApprove = (userId) => run(() => approvePendingUser(userId), `Approved ${userId}.`);
+    const handleReject = (userId) => run(() => rejectPendingUser(userId), `Rejected ${userId}.`);
+    const handleApproveSelected = () => run(() => approvePendingUsers(selection), `Approved ${selection.length} user(s).`);
     const handleApproveAll = () =>
-        runAction(() => approvePendingUsers(users.map((u) => u.user_name)), `Approved all ${users.length} pending user(s).`);
+        run(() => approvePendingUsers(users.map((u) => u.user_name)), `Approved all ${users.length} pending user(s).`);
 
     const rows = users.map((user) => ({ id: user.user_name, user_name: user.user_name }));
 
@@ -122,13 +112,9 @@ function PendingUsers() {
                     columns={columns}
                     loading={loading}
                     checkboxSelection
-                    disableRowSelectionOnClick
                     rowSelectionModel={selection}
                     onRowSelectionModelChange={(model) => setSelection(model)}
-                    slots={{ toolbar: GridToolbar }}
-                    slotProps={{ toolbar: { showQuickFilter: true } }}
-                    pageSizeOptions={[10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                    {...adminDataGridProps}
                     localeText={{ noRowsLabel: 'No pending users' }}
                 />
             </Box>

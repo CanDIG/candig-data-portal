@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 // mui
 import { Alert, Box, Button, Chip, Stack, TextField, Typography } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { IconRefresh, IconTrash, IconUserPlus } from '@tabler/icons-react';
 
 // project imports
 import { addPreapprovedUsers, fetchPreapprovedUsers, removePreapprovedUser } from '../../store/api';
+import useAdminAction from '../../hooks/useAdminAction';
+import { adminDataGridProps, parseUserList } from '../../utils/adminHelpers';
 
 // ===========================|| PREAPPROVED USERS ||=========================== //
 
@@ -18,9 +20,8 @@ import { addPreapprovedUsers, fetchPreapprovedUsers, removePreapprovedUser } fro
 function PreapprovedUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [busy, setBusy] = useState(false);
     const [input, setInput] = useState('');
-    const [feedback, setFeedback] = useState(null);
+    const { busy, feedback, setFeedback, runAction } = useAdminAction();
 
     const loadUsers = useCallback(() => {
         setLoading(true);
@@ -28,38 +29,28 @@ function PreapprovedUsers() {
             .then((results) => setUsers(results))
             .catch((error) => setFeedback({ severity: 'error', text: `Could not load preapproved users. ${error}` }))
             .finally(() => setLoading(false));
-    }, []);
+    }, [setFeedback]);
 
     useEffect(() => {
         loadUsers();
     }, [loadUsers]);
 
-    const runAction = (action, successText) => {
-        setBusy(true);
-        setFeedback(null);
-        return action()
-            .then(() => {
-                setFeedback({ severity: 'success', text: successText });
-                return loadUsers();
-            })
-            .catch((error) => setFeedback({ severity: 'error', text: `${error}` }))
-            .finally(() => setBusy(false));
-    };
-
     const handleAdd = () => {
-        // Accept commas, semicolons, and any whitespace as separators.
-        const userIds = input
-            .split(/[\s,;]+/)
-            .map((value) => value.trim())
-            .filter(Boolean);
+        const userIds = parseUserList(input);
         if (userIds.length === 0) {
             setFeedback({ severity: 'warning', text: 'Enter at least one user id to add.' });
             return;
         }
-        runAction(() => addPreapprovedUsers(userIds), `Added ${userIds.length} preapproved user(s).`).then(() => setInput(''));
+        runAction(() => addPreapprovedUsers(userIds), `Added ${userIds.length} preapproved user(s).`).then((result) => {
+            if (result.ok) {
+                setInput('');
+                loadUsers();
+            }
+        });
     };
 
-    const handleRemove = (userId) => runAction(() => removePreapprovedUser(userId), `Removed ${userId}.`);
+    const handleRemove = (userId) =>
+        runAction(() => removePreapprovedUser(userId), `Removed ${userId}.`).then((result) => result.ok && loadUsers());
 
     const rows = users.map((user) => ({ id: user.user_name, user_name: user.user_name }));
 
@@ -130,12 +121,8 @@ function PreapprovedUsers() {
                     rows={rows}
                     columns={columns}
                     loading={loading}
-                    slots={{ toolbar: GridToolbar }}
-                    slotProps={{ toolbar: { showQuickFilter: true } }}
-                    pageSizeOptions={[10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                    {...adminDataGridProps}
                     localeText={{ noRowsLabel: 'No preapproved users' }}
-                    disableRowSelectionOnClick
                 />
             </Box>
         </Box>

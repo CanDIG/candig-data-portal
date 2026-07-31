@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // mui
@@ -21,19 +21,7 @@ import { IconDeviceFloppy, IconSearch } from '@tabler/icons-react';
 
 // project imports
 import { addProgram, fetchProgram, fetchProgramDacs, fetchPrograms } from '../../store/api';
-
-// Split a free-text field into a lower-cased, de-duplicated list of user ids
-// (the ingest service stores curators/team members lower-cased).
-function parseUserList(value) {
-    return [
-        ...new Set(
-            value
-                .split(/[\s,;]+/)
-                .map((item) => item.trim().toLowerCase())
-                .filter(Boolean)
-        )
-    ];
-}
+import { parseUserList } from '../../utils/adminHelpers';
 
 // Case-insensitive union of two user id lists.
 function unionUsers(existing, added) {
@@ -63,6 +51,9 @@ function ManagePrograms({ onNavigate, allowedPrograms, showHeading }) {
 
     const [busy, setBusy] = useState(false);
     const [feedback, setFeedback] = useState(null);
+    // Monotonic id so out-of-order lookup responses (look up A then B quickly)
+    // are ignored — only the latest request's result is applied.
+    const lookupSeq = useRef(0);
 
     const loadProgramOptions = useCallback(() => {
         // When restricted to a set of programs (e.g. a program curator managing
@@ -93,6 +84,7 @@ function ManagePrograms({ onNavigate, allowedPrograms, showHeading }) {
                 setResult(null);
                 return;
             }
+            const requestId = (lookupSeq.current += 1);
             setLooking(true);
             setFeedback(null);
             setCuratorsInput('');
@@ -100,6 +92,10 @@ function ManagePrograms({ onNavigate, allowedPrograms, showHeading }) {
             setMode('add');
             Promise.all([fetchProgram(programId), fetchProgramDacs(programId).catch(() => ({}))])
                 .then(([programResponse, dacs]) => {
+                    // Ignore this response if a newer lookup has since started.
+                    if (lookupSeq.current !== requestId) {
+                        return;
+                    }
                     if (programResponse.ok && programResponse.data) {
                         setResult({
                             programId,
@@ -118,10 +114,17 @@ function ManagePrograms({ onNavigate, allowedPrograms, showHeading }) {
                     }
                 })
                 .catch((error) => {
+                    if (lookupSeq.current !== requestId) {
+                        return;
+                    }
                     setFeedback({ severity: 'error', text: `Could not look up ${programId}. ${error}` });
                     setResult(null);
                 })
-                .finally(() => setLooking(false));
+                .finally(() => {
+                    if (lookupSeq.current === requestId) {
+                        setLooking(false);
+                    }
+                });
         },
         [lookupInput, allowedPrograms]
     );

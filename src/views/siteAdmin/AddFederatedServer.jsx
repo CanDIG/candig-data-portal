@@ -7,25 +7,13 @@ import { IconClipboardCheck, IconServerBolt } from '@tabler/icons-react';
 
 // project imports
 import { addFederatedServer } from '../../store/api';
+import { hcProvCodes, provFullNames } from '../../store/constant';
 
-// Canonical Canadian provinces/territories and their CanDIG province codes. The
-// province is chosen from this list and the code is derived from it, so the two
-// can never disagree.
-const PROVINCES = [
-    { name: 'Alberta', code: 'ca-ab' },
-    { name: 'British Columbia', code: 'ca-bc' },
-    { name: 'Manitoba', code: 'ca-mb' },
-    { name: 'New Brunswick', code: 'ca-nb' },
-    { name: 'Newfoundland and Labrador', code: 'ca-nl' },
-    { name: 'Northwest Territories', code: 'ca-nt' },
-    { name: 'Nova Scotia', code: 'ca-ns' },
-    { name: 'Nunavut', code: 'ca-nu' },
-    { name: 'Ontario', code: 'ca-on' },
-    { name: 'Prince Edward Island', code: 'ca-pe' },
-    { name: 'Quebec', code: 'ca-qc' },
-    { name: 'Saskatchewan', code: 'ca-sk' },
-    { name: 'Yukon', code: 'ca-yt' }
-];
+// Canonical Canadian provinces/territories and their CanDIG province codes,
+// derived from the shared constants (name/code aligned by index). The province
+// is chosen from this list and the code is derived from it, so the two can never
+// disagree.
+const PROVINCES = provFullNames.map((name, index) => ({ name, code: hcProvCodes[index] }));
 
 const provinceCodeFor = (name) => PROVINCES.find((p) => p.name === name)?.code || '';
 

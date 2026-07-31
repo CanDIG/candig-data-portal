@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 
 // mui
 import { Alert, Box, Button, Chip, Stack, TextField, Typography } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { IconRefresh, IconTrash, IconUserPlus } from '@tabler/icons-react';
 
 // project imports
 import { addUserToSiteRole, fetchSiteRoleUsers, removeUserFromSiteRole } from '../../store/api';
+import useAdminAction from '../../hooks/useAdminAction';
+import { adminDataGridProps, parseUserList } from '../../utils/adminHelpers';
 
 // ===========================|| SITE ROLE MANAGER ||=========================== //
 
@@ -20,9 +22,8 @@ import { addUserToSiteRole, fetchSiteRoleUsers, removeUserFromSiteRole } from '.
 function SiteRoleManager({ roleType, title, description, addLabel, columnHeader, emptyLabel }) {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [busy, setBusy] = useState(false);
     const [input, setInput] = useState('');
-    const [feedback, setFeedback] = useState(null);
+    const { busy, setBusy, feedback, setFeedback, runAction } = useAdminAction();
 
     const loadMembers = useCallback(() => {
         setLoading(true);
@@ -30,41 +31,46 @@ function SiteRoleManager({ roleType, title, description, addLabel, columnHeader,
             .then((users) => setMembers(users))
             .catch((error) => setFeedback({ severity: 'error', text: `Could not load ${title.toLowerCase()}. ${error}` }))
             .finally(() => setLoading(false));
-    }, [roleType, title]);
+    }, [roleType, title, setFeedback]);
 
     useEffect(() => {
         loadMembers();
     }, [loadMembers]);
 
-    const runAction = (action, successText) => {
-        setBusy(true);
-        setFeedback(null);
-        return action()
-            .then(() => {
-                setFeedback({ severity: 'success', text: successText });
-                return loadMembers();
-            })
-            .catch((error) => setFeedback({ severity: 'error', text: `${error}` }))
-            .finally(() => setBusy(false));
-    };
-
     const handleAdd = () => {
-        const userIds = input
-            .split(/[\s,;]+/)
-            .map((value) => value.trim())
-            .filter(Boolean);
+        const userIds = parseUserList(input);
         if (userIds.length === 0) {
             setFeedback({ severity: 'warning', text: 'Enter at least one user id to add.' });
             return;
         }
-        // The ingest service adds a single user per call, so chain the requests.
-        runAction(
-            () => userIds.reduce((chain, userId) => chain.then(() => addUserToSiteRole(roleType, userId)), Promise.resolve()),
-            `Added ${userIds.length} ${addLabel}.`
-        ).then(() => setInput(''));
+        // The ingest service adds a single user per call. Run them independently
+        // so one failure doesn't abort the rest, and report per-user outcomes.
+        setBusy(true);
+        setFeedback(null);
+        Promise.allSettled(userIds.map((userId) => addUserToSiteRole(roleType, userId)))
+            .then((results) => {
+                const failed = [];
+                results.forEach((result, index) => {
+                    if (result.status === 'rejected') {
+                        failed.push(`${userIds[index]} (${result.reason})`);
+                    }
+                });
+                const succeeded = userIds.length - failed.length;
+                if (failed.length === 0) {
+                    setFeedback({ severity: 'success', text: `Added ${succeeded} ${addLabel}.` });
+                    setInput('');
+                } else if (succeeded === 0) {
+                    setFeedback({ severity: 'error', text: `Failed to add: ${failed.join('; ')}` });
+                } else {
+                    setFeedback({ severity: 'warning', text: `Added ${succeeded} ${addLabel}. Failed: ${failed.join('; ')}` });
+                }
+                return loadMembers();
+            })
+            .finally(() => setBusy(false));
     };
 
-    const handleRemove = (userId) => runAction(() => removeUserFromSiteRole(roleType, userId), `Removed ${userId}.`);
+    const handleRemove = (userId) =>
+        runAction(() => removeUserFromSiteRole(roleType, userId), `Removed ${userId}.`).then((result) => result.ok && loadMembers());
 
     const rows = members.map((userId) => ({ id: userId, user_id: userId }));
 
@@ -141,12 +147,8 @@ function SiteRoleManager({ roleType, title, description, addLabel, columnHeader,
                     rows={rows}
                     columns={columns}
                     loading={loading}
-                    slots={{ toolbar: GridToolbar }}
-                    slotProps={{ toolbar: { showQuickFilter: true } }}
-                    pageSizeOptions={[10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                    {...adminDataGridProps}
                     localeText={{ noRowsLabel: emptyLabel }}
-                    disableRowSelectionOnClick
                 />
             </Box>
         </Box>

@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react';
 
 import { fetchCurrentUserAuthorization } from '../store/api';
-
-// Default site role names, as defined in the OPA site_roles store.
-const SITE_ADMIN_ROLE = 'admin';
-const SITE_CURATOR_ROLE = 'curator';
+import { SITE_ROLES } from '../store/constant';
 
 // ===========================|| SITE ROLES HOOK ||=========================== //
 
 /*
- * Fetch the currently logged-in user's site roles from the ingest service's
- * /user/me endpoint and expose convenient booleans. Used to gate the site
- * admin / site curator dashboards and their menu entries.
+ * Fetch the currently logged-in user's authorization from the ingest service's
+ * /user/me endpoint (shared/cached — see fetchCurrentUserAuthorization) and
+ * expose convenient role booleans. Used to gate the site admin / site curator
+ * dashboards and their menu entries.
  *
- * @returns {{ loading: boolean, roles: string[], isSiteAdmin: boolean, isSiteCurator: boolean, userId: string|undefined }}
+ * Distinguishes a genuine "not authorized" (roles resolved, but empty) from a
+ * fetch failure via the `error` field, so callers can show an error state
+ * separate from the unauthorized state.
+ *
+ * @returns {{ loading, error, roles, userinfo, userId, isSiteAdmin, isSiteCurator }}
  */
 export default function useSiteRoles() {
-    const [state, setState] = useState({ loading: true, roles: [], userId: undefined });
+    const [state, setState] = useState({ loading: true, error: null, roles: [], userinfo: undefined });
 
     useEffect(() => {
         let active = true;
@@ -27,14 +29,15 @@ export default function useSiteRoles() {
                 }
                 setState({
                     loading: false,
+                    error: null,
                     roles: authorization?.site_roles || [],
-                    userId: authorization?.userinfo?.user_name
+                    userinfo: authorization?.userinfo
                 });
             })
             .catch((error) => {
                 console.log(`Could not determine site roles: ${error}`);
                 if (active) {
-                    setState({ loading: false, roles: [], userId: undefined });
+                    setState({ loading: false, error: `${error}`, roles: [], userinfo: undefined });
                 }
             });
         return () => {
@@ -44,7 +47,8 @@ export default function useSiteRoles() {
 
     return {
         ...state,
-        isSiteAdmin: state.roles.includes(SITE_ADMIN_ROLE),
-        isSiteCurator: state.roles.includes(SITE_CURATOR_ROLE)
+        userId: state.userinfo?.user_name,
+        isSiteAdmin: state.roles.includes(SITE_ROLES.ADMIN),
+        isSiteCurator: state.roles.includes(SITE_ROLES.CURATOR)
     };
 }

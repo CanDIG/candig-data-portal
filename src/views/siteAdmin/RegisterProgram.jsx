@@ -7,18 +7,7 @@ import { IconLibraryPlus } from '@tabler/icons-react';
 
 // project imports
 import { addProgram, fetchProgram } from '../../store/api';
-
-// Split a free-text field into a lower-cased, de-duplicated list of user ids.
-function parseUserList(value) {
-    return [
-        ...new Set(
-            value
-                .split(/[\s,;]+/)
-                .map((item) => item.trim().toLowerCase())
-                .filter(Boolean)
-        )
-    ];
-}
+import { parseUserList } from '../../utils/adminHelpers';
 
 // ===========================|| REGISTER PROGRAM ||=========================== //
 

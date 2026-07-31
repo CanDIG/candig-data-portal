@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 
 // mui
 import { Alert, Box, Button, Chip, Stack, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { IconRefresh, IconShieldPlus } from '@tabler/icons-react';
 
 // project imports
 import { fetchAllDacAuthorizations } from '../../store/api';
+import { adminDataGridProps } from '../../utils/adminHelpers';
 
 // Collapse authorizations that share the same program, DAC id, and date range
 // into a single row, listing all their users as a comma-delimited string.
@@ -28,10 +29,11 @@ function groupDacAuthorizations(authorizations) {
             groups.get(key).userSet.add(dac.user_id);
         }
     });
-    return [...groups.values()].map((group, index) => {
+    return [...groups.entries()].map(([key, group]) => {
         const users = [...group.userSet].sort();
         return {
-            id: index,
+            // Stable composite id (program/DAC/date range) rather than an index.
+            id: key,
             program_id: group.program_id,
             dac_id: group.dac_id,
             start_date: group.start_date,
@@ -54,14 +56,14 @@ function groupDacAuthorizations(authorizations) {
 function DacAuthorizationsTable({ onNavigate }) {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [feedback, setFeedback] = useState(null);
 
     const loadDacs = useCallback(() => {
         setLoading(true);
-        setError(null);
+        setFeedback(null);
         return fetchAllDacAuthorizations()
             .then((authorizations) => setRows(groupDacAuthorizations(authorizations)))
-            .catch((err) => setError(`Could not load DAC authorizations. ${err}`))
+            .catch((err) => setFeedback({ severity: 'error', text: `Could not load DAC authorizations. ${err}` }))
             .finally(() => setLoading(false));
     }, []);
 
@@ -107,9 +109,9 @@ function DacAuthorizationsTable({ onNavigate }) {
                 </Button>
             </Stack>
 
-            {error && (
-                <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
-                    {error}
+            {feedback && (
+                <Alert severity={feedback.severity} onClose={() => setFeedback(null)} sx={{ mb: 2 }}>
+                    {feedback.text}
                 </Alert>
             )}
 
@@ -118,12 +120,10 @@ function DacAuthorizationsTable({ onNavigate }) {
                     rows={rows}
                     columns={columns}
                     loading={loading}
-                    slots={{ toolbar: GridToolbar }}
-                    slotProps={{ toolbar: { showQuickFilter: true } }}
+                    {...adminDataGridProps}
                     pageSizeOptions={[10, 25, 50, 100]}
                     initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
                     localeText={{ noRowsLabel: 'No DAC authorizations found' }}
-                    disableRowSelectionOnClick
                 />
             </Box>
         </Box>

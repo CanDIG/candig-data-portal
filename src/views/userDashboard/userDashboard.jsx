@@ -1,31 +1,16 @@
 import { useEffect, useState } from 'react';
 
 // mui
-import {
-    Alert,
-    Box,
-    Chip,
-    CircularProgress,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Stack,
-    Typography,
-    useMediaQuery
-} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { IconId, IconShieldCheck, IconUserCog, IconUsers } from '@tabler/icons-react';
 
 // project imports
-import MainCard from '../../ui-component/cards/MainCard';
-import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
+import DashboardShell from '../../ui-component/DashboardShell';
 import ManagePrograms from '../siteAdmin/ManagePrograms';
 import { fetchCurrentUserAuthorization } from '../../store/api';
-
-// Friendly labels for the global site roles.
-const SITE_ROLE_LABELS = { admin: 'Site Admin', curator: 'Site Curator' };
+import { SITE_ROLES, SITE_ROLE_LABELS } from '../../store/constant';
+import { adminDataGridProps } from '../../utils/adminHelpers';
 
 // Classify a DAC authorization by its date window relative to today.
 function dacStatus(dac) {
@@ -48,12 +33,11 @@ const STATUS_COLORS = { Active: 'success', Upcoming: 'info', Expired: 'default' 
  * programs they curate / are a team member of, and the DAC authorizations they
  * hold. Program curators additionally get a "Manage Programs" section to add
  * team members / curators to the programs they curate. Sourced from the ingest
- * service's /user/me endpoint.
+ * service's /user/me endpoint (shared/cached via fetchCurrentUserAuthorization).
  */
 function UserDashboard() {
     const [state, setState] = useState({ loading: true, error: null, data: null });
     const [activeSection, setActiveSection] = useState('access');
-    const isSmall = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
     useEffect(() => {
         let active = true;
@@ -65,36 +49,10 @@ function UserDashboard() {
         };
     }, []);
 
-    if (state.loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: 300 }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (state.error) {
-        return (
-            <MainCard title="User Dashboard">
-                <Alert severity="error">Could not load your authorizations. {state.error}</Alert>
-            </MainCard>
-        );
-    }
-
     const data = state.data || {};
     const userName = data.userinfo?.user_name || 'Unknown user';
     const siteRoles = data.site_roles || [];
-
-    // This dashboard is for standard users; site admins / curators have their own.
-    if (siteRoles.includes('admin') || siteRoles.includes('curator')) {
-        return (
-            <MainCard title="User Dashboard">
-                <Alert severity="info">
-                    This dashboard is for standard users. Use your Site Admin or Site Curator Dashboard to view and manage authorizations.
-                </Alert>
-            </MainCard>
-        );
-    }
+    const isSiteStaff = siteRoles.includes(SITE_ROLES.ADMIN) || siteRoles.includes(SITE_ROLES.CURATOR);
 
     const programAuth = data.program_authorizations || {};
     const curatorPrograms = programAuth.program_curator || [];
@@ -190,12 +148,8 @@ function UserDashboard() {
                     <DataGrid
                         rows={accessRows}
                         columns={accessColumns}
-                        slots={{ toolbar: GridToolbar }}
-                        slotProps={{ toolbar: { showQuickFilter: true } }}
-                        pageSizeOptions={[10, 25, 50]}
-                        initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                        {...adminDataGridProps}
                         localeText={{ noRowsLabel: 'You are not a curator or team member of any program' }}
-                        disableRowSelectionOnClick
                     />
                 </Box>
 
@@ -213,56 +167,46 @@ function UserDashboard() {
                     <DataGrid
                         rows={dacRows}
                         columns={dacColumns}
-                        slots={{ toolbar: GridToolbar }}
-                        slotProps={{ toolbar: { showQuickFilter: true } }}
-                        pageSizeOptions={[10, 25, 50]}
-                        initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                        {...adminDataGridProps}
                         localeText={{ noRowsLabel: 'You have no DAC authorizations' }}
-                        disableRowSelectionOnClick
                     />
                 </Box>
             </>
         );
     };
 
-    return (
-        <MainCard title="User Dashboard">
-            <DefaultErrorBoundary>
-                <Stack direction="row" alignItems="center" spacing={1} mb={2} flexWrap="wrap" useFlexGap>
-                    <Typography variant="h4">{userName}</Typography>
-                    {siteRoles
-                        .filter((role) => SITE_ROLE_LABELS[role])
-                        .map((role) => (
-                            <Chip key={role} label={SITE_ROLE_LABELS[role]} color="primary" size="small" />
-                        ))}
-                </Stack>
+    // This dashboard is for standard users; site admins / curators have their own.
+    const notice = state.error
+        ? { severity: 'error', message: `Could not load your authorizations. ${state.error}` }
+        : isSiteStaff
+        ? {
+              severity: 'info',
+              message: 'This dashboard is for standard users. Use your Site Admin or Site Curator Dashboard to view and manage authorizations.'
+          }
+        : null;
 
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
-                    <Box sx={{ width: { xs: '100%', md: 260 }, flexShrink: 0 }}>
-                        <List component="nav" sx={{ p: 0 }}>
-                            {sections.map((section) => {
-                                const SectionIcon = section.icon;
-                                return (
-                                    <ListItemButton
-                                        key={section.id}
-                                        selected={currentSection === section.id}
-                                        onClick={() => setActiveSection(section.id)}
-                                        sx={{ borderRadius: 2, mb: 0.5 }}
-                                    >
-                                        <ListItemIcon sx={{ minWidth: 36 }}>
-                                            <SectionIcon size="1.3rem" stroke={1.5} />
-                                        </ListItemIcon>
-                                        <ListItemText primary={section.label} />
-                                    </ListItemButton>
-                                );
-                            })}
-                        </List>
-                    </Box>
-                    {isSmall ? <Divider /> : <Divider orientation="vertical" flexItem />}
-                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>{renderSection()}</Box>
-                </Box>
-            </DefaultErrorBoundary>
-        </MainCard>
+    const header = (
+        <Stack direction="row" alignItems="center" spacing={1} mb={2} flexWrap="wrap" useFlexGap>
+            <Typography variant="h4">{userName}</Typography>
+            {siteRoles
+                .filter((role) => SITE_ROLE_LABELS[role])
+                .map((role) => (
+                    <Chip key={role} label={SITE_ROLE_LABELS[role]} color="primary" size="small" />
+                ))}
+        </Stack>
+    );
+
+    return (
+        <DashboardShell
+            title="User Dashboard"
+            loading={state.loading}
+            notice={notice}
+            header={header}
+            sections={sections}
+            activeSection={currentSection}
+            onSelectSection={setActiveSection}
+            renderSection={renderSection}
+        />
     );
 }
 

@@ -7,6 +7,7 @@ import { IconShieldPlus } from '@tabler/icons-react';
 
 // project imports
 import { addDacAuthorization, fetchPrograms } from '../../store/api';
+import { parseUserList } from '../../utils/adminHelpers';
 
 // ===========================|| ADD DAC AUTHORIZATION ||=========================== //
 
@@ -33,16 +34,6 @@ function AddDacAuthorization({ onSuccess }) {
             .catch((error) => setFeedback({ severity: 'error', text: `Could not load programs. ${error}` }));
     }, []);
 
-    // Split the user id field on commas / semicolons / whitespace, de-duplicated.
-    const parseUserIds = () => [
-        ...new Set(
-            userIds
-                .split(/[\s,;]+/)
-                .map((value) => value.trim())
-                .filter(Boolean)
-        )
-    ];
-
     const validate = (parsedUserIds) => {
         if (parsedUserIds.length === 0 || programIds.length === 0 || !startDate || !endDate) {
             return 'User id(s), at least one program, start date, and end date are required.';
@@ -54,7 +45,7 @@ function AddDacAuthorization({ onSuccess }) {
     };
 
     const handleSubmit = () => {
-        const parsedUserIds = parseUserIds();
+        const parsedUserIds = parseUserList(userIds);
         const validationError = validate(parsedUserIds);
         if (validationError) {
             setFeedback({ severity: 'warning', text: validationError });

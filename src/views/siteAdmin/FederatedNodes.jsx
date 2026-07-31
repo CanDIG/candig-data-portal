@@ -22,17 +22,20 @@ import { IconRefresh, IconServerBolt, IconTrash } from '@tabler/icons-react';
 // project imports
 import { deleteFederatedServer, fetchFederatedServers, fetchNodeStatus } from '../../store/api';
 
-// Build a lookup of node status keyed by (lower-cased) location name. The status
-// probe returns one entry per registered node: { location: { name }, status }.
+// Key a node by location name + province so two nodes sharing a name (but in
+// different provinces) don't collide when merging live status onto the registry.
+const locationKey = (location) => `${(location?.name || '').toLowerCase()}||${(location?.province || '').toLowerCase()}`;
+
+// Build a lookup of node status keyed by location. The status probe returns one
+// entry per registered node: { location: { name, province }, status }.
 function indexStatusByLocation(statusArray) {
-    const byName = new Map();
+    const byLocation = new Map();
     (Array.isArray(statusArray) ? statusArray : []).forEach((entry) => {
-        const name = entry?.location?.name;
-        if (name) {
-            byName.set(name.toLowerCase(), entry);
+        if (entry?.location?.name) {
+            byLocation.set(locationKey(entry.location), entry);
         }
     });
-    return byName;
+    return byLocation;
 }
 
 // Classify a raw fanout status code into a display state. A missing probe entry
@@ -72,7 +75,7 @@ function FederatedNodes({ onNavigate }) {
                 const statusByName = indexStatusByLocation(statusArray);
                 const nextRows = servers.map((server) => {
                     const location = server?.location || {};
-                    const status = classifyStatus(location.name ? statusByName.get(location.name.toLowerCase()) : undefined);
+                    const status = classifyStatus(location.name ? statusByName.get(locationKey(location)) : undefined);
                     return {
                         id: server.id,
                         name: location.name || '',
@@ -98,14 +101,28 @@ function FederatedNodes({ onNavigate }) {
         setConfirmOpen(false);
         setBusy(true);
         setFeedback(null);
-        // The federation service deletes a single server per call, so chain them.
-        selection
-            .reduce((chain, serverId) => chain.then(() => deleteFederatedServer(serverId)), Promise.resolve())
-            .then(() => {
-                setFeedback({ severity: 'success', text: `Unregistered ${selection.length} node(s).` });
+        // The federation service deletes a single server per call. Run them
+        // independently so one failure doesn't abort the rest, report per-node
+        // outcomes, and always refresh so partial deletions are reflected.
+        const ids = [...selection];
+        Promise.allSettled(ids.map((serverId) => deleteFederatedServer(serverId)))
+            .then((results) => {
+                const failed = [];
+                results.forEach((result, index) => {
+                    if (result.status === 'rejected') {
+                        failed.push(`${ids[index]} (${result.reason})`);
+                    }
+                });
+                const succeeded = ids.length - failed.length;
+                if (failed.length === 0) {
+                    setFeedback({ severity: 'success', text: `Unregistered ${succeeded} node(s).` });
+                } else if (succeeded === 0) {
+                    setFeedback({ severity: 'error', text: `Could not unregister: ${failed.join('; ')}` });
+                } else {
+                    setFeedback({ severity: 'warning', text: `Unregistered ${succeeded} node(s). Failed: ${failed.join('; ')}` });
+                }
                 return loadNodes();
             })
-            .catch((error) => setFeedback({ severity: 'error', text: `Could not unregister node(s). ${error}` }))
             .finally(() => setBusy(false));
     };
 

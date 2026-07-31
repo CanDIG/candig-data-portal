@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -180,11 +180,14 @@ function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
-    const { isSiteAdmin, isSiteCurator } = useSiteRoles();
+    const { isSiteAdmin, isSiteCurator, userinfo } = useSiteRoles();
 
     const [open, setOpen] = useState(false);
 
-    const [username, setUsername] = useState('');
+    // Displayed identity comes from the shared (cached) /user/me authorization —
+    // prefer the configured user key (preferred_username) to match the previous
+    // /query/whoami value, falling back to the user_name.
+    const username = userinfo?.preferred_username || userinfo?.user_name || '';
 
     const anchorEl = React.useRef(null);
 
@@ -203,25 +206,6 @@ function ProfileSection() {
 
         setOpen(false);
     };
-
-    // Grab the user key for the logged in user
-    useEffect(() => {
-        fetch(`/query/whoami`)
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                console.log(`whoami could not determine logged in user: ${response}`);
-                throw new Error(`${response}`);
-            })
-            .then((response) => {
-                setUsername(response?.key);
-            })
-            .catch((error) => {
-                console.log(`Whoami error: ${error}`);
-                return '';
-            });
-    }, []);
 
     return (
         <>
