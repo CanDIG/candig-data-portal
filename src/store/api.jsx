@@ -38,7 +38,7 @@ export function fetchOrRelogin(...args) {
 /*
 Generic querying for federation
 */
-export function fetchFederation(path, service, payload = {}, fetchMethod = fetchOrRelogin) {
+export function fetchFederation(path, service, payload = {}, fetchMethod = fetchOrRelogin, extraBody = {}) {
     return fetchMethod(`${federation}/fanout`, {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
@@ -46,7 +46,9 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
             method: 'GET',
             path,
             payload: payload || {},
-            service
+            service,
+            // Extra top-level fanout options (e.g. { unsafe: true }).
+            ...extraBody
         })
     })
         .then((response) => {
@@ -220,4 +222,285 @@ export function fetchRefreshToken() {
             console.log('Error:', error);
             return error;
         });
+}
+
+/* ============================================================================
+ * Site administration (ingest service)
+ *
+ * All of the endpoints below are served by the ingest service and are only
+ * accessible to site administrators. They are consumed by the Site Admin
+ * Dashboard (src/views/siteAdmin). Authentication is handled by the Tyk
+ * gateway via the session cookie, exactly as with the other ingest calls
+ * above, so no Authorization header is set here.
+ * ========================================================================== */
+
+/*
+ * Small helper that unwraps an ingest or federation response as JSON and throws
+ * a useful error (including the server-supplied message when present) on
+ * failure. Shared by every admin helper below.
+ */
+async function unwrapJson(response) {
+    let body;
+    try {
+        body = await response.json();
+    } catch (e) {
+        body = undefined;
+    }
+    if (!response.ok) {
+        const detail = body?.error || body?.message || body?.result || response.statusText;
+        throw new Error(`${response.status}: ${detail}`);
+    }
+    return body;
+}
+
+/*
+ * Return authorization information for the currently logged-in user, including
+ * their site_roles (e.g. "admin", "curator"). Used to gate the dashboards.
+ *
+ * The result is cached at module scope: the user's authorization does not change
+ * within a page load (a re-login reloads the page), and several independent
+ * consumers (useSiteRoles, useSiteAdmin, ProfileSection, the notification badge,
+ * the user dashboard) request it. Caching the promise means they all share a
+ * single /user/me request. A failed request clears the cache so it can be
+ * retried, and `force` bypasses the cache when a fresh read is required.
+ */
+let currentUserAuthorizationPromise = null;
+export function fetchCurrentUserAuthorization({ force = false } = {}) {
+    if (!currentUserAuthorizationPromise || force) {
+        currentUserAuthorizationPromise = fetchOrRelogin(`${INGEST_URL}/user/me`)
+            .then(unwrapJson)
+            .catch((error) => {
+                currentUserAuthorizationPromise = null;
+                throw error;
+            });
+    }
+    return currentUserAuthorizationPromise;
+}
+
+/* ---- Pending users ---- */
+
+export function fetchPendingUsers() {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending`)
+        .then(unwrapJson)
+        .then((data) => data?.results || []);
+}
+
+export function approvePendingUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending/${encodeURIComponent(userId)}`, {
+        method: 'post'
+    }).then(unwrapJson);
+}
+
+export function rejectPendingUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(unwrapJson);
+}
+
+export function approvePendingUsers(userIds) {
+    return fetchOrRelogin(`${INGEST_URL}/user/pending`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userIds)
+    }).then(unwrapJson);
+}
+
+/* ---- Preapproved users ---- */
+
+export function fetchPreapprovedUsers() {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved`)
+        .then(unwrapJson)
+        .then((data) => data?.results || []);
+}
+
+export function addPreapprovedUsers(userIds) {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userIds)
+    }).then(unwrapJson);
+}
+
+export function removePreapprovedUser(userId) {
+    return fetchOrRelogin(`${INGEST_URL}/user/preapproved/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(unwrapJson);
+}
+
+/* ---- Programs ---- */
+
+export function fetchPrograms() {
+    return fetchOrRelogin(`${INGEST_URL}/program`).then(unwrapJson);
+}
+
+export function addProgram(program) {
+    return fetchOrRelogin(`${INGEST_URL}/program`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(program)
+    }).then(unwrapJson);
+}
+
+/*
+ * Fetch a single program's authorization info (program_curators, team_members).
+ * Resolves to { ok, status, data } so callers can distinguish "not found" (404)
+ * from other errors without throwing. Note the ingest service strips
+ * dac_authorizations from this response; use fetchProgramDacs for those.
+ */
+export function fetchProgram(programId) {
+    return fetchOrRelogin(`${INGEST_URL}/program/${encodeURIComponent(programId)}`).then(async (response) => {
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = undefined;
+        }
+        return { ok: response.ok, status: response.status, data };
+    });
+}
+
+/*
+ * Get the DAC authorizations for a single program. The ingest service returns
+ * an object keyed by user id: { <user_id>: { program_id, start_date, end_date } }
+ */
+export function fetchProgramDacs(programId) {
+    return fetchOrRelogin(`${INGEST_URL}/program/${encodeURIComponent(programId)}/dac_authorization`).then(unwrapJson);
+}
+
+/*
+ * Aggregate every DAC authorization across all programs into a flat list of
+ * { program_id, user_id, start_date, end_date } rows, suitable for a table.
+ *
+ * Note: this is a fan-out of one request per program (an N+1 pattern). It is
+ * parallelised and per-program failures are isolated, so it is fine at current
+ * program counts; a bulk "all DAC authorizations" ingest endpoint would be the
+ * fix if program counts grow large (mirrors the query-service PAGE_SIZE caveat).
+ */
+export function fetchAllDacAuthorizations() {
+    return fetchPrograms().then((programs) => {
+        const programIds = Array.isArray(programs) ? programs : [];
+        return Promise.all(
+            programIds.map((programId) =>
+                fetchProgramDacs(programId)
+                    .then((dacs) =>
+                        Object.entries(dacs || {}).map(([userId, dac]) => ({
+                            program_id: dac?.program_id || programId,
+                            user_id: userId,
+                            dac_id: dac?.dac_id || '',
+                            start_date: dac?.start_date || '',
+                            end_date: dac?.end_date || ''
+                        }))
+                    )
+                    .catch((error) => {
+                        console.log(`Could not fetch DAC authorizations for ${programId}: ${error}`);
+                        return [];
+                    })
+            )
+        ).then((nested) => nested.flat());
+    });
+}
+
+/* ---- DAC authorizations ---- */
+
+export function addDacAuthorization(userId, authorizations) {
+    return fetchOrRelogin(`${INGEST_URL}/user/${encodeURIComponent(userId)}/dac_authorization`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(authorizations)
+    }).then(unwrapJson);
+}
+
+/* ---- Site roles ---- */
+
+/*
+ * List the users assigned to a given site role (e.g. "curator", "admin"). The
+ * ingest service returns an object keyed by role type: { <role_type>: [...] },
+ * so we normalise it down to a plain array of user ids.
+ */
+export function fetchSiteRoleUsers(roleType) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}`)
+        .then(unwrapJson)
+        .then((data) => {
+            if (Array.isArray(data)) {
+                return data;
+            }
+            if (data && Array.isArray(data[roleType])) {
+                return data[roleType];
+            }
+            return [];
+        });
+}
+
+export function addUserToSiteRole(roleType, userId) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}/user_id/${encodeURIComponent(userId)}`, {
+        method: 'post'
+    }).then(unwrapJson);
+}
+
+export function removeUserFromSiteRole(roleType, userId) {
+    return fetchOrRelogin(`${INGEST_URL}/site-role/${encodeURIComponent(roleType)}/user_id/${encodeURIComponent(userId)}`, {
+        method: 'delete'
+    }).then(unwrapJson);
+}
+
+/* ============================================================================
+ * Federation node management (federation service)
+ *
+ * Site administrators can register, list, and unregister peer CanDIG nodes.
+ * These endpoints live on the federation service (same base as /fanout) and
+ * are gated to site admins by the gateway, so — as with the ingest calls above
+ * — no Authorization header is set here. There is no dedicated node-liveness
+ * endpoint, so status is derived from an (unsafe) fanout probe; see
+ * fetchNodeStatus below. JSON responses are unwrapped by the shared unwrapJson
+ * helper defined above.
+ * ========================================================================== */
+
+/*
+ * List the peer nodes registered with this node's federation service. Resolves
+ * to an array of { id, url, location: { name, province, province-code } }.
+ */
+export function fetchFederatedServers() {
+    return fetchOrRelogin(`${federation}/servers`)
+        .then(unwrapJson)
+        .then((data) => (Array.isArray(data) ? data : []));
+}
+
+/*
+ * Register a peer CanDIG node. `payload` is the full { server, authentication }
+ * body expected by POST /servers (assembled in AddFederatedServer).
+ */
+export function addFederatedServer(payload) {
+    return fetchOrRelogin(`${federation}/servers`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(unwrapJson);
+}
+
+/*
+ * Unregister a peer node by its server id.
+ */
+export function deleteFederatedServer(serverId) {
+    return fetchOrRelogin(`${federation}/servers/${encodeURIComponent(serverId)}`, {
+        method: 'delete'
+    }).then(unwrapJson);
+}
+
+/*
+ * Probe the reachability of every registered node. The federation service has
+ * no dedicated status endpoint, so we fan a lightweight discovery request out
+ * to all nodes with `unsafe` set: this bypasses the heartbeat's live-server
+ * filter so unreachable nodes are still contacted (and time out / error) rather
+ * than being silently skipped. Resolves to the raw fanout array, one entry per
+ * node: { location: { name, province }, status, message }. This is the same
+ * signal the Summary page uses for its node counts (reusing fetchFederation).
+ */
+export function fetchNodeStatus() {
+    return fetchFederation(
+        'query/discovery',
+        'query',
+        { targetService: 'katsu', targetPath: 'v3/discovery/overview/individual_count' },
+        fetchOrRelogin,
+        { unsafe: true }
+    );
 }

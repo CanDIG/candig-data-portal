@@ -26,6 +26,15 @@ const IngestPortal = Loadable(lazy(() => import('../views/ingest/ingest')));
 // Completeness
 const CompletenessStats = Loadable(lazy(() => import('../views/completeness/completeness')));
 
+// Site Admin Dashboard
+const SiteAdmin = Loadable(lazy(() => import('../views/siteAdmin/siteAdmin')));
+
+// Site Curator Dashboard
+const SiteCurator = Loadable(lazy(() => import('../views/siteCurator/siteCurator')));
+
+// User Dashboard
+const UserDashboard = Loadable(lazy(() => import('../views/userDashboard/userDashboard')));
+
 // Error Pages
 const ErrorNotFoundPage = Loadable(lazy(() => import('../views/errorPages/ErrorNotFoundPage')));
 
@@ -70,6 +79,18 @@ const MainRoutes = {
         {
             path: `${basename}/requestAccess`,
             element: <RequestDataAccessForm />
+        },
+        {
+            path: `${basename}/siteAdmin`,
+            element: <SiteAdmin />
+        },
+        {
+            path: `${basename}/siteCurator`,
+            element: <SiteCurator />
+        },
+        {
+            path: `${basename}/userDashboard`,
+            element: <UserDashboard />
         },
         {
             path: '*',
