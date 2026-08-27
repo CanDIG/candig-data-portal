@@ -93,22 +93,38 @@ function DataVisualization() {
 
         // Check the clinical results to see if we can fill in any censored data with real ones
         Object.entries(clinical).forEach(([siteName, site]) => {
-            Object.keys(site.summary?.[dataKey]).forEach((key) => {
+            // A clinical node can return results without a summary for this category;
+            // Object.keys(undefined) would throw, so skip such nodes.
+            const clinicalSummary = site.summary?.[dataKey];
+            if (!clinicalSummary) {
+                return;
+            }
+            Object.keys(clinicalSummary).forEach((key) => {
                 if (isObject) {
-                    Object.keys(site.summary[dataKey]).forEach((innerKey) => {
-                        if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
-                            const siteValue = site.summary[dataKey][innerKey];
+                    // Discovery may not have returned counts for this node (offline, timed
+                    // out, a 403 from federation, or a name mismatch between the discovery
+                    // and clinical responses). Without a matching per-site bucket there is
+                    // nothing to fill in, and indexing it by program id would throw
+                    // "Cannot read properties of undefined (reading '<program>')".
+                    const discoveryBucket = dataObj[transformer(siteName, key)];
+                    const targetBucket = newDataObj[transformer(siteName, key)];
+                    if (!discoveryBucket || !targetBucket) {
+                        return;
+                    }
+                    Object.keys(clinicalSummary).forEach((innerKey) => {
+                        if (isCensored(discoveryBucket[innerKey])) {
+                            const siteValue = clinicalSummary[innerKey];
                             // Same guard as the numeric path below: only substitute a real
                             // numeric per-site count. A censored per-site value (e.g. "<5")
                             // assigned here would put a string into the stacked-chart series
                             // and trigger Highcharts #14 (string sent to numeric series).
                             if (typeof siteValue === 'number') {
-                                newDataObj[transformer(siteName, key)][innerKey] = siteValue;
+                                targetBucket[innerKey] = siteValue;
                             }
                         }
                     });
                 } else if (isCensored(dataObj[transformer(siteName, key)])) {
-                    const siteValue = site.summary[dataKey][key];
+                    const siteValue = clinicalSummary[key];
                     // Only fold in real numeric per-site counts. If the per-site value is
                     // itself censored (e.g. "<5"), we can't recover the real number, so skip
                     // it — otherwise `0 + "<5"` would produce the string "0<5" and Highcharts
