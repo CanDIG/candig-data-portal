@@ -59,14 +59,30 @@ function DataVisualization() {
 
         let hasCensoredData = false;
         const newDataObj = {};
-        // Copy over the data into a new object, substituting 0 instead of any censored data
+        // Copy over the data into a new object, substituting 0 for any censored value.
+        // Object-valued categories (e.g. patients_per_program) are copied into a fresh
+        // object with their nested counts sanitised, so we neither leak a censored string
+        // ("<5") into a numeric series (Highcharts #14) nor mutate the original counts by
+        // reference. Flagging hasCensoredData here also ensures the censorship caption
+        // appears for object-valued categories, not just scalar ones.
         Object.keys(dataObj).forEach((key) => {
-            newDataObj[key] = 0;
-            if (isCensored(dataObj[key])) {
+            const value = dataObj[key];
+            if (isObject && value && typeof value === 'object') {
+                const inner = {};
+                Object.keys(value).forEach((innerKey) => {
+                    if (isCensored(value[innerKey])) {
+                        inner[innerKey] = 0;
+                        hasCensoredData = true;
+                    } else {
+                        inner[innerKey] = value[innerKey];
+                    }
+                });
+                newDataObj[key] = inner;
+            } else if (isCensored(value)) {
                 newDataObj[key] = 0;
                 hasCensoredData = true;
             } else {
-                newDataObj[key] = dataObj[key];
+                newDataObj[key] = value;
             }
         });
 
@@ -81,11 +97,25 @@ function DataVisualization() {
                 if (isObject) {
                     Object.keys(site.summary[dataKey]).forEach((innerKey) => {
                         if (isCensored(dataObj[transformer(siteName, key)][innerKey])) {
-                            newDataObj[transformer(siteName, key)][innerKey] = site.summary[dataKey][innerKey];
+                            const siteValue = site.summary[dataKey][innerKey];
+                            // Same guard as the numeric path below: only substitute a real
+                            // numeric per-site count. A censored per-site value (e.g. "<5")
+                            // assigned here would put a string into the stacked-chart series
+                            // and trigger Highcharts #14 (string sent to numeric series).
+                            if (typeof siteValue === 'number') {
+                                newDataObj[transformer(siteName, key)][innerKey] = siteValue;
+                            }
                         }
                     });
                 } else if (isCensored(dataObj[transformer(siteName, key)])) {
-                    newDataObj[transformer(site, key)] += site.summary[dataKey][key];
+                    const siteValue = site.summary[dataKey][key];
+                    // Only fold in real numeric per-site counts. If the per-site value is
+                    // itself censored (e.g. "<5"), we can't recover the real number, so skip
+                    // it — otherwise `0 + "<5"` would produce the string "0<5" and Highcharts
+                    // rejects it with error #14 (string sent to numeric series).
+                    if (typeof siteValue === 'number') {
+                        newDataObj[transformer(siteName, key)] += siteValue;
+                    }
                 }
             });
         });

@@ -754,7 +754,9 @@ function Sidebar() {
                 ...old,
                 filter: {
                     ...old.filter,
-                    node: [readerContext?.programs?.map((loc) => loc.location.name) || []]
+                    // Empty exclusion list = include all nodes. Avoids the nested-array
+                    // sentinel that excluded the sole node on single-node deployments.
+                    node: []
                 },
                 reqNum: old.reqNum + 1
             }));
@@ -846,17 +848,21 @@ function Sidebar() {
         setSelectedPrimarySite({});
         setSelectedSystemicTherapy({});
 
-        // Set context writer to include only nodes and programs
-        writerContext({
-            // Set nodes and programs in the filter
+        // Clear every filter and re-run the search. Use an empty node exclusion list
+        // (exclude nothing) rather than the previous nested-array sentinel: SearchHandler
+        // builds exclude_servers via filter.node.join('|'), and on a single-node
+        // deployment the nested shape joined to that node's own name and excluded it,
+        // making the node look like a connection error until a page refresh. Merge onto
+        // the existing query state and bump reqNum so the re-query fires reliably.
+        writerContext((old) => ({
+            ...old,
             filter: {
-                node: [readerContext?.programs?.map((loc) => loc.location.name) || []],
-                exclude_programs: [
-                    readerContext?.programs?.map((loc) => loc?.results?.items?.map((program) => program.program_id)).flat(1) || []
-                ],
-                query: {}
-            }
-        });
+                ...old.filter,
+                node: []
+            },
+            query: {},
+            reqNum: 'reqNum' in old ? old.reqNum + 1 : 0
+        }));
     }
 
     // Set programs to the given list
