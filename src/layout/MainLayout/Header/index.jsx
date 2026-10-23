@@ -7,6 +7,7 @@ import LogoSection from '../LogoSection';
 // import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 import TourButton from './TourButton';
+import PendingUsersNotification from '../../../ui-component/PendingUsersNotification';
 // import NotificationSection from './NotificationSection';
 import MenuList from '../../../MenuList';
 
@@ -81,6 +82,7 @@ function Header({ handleLeftDrawerToggle }) {
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}
+            <PendingUsersNotification />
             <ProfileSection />
         </>
     );

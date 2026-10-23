@@ -110,6 +110,11 @@ export const CLIN_METADATA = [
 // Roles
 export const SITE = import.meta.env.VITE_SITE_LOCATION;
 
+// Global site roles, as defined in the OPA site_roles store. Kept here so the
+// role strings and their display labels live in exactly one place.
+export const SITE_ROLES = { ADMIN: 'admin', CURATOR: 'curator' };
+export const SITE_ROLE_LABELS = { [SITE_ROLES.ADMIN]: 'Site Admin', [SITE_ROLES.CURATOR]: 'Site Curator' };
+
 // API URL where the Dashboard get all the data
 export const BASE_URL = import.meta.env.VITE_CANDIG_SERVER;
 

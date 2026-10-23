@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { useTheme } from '@mui/system';
 import {
@@ -23,9 +24,11 @@ import {
 import MainCard from '../../../../ui-component/cards/MainCard';
 import Transitions from '../../../../ui-component/extended/Transitions';
 import { SITE } from '../../../../store/constant';
+import config from '../../../../config';
+import useSiteRoles from '../../../../hooks/useSiteRoles';
 
 // assets
-import { IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconLogout, IconSettings, IconUser, IconUserShield, IconUsersGroup } from '@tabler/icons-react';
 import siteLogo from '../../../../assets/images/users/siteLogo.png';
 import APITokenButton from './apiTokenbutton';
 
@@ -176,15 +179,25 @@ const PopperRoot = styled(Popper)(({ theme }) => ({
 function ProfileSection() {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
+    const navigate = useNavigate();
+    const { isSiteAdmin, isSiteCurator, userinfo } = useSiteRoles();
 
     const [open, setOpen] = useState(false);
 
-    const [username, setUsername] = useState('');
+    // Displayed identity comes from the shared (cached) /user/me authorization —
+    // prefer the configured user key (preferred_username) to match the previous
+    // /query/whoami value, falling back to the user_name.
+    const username = userinfo?.preferred_username || userinfo?.user_name || '';
 
     const anchorEl = React.useRef(null);
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleNavigate = (path) => {
+        setOpen(false);
+        navigate(path);
     };
     const handleClose = (event) => {
         if (anchorEl?.current?.contains(event.target)) {
@@ -193,25 +206,6 @@ function ProfileSection() {
 
         setOpen(false);
     };
-
-    // Grab the user key for the logged in user
-    useEffect(() => {
-        fetch(`/query/whoami`)
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                console.log(`whoami could not determine logged in user: ${response}`);
-                throw new Error(`${response}`);
-            })
-            .then((response) => {
-                setUsername(response?.key);
-            })
-            .catch((error) => {
-                console.log(`Whoami error: ${error}`);
-                return '';
-            });
-    }, []);
 
     return (
         <>
@@ -287,6 +281,42 @@ function ProfileSection() {
                                         <Divider />
                                         <List component="nav" className={classes.navContainer}>
                                             <APITokenButton classes={classes} customization={customization} />
+                                            {!isSiteAdmin && !isSiteCurator && (
+                                                <ListItemButton
+                                                    className={classes.listItem}
+                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                    onClick={() => handleNavigate(`${config.basename}/userDashboard`)}
+                                                >
+                                                    <ListItemIcon>
+                                                        <IconUser stroke={1.5} size="1.3rem" />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={<Typography variant="body2">User Dashboard</Typography>} />
+                                                </ListItemButton>
+                                            )}
+                                            {isSiteAdmin && (
+                                                <ListItemButton
+                                                    className={classes.listItem}
+                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                    onClick={() => handleNavigate(`${config.basename}/siteAdmin`)}
+                                                >
+                                                    <ListItemIcon>
+                                                        <IconUserShield stroke={1.5} size="1.3rem" />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={<Typography variant="body2">Site Admin Dashboard</Typography>} />
+                                                </ListItemButton>
+                                            )}
+                                            {isSiteCurator && (
+                                                <ListItemButton
+                                                    className={classes.listItem}
+                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                    onClick={() => handleNavigate(`${config.basename}/siteCurator`)}
+                                                >
+                                                    <ListItemIcon>
+                                                        <IconUsersGroup stroke={1.5} size="1.3rem" />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={<Typography variant="body2">Site Curator Dashboard</Typography>} />
+                                                </ListItemButton>
+                                            )}
                                             <ListItemButton
                                                 className={classes.listItem}
                                                 sx={{ borderRadius: `${customization.borderRadius}px` }}
