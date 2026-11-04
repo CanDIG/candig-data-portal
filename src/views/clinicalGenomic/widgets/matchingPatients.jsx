@@ -74,7 +74,8 @@ function MatchingPatientsView() {
                 submitter_donor_id: patient.donor_id,
                 location: patient.location?.name,
                 genomes: (patient.genomes || []).join(', '),
-                transcriptomes: (patient.transcriptomes || []).join(', '),
+                // transcriptomes holds the WTS experiment IDs; the files are its sequence_annotation analyses
+                transcriptomes: (patient.annotations || []).join(', '),
                 reads: (patient.reads || []).join(', '),
                 variants: (patient.variants || []).join(', ')
             }));
