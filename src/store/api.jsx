@@ -58,6 +58,44 @@ export function fetchFederation(path, service, payload = {}, fetchMethod = fetch
         });
 }
 
+/*
+    Build an exclude_servers value that limits a fanout to the single node named location
+    * @param {location} Location name of the node that should receive the request
+    * Resolves to undefined (i.e. send to every node) if the registered servers can't be
+    * fetched, or if location isn't one of them
+*/
+let registeredServers = null;
+export function excludeAllServersExcept(location) {
+    if (!location) {
+        return Promise.resolve(undefined);
+    }
+    if (!registeredServers) {
+        registeredServers = fetchOrRelogin(`${federation}/servers`).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error(`Error while listing federation servers ${response.status}: ${response.statusText}`);
+        });
+        // Don't cache a failure, so the next call retries
+        registeredServers.catch(() => {
+            registeredServers = null;
+        });
+    }
+    return registeredServers
+        .then((servers) => {
+            const names = servers.map((server) => server.location?.name);
+            if (!names.includes(location)) {
+                return undefined;
+            }
+            const others = names.filter((name) => name && name !== location);
+            return others.length > 0 ? others.join('|') : undefined;
+        })
+        .catch((error) => {
+            console.log(error);
+            return undefined;
+        });
+}
+
 /**
  * Fetch federated sub-services by querying the Query microservice.
  *

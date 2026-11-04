@@ -9,7 +9,7 @@ import MainCard from '../../ui-component/cards/MainCard';
 import useClinicalPatientData from './useClinicalPatientData';
 import { formatKey, handleTableSet } from '../../utils/utils';
 import Timeline from './widgets/timeline';
-import { query } from '../../store/api';
+import { excludeAllServersExcept, query } from '../../store/api';
 import DefaultErrorBoundary from '../../ui-component/DefaultErrorBoundary';
 import { SET_MENU } from '../../store/actions';
 import { useTour } from '../../ui-component/tour/TourContext';
@@ -112,30 +112,37 @@ function ClinicalPatientView() {
 
         if (!submitterDonorId) return;
 
-        query({
-            donors: submitterDonorId,
-            genomic_data_types: 'any'
-        }).then((response) => {
-            let allGenomics = [];
-            response.forEach((siteResponse) => {
-                if (siteResponse?.results?.genomic) {
-                    allGenomics = allGenomics.concat(siteResponse.results.genomic);
-                }
+        // Only send the query to the node that holds this patient
+        excludeAllServersExcept(initiallocation)
+            .then((excludeServers) =>
+                query({
+                    donors: submitterDonorId,
+                    genomic_data_types: 'any',
+                    ...(excludeServers && { exclude_servers: excludeServers })
+                })
+            )
+            .then((response) => {
+                let allGenomics = [];
+                response.forEach((siteResponse) => {
+                    if (siteResponse?.results?.genomic) {
+                        allGenomics = allGenomics.concat(siteResponse.results.genomic);
+                    }
+                });
+                const flattenedRows = allGenomics.map((row, idx) => ({
+                    id: idx,
+                    submitter_sample_id: row.submitter_sample_id,
+                    program_id: row.program_id,
+                    variant_count: row.variants_count || 0,
+                    tumour_normal_designation: row.tumour_normal_designation || 'NA',
+                    experiment_id: [...row.genomes, ...row.transcriptomes].join(', ') || 'NA',
+                    genomes: row.genomes.join(', ') || 'NA',
+                    variants: row.variants.join(', ') || 'NA',
+                    reads: row.reads.join(', ') || 'NA',
+                    // transcriptomes holds the WTS experiment IDs; the files are its sequence_annotation analyses
+                    transcriptomes: (row.annotations || []).join(', ') || 'NA'
+                }));
+                setGenomicRows(flattenedRows);
             });
-            const flattenedRows = allGenomics.map((row, idx) => ({
-                id: idx,
-                submitter_sample_id: row.submitter_sample_id,
-                program_id: row.program_id,
-                variant_count: row.variants_count || 0,
-                tumour_normal_designation: row.tumour_normal_designation || 'NA',
-                experiment_id: row.genomes.join(', ') || 'NA',
-                genomes: row.genomes.join(', ') || 'NA',
-                variants: row.variants.join(', ') || 'NA',
-                reads: row.reads.join(', ') || 'NA',
-                transcriptomes: row.transcriptomes.join(', ') || 'NA'
-            }));
-            setGenomicRows(flattenedRows);
-        });
     }, []);
 
     return (

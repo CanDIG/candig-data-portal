@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSidebarWriterContext } from '../../layout/MainLayout/Sidebar/SidebarContext';
-import { fetchFederation } from '../../store/api';
+import { excludeAllServersExcept, fetchFederation } from '../../store/api';
 import PatientSidebar from './widgets/patientSidebar';
 
 /*
@@ -55,7 +55,9 @@ function useClinicalPatientData(patientId, programId, location, forceSelection) 
                 if (programId && patientId) {
                     const url = `v3/authorized/donor_with_clinical_data/program/${programId}/donor/${patientId}`;
 
-                    const result = await fetchFederation(url, 'katsu');
+                    // Only send the request to the node that holds this patient
+                    const excludeServers = await excludeAllServersExcept(location);
+                    const result = await fetchFederation(url, 'katsu', excludeServers ? { exclude_servers: excludeServers } : {});
                     // Extract patientData from the fetched result or use an empty object
                     const matchingObj = result.find((obj) => obj.location?.name === location);
 
